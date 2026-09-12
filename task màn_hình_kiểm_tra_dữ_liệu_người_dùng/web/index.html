@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173f37">
+  <title>AI Interviewer</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/styles.css?v=6">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"><i data-lucide="audio-lines"></i></span>
+      <span class="brand-copy">
+        <strong>AI Interviewer</strong>
+        <small>Phỏng vấn kiến thức bằng giọng nói</small>
+      </span>
+    </div>
+    <div class="header-actions">
+      <button class="candidate-badge" type="button" id="candidateBadge" title="Sửa thông tin cá nhân" hidden>
+        <i data-lucide="user-round"></i>
+        <span>
+          <strong id="candidateBadgeName"></strong>
+          <small id="candidateBadgeMeta"></small>
+        </span>
+        <i data-lucide="pencil"></i>
+      </button>
+      <div class="service-status is-loading" id="serviceStatus" role="status">
+        <span class="status-dot"></span>
+        <span id="serviceStatusText">Đang kết nối</span>
+      </div>
+      <a class="icon-button" href="/api/docs" title="Tài liệu API" aria-label="Tài liệu API">
+        <i data-lucide="book-open"></i>
+      </a>
+      <button class="icon-button" type="button" id="logoutButton" title="Đăng xuất" aria-label="Đăng xuất" hidden>
+        <i data-lucide="log-out"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <section class="auth-screen" id="loginScreen" aria-labelledby="loginTitle">
+      <div class="auth-layout">
+        <div class="auth-context">
+          <span class="auth-mark" aria-hidden="true"><i data-lucide="audio-lines"></i></span>
+          <div>
+            <p class="screen-kicker">Không gian phỏng vấn cá nhân</p>
+            <h1>AI Interviewer</h1>
+            <p>Đăng nhập để quản lý thông tin cá nhân và bắt đầu phiên phỏng vấn bằng giọng nói.</p>
+          </div>
+          <dl class="auth-features">
+            <div><dt><i data-lucide="shield-check"></i> Xử lý local</dt><dd>Dữ liệu âm thanh được xử lý trực tiếp trên máy.</dd></div>
+            <div><dt><i data-lucide="gauge"></i> Tối ưu hiệu năng</dt><dd>Hoạt động trên CPU, không yêu cầu GPU rời.</dd></div>
+          </dl>
+        </div>
+
+        <div class="auth-form-wrap">
+          <form class="auth-form" id="loginForm" novalidate>
+            <div class="auth-form-heading">
+              <p class="screen-kicker">Chào mừng trở lại</p>
+              <h1 id="loginTitle">Đăng nhập</h1>
+              <p>Nhập thông tin tài khoản để tiếp tục.</p>
+            </div>
+
+            <label class="field" for="loginIdentity">
+              <span>Tên đăng nhập hoặc email</span>
+              <span class="input-with-icon">
+                <i data-lucide="user-round" aria-hidden="true"></i>
+                <input id="loginIdentity" name="identity" type="text" minlength="3" maxlength="120" autocomplete="username" placeholder="Nhập tên đăng nhập" data-error-id="loginIdentityError" required>
+              </span>
+              <small class="field-error" id="loginIdentityError" aria-live="polite"></small>
+            </label>
+
+            <label class="field" for="loginPassword">
+              <span>Mật khẩu</span>
+              <span class="input-with-icon password-input">
+                <i data-lucide="lock-keyhole" aria-hidden="true"></i>
+                <input id="loginPassword" name="password" type="password" minlength="8" maxlength="128" autocomplete="current-password" placeholder="Nhập mật khẩu" data-error-id="loginPasswordError" required>
+                <button class="password-toggle" type="button" id="passwordToggle" title="Hiện mật khẩu" aria-label="Hiện mật khẩu">
+                  <i data-lucide="eye"></i>
+                </button>
+              </span>
+              <small class="field-error" id="loginPasswordError" aria-live="polite"></small>
+            </label>
+
+            <div class="form-error" id="loginFormError" role="alert" hidden>
+              <i data-lucide="circle-alert"></i><span>Vui lòng kiểm tra lại thông tin đăng nhập.</span>
+            </div>
+            <button class="primary-button auth-submit" type="submit">
+              <span>Đăng nhập</span><i data-lucide="arrow-right"></i>
+            </button>
+            <p class="auth-privacy"><i data-lucide="laptop-minimal-check"></i> Phiên đăng nhập chỉ được lưu trên thiết bị này.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="onboarding-screen" id="introScreen" aria-labelledby="introTitle" hidden>
+      <div class="progress-nav" aria-label="Tiến trình phỏng vấn">
+        <span class="is-active"><b>01</b> Giới thiệu</span>
+        <span><b>02</b> Thông tin cá nhân</span>
+        <span><b>03</b> Phỏng vấn</span>
+      </div>
+
+      <div class="intro-layout">
+        <div class="intro-copy">
+          <p class="screen-kicker">Bắt đầu phiên phỏng vấn</p>
+          <h1 id="introTitle">AI Interviewer</h1>
+          <p class="intro-lead">Phỏng vấn kiến thức bằng giọng nói với hệ thống nhận dạng được tối ưu để chạy trực tiếp trên máy.</p>
+
+          <div class="value-list" aria-label="Thông tin phiên phỏng vấn">
+            <div>
+              <i data-lucide="shield-check"></i>
+              <span><strong>Xử lý tại thiết bị</strong><small>Âm thanh và transcript không gửi đến dịch vụ bên ngoài.</small></span>
+            </div>
+            <div>
+              <i data-lucide="languages"></i>
+              <span><strong>Tiếng Việt và tiếng Anh</strong><small>Chọn ngôn ngữ hoặc để hệ thống tự nhận dạng.</small></span>
+            </div>
+            <div>
+              <i data-lucide="gauge"></i>
+              <span><strong>Phù hợp nhiều cấu hình máy</strong><small>Có chế độ Nhanh, Cân bằng và Chính xác.</small></span>
+            </div>
+          </div>
+
+          <button class="primary-button intro-action" type="button" id="startButton">
+            <span>Bắt đầu</span><i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+
+        <aside class="readiness-panel" aria-labelledby="readinessTitle">
+          <div class="readiness-heading">
+            <span class="readiness-icon"><i data-lucide="audio-lines"></i></span>
+            <div><p>Trạng thái hệ thống</p><h2 id="readinessTitle">Sẵn sàng phỏng vấn</h2></div>
+          </div>
+          <div class="wave-bars" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <dl class="readiness-data">
+            <div><dt>Model</dt><dd id="introModelName">Đang kiểm tra</dd></div>
+            <div><dt>Thiết bị xử lý</dt><dd id="introRuntimeName">Đang kiểm tra</dd></div>
+            <div><dt>Quyền riêng tư</dt><dd>100% local</dd></div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <section class="onboarding-screen candidate-screen" id="profileScreen" aria-labelledby="profileTitle" hidden>
+      <div class="progress-nav" aria-label="Tiến trình phỏng vấn">
+        <span class="is-complete"><b>01</b> Giới thiệu</span>
+        <span class="is-active"><b>02</b> Thông tin cá nhân</span>
+        <span><b>03</b> Phỏng vấn</span>
+      </div>
+
+      <div class="candidate-layout">
+        <div class="candidate-heading">
+          <p class="screen-kicker">Hồ sơ người dùng</p>
+          <h1 id="profileTitle">Thông tin cá nhân</h1>
+          <p>Cập nhật thông tin dùng cho phiên phỏng vấn hiện tại. Dữ liệu chỉ được giữ trên thiết bị.</p>
+        </div>
+
+        <form class="candidate-form" id="profileForm" novalidate>
+          <div class="form-section-heading">
+            <i data-lucide="id-card"></i>
+            <span><strong>Thông tin cơ bản</strong><small>Các trường có dấu * là bắt buộc</small></span>
+          </div>
+          <div class="form-grid">
+            <label class="field field-wide" for="candidateName">
+              <span>Họ và tên *</span>
+              <input id="candidateName" name="fullName" type="text" minlength="2" maxlength="80" autocomplete="name" placeholder="Nguyễn Văn An" data-error-id="candidateNameError" required>
+              <small class="field-error" id="candidateNameError" aria-live="polite"></small>
+            </label>
+            <label class="field field-wide" for="candidateEmail">
+              <span>Email *</span>
+              <input id="candidateEmail" name="email" type="email" maxlength="120" autocomplete="email" placeholder="an.nguyen@example.edu.vn" data-error-id="candidateEmailError" required>
+              <small class="field-error" id="candidateEmailError" aria-live="polite"></small>
+            </label>
+          </div>
+
+          <div class="form-section-heading form-section-spaced">
+            <i data-lucide="graduation-cap"></i>
+            <span><strong>Thông tin học tập</strong><small>Dùng để xác định ngữ cảnh phỏng vấn</small></span>
+          </div>
+          <div class="form-grid">
+            <label class="field" for="candidateClass">
+              <span>Lớp *</span>
+              <input id="candidateClass" name="className" type="text" minlength="2" maxlength="40" autocomplete="off" placeholder="CNTT-K18A" data-error-id="candidateClassError" required>
+              <small class="field-error" id="candidateClassError" aria-live="polite"></small>
+            </label>
+            <label class="field" for="candidateMajor">
+              <span>Chuyên ngành *</span>
+              <select id="candidateMajor" name="major" data-error-id="candidateMajorError" required>
+                <option value="">Chọn chuyên ngành</option>
+                <option>Công nghệ thông tin</option>
+                <option>Khoa học máy tính</option>
+                <option>Kỹ thuật phần mềm</option>
+                <option>Hệ thống thông tin</option>
+                <option value="Khác">Khác</option>
+              </select>
+              <small class="field-error" id="candidateMajorError" aria-live="polite"></small>
+            </label>
+            <label class="field field-wide" for="candidateSubject">
+              <span>Môn phỏng vấn *</span>
+              <input id="candidateSubject" name="subject" type="text" minlength="2" maxlength="80" autocomplete="off" placeholder="Nhập tên môn học" data-error-id="candidateSubjectError" required>
+              <small class="field-error" id="candidateSubjectError" aria-live="polite"></small>
+            </label>
+          </div>
+
+          <div class="form-error" id="profileFormError" role="alert" hidden>
+            <i data-lucide="circle-alert"></i><span>Vui lòng kiểm tra lại các trường được đánh dấu.</span>
+          </div>
+          <div class="form-actions">
+            <button class="secondary-button" type="button" id="profileBackButton">
+              <i data-lucide="arrow-left"></i><span>Quay lại</span>
+            </button>
+            <button class="primary-button form-submit" type="submit">
+              <span>Tiếp tục phỏng vấn</span><i data-lucide="arrow-right"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="workspace" id="interviewScreen" aria-label="Không gian phỏng vấn" hidden>
+      <section class="input-panel" aria-labelledby="pageTitle">
+      <div class="interview-context">
+        <span>Ứng viên</span>
+        <strong id="workspaceCandidateName">--</strong>
+        <small id="workspaceCandidateMeta">--</small>
+      </div>
+      <div class="panel-heading">
+        <p class="eyebrow">Nhận dạng giọng nói</p>
+        <h1 id="pageTitle">Chuyển âm thanh thành văn bản</h1>
+        <p class="panel-intro">Xử lý trên máy local. Dữ liệu âm thanh không được gửi đến dịch vụ bên ngoài.</p>
+      </div>
+
+      <div class="source-tabs" role="tablist" aria-label="Nguồn âm thanh">
+        <button class="source-tab is-active" type="button" role="tab" aria-selected="true" data-source="file">
+          <i data-lucide="file-audio"></i><span>Tệp âm thanh</span>
+        </button>
+        <button class="source-tab" type="button" role="tab" aria-selected="false" data-source="microphone">
+          <i data-lucide="mic"></i><span>Microphone</span>
+        </button>
+      </div>
+
+      <div class="source-pane" id="filePane">
+        <label class="drop-zone" id="dropZone" for="audioFile">
+          <input id="audioFile" type="file" accept="audio/*,video/*" hidden>
+          <span class="drop-icon" aria-hidden="true"><i data-lucide="upload-cloud"></i></span>
+          <strong>Chọn hoặc kéo tệp vào đây</strong>
+          <span>WAV, MP3, M4A, MP4 hoặc WebM, tối đa 100 MB</span>
+        </label>
+        <div class="selected-file" id="selectedFile" hidden>
+          <div class="file-type"><i data-lucide="music-2"></i></div>
+          <div class="file-details">
+            <strong id="fileName"></strong>
+            <span id="fileMeta"></span>
+          </div>
+          <button class="icon-button quiet" type="button" id="removeFile" title="Bỏ tệp" aria-label="Bỏ tệp">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <audio id="audioPreview" controls hidden></audio>
+      </div>
+
+      <div class="source-pane" id="microphonePane" hidden>
+        <div class="recorder">
+          <canvas id="waveform" width="720" height="128" aria-label="Mức âm thanh microphone"></canvas>
+          <div class="record-state">
+            <span class="record-time" id="recordTime">00:00</span>
+            <span id="recordLabel">Sẵn sàng ghi âm</span>
+          </div>
+          <button class="record-button" type="button" id="recordButton">
+            <i data-lucide="circle"></i><span>Bắt đầu ghi</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <fieldset class="setting-group">
+          <legend>Ngôn ngữ</legend>
+          <div class="segmented" id="languageControl">
+            <button type="button" data-value="vi" class="is-active">Tiếng Việt</button>
+            <button type="button" data-value="en">English</button>
+            <button type="button" data-value="auto">Tự động</button>
+          </div>
+        </fieldset>
+        <fieldset class="setting-group">
+          <legend>Chế độ</legend>
+          <div class="segmented" id="qualityControl">
+            <button type="button" data-model="small" data-beam="1" class="is-active" title="Whisper Small, ưu tiên tốc độ">Nhanh</button>
+            <button type="button" data-model="small" data-beam="3" title="Whisper Small, cân bằng tốc độ và độ chính xác">Cân bằng</button>
+            <button type="button" data-model="medium" data-beam="5" title="Whisper Medium, ưu tiên độ chính xác">Chính xác</button>
+          </div>
+        </fieldset>
+      </div>
+
+      <label class="keyword-field" for="hotwordsInput">
+        <span>Từ khóa ưu tiên <small>Không bắt buộc</small></span>
+        <span class="keyword-input">
+          <i data-lucide="tags" aria-hidden="true"></i>
+          <input id="hotwordsInput" type="text" maxlength="1000" autocomplete="off" placeholder="Tên riêng, thuật ngữ môn học, từ chuyên ngành">
+        </span>
+      </label>
+
+      <button class="primary-button" type="button" id="transcribeButton" disabled>
+        <i data-lucide="sparkles"></i>
+        <span>Chuyển thành văn bản</span>
+      </button>
+
+      <div class="runtime-strip" aria-label="Thông tin model">
+        <div title="Phiên bản mô hình Faster Whisper đang được sử dụng">
+          <span>Mô hình nhận dạng</span><strong id="modelName">--</strong>
+        </div>
+        <div title="Thiết bị và kiểu số dùng để thực hiện suy luận">
+          <span>Thiết bị xử lý</span><strong id="runtimeName">--</strong>
+        </div>
+        <div title="Số luồng CPU tối đa dành cho quá trình nhận dạng">
+          <span>Số luồng xử lý</span><strong id="threadCount">--</strong>
+        </div>
+      </div>
+      </section>
+
+      <section class="output-panel" aria-labelledby="transcriptTitle">
+      <div class="output-header">
+        <div>
+          <p class="eyebrow">Kết quả</p>
+          <h2 id="transcriptTitle">Transcript</h2>
+        </div>
+        <div class="output-actions">
+          <button class="icon-button quiet" type="button" id="copyButton" title="Sao chép transcript" aria-label="Sao chép transcript" disabled>
+            <i data-lucide="copy"></i>
+          </button>
+          <button class="icon-button quiet" type="button" id="downloadButton" title="Tải tệp TXT" aria-label="Tải tệp TXT" disabled>
+            <i data-lucide="download"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="transcript-body" id="transcriptBody">
+        <div class="empty-state" id="emptyState">
+          <span aria-hidden="true"><i data-lucide="text-cursor-input"></i></span>
+          <strong>Chưa có nội dung</strong>
+          <p>Chọn tệp âm thanh hoặc ghi âm để bắt đầu.</p>
+        </div>
+        <div class="processing-state" id="processingState" hidden>
+          <span class="processing-mark"><i data-lucide="audio-waveform"></i></span>
+          <strong>Đang nhận dạng giọng nói</strong>
+          <p>Model đang xử lý âm thanh trên máy local.</p>
+        </div>
+        <article class="transcript-text" id="transcriptText" hidden></article>
+      </div>
+
+      <div class="metrics" id="metrics">
+        <div><span>Thời lượng</span><strong id="durationMetric">--</strong></div>
+        <div><span>Xử lý</span><strong id="processingMetric">--</strong></div>
+        <div><span>RTF</span><strong id="rtfMetric">--</strong></div>
+        <div><span>Ngôn ngữ</span><strong id="languageMetric">--</strong></div>
+      </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="status-bar">
+    <span><i data-lucide="shield-check"></i> Xử lý 100% tại thiết bị</span>
+    <span id="footerStatus">Sẵn sàng</span>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/static/vendor/lucide.min.js"></script>
+  <script type="module" src="/static/app.js?v=10"></script>
+</body>
+</html>

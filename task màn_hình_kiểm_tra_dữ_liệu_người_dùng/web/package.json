@@ -1,0 +1,9 @@
+{
+  "name": "ai-interviewer-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check app.js && node --check router.js && node --check api-client.js"
+  }
+}
