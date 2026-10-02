@@ -1,0 +1,18 @@
+[
+  {
+    "language": "vi",
+    "subject": "Backend Development",
+    "competency": "Thiết kế API",
+    "topic": "REST API",
+    "concept": "Idempotency",
+    "difficulty": "Medium",
+    "question": "Idempotency trong REST API là gì? Cho một ví dụ.",
+    "reference_answer": "Một thao tác idempotent cho cùng kết quả quan sát được khi thực hiện một hay nhiều lần với cùng đầu vào. Ví dụ PUT cập nhật một resource về cùng trạng thái.",
+    "key_points": [
+      "Lặp lại cùng yêu cầu không làm thay đổi thêm trạng thái quan sát được",
+      "PUT thường được thiết kế idempotent"
+    ],
+    "id": "BE_REST_001"
+  }
+]
+

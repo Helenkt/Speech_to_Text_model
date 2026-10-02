@@ -1,0 +1,22 @@
+{
+  "users": [
+    {
+      "username": "gv01",
+      "password": "CHANGE_ME",
+      "full_name": "Nguyễn Văn Giáo Viên",
+      "role": "teacher",
+      "email": "giaovien@example.com",
+      "student_id": "",
+      "active": true
+    },
+    {
+      "username": "sv001",
+      "password": "CHANGE_ME",
+      "full_name": "Trần Minh Ứng Viên",
+      "role": "candidate",
+      "email": "ungvien@example.com",
+      "student_id": "SE000001",
+      "active": true
+    }
+  ]
+}

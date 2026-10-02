@@ -1,0 +1,3 @@
+username,password,full_name,role,email,student_id,active
+gv01,CHANGE_ME,Nguyễn Văn Giáo Viên,teacher,giaovien@example.com,,true
+sv001,CHANGE_ME,Trần Minh Ứng Viên,candidate,ungvien@example.com,SE000001,true

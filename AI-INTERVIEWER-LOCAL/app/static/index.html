@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AI Interview chạy local với hai vai trò Giáo viên và Ứng viên">
+  <title>AI Interview</title>
+  <link rel="stylesheet" href="/static/styles.css?v=1.7.0">
+</head>
+
+<body>
+  <section id="loginView" class="login-view">
+    <div class="login-card">
+      <div class="login-logo">AI</div>
+      <p class="login-kicker">AI INTERVIEW</p>
+      <h1>USER LOGIN</h1>
+      <p class="login-copy">Đăng nhập bằng tài khoản được cung cấp</p>
+      <form id="loginForm" class="login-form">
+        <label class="login-field">
+          <span class="login-icon" aria-hidden="true">●</span>
+          <input id="loginUsername" name="username" autocomplete="username" placeholder="Tên đăng nhập" required>
+        </label>
+        <div class="login-field">
+          <input id="loginPassword" name="password" type="password" autocomplete="current-password"
+            placeholder="Mật khẩu" aria-label="Mật khẩu" required>
+
+          <button id="togglePasswordButton" class="login-icon password-toggle" type="button" aria-label="Hiện mật khẩu"
+            aria-controls="loginPassword" aria-pressed="false">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6S2.5 12 2.5 12Z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+        <button id="loginButton" class="login-button" type="submit">ĐĂNG NHẬP</button>
+      </form>
+      <p id="loginError" class="login-error" role="alert"></p>
+    </div>
+  </section>
+
+  <div id="appShell" class="hidden">
+    <header class="app-header">
+      <a class="brand" href="#" aria-label="AI Interview">
+        <span class="brand-logo">AI</span>
+        <span><strong>Interview</strong></span>
+      </a>
+      <nav id="roleNav" aria-label="Điều hướng chính"></nav>
+      <div class="user-menu">
+        <span><strong id="headerUserName"></strong><small id="headerUserRole"></small></span>
+        <button id="logoutButton" class="button secondary compact" type="button">Đăng xuất</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="teacherDashboardView" class="app-view">
+        <div class="page-heading">
+          <p class="eyebrow">TEACHER WORKSPACE</p>
+          <h1>Quản lý hệ thống Interview</h1>
+          <p>Thay bộ dữ liệu và mở kiểm tra cho ứng viên.</p>
+        </div>
+
+        <div class="teacher-grid">
+          <article class="card import-card">
+            <p class="eyebrow">QUESTION BANK</p>
+            <h2>Thêm hoặc thay bộ câu hỏi</h2>
+            <form id="questionUploadForm">
+              <label class="drop-zone" for="questionFile">
+                <span class="upload-arrow">↑</span>
+                <strong>Chọn file JSON</strong>
+                <small id="questionFileName">Tối đa 25 MB · kiểm tra toàn bộ trước khi ghi</small>
+              </label>
+              <input id="questionFile" class="visually-hidden" type="file" accept=".json,application/json" required>
+              <div class="field-row">
+                <label>Kiểu cập nhật
+                  <select id="questionImportMode">
+                    <option value="upsert">Thêm mới / cập nhật</option>
+                    <option value="replace">Thay dữ liệu cùng ngôn ngữ</option>
+                  </select>
+                </label>
+                <label>Ngôn ngữ mặc định
+                  <select id="questionDefaultLanguage">
+                    <option value="">Lấy từ file</option>
+                    <option value="vi">Tiếng Việt</option>
+                    <option value="en">English</option>
+                  </select>
+                </label>
+              </div>
+              <button id="questionImportButton" class="button primary full" type="submit">Kiểm tra và import</button>
+            </form>
+            <div class="inline-actions">
+              <a class="text-link" href="/api/questions/template">Tải JSON mẫu</a>
+              <button id="reloadDemoButton" class="text-button" type="button">Nạp lại 2 bộ demo</button>
+            </div>
+            <div id="questionBankRows" class="summary-list"></div>
+          </article>
+
+          <article class="card exam-create-card">
+            <p class="eyebrow">REAL INTERVIEW</p>
+            <h2>Quản lý bài Interview</h2>
+            <form id="examForm">
+              <label>Tên bài kiểm tra
+                <input id="examTitle" placeholder="Ví dụ: Kiểm tra Backend đợt 1" required>
+              </label>
+              <div class="field-row">
+                <label>Ngôn ngữ
+                  <select id="examLanguage" required></select>
+                </label>
+                <label>Số câu hỏi
+                  <input id="examQuestionCount" type="number" min="1" max="30" value="5" required>
+                </label>
+              </div>
+              <label>Môn học / lĩnh vực
+                <select id="examSubject" required></select>
+              </label>
+              <div class="field-row">
+                <label>Mã đề thi
+                  <input id="examCode" maxlength="20" placeholder="Ví dụ: AI2026" required>
+                </label>
+                <label>Hình thức
+                  <select id="examAnswerMode" disabled>
+                    <option value="voice" selected>Chỉ ghi âm</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field-row">
+                <label>Thời gian bắt đầu
+                  <input id="examStartsAt" type="datetime-local" step="60" required>
+                </label>
+
+                <label>Thời lượng
+                  <select id="examDuration" required>
+                    <option value="30">30 phút</option>
+                    <option value="60">1 giờ</option>
+                    <option value="90">1 giờ 30 phút</option>
+                    <option value="120" selected>2 giờ</option>
+                    <option value="180">3 giờ</option>
+                    <option value="360">6 giờ</option>
+                    <option value="1440">1 ngày</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="time-shortcuts">
+                <span>Bắt đầu nhanh:</span>
+
+                <button class="button secondary compact" type="button" data-start-offset="0">
+                  Ngay bây giờ
+                </button>
+
+                <button class="button secondary compact" type="button" data-start-offset="15">
+                  Sau 15 phút
+                </button>
+
+                <button class="button secondary compact" type="button" data-start-offset="60">
+                  Sau 1 giờ
+                </button>
+              </div>
+
+              <div class="time-preview" aria-live="polite">
+                <span>Bài Interview sẽ kết thúc lúc</span>
+                <strong id="examEndPreview">—</strong>
+              </div>
+              <fieldset>
+                <legend>Độ khó khởi đầu</legend>
+                <div class="segmented">
+                  <label><input type="radio" name="examDifficulty" value="Easy" checked><span>Dễ</span></label>
+                  <label><input type="radio" name="examDifficulty" value="Medium"><span>Trung bình</span></label>
+                  <label><input type="radio" name="examDifficulty" value="Hard"><span>Khó</span></label>
+                </div>
+              </fieldset>
+              <button id="createExamButton" class="button primary full" type="submit">Tạo và mở đợt Interview →</button>
+            </form>
+          </article>
+        </div>
+
+        <article class="card section-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">EXAM ROUNDS</p>
+              <h2>Các Interview</h2>
+            </div>
+            <button id="refreshExamsButton" class="button secondary compact" type="button">Làm mới</button>
+          </div>
+          <div id="examRows" class="round-list"></div>
+        </article>
+      </section>
+
+      <section id="teacherAccountsView" class="app-view">
+        <div class="page-heading">
+          <p class="eyebrow">ACCOUNT DATA</p>
+          <h1>Quản lý tài khoản</h1>
+          <p>Tài khoản chỉ được thêm bằng file của Giáo viên.</p>
+        </div>
+        <article class="card">
+          <form id="accountUploadForm" class="account-import-form">
+            <label>File tài khoản
+              <input id="accountFile" type="file" accept=".xlsx,.csv,.json" required>
+            </label>
+            <label>Kiểu cập nhật
+              <select id="accountImportMode">
+                <option value="upsert">Thêm mới / cập nhật</option>
+                <option value="replace">Khóa tài khoản không có trong file</option>
+              </select>
+            </label>
+            <button id="accountImportButton" class="button primary" type="submit">Kiểm tra và import</button>
+          </form>
+          <div class="template-links">
+            <span>Tải file mẫu:</span>
+            <a href="/api/teacher/accounts/template/xlsx">Excel</a>
+            <a href="/api/teacher/accounts/template/csv">CSV</a>
+            <a href="/api/teacher/accounts/template/json">JSON</a>
+          </div>
+        </article>
+        <article class="card section-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">USERS</p>
+              <h2>Danh sách tài khoản</h2>
+            </div>
+            <span id="accountCount" class="muted"></span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tài khoản</th>
+                  <th>Họ tên</th>
+                  <th>Vai trò</th>
+                  <th>Email / Mã</th>
+                  <th>Trạng thái</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="accountRows"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="teacherResultsView" class="app-view">
+        <div class="page-heading">
+          <p class="eyebrow">REAL INTERVIEW</p>
+          <h1>Kết quả ứng viên</h1>
+          <p>Kết quả Interview thật chỉ hiển thị cho Giáo viên.</p>
+        </div>
+        <article class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mã đề</th>
+                  <th>Ứng viên</th>
+                  <th>Tiến độ</th>
+                  <th>Điểm</th>
+                  <th>Thời gian</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="teacherResultRows"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="practiceSetupView" class="app-view candidate-centered">
+        <article class="card setup-card">
+          <p class="eyebrow centered">PRACTICE MODE</p>
+          <h1>Tạo phiên luyện tập</h1>
+          <form id="practiceForm">
+            <label>Tên ứng viên
+              <input id="practiceCandidateName" readonly>
+            </label>
+            <div class="field-row">
+              <label>Ngôn ngữ
+                <select id="practiceLanguage" required></select>
+              </label>
+              <label>Số câu hỏi
+                <input id="practiceQuestionCount" type="number" min="1" max="30" value="5" required>
+              </label>
+            </div>
+            <label>Môn / lĩnh vực
+              <select id="practiceSubject"></select>
+            </label>
+            <fieldset>
+              <legend>Độ khó khởi đầu</legend>
+              <div class="segmented">
+                <label><input type="radio" name="practiceDifficulty" value="Easy" checked><span>Dễ</span></label>
+                <label><input type="radio" name="practiceDifficulty" value="Medium"><span>Trung bình</span></label>
+                <label><input type="radio" name="practiceDifficulty" value="Hard"><span>Khó</span></label>
+              </div>
+            </fieldset>
+            <button id="startPracticeButton" class="button primary full" type="submit">Bắt đầu luyện tập →</button>
+          </form>
+          <p class="form-note"> </p>
+        </article>
+      </section>
+
+      <section id="practiceHistoryView" class="app-view">
+        <div class="page-heading">
+          <p class="eyebrow">PRACTICE HISTORY</p>
+          <h1>Lịch sử luyện tập</h1>
+          <p>Xem lại tiến độ, điểm số và báo cáo của các buổi luyện tập trước.</p>
+        </div>
+        <article class="card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">YOUR SESSIONS</p>
+              <h2>Các buổi đã luyện tập</h2>
+            </div>
+            <div class="history-toolbar">
+              <span id="practiceHistoryCount" class="muted"></span>
+              <button id="refreshPracticeHistoryButton" class="button secondary compact" type="button">Làm mới</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Thời gian</th>
+                  <th>Môn học</th>
+                  <th>Tiến độ</th>
+                  <th>Điểm</th>
+                  <th>Trạng thái</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="practiceHistoryRows"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="realSetupView" class="app-view candidate-centered">
+        <article class="card setup-card">
+          <p class="eyebrow centered">OFFICIAL MODE</p>
+          <h1>AI Interview</h1>
+          <form id="examLookupForm">
+            <label>Tên ứng viên
+              <input id="realCandidateName" readonly>
+            </label>
+            <label>Thông tin liên hệ
+              <input id="realCandidateEmail" readonly>
+            </label>
+            <label>Mã đề thi
+              <div class="input-action">
+                <input id="candidateExamCode" maxlength="20" placeholder="Mã đề do Giáo viên cung cấp" required>
+                <button id="checkExamButton" class="button secondary" type="submit">Kiểm tra</button>
+              </div>
+            </label>
+          </form>
+          <div id="examPreview" class="exam-preview hidden">
+            <div><span>Môn học</span><strong id="previewSubject"></strong></div>
+            <div><span>Ngôn ngữ</span><strong id="previewLanguage"></strong></div>
+            <div><span>Số câu</span><strong id="previewQuestionCount"></strong></div>
+            <div><span>Hình thức</span><strong id="previewAnswerMode"></strong></div>
+            <div class="wide"><span>Thời gian</span><strong id="previewTime"></strong></div>
+            <p id="previewAvailability" class="availability wide"></p>
+            <button id="startRealButton" class="button primary full wide" type="button">Bắt đầu Interview →</button>
+          </div>
+          <p class="form-note">Interview chỉ hoạt động khi Giáo viên đã mở kiểm tra và còn trong thời gian cho
+            phép.</p>
+        </article>
+      </section>
+
+      <section id="interviewView" class="app-view">
+        <div class="session-bar card">
+          <div><strong id="sessionMode"></strong><span id="sessionCandidate"></span></div>
+          <div class="progress" aria-label="Tiến độ"><i id="progressBar"></i></div>
+          <span id="sessionProgress"></span>
+        </div>
+        <div class="interview-column">
+          <article class="card question-card">
+            <div class="question-info"><span id="questionDifficulty" class="tag"></span><span id="questionMeta"></span>
+            </div>
+            <h1 id="questionText"></h1>
+          </article>
+          <article id="answerCard" class="card answer-card">
+            <div class="answer-heading">
+              <div>
+                <h2>Câu trả lời của bạn</h2>
+                <p id="answerModeHint"></p>
+              </div>
+              <span id="sttStatus" class="status-pill"></span>
+            </div>
+            <div id="voicePipeline" class="voice-pipeline" aria-label="Tiến trình xử lý giọng nói">
+              <span data-voice-stage="record">Ghi âm</span>
+              <span data-voice-stage="transcribe">Nhận dạng</span>
+              <span data-voice-stage="verify">Xác minh</span>
+            </div>
+            <label class="microphone-field" for="microphoneSelect">
+              <span>Microphone</span>
+              <select id="microphoneSelect" aria-label="Chọn microphone">
+                <option value="">Microphone mặc định</option>
+              </select>
+            </label>
+            <label class="transcript-label" for="answerText">Bản ghi đã xác minh</label>
+            <textarea id="answerText" maxlength="20000" readonly aria-label="Bản chuyển giọng nói"
+              placeholder="Bản chuyển giọng nói sẽ xuất hiện tại đây..."></textarea>
+            <div class="answer-footer">
+              <span id="charCount" class="hidden">0 ký tự</span>
+              <div class="voice-control">
+                <button id="recordButton" class="button secondary" type="button">● Ghi âm</button>
+                <span id="recordingStatus" aria-live="polite">Bấm Ghi âm để trả lời</span>
+              </div>
+              <button id="submitAnswerButton" class="button primary" type="button">Gửi câu trả lời</button>
+            </div>
+          </article>
+          <article id="evaluationCard" class="card evaluation hidden">
+            <div class="score"><strong id="evaluationScore">0</strong><span>/100</span></div>
+            <div class="evaluation-main">
+              <h2 id="evaluationVerdict"></h2>
+              <p id="evaluationFeedback"></p><small id="evaluationEngine"></small>
+            </div>
+            <div id="evaluationReview" class="review-notice hidden"></div>
+            <div class="rubric rubric-four">
+              <div>
+                <h3>Đạt</h3>
+                <ul id="matchedPoints" class="positive-list"></ul>
+              </div>
+              <div>
+                <h3>Đạt một phần</h3>
+                <ul id="partialPoints" class="partial-list"></ul>
+              </div>
+              <div>
+                <h3>Mâu thuẫn</h3>
+                <ul id="contradictedPoints" class="contradicted-list"></ul>
+              </div>
+              <div>
+                <h3>Thiếu</h3>
+                <ul id="missingPoints" class="gap-list"></ul>
+              </div>
+            </div>
+            <div id="pointAssessmentList" class="assessment-list"></div>
+            <button id="nextQuestionButton" class="button primary full" type="button">Câu tiếp theo →</button>
+          </article>
+          <button id="finishPracticeButton" class="button text danger" type="button">Kết thúc buổi luyện tập
+            sớm</button>
+        </div>
+      </section>
+
+      <section id="realCompleteView" class="app-view candidate-centered">
+        <article class="card completion-card">
+          <div class="completion-icon">✓</div>
+          <h1>Đã nộp bài Interview</h1>
+          <p>Hệ thống đã lưu toàn bộ câu trả lời. Kết quả chi tiết sẽ được gửi cho Giáo viên.</p>
+          <button id="backToRealButton" class="button primary" type="button">Quay về trang mã đề</button>
+        </article>
+      </section>
+
+      <section id="reportView" class="app-view">
+        <div class="page-heading report-heading">
+          <div>
+            <p class="eyebrow">INTERVIEW REPORT</p>
+            <h1 id="reportTitle">Báo cáo</h1>
+            <p id="reportMeta"></p>
+          </div>
+          <button id="reportBackButton" class="button secondary" type="button">Quay lại</button>
+        </div>
+        <div class="report-grid">
+          <article class="card report-score"><span>Điểm trung bình</span><strong id="reportScore">0</strong><small
+              id="reportVerdict"></small></article>
+          <article class="card">
+            <h2>Điểm mạnh</h2>
+            <ul id="strengthList" class="positive-list"></ul>
+          </article>
+          <article class="card">
+            <h2>Cần phát triển</h2>
+            <ul id="gapList" class="gap-list"></ul>
+          </article>
+        </div>
+        <article class="card section-card">
+          <h2>Năng lực</h2>
+          <div id="competencyRows"></div>
+        </article>
+        <section class="report-details">
+          <h2>Chi tiết từng câu</h2>
+          <div id="answerDetails"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/app.js?v=1.8.0" defer></script>
+</body>
+
+</html>
