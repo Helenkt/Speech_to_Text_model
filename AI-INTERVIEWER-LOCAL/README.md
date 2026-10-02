@@ -126,6 +126,21 @@ Faster-Whisper. Model chỉ nhận câu hỏi hiện tại và danh sách thuậ
 không nhận đáp án tham chiếu. Server chỉ áp dụng từng cặp thay thế gần âm đã vượt qua
 bộ kiểm tra an toàn, đồng thời giữ cả transcript gốc, bản sửa và danh sách thay đổi.
 
+Sau khi cài Ollama trên máy mới, tải model đúng phiên bản trước khi chạy ứng dụng:
+
+```powershell
+ollama pull qwen2.5:3b
+```
+
+Kiểm tra model đã có trên máy:
+
+```powershell
+ollama list
+```
+
+Lệnh pull chỉ cần chạy một lần khi máy đang có Internet. Sau khi tải xong, Ollama và
+`qwen2.5:3b` có thể chạy hoàn toàn local.
+
 Luồng xử lý:
 
 ```text
@@ -193,3 +208,4 @@ python -m pytest -q
 Database local nằm tại `data/ai_interviewer.db`. Server chỉ lắng nghe `127.0.0.1`, nên mặc định chỉ laptop đang chạy ứng dụng truy cập được.
 
 > Lưu ý: mọi thao tác xóa là vĩnh viễn. Khi Giáo viên xóa một kết quả Interview thật, ứng viên có thể làm lại mã đề nếu đợt vẫn mở. Khi Giáo viên xóa cả đợt Interview, mã đề cùng toàn bộ lượt làm, câu trả lời và báo cáo liên quan cũng bị xóa.
+
