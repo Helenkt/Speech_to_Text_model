@@ -1,8 +1,0 @@
-.venv/
-.cache/
-models/
-__pycache__/
-*.pyc
-*.json
-!config.example.json
-!web/package.json

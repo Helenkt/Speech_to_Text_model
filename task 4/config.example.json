@@ -1,8 +1,0 @@
-{
-  "model": "auto",
-  "language": "vi",
-  "device": "auto",
-  "compute_type": "auto",
-  "beam_size": 1,
-  "vad_filter": true
-}
