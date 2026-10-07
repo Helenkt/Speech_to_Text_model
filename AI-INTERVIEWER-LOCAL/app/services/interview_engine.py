@@ -280,6 +280,11 @@ async def submit_answer(
         )
         if notice not in evaluation["feedback"]:
             evaluation["feedback"] = f'{evaluation["feedback"]} {notice}'.strip()
+    if (
+        session["interview_mode"] == "real"
+        and float(evaluation["score"]) < settings.teacher_review_score_threshold
+    ):
+        evaluation["review_required"] = True
 
     with database(settings.database_path) as connection:
         session = connection.execute(
@@ -299,8 +304,8 @@ async def submit_answer(
                 session_id, sequence_number, question_uid, question_json, answer_text,
                 score, verdict, matched_points_json, missing_points_json, feedback,
                 confidence, evaluator, assessment_json, review_required,
-                rubric_version, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                rubric_version, transcription_id, ai_score, final_score, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 session_id,
@@ -318,6 +323,9 @@ async def submit_answer(
                 json.dumps(evaluation.get("point_assessments", []), ensure_ascii=False),
                 int(bool(evaluation.get("review_required"))),
                 evaluation.get("rubric_version", "key-points-v2"),
+                transcription_id,
+                evaluation["score"],
+                evaluation["score"],
                 _now(),
             ),
         )
@@ -441,8 +449,12 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
             raise InterviewError("Không tìm thấy phiên phỏng vấn")
         answer_rows = connection.execute(
             """
-            SELECT * FROM interview_answers
-            WHERE session_id = ? ORDER BY sequence_number
+            SELECT a.*, t.audio_path, t.audio_sha256, t.audio_mime_type,
+                   t.audio_size, t.raw_text, t.corrected_text
+            FROM interview_answers AS a
+            LEFT JOIN speech_transcriptions AS t
+                ON t.transcription_id = a.transcription_id
+            WHERE a.session_id = ? ORDER BY a.sequence_number
             """,
             (session_id,),
         ).fetchall()
@@ -455,7 +467,8 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
 
     for row in answer_rows:
         question = json.loads(row["question_json"])
-        score = float(row["score"])
+        ai_score = float(row["ai_score"] if row["ai_score"] is not None else row["score"])
+        score = float(row["final_score"] if row["final_score"] is not None else ai_score)
         scores.append(score)
         competency_scores[question["competency"]].append(score)
         matched = json.loads(row["matched_points_json"])
@@ -468,12 +481,28 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
         details.append(
             {
                 "sequence_number": row["sequence_number"],
+                "answer_id": row["answer_id"],
                 "question": public_question(question),
                 "reference_answer": question["reference_answer"],
                 "key_points": question["key_points"],
                 "answer": row["answer_text"],
+                "voice": {
+                    "transcription_id": row["transcription_id"],
+                    "audio_available": bool(row["audio_path"]),
+                    "audio_sha256": row["audio_sha256"],
+                    "audio_mime_type": row["audio_mime_type"],
+                    "audio_size": row["audio_size"],
+                    "raw_transcript": row["raw_text"],
+                    "verified_transcript": row["corrected_text"],
+                },
                 "evaluation": {
                     "score": score,
+                    "ai_score": ai_score,
+                    "final_score": score,
+                    "teacher_score": row["teacher_score"],
+                    "teacher_feedback": row["teacher_feedback"],
+                    "reviewed_by": row["reviewed_by"],
+                    "reviewed_at": row["reviewed_at"],
                     "verdict": row["verdict"],
                     "matched_points": matched,
                     "missing_points": missing,
@@ -558,7 +587,7 @@ def list_practice_history(
                 sessions.created_at,
                 sessions.finished_at,
                 COUNT(answers.answer_id) AS stored_answer_count,
-                AVG(answers.score) AS average_score
+                AVG(COALESCE(answers.final_score, answers.score)) AS average_score
             FROM interview_sessions AS sessions
             LEFT JOIN interview_answers AS answers
                 ON answers.session_id = sessions.session_id
@@ -601,10 +630,19 @@ def delete_practice_history(
             raise InterviewError("Bạn không có quyền xóa lịch sử này")
 
         connection.execute(
-            "DELETE FROM speech_transcriptions WHERE session_id = ?", (session_id,)
+            """
+            DELETE FROM answer_reviews
+            WHERE answer_id IN (
+                SELECT answer_id FROM interview_answers WHERE session_id = ?
+            )
+            """,
+            (session_id,),
         )
         connection.execute(
             "DELETE FROM interview_answers WHERE session_id = ?", (session_id,)
+        )
+        connection.execute(
+            "DELETE FROM speech_transcriptions WHERE session_id = ?", (session_id,)
         )
         connection.execute(
             "DELETE FROM interview_sessions WHERE session_id = ?", (session_id,)
@@ -629,10 +667,19 @@ def delete_real_interview_result(
             raise InterviewError("Chỉ được xóa kết quả Interview thật tại đây")
 
         connection.execute(
-            "DELETE FROM speech_transcriptions WHERE session_id = ?", (session_id,)
+            """
+            DELETE FROM answer_reviews
+            WHERE answer_id IN (
+                SELECT answer_id FROM interview_answers WHERE session_id = ?
+            )
+            """,
+            (session_id,),
         )
         connection.execute(
             "DELETE FROM interview_answers WHERE session_id = ?", (session_id,)
+        )
+        connection.execute(
+            "DELETE FROM speech_transcriptions WHERE session_id = ?", (session_id,)
         )
         connection.execute(
             "DELETE FROM interview_sessions WHERE session_id = ?", (session_id,)

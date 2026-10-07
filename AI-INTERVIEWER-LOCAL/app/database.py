@@ -140,8 +140,17 @@ CREATE TABLE IF NOT EXISTS interview_answers (
     assessment_json TEXT NOT NULL DEFAULT '{}',
     review_required INTEGER NOT NULL DEFAULT 0,
     rubric_version TEXT NOT NULL DEFAULT 'key-points-v2',
+    transcription_id TEXT,
+    ai_score REAL,
+    final_score REAL,
+    teacher_score REAL,
+    teacher_feedback TEXT,
+    reviewed_by INTEGER,
+    reviewed_at TEXT,
     created_at TEXT NOT NULL,
     FOREIGN KEY (session_id) REFERENCES interview_sessions(session_id),
+    FOREIGN KEY (transcription_id) REFERENCES speech_transcriptions(transcription_id),
+    FOREIGN KEY (reviewed_by) REFERENCES users(user_id),
     UNIQUE (session_id, sequence_number)
 );
 
@@ -157,11 +166,40 @@ CREATE TABLE IF NOT EXISTS speech_transcriptions (
     confidence REAL NOT NULL,
     ambient_noise_dbfs REAL,
     metadata_json TEXT NOT NULL,
+    audio_path TEXT,
+    audio_sha256 TEXT,
+    audio_mime_type TEXT,
+    audio_size INTEGER,
     accepted INTEGER NOT NULL DEFAULT 1,
     consumed INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL,
     FOREIGN KEY (session_id) REFERENCES interview_sessions(session_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS generated_questions (
+    generated_id TEXT PRIMARY KEY,
+    question_json TEXT NOT NULL,
+    rubric_result_json TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('draft', 'approved', 'rejected')),
+    generated_by INTEGER NOT NULL,
+    approved_by INTEGER,
+    created_at TEXT NOT NULL,
+    reviewed_at TEXT,
+    FOREIGN KEY (generated_by) REFERENCES users(user_id),
+    FOREIGN KEY (approved_by) REFERENCES users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS answer_reviews (
+    review_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    answer_id INTEGER NOT NULL,
+    previous_final_score REAL NOT NULL,
+    teacher_score REAL NOT NULL,
+    feedback TEXT NOT NULL,
+    reviewed_by INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (answer_id) REFERENCES interview_answers(answer_id),
+    FOREIGN KEY (reviewed_by) REFERENCES users(user_id)
 );
 """
 
@@ -184,6 +222,12 @@ ON interview_sessions (user_id, interview_mode, created_at);
 
 CREATE INDEX IF NOT EXISTS idx_transcriptions_question
 ON speech_transcriptions (session_id, user_id, question_uid, consumed, created_at);
+
+CREATE INDEX IF NOT EXISTS idx_answers_review_queue
+ON interview_answers (review_required, reviewed_at, final_score);
+
+CREATE INDEX IF NOT EXISTS idx_generated_questions_status
+ON generated_questions (status, created_at);
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_one_real_attempt
 ON interview_sessions (exam_round_id, user_id)
@@ -263,11 +307,41 @@ def _migrate_existing_database(connection: sqlite3.Connection) -> None:
         "assessment_json": "TEXT NOT NULL DEFAULT '{}'",
         "review_required": "INTEGER NOT NULL DEFAULT 0",
         "rubric_version": "TEXT NOT NULL DEFAULT 'key-points-v2'",
+        "transcription_id": "TEXT",
+        "ai_score": "REAL",
+        "final_score": "REAL",
+        "teacher_score": "REAL",
+        "teacher_feedback": "TEXT",
+        "reviewed_by": "INTEGER",
+        "reviewed_at": "TEXT",
     }
     for name, definition in answer_additions.items():
         if name not in answer_columns:
             connection.execute(
                 f"ALTER TABLE interview_answers ADD COLUMN {name} {definition}"
+            )
+
+    connection.execute(
+        "UPDATE interview_answers SET ai_score = score WHERE ai_score IS NULL"
+    )
+    connection.execute(
+        "UPDATE interview_answers SET final_score = score WHERE final_score IS NULL"
+    )
+
+    transcription_columns = {
+        row["name"]
+        for row in connection.execute("PRAGMA table_info(speech_transcriptions)").fetchall()
+    }
+    transcription_additions = {
+        "audio_path": "TEXT",
+        "audio_sha256": "TEXT",
+        "audio_mime_type": "TEXT",
+        "audio_size": "INTEGER",
+    }
+    for name, definition in transcription_additions.items():
+        if name not in transcription_columns:
+            connection.execute(
+                f"ALTER TABLE speech_transcriptions ADD COLUMN {name} {definition}"
             )
 
     connection.execute(

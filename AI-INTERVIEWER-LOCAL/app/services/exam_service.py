@@ -240,7 +240,19 @@ def delete_exam_round(database_path: Path, exam_round_id: str) -> dict[str, Any]
 
         connection.execute(
             """
-            DELETE FROM speech_transcriptions
+            DELETE FROM answer_reviews
+            WHERE answer_id IN (
+                SELECT a.answer_id
+                FROM interview_answers AS a
+                JOIN interview_sessions AS s ON s.session_id = a.session_id
+                WHERE s.exam_round_id = ?
+            )
+            """,
+            (exam_round_id,),
+        )
+        connection.execute(
+            """
+            DELETE FROM interview_answers
             WHERE session_id IN (
                 SELECT session_id FROM interview_sessions WHERE exam_round_id = ?
             )
@@ -249,7 +261,7 @@ def delete_exam_round(database_path: Path, exam_round_id: str) -> dict[str, Any]
         )
         connection.execute(
             """
-            DELETE FROM interview_answers
+            DELETE FROM speech_transcriptions
             WHERE session_id IN (
                 SELECT session_id FROM interview_sessions WHERE exam_round_id = ?
             )
@@ -360,7 +372,9 @@ def list_exam_attempts(
             SELECT s.session_id, s.candidate_name, s.status, s.answered_count,
                    s.requested_count, s.created_at, s.finished_at, u.username,
                    u.email, u.student_id, r.exam_code, r.title, r.subject,
-                   ROUND(AVG(a.score), 1) AS average_score
+                   ROUND(AVG(COALESCE(a.final_score, a.score)), 1) AS average_score,
+                   SUM(CASE WHEN a.review_required = 1 AND a.reviewed_at IS NULL
+                            THEN 1 ELSE 0 END) AS pending_review_count
             FROM interview_sessions AS s
             JOIN users AS u ON u.user_id = s.user_id
             JOIN exam_rounds AS r ON r.exam_round_id = s.exam_round_id

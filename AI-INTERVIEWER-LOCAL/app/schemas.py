@@ -41,3 +41,21 @@ class ExamRoundCreateRequest(BaseModel):
 
 class ExamStatusRequest(BaseModel):
     status: Literal["open", "closed"]
+
+
+class QuestionGenerateRequest(BaseModel):
+    language: Literal["vi", "en"] = "vi"
+    subject: str = Field(min_length=1, max_length=200)
+    topic: str | None = Field(default=None, max_length=200)
+    easy_count: int = Field(default=0, ge=0, le=10)
+    medium_count: int = Field(default=0, ge=0, le=10)
+    hard_count: int = Field(default=0, ge=0, le=10)
+
+
+class GeneratedQuestionDecisionRequest(BaseModel):
+    action: Literal["approve", "reject"]
+
+
+class TeacherAnswerReviewRequest(BaseModel):
+    score: float = Field(ge=0, le=100)
+    feedback: str = Field(min_length=1, max_length=2_000)

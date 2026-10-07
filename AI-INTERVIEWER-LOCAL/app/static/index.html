@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="AI Interview chạy local với hai vai trò Giáo viên và Ứng viên">
   <title>AI Interview</title>
-  <link rel="stylesheet" href="/static/styles.css?v=1.7.0">
+  <link rel="stylesheet" href="/static/styles.css?v=1.8.0">
 </head>
 
 <body>
@@ -183,6 +183,113 @@
             <button id="refreshExamsButton" class="button secondary compact" type="button">Làm mới</button>
           </div>
           <div id="examRows" class="round-list"></div>
+        </article>
+      </section>
+
+      <section id="teacherQuestionsView" class="app-view">
+        <div class="page-heading heading-with-status">
+          <div>
+            <p class="eyebrow">QUESTION GOVERNANCE</p>
+            <h1>Ngân hàng câu hỏi</h1>
+            <p>Sinh câu hỏi từ dữ liệu nội bộ, kiểm tra rubric và duyệt trước khi sử dụng.</p>
+          </div>
+          <div class="model-status">
+            <span>Model sinh câu hỏi</span>
+            <strong id="questionModelName">Qwen3:8B</strong>
+            <small>Chỉ dùng nguồn trong hệ thống</small>
+          </div>
+        </div>
+
+        <div class="question-workspace">
+          <article class="card generator-panel">
+            <div class="section-heading compact-heading">
+              <div>
+                <p class="eyebrow">AI GENERATOR</p>
+                <h2>Tạo bộ câu hỏi mới</h2>
+              </div>
+              <span class="status-badge">Cần giảng viên duyệt</span>
+            </div>
+            <form id="questionGeneratorForm">
+              <div class="field-row">
+                <label>Ngôn ngữ
+                  <select id="generatedQuestionLanguage" required></select>
+                </label>
+                <label>Môn học
+                  <select id="generatedQuestionSubject" required></select>
+                </label>
+              </div>
+              <label>Chủ đề cụ thể
+                <input id="generatedQuestionTopic" placeholder="Để trống nếu dùng toàn bộ môn học">
+              </label>
+              <div class="difficulty-counts" aria-label="Số câu theo độ khó">
+                <label><span>Dễ</span><input id="generatedEasyCount" type="number" min="0" max="10" value="1"></label>
+                <label><span>Trung bình</span><input id="generatedMediumCount" type="number" min="0" max="10" value="1"></label>
+                <label><span>Khó</span><input id="generatedHardCount" type="number" min="0" max="10" value="1"></label>
+              </div>
+              <div class="source-policy">
+                <strong>Quy tắc bắt buộc</strong>
+                <span>Bám nguồn nội bộ · Đúng cấp độ Bloom · Có đáp án và key points · Không tự vào đề thi</span>
+              </div>
+              <button id="generateQuestionsButton" class="button primary full" type="submit">Sinh và kiểm tra câu hỏi</button>
+            </form>
+          </article>
+
+          <article class="card generation-summary">
+            <p class="eyebrow">APPROVAL FLOW</p>
+            <h2>Quy trình kiểm soát</h2>
+            <ol class="flow-steps">
+              <li><span>1</span><div><strong>Lấy dữ liệu nguồn</strong><small>Chọn các câu phù hợp trong kho nội bộ.</small></div></li>
+              <li><span>2</span><div><strong>Sinh theo độ khó</strong><small>Qwen3 tạo câu hỏi theo rubric Easy, Medium, Hard.</small></div></li>
+              <li><span>3</span><div><strong>Kiểm định tự động</strong><small>Kiểm tra nguồn, cấu trúc, độ khó và trùng lặp.</small></div></li>
+              <li><span>4</span><div><strong>Giảng viên quyết định</strong><small>Chỉ câu được duyệt mới vào ngân hàng.</small></div></li>
+            </ol>
+          </article>
+        </div>
+
+        <article class="card section-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">REVIEW QUEUE</p>
+              <h2>Câu hỏi chờ duyệt</h2>
+            </div>
+            <div class="toolbar-inline">
+              <select id="generatedQuestionStatus" aria-label="Lọc trạng thái câu hỏi">
+                <option value="draft">Chờ duyệt</option>
+                <option value="approved">Đã duyệt</option>
+                <option value="rejected">Đã từ chối</option>
+                <option value="">Tất cả</option>
+              </select>
+              <button id="refreshGeneratedQuestionsButton" class="button secondary compact" type="button">Làm mới</button>
+            </div>
+          </div>
+          <div id="generatedQuestionRows" class="generated-question-list"></div>
+        </article>
+      </section>
+
+      <section id="teacherReviewsView" class="app-view">
+        <div class="page-heading heading-with-status">
+          <div>
+            <p class="eyebrow">HUMAN REVIEW</p>
+            <h1>Chấm lại câu trả lời</h1>
+            <p>Nghe voice gốc, đối chiếu bản ghi và quyết định điểm cuối cùng.</p>
+          </div>
+          <div class="review-threshold">
+            <span>Ngưỡng chuyển giảng viên</span>
+            <strong id="reviewThresholdValue">Dưới 50 điểm</strong>
+          </div>
+        </div>
+        <article class="card section-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">PENDING ANSWERS</p>
+              <h2>Hàng chờ cần xử lý</h2>
+            </div>
+            <div class="toolbar-inline">
+              <span id="reviewQueueCount" class="muted"></span>
+              <button id="refreshReviewQueueButton" class="button secondary compact" type="button">Làm mới</button>
+            </div>
+          </div>
+          <div id="teacherReviewRows" class="teacher-review-list"></div>
         </article>
       </section>
 
@@ -388,12 +495,16 @@
               <span data-voice-stage="transcribe">Nhận dạng</span>
               <span data-voice-stage="verify">Xác minh</span>
             </div>
-            <label class="microphone-field" for="microphoneSelect">
-              <span>Microphone</span>
-              <select id="microphoneSelect" aria-label="Chọn microphone">
-                <option value="">Microphone mặc định</option>
-              </select>
-            </label>
+            <div class="microphone-tools">
+              <label class="microphone-field" for="microphoneSelect">
+                <span>Microphone</span>
+                <select id="microphoneSelect" aria-label="Chọn microphone">
+                  <option value="">Microphone mặc định</option>
+                </select>
+              </label>
+              <button id="checkMicrophoneButton" class="button secondary" type="button">Kiểm tra mic</button>
+            </div>
+            <div id="microphoneCheckResult" class="microphone-result hidden" aria-live="polite"></div>
             <label class="transcript-label" for="answerText">Bản ghi đã xác minh</label>
             <textarea id="answerText" maxlength="20000" readonly aria-label="Bản chuyển giọng nói"
               placeholder="Bản chuyển giọng nói sẽ xuất hiện tại đây..."></textarea>

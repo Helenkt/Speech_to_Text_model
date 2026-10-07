@@ -25,6 +25,7 @@ class Settings:
     static_dir: Path
     demo_data_dir: Path
     whisper_download_root: Path
+    audio_storage_dir: Path | None = None
     auto_seed_demo: bool = True
     evaluator_mode: str = "auto"
     ollama_base_url: str = "http://127.0.0.1:11434"
@@ -32,12 +33,14 @@ class Settings:
     ollama_timeout_seconds: float = 120.0
     ollama_evaluator_timeout_seconds: float = 20.0
     ollama_keep_alive: str = "30m"
+    question_generation_model: str = "qwen3:8b"
     whisper_model: str = "small"
     whisper_device: str = "cpu"
     whisper_compute_type: str = "int8"
     transcript_correction_mode: str = "auto"
     stt_min_confidence: float = 0.48
     stt_max_ambient_noise_dbfs: float = -28.0
+    teacher_review_score_threshold: float = 50.0
     max_upload_mb: int = 25
 
     @classmethod
@@ -63,6 +66,9 @@ class Settings:
             whisper_download_root=_resolve_path(
                 root, os.getenv("WHISPER_DOWNLOAD_ROOT", "models/whisper")
             ),
+            audio_storage_dir=_resolve_path(
+                root, os.getenv("AUDIO_STORAGE_DIR", "data/audio")
+            ),
             auto_seed_demo=_as_bool(os.getenv("AUTO_SEED_DEMO"), True),
             evaluator_mode=evaluator_mode,
             ollama_base_url=os.getenv(
@@ -74,6 +80,9 @@ class Settings:
                 os.getenv("OLLAMA_EVALUATOR_TIMEOUT_SECONDS", "20")
             ),
             ollama_keep_alive=os.getenv("OLLAMA_KEEP_ALIVE", "30m").strip() or "30m",
+            question_generation_model=os.getenv(
+                "QUESTION_GENERATION_MODEL", "qwen3:8b"
+            ).strip() or "qwen3:8b",
             whisper_model=os.getenv("WHISPER_MODEL", "auto").strip().lower(),
             whisper_device=os.getenv("WHISPER_DEVICE", "auto").strip().lower(),
             whisper_compute_type=os.getenv(
@@ -86,6 +95,10 @@ class Settings:
             stt_max_ambient_noise_dbfs=min(
                 -5.0,
                 max(-80.0, float(os.getenv("STT_MAX_AMBIENT_NOISE_DBFS", "-28"))),
+            ),
+            teacher_review_score_threshold=min(
+                100.0,
+                max(0.0, float(os.getenv("TEACHER_REVIEW_SCORE_THRESHOLD", "50"))),
             ),
             max_upload_mb=max(1, int(os.getenv("MAX_UPLOAD_MB", "25"))),
         )

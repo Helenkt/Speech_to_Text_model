@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import uuid
 from datetime import datetime, timezone
@@ -62,23 +63,67 @@ def save_transcription(
     confidence: float,
     ambient_noise_dbfs: float | None,
     metadata: dict[str, Any],
+    audio_storage_dir: Path | None = None,
+    audio_content: bytes | None = None,
+    audio_filename: str | None = None,
+    audio_mime_type: str | None = None,
 ) -> str:
     transcription_id = str(uuid.uuid4())
-    with database(database_path) as connection:
-        connection.execute(
-            """
-            INSERT INTO speech_transcriptions (
-                transcription_id, session_id, user_id, question_uid, raw_text,
-                corrected_text, model, runtime, confidence, ambient_noise_dbfs,
-                metadata_json, accepted, consumed, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0, ?)
-            """,
-            (
-                transcription_id, session_id, user_id, question_uid, raw_text,
-                corrected_text, model, runtime, confidence, ambient_noise_dbfs,
-                json.dumps(metadata, ensure_ascii=False), _now(),
-            ),
-        )
+    relative_audio_path: str | None = None
+    audio_sha256: str | None = None
+    audio_size: int | None = None
+    saved_audio_path: Path | None = None
+
+    if audio_content:
+        allowed_extensions = {".webm", ".wav", ".mp3", ".m4a", ".ogg", ".flac", ".mp4"}
+        extension = Path(audio_filename or "recording.webm").suffix.lower()
+        if extension not in allowed_extensions:
+            extension = ".webm"
+        storage_root = (audio_storage_dir or database_path.parent / "audio").resolve()
+        session_dir = storage_root / session_id
+        session_dir.mkdir(parents=True, exist_ok=True)
+        saved_audio_path = session_dir / f"{transcription_id}{extension}"
+        temporary_path = saved_audio_path.with_suffix(saved_audio_path.suffix + ".tmp")
+        temporary_path.write_bytes(audio_content)
+        temporary_path.replace(saved_audio_path)
+        relative_audio_path = saved_audio_path.relative_to(storage_root).as_posix()
+        audio_sha256 = hashlib.sha256(audio_content).hexdigest()
+        audio_size = len(audio_content)
+
+    try:
+        with database(database_path) as connection:
+            connection.execute(
+                """
+                INSERT INTO speech_transcriptions (
+                    transcription_id, session_id, user_id, question_uid, raw_text,
+                    corrected_text, model, runtime, confidence, ambient_noise_dbfs,
+                    metadata_json, audio_path, audio_sha256, audio_mime_type,
+                    audio_size, accepted, consumed, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0, ?)
+                """,
+                (
+                    transcription_id,
+                    session_id,
+                    user_id,
+                    question_uid,
+                    raw_text,
+                    corrected_text,
+                    model,
+                    runtime,
+                    confidence,
+                    ambient_noise_dbfs,
+                    json.dumps(metadata, ensure_ascii=False),
+                    relative_audio_path,
+                    audio_sha256,
+                    audio_mime_type,
+                    audio_size,
+                    _now(),
+                ),
+            )
+    except Exception:
+        if saved_audio_path:
+            saved_audio_path.unlink(missing_ok=True)
+        raise
     return transcription_id
 
 

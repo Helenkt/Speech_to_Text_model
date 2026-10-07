@@ -1,0 +1,138 @@
+{
+  "rubric_id": "question-generation-v1",
+  "name": "Rubric kiểm định câu hỏi do AI sinh",
+  "version": "1.0.0",
+  "purpose": "Bảo đảm câu hỏi bám nguồn nội bộ và tăng độ khó theo thứ tự Easy -> Medium -> Hard.",
+  "approved_sources": [
+    "data/question_bank_vi.json",
+    "data/question_bank_en.json"
+  ],
+  "generation_policy": {
+    "external_knowledge_allowed": false,
+    "source_question_ids_required": true,
+    "one_primary_learning_objective": true,
+    "answer_must_be_derivable_from_sources": true,
+    "real_exam_requires_teacher_approval": true,
+    "practice_auto_approval_min_score": 85,
+    "teacher_review_min_score": 75,
+    "duplicate_similarity_threshold": 0.9
+  },
+  "hard_gates": [
+    {
+      "id": "G1_SOURCE",
+      "rule": "Có ít nhất một source_question_id hợp lệ và mọi nội dung đều suy ra được từ nguồn đã duyệt."
+    },
+    {
+      "id": "G2_SCHEMA",
+      "rule": "Đủ câu hỏi, đáp án tham chiếu, key_points, mục tiêu học tập và bằng chứng độ khó."
+    },
+    {
+      "id": "G3_ALIGNMENT",
+      "rule": "Câu hỏi, đáp án tham chiếu và key_points cùng kiểm tra một mục tiêu học tập chính."
+    },
+    {
+      "id": "G4_DIFFICULTY",
+      "rule": "Thông số độ khó nằm đúng cấu hình Easy, Medium hoặc Hard; không gắn nhãn khó chỉ vì câu dài hoặc nhiều thuật ngữ."
+    },
+    {
+      "id": "G5_NO_LEAKAGE",
+      "rule": "Câu hỏi không chứa nguyên đáp án hoặc tiết lộ trực tiếp toàn bộ key_points."
+    },
+    {
+      "id": "G6_UNIQUENESS",
+      "rule": "Không trùng hoặc gần trùng câu đã dùng trong cùng phiên phỏng vấn."
+    },
+    {
+      "id": "G7_ORAL_SUITABILITY",
+      "rule": "Câu hỏi có thể hiểu khi nghe một lần và có thể trả lời bằng lời nói trong thời lượng quy định."
+    }
+  ],
+  "difficulty_levels": {
+    "Easy": {
+      "rank": 1,
+      "bloom_levels": ["remember", "understand"],
+      "concept_count": {"min": 1, "max": 1},
+      "reasoning_steps": {"min": 1, "max": 1},
+      "constraint_count": {"min": 0, "max": 1},
+      "expected_answer_seconds": {"min": 20, "max": 45},
+      "key_points": {"min": 2, "max": 3},
+      "question_intents": ["define", "identify", "describe", "give_basic_example"],
+      "description": "Nhớ hoặc giải thích một khái niệm nền tảng; không yêu cầu chuỗi suy luận hay đánh đổi phức tạp."
+    },
+    "Medium": {
+      "rank": 2,
+      "bloom_levels": ["apply", "analyze"],
+      "concept_count": {"min": 1, "max": 2},
+      "reasoning_steps": {"min": 2, "max": 3},
+      "constraint_count": {"min": 1, "max": 2},
+      "expected_answer_seconds": {"min": 45, "max": 90},
+      "key_points": {"min": 3, "max": 4},
+      "question_intents": ["apply", "compare", "diagnose", "explain_why"],
+      "description": "Áp dụng kiến thức vào tình huống, so sánh hoặc phân tích nguyên nhân với một đến hai ràng buộc."
+    },
+    "Hard": {
+      "rank": 3,
+      "bloom_levels": ["analyze", "evaluate", "create"],
+      "concept_count": {"min": 2, "max": 4},
+      "reasoning_steps": {"min": 3, "max": 5},
+      "constraint_count": {"min": 2, "max": 4},
+      "expected_answer_seconds": {"min": 90, "max": 180},
+      "key_points": {"min": 4, "max": 6},
+      "question_intents": ["design", "justify", "evaluate_tradeoffs", "analyze_failure", "propose_counterexample"],
+      "description": "Tổng hợp nhiều khái niệm, đánh giá đánh đổi hoặc thiết kế giải pháp có ràng buộc và phải giải thích quyết định."
+    }
+  },
+  "scoring_dimensions": [
+    {"id": "source_grounding", "name": "Bám nguồn đã duyệt", "weight": 20},
+    {"id": "learning_objective", "name": "Mục tiêu học tập rõ ràng", "weight": 10},
+    {"id": "difficulty_alignment", "name": "Đúng cấp độ khó", "weight": 25},
+    {"id": "reference_correctness", "name": "Đáp án tham chiếu chính xác", "weight": 15},
+    {"id": "key_points_quality", "name": "Key points đủ và chấm được", "weight": 10},
+    {"id": "clarity_oral", "name": "Rõ ràng khi phỏng vấn bằng giọng nói", "weight": 10},
+    {"id": "language_quality", "name": "Ngôn ngữ và thuật ngữ đúng", "weight": 5},
+    {"id": "uniqueness", "name": "Không trùng lặp", "weight": 5}
+  ],
+  "progression": {
+    "default_start": "Easy",
+    "promotion_score": 80,
+    "demotion_score": 45,
+    "minimum_evaluation_confidence": 0.65,
+    "maximum_rank_change": 1,
+    "allowed_transitions": {
+      "Easy": ["Easy", "Medium"],
+      "Medium": ["Easy", "Medium", "Hard"],
+      "Hard": ["Medium", "Hard"]
+    },
+    "rules": [
+      "Điểm >= 80 và confidence >= 0.65: tăng tối đa một cấp.",
+      "Điểm từ 45 đến dưới 80: giữ nguyên cấp và đổi góc hỏi.",
+      "Điểm < 45: giảm tối đa một cấp và hỏi chẩn đoán lại khái niệm chưa hiểu.",
+      "Không được nhảy trực tiếp từ Easy lên Hard.",
+      "Không hỏi lại cùng câu hoặc cùng cách diễn đạt trong một phiên."
+    ]
+  },
+  "required_output_fields": [
+    "id",
+    "language",
+    "subject",
+    "competency",
+    "topic",
+    "concept",
+    "difficulty",
+    "bloom_level",
+    "learning_objective",
+    "question",
+    "reference_answer",
+    "key_points",
+    "source_question_ids",
+    "source_evidence",
+    "difficulty_evidence"
+  ],
+  "difficulty_evidence_fields": [
+    "concept_count",
+    "reasoning_steps",
+    "constraint_count",
+    "expected_answer_seconds",
+    "justification"
+  ]
+}

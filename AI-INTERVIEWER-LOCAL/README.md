@@ -130,6 +130,7 @@ Sau khi cài Ollama trên máy mới, tải model đúng phiên bản trước k
 
 ```powershell
 ollama pull qwen2.5:3b
+ollama pull qwen3:8b
 ```
 
 Kiểm tra model đã có trên máy:
@@ -140,6 +141,10 @@ ollama list
 
 Lệnh pull chỉ cần chạy một lần khi máy đang có Internet. Sau khi tải xong, Ollama và
 `qwen2.5:3b` có thể chạy hoàn toàn local.
+
+`qwen2.5:3b` tiếp tục làm nhiệm vụ sửa transcript và chấm rubric. `qwen3:8b`
+được dùng riêng để sinh câu hỏi có cấu trúc vì tác vụ này cần khả năng tuân thủ schema
+và lập luận tốt hơn. Có thể đổi model bằng biến `QUESTION_GENERATION_MODEL`.
 
 Luồng xử lý:
 
@@ -183,6 +188,52 @@ Giáo viên có hai lựa chọn:
 Hệ thống kiểm tra toàn bộ file trước khi ghi. Nếu có một câu sai cấu trúc, toàn bộ lần import bị hủy.
 Mỗi ngôn ngữ hiện có 900 câu, chia đều 300 câu cho từng mức Easy, Medium và Hard.
 
+### Rubric sinh câu hỏi bằng LLM
+
+Quy tắc kiểm định câu hỏi do LLM sinh nằm trong
+`data/question_generation_rubric.json`; bản giải thích để đọc và trình bày nằm trong
+`QUESTION_GENERATION_RUBRIC.md`. Model chỉ được nhận các câu nguồn đã duyệt, không
+được bổ sung kiến thức Internet. Backend kiểm tra nguồn, cấu trúc, độ trùng và bằng
+chứng độ khó trước khi cho phép sử dụng câu hỏi.
+
+Độ khó không được xác định chỉ bằng độ dài câu. Rubric đo mức Bloom, số khái niệm,
+số bước suy luận, số ràng buộc, thời lượng trả lời và số key points. Câu luyện tập cần
+đạt tối thiểu 85/100 và không vi phạm điều kiện bắt buộc; câu dùng trong Interview
+thật luôn cần Giáo viên duyệt.
+
+Luồng backend dành cho Giáo viên:
+
+```text
+Chọn môn + ngôn ngữ + số câu theo từng độ khó
+→ Qwen3 sinh câu chỉ từ các câu nguồn nội bộ
+→ backend kiểm tra rubric, nguồn và độ trùng
+→ lưu ở trạng thái chờ duyệt
+→ Giáo viên duyệt hoặc từ chối
+→ câu đã duyệt mới được đưa vào ngân hàng
+```
+
+Các API chính:
+
+- `POST /api/teacher/questions/generate`: sinh câu hỏi Dễ, Trung bình và Khó.
+- `GET /api/teacher/questions/generated`: xem danh sách câu đang chờ duyệt.
+- `PATCH /api/teacher/questions/generated/{id}`: duyệt hoặc từ chối câu hỏi.
+
+### Voice và Giáo viên chấm lại
+
+Mỗi câu trả lời bằng giọng nói lưu file voice gốc trong `data/audio`, kèm SHA-256,
+transcript ban đầu, transcript đã xác minh và độ tin cậy. Thư mục voice được loại khỏi
+Git để không công khai dữ liệu cá nhân của sinh viên.
+
+Điểm AI là điểm tạm thời. Trong kỳ thi chính thức, câu có điểm dưới
+`TEACHER_REVIEW_SCORE_THRESHOLD` hoặc có cảnh báo STT được đưa vào hàng chờ. Giáo viên
+có quyền nghe voice, đối chiếu transcript và nhập điểm mới. Báo cáo dùng điểm Giáo viên
+làm điểm cuối, đồng thời vẫn giữ điểm AI và lịch sử thay đổi để kiểm tra.
+
+- `GET /api/teacher/reviews`: hàng chờ cần chấm lại.
+- `GET /api/teacher/transcriptions/{id}/audio`: nghe hoặc tải voice gốc.
+- `PATCH /api/teacher/answers/{id}/review`: nhập điểm và nhận xét của Giáo viên.
+- `GET /api/teacher/answers/{id}/reviews`: xem lịch sử chấm lại.
+
 ## 7. Cấu trúc chính
 
 | Vị trí | Chức năng |
@@ -193,6 +244,9 @@ Mỗi ngôn ngữ hiện có 900 câu, chia đều 300 câu cho từng mức Eas
 | `app/services/exam_service.py` | Quản lý đợt Interview thật. |
 | `app/services/interview_engine.py` | Chọn câu hỏi thích ứng và tạo báo cáo. |
 | `app/services/evaluator.py` | Chấm bằng Ollama hoặc rubric local. |
+| `app/services/question_generation_rubric.py` | Tạo prompt và kiểm định câu hỏi do LLM sinh. |
+| `app/services/question_generator.py` | Sinh, lưu và duyệt câu hỏi từ model local. |
+| `app/services/teacher_review.py` | Hàng chờ, voice và điểm Giáo viên chấm lại. |
 | `app/services/speech_to_text.py` | Chuyển Voice thành văn bản. |
 | `app/static/` | Giao diện web. |
 | `data/` | Dữ liệu mẫu và SQLite khi chạy. |
@@ -208,4 +262,3 @@ python -m pytest -q
 Database local nằm tại `data/ai_interviewer.db`. Server chỉ lắng nghe `127.0.0.1`, nên mặc định chỉ laptop đang chạy ứng dụng truy cập được.
 
 > Lưu ý: mọi thao tác xóa là vĩnh viễn. Khi Giáo viên xóa một kết quả Interview thật, ứng viên có thể làm lại mã đề nếu đợt vẫn mở. Khi Giáo viên xóa cả đợt Interview, mã đề cùng toàn bộ lượt làm, câu trả lời và báo cáo liên quan cũng bị xóa.
-

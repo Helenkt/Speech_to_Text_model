@@ -384,6 +384,195 @@ def _quality_metrics(segments: list[Any]) -> dict[str, Any]:
 WORD_CONFIDENCE_THRESHOLD = 0.45
 
 
+def _dbfs(value: float) -> float:
+    if value <= 0:
+        return -80.0
+    return max(-80.0, min(0.0, 20.0 * math.log10(value)))
+
+
+def _noise_level(dbfs: float | None) -> tuple[str, str]:
+    if dbfs is None:
+        return "unknown", "Chưa đo"
+    if dbfs <= -45:
+        return "quiet", "Yên tĩnh"
+    if dbfs <= -32:
+        return "moderate", "Trung bình"
+    if dbfs <= -20:
+        return "noisy", "Ồn"
+    return "very_noisy", "Rất ồn"
+
+
+def assess_microphone_quality(
+    metrics: dict[str, Any], *, maximum_ambient_noise_dbfs: float = -28.0
+) -> dict[str, Any]:
+    """Score a short microphone sample without loading the speech model."""
+    duration = float(metrics.get("duration_seconds") or 0.0)
+    input_level = float(metrics.get("input_level_dbfs") or -80.0)
+    peak = float(metrics.get("peak_dbfs") or -80.0)
+    noise = float(metrics.get("ambient_noise_dbfs") or -80.0)
+    clipping = float(metrics.get("clipping_ratio") or 0.0)
+    silence = float(metrics.get("silence_ratio") or 0.0)
+    snr = float(metrics.get("signal_to_noise_db") or 0.0)
+
+    score = 100
+    recommendations: list[str] = []
+    if duration < 1.0:
+        score -= 35
+        recommendations.append("Hãy ghi thử ít nhất 2-3 giây.")
+    if input_level < -42:
+        score -= 25
+        recommendations.append("Âm lượng quá nhỏ; hãy đưa microphone gần hơn.")
+    elif input_level > -6:
+        score -= 10
+        recommendations.append("Âm lượng khá lớn; nên đưa microphone xa hơn một chút.")
+    if peak > -1.0 or clipping > 0.01:
+        score -= 35
+        recommendations.append("Âm thanh bị vỡ; hãy giảm gain hoặc tăng khoảng cách tới microphone.")
+    if noise > maximum_ambient_noise_dbfs:
+        score -= 20 if noise <= -20 else 35
+        recommendations.append("Tiếng nền cao; hãy giảm nguồn ồn hoặc đổi vị trí microphone.")
+    if silence > 0.85:
+        score -= 20
+        recommendations.append("Mẫu thử có quá ít giọng nói.")
+    if snr < 10:
+        score -= 25
+        recommendations.append("Giọng nói chưa tách rõ khỏi tiếng nền.")
+    elif snr < 18:
+        score -= 10
+        recommendations.append("Tỷ lệ giọng nói trên tiếng nền ở mức trung bình.")
+
+    score = max(0, min(100, score))
+    status = "good" if score >= 80 else "acceptable" if score >= 60 else "poor"
+    labels = {
+        "good": "Mic hoạt động tốt",
+        "acceptable": "Mic có thể sử dụng",
+        "poor": "Mic chưa ổn định",
+    }
+    noise_code, noise_label = _noise_level(noise)
+    return {
+        "status": status,
+        "status_label": labels[status],
+        "ready": status != "poor",
+        "microphone_score_percent": score,
+        "noise": {
+            "dbfs": round(noise, 1),
+            "level": noise_code,
+            "label": noise_label,
+            "limit_dbfs": maximum_ambient_noise_dbfs,
+        },
+        "metrics": {
+            **metrics,
+            "duration_seconds": round(duration, 2),
+            "input_level_dbfs": round(input_level, 1),
+            "peak_dbfs": round(peak, 1),
+            "clipping_ratio": round(clipping, 4),
+            "silence_ratio": round(silence, 4),
+            "signal_to_noise_db": round(snr, 1),
+        },
+        "recommendations": list(dict.fromkeys(recommendations)),
+    }
+
+
+def analyze_microphone_sample(
+    content: bytes,
+    *,
+    filename: str,
+    ambient_noise_dbfs: float | None = None,
+    maximum_ambient_noise_dbfs: float = -28.0,
+) -> dict[str, Any]:
+    """Decode a browser recording and measure level, clipping, silence and SNR."""
+    suffix = Path(filename).suffix or ".webm"
+    temporary_path: str | None = None
+    samples: list[int] = []
+    sample_rate = 16_000
+    try:
+        import av
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temporary:
+            temporary.write(content)
+            temporary_path = temporary.name
+
+        with av.open(temporary_path) as container:
+            resampler = av.AudioResampler(format="s16", layout="mono", rate=sample_rate)
+            for frame in container.decode(audio=0):
+                for converted in resampler.resample(frame):
+                    samples.extend(int(value) for value in converted.to_ndarray().reshape(-1))
+                    if len(samples) >= sample_rate * 10:
+                        break
+                if len(samples) >= sample_rate * 10:
+                    break
+            for converted in resampler.resample(None):
+                samples.extend(int(value) for value in converted.to_ndarray().reshape(-1))
+    except Exception as exc:
+        raise SpeechToTextError(f"Không thể phân tích mẫu microphone: {exc}") from exc
+    finally:
+        if temporary_path:
+            Path(temporary_path).unlink(missing_ok=True)
+
+    if not samples:
+        raise SpeechToTextError("Mẫu microphone không có dữ liệu âm thanh.")
+
+    normalized = [max(-1.0, min(1.0, value / 32768.0)) for value in samples]
+    rms = math.sqrt(sum(value * value for value in normalized) / len(normalized))
+    peak = max(abs(value) for value in normalized)
+    clipping_ratio = sum(abs(value) >= 0.98 for value in normalized) / len(normalized)
+    silence_ratio = sum(abs(value) < 0.01 for value in normalized) / len(normalized)
+    ambient_count = min(len(normalized), max(1, sample_rate))
+    ambient_samples = normalized[:ambient_count]
+    ambient_rms = math.sqrt(
+        sum(value * value for value in ambient_samples) / len(ambient_samples)
+    )
+    measured_noise = _dbfs(ambient_rms)
+    noise = measured_noise if ambient_noise_dbfs is None else ambient_noise_dbfs
+    signal_dbfs = _dbfs(rms)
+    metrics = {
+        "duration_seconds": len(normalized) / sample_rate,
+        "sample_rate_hz": sample_rate,
+        "input_level_dbfs": signal_dbfs,
+        "peak_dbfs": _dbfs(peak),
+        "ambient_noise_dbfs": noise,
+        "measured_ambient_noise_dbfs": measured_noise,
+        "clipping_ratio": clipping_ratio,
+        "silence_ratio": silence_ratio,
+        "signal_to_noise_db": max(0.0, signal_dbfs - noise),
+    }
+    return assess_microphone_quality(
+        metrics, maximum_ambient_noise_dbfs=maximum_ambient_noise_dbfs
+    )
+
+
+def build_recording_report(
+    metrics: dict[str, Any], *, maximum_ambient_noise_dbfs: float = -28.0
+) -> dict[str, Any]:
+    """Expose STT quality in stable, UI-ready percentages."""
+    confidence = max(0.0, min(1.0, float(metrics.get("confidence") or 0.0)))
+    quality = max(0.0, min(1.0, float(metrics.get("quality_score") or 0.0)))
+    uncertain_ratio = max(
+        0.0, min(1.0, float(metrics.get("uncertain_word_ratio") or 0.0))
+    )
+    noise_value = metrics.get("ambient_noise_dbfs")
+    noise = float(noise_value) if noise_value is not None else None
+    noise_code, noise_label = _noise_level(noise)
+    estimated_accuracy = 0.70 * confidence + 0.20 * (1.0 - uncertain_ratio) + 0.10 * quality
+    return {
+        "recognition_confidence_percent": round(confidence * 100),
+        "recording_quality_percent": round(quality * 100),
+        "estimated_recognition_accuracy_percent": round(
+            max(0.0, min(1.0, estimated_accuracy)) * 100
+        ),
+        "noise": {
+            "dbfs": round(noise, 1) if noise is not None else None,
+            "level": noise_code,
+            "label": noise_label,
+            "limit_dbfs": maximum_ambient_noise_dbfs,
+        },
+        "accuracy_note": (
+            "Đây là độ chính xác ước tính từ độ tin cậy của model và chất lượng bản ghi; "
+            "độ chính xác thực chỉ đo được khi có transcript chuẩn để đối chiếu."
+        ),
+    }
+
+
 def _segment_diagnostics(
     segments: list[Any], *, word_threshold: float = WORD_CONFIDENCE_THRESHOLD
 ) -> tuple[list[dict[str, Any]], list[str]]:

@@ -1,6 +1,7 @@
 .venv/
 .test-venv/
 .pytest-tmp*/
+.pytest-model*/
 .env
 __pycache__/
 *.py[cod]
@@ -19,3 +20,4 @@ data/*.db-shm
 data/*.db-wal
 data/accounts_demo.*
 data/account_template.xlsx
+data/audio/

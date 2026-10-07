@@ -20,9 +20,12 @@ from app.schemas import (
     AccountActiveRequest,
     ExamRoundCreateRequest,
     ExamStatusRequest,
+    GeneratedQuestionDecisionRequest,
     LoginRequest,
+    QuestionGenerateRequest,
     StartInterviewRequest,
     SubmitAnswerRequest,
+    TeacherAnswerReviewRequest,
 )
 from app.services.account_importer import (
     AccountImportError,
@@ -68,8 +71,16 @@ from app.services.question_importer import (
     import_question_bank,
     load_demo_banks,
 )
+from app.services.question_generator import (
+    QuestionGenerationError,
+    generate_question_drafts,
+    list_generated_questions,
+    review_generated_question,
+)
 from app.services.speech_to_text import (
+    analyze_microphone_sample,
     assess_transcription_quality,
+    build_recording_report,
     SpeechToTextError,
     stt_status,
     transcribe_bytes,
@@ -78,6 +89,13 @@ from app.services.transcription_store import (
     TranscriptionError,
     save_transcription,
     transcription_context,
+)
+from app.services.teacher_review import (
+    TeacherReviewError,
+    list_review_queue,
+    review_answer,
+    review_history,
+    transcription_audio,
 )
 
 
@@ -96,7 +114,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(
         title="AI Interview Local",
-        version="1.6.0",
+        version="1.8.0",
         description="Hệ thống AI Interview local với phân quyền Giáo viên và Ứng viên.",
         lifespan=lifespan,
     )
@@ -153,6 +171,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             },
             "evaluator_mode": app_settings.evaluator_mode,
             "ollama": ollama,
+            "question_generation": {
+                "model": app_settings.question_generation_model,
+                "source_restricted": True,
+                "teacher_approval_required": True,
+            },
             "transcript_correction": {
                 "mode": app_settings.transcript_correction_mode,
                 "engine": f"ollama:{app_settings.ollama_model}",
@@ -250,6 +273,58 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "summary": question_summary(app_settings.database_path),
             }
         except QuestionBankError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.post("/api/teacher/questions/generate", status_code=201)
+    async def generate_questions(
+        payload: QuestionGenerateRequest,
+        user: dict[str, Any] = Depends(teacher_user),
+    ) -> dict[str, Any]:
+        try:
+            generated = await generate_question_drafts(
+                app_settings,
+                generated_by=user["user_id"],
+                language=payload.language,
+                subject=payload.subject,
+                topic=payload.topic,
+                counts={
+                    "Easy": payload.easy_count,
+                    "Medium": payload.medium_count,
+                    "Hard": payload.hard_count,
+                },
+            )
+            return {
+                "questions": generated,
+                "model": app_settings.question_generation_model,
+                "teacher_approval_required": True,
+            }
+        except QuestionGenerationError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.get("/api/teacher/questions/generated")
+    async def generated_questions(
+        status: str | None = None,
+        _: dict[str, Any] = Depends(teacher_user),
+    ) -> dict[str, Any]:
+        try:
+            return {"questions": list_generated_questions(app_settings, status=status)}
+        except QuestionGenerationError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.patch("/api/teacher/questions/generated/{generated_id}")
+    async def decide_generated_question(
+        generated_id: str,
+        payload: GeneratedQuestionDecisionRequest,
+        user: dict[str, Any] = Depends(teacher_user),
+    ) -> dict[str, Any]:
+        try:
+            return review_generated_question(
+                app_settings,
+                generated_id=generated_id,
+                action=payload.action,
+                teacher_id=user["user_id"],
+            )
+        except (QuestionGenerationError, QuestionBankError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.get("/api/teacher/accounts")
@@ -507,6 +582,57 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except InterviewError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
+    @app.get("/api/teacher/reviews")
+    async def teacher_review_queue(
+        _: dict[str, Any] = Depends(teacher_user),
+    ) -> dict[str, Any]:
+        return {
+            "answers": list_review_queue(app_settings),
+            "score_threshold": app_settings.teacher_review_score_threshold,
+        }
+
+    @app.patch("/api/teacher/answers/{answer_id}/review")
+    async def submit_teacher_review(
+        answer_id: int,
+        payload: TeacherAnswerReviewRequest,
+        user: dict[str, Any] = Depends(teacher_user),
+    ) -> dict[str, Any]:
+        try:
+            return review_answer(
+                app_settings,
+                answer_id=answer_id,
+                teacher_id=user["user_id"],
+                score=payload.score,
+                feedback=payload.feedback,
+            )
+        except TeacherReviewError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.get("/api/teacher/answers/{answer_id}/reviews")
+    async def answer_review_history(
+        answer_id: int,
+        _: dict[str, Any] = Depends(teacher_user),
+    ) -> dict[str, Any]:
+        return {"reviews": review_history(app_settings, answer_id=answer_id)}
+
+    @app.get("/api/teacher/transcriptions/{transcription_id}/audio")
+    async def teacher_audio(
+        transcription_id: str,
+        _: dict[str, Any] = Depends(teacher_user),
+    ) -> FileResponse:
+        try:
+            audio = transcription_audio(
+                app_settings, transcription_id=transcription_id
+            )
+            return FileResponse(
+                audio["path"],
+                media_type=audio["media_type"],
+                filename=f"voice-{transcription_id}{audio['path'].suffix}",
+                headers={"X-Audio-SHA256": str(audio["sha256"] or "")},
+            )
+        except TeacherReviewError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
     @app.delete("/api/teacher/results/{session_id}")
     async def remove_teacher_result(
         session_id: str,
@@ -551,6 +677,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 ambient_noise_dbfs=ambient_noise_dbfs,
                 maximum_ambient_noise_dbfs=app_settings.stt_max_ambient_noise_dbfs,
             )
+            result["recording_report"] = build_recording_report(
+                result.get("metrics", {}),
+                maximum_ambient_noise_dbfs=app_settings.stt_max_ambient_noise_dbfs,
+            )
             if result.get("needs_retry") or not result["text"]:
                 raise HTTPException(
                     status_code=422,
@@ -592,12 +722,35 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     confidence=float(result.get("metrics", {}).get("confidence", 0.0)),
                     ambient_noise_dbfs=ambient_noise_dbfs,
                     metadata=result,
+                    audio_storage_dir=app_settings.audio_storage_dir,
+                    audio_content=content,
+                    audio_filename=file.filename or "recording.webm",
+                    audio_mime_type=file.content_type,
                 )
             return result
         except TranscriptionError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         except SpeechToTextError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    @app.post("/api/speech/microphone-check")
+    async def microphone_check(
+        file: UploadFile = File(...),
+        ambient_noise_dbfs: float | None = Form(None),
+        _: dict[str, Any] = Depends(candidate_user),
+    ) -> dict[str, Any]:
+        content = await read_upload(file)
+        try:
+            operation = functools.partial(
+                analyze_microphone_sample,
+                content,
+                filename=file.filename or "microphone-check.webm",
+                ambient_noise_dbfs=ambient_noise_dbfs,
+                maximum_ambient_noise_dbfs=app_settings.stt_max_ambient_noise_dbfs,
+            )
+            return await run_in_threadpool(operation)
+        except SpeechToTextError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.exception_handler(Exception)
     async def unexpected_error(_: Request, exc: Exception) -> JSONResponse:

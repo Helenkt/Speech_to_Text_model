@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.8.0
+
+- Thêm màn hình sinh câu hỏi Easy, Medium, Hard bằng Qwen3:8B từ nguồn nội bộ.
+- Hiển thị điểm rubric, nguồn truy vết, đáp án và key points trước khi Giáo viên duyệt.
+- Thêm hàng chờ chấm lại với voice gốc, transcript, điểm AI và điểm cuối của Giáo viên.
+- Bổ sung kiểm tra microphone độc lập, mức tiếng ồn và chất lượng bản ghi.
+- Nâng cấp báo cáo Giáo viên với đối chiếu STT gốc, bản xác minh và lịch sử điểm.
+- Tối ưu giao diện responsive cho laptop và thiết bị di động.
+
+## 1.7.0
+
+- Thêm backend sinh câu hỏi bằng model local từ nguồn nội bộ đã duyệt.
+- Chấm câu hỏi sinh mới bằng rubric 100 điểm và bắt buộc Giáo viên duyệt trước khi đưa vào ngân hàng.
+- Lưu file voice gốc theo từng câu trả lời, kèm SHA-256, định dạng và dung lượng.
+- Thêm API chỉ dành cho Giáo viên để nghe lại voice.
+- Tách điểm AI, điểm Giáo viên và điểm cuối; giữ lịch sử mỗi lần chấm lại.
+- Tự đưa bài thi có điểm thấp hoặc độ tin cậy thấp vào hàng chờ kiểm tra.
+- Báo cáo và danh sách kết quả sử dụng điểm cuối sau khi Giáo viên chấm.
+
 ## 1.5.0
 
 - Thêm nút **Xóa đợt** trong danh sách đợt Interview của Giáo viên.

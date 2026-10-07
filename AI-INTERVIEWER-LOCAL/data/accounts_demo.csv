@@ -1,0 +1,4 @@
+username,password,full_name,role,email,student_id,active
+teacher,Teacher@123,Giáo viên Demo,teacher,teacher@local.demo,,true
+candidate01,Candidate@123,Nguyễn Văn An,candidate,an@local.demo,SV001,true
+candidate02,Candidate@123,Trần Minh Anh,candidate,anh@local.demo,SV002,true

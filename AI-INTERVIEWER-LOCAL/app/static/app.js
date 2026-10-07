@@ -5,6 +5,8 @@ const state = {
   exams: [],
   accounts: [],
   results: [],
+  generatedQuestions: [],
+  reviewQueue: [],
   practiceHistory: [],
   candidateExam: null,
   session: null,
@@ -26,7 +28,9 @@ const el = Object.fromEntries(
 
 const NAV_ITEMS = {
   teacher: [
-    ["teacherDashboardView", "Interview"],
+    ["teacherDashboardView", "Bài thi"],
+    ["teacherQuestionsView", "Câu hỏi"],
+    ["teacherReviewsView", "Chấm lại"],
     ["teacherAccountsView", "Tài khoản"],
     ["teacherResultsView", "Kết quả"],
   ],
@@ -123,6 +127,7 @@ async function enterApp(user) {
     const [health, summary] = await Promise.all([api("/api/health"), api("/api/questions/summary")]);
     state.health = health;
     applySummary(summary);
+    el.questionModelName.textContent = health.question_generation?.model || "Qwen3:8B";
     if (user.role === "teacher") {
       showView("teacherDashboardView");
       setDefaultExamTimes();
@@ -217,8 +222,10 @@ function applySummary(summary) {
   state.summary = summary;
   fillLanguageSelect(el.examLanguage);
   fillLanguageSelect(el.practiceLanguage);
+  fillLanguageSelect(el.generatedQuestionLanguage);
   updateSubjectSelect(el.examLanguage, el.examSubject, false);
   updateSubjectSelect(el.practiceLanguage, el.practiceSubject, true);
+  updateSubjectSelect(el.generatedQuestionLanguage, el.generatedQuestionSubject, false);
   const rows = summary.languages || [];
   el.questionBankRows.innerHTML = rows.length
     ? rows.map((item) => `<div class="summary-row"><strong>${languageName(item.language)}</strong><span>${item.total.toLocaleString("vi-VN")} câu · ${item.subjects.length} lĩnh vực</span></div>`).join("")
@@ -265,6 +272,111 @@ async function reloadDemo() {
     toast(error.message, true);
   } finally {
     el.reloadDemoButton.disabled = false;
+  }
+}
+
+function generatedStatusLabel(status) {
+  return {
+    draft: ["Chờ duyệt", "waiting"],
+    approved: ["Đã duyệt", ""],
+    rejected: ["Đã từ chối", "closed"],
+  }[status] || [status, "closed"];
+}
+
+function renderGeneratedQuestions() {
+  el.generatedQuestionRows.innerHTML = state.generatedQuestions.length
+    ? state.generatedQuestions.map((item) => {
+      const question = item.question || {};
+      const rubric = item.rubric || {};
+      const [statusLabel, statusClass] = generatedStatusLabel(item.status);
+      const sourceIds = Array.isArray(question.source_question_ids) ? question.source_question_ids : [];
+      const keyPoints = Array.isArray(question.key_points) ? question.key_points : [];
+      const failures = Array.isArray(rubric.hard_gate_failures) ? rubric.hard_gate_failures : [];
+      const actions = item.status === "draft"
+        ? `<div class="generated-actions"><button class="button secondary danger compact" type="button" data-generated-action="reject" data-generated-id="${escapeHtml(item.generated_id)}">Từ chối</button><button class="button primary compact" type="button" data-generated-action="approve" data-generated-id="${escapeHtml(item.generated_id)}">Duyệt vào ngân hàng</button></div>`
+        : "";
+      return `<article class="generated-question-item">
+        <div class="generated-question-head">
+          <div class="question-tags"><span class="tag">${difficultyName(question.difficulty)}</span><span>${escapeHtml(question.subject)}</span><span>${escapeHtml(question.topic || question.concept || "")}</span></div>
+          <span class="status-badge ${statusClass}">${statusLabel}</span>
+        </div>
+        <h3>${escapeHtml(question.question)}</h3>
+        <div class="rubric-score"><strong>${Number(rubric.score || 0)}/100</strong><span>Điểm kiểm định · ${escapeHtml(rubric.status || "chưa đánh giá")}</span></div>
+        <details>
+          <summary>Xem đáp án, nguồn và rubric</summary>
+          <div class="generated-detail-grid">
+            <div><h4>Đáp án tham chiếu</h4><p>${escapeHtml(question.reference_answer || "—")}</p></div>
+            <div><h4>Key points</h4><ul>${keyPoints.map((point) => `<li>${escapeHtml(point)}</li>`).join("") || "<li>Chưa có</li>"}</ul></div>
+            <div><h4>Nguồn truy vết</h4><p>${sourceIds.map((id) => `<code>${escapeHtml(id)}</code>`).join(" ") || "—"}</p></div>
+            <div><h4>Kết quả kiểm tra</h4><p>${failures.length ? failures.map(escapeHtml).join(" · ") : "Đạt toàn bộ cổng kiểm định tự động."}</p></div>
+          </div>
+        </details>
+        ${actions}
+      </article>`;
+    }).join("")
+    : '<div class="empty-state">Không có câu hỏi ở trạng thái đã chọn.</div>';
+}
+
+async function loadGeneratedQuestions() {
+  el.generatedQuestionRows.setAttribute("aria-busy", "true");
+  try {
+    const status = el.generatedQuestionStatus.value;
+    const query = status ? `?status=${encodeURIComponent(status)}` : "";
+    const result = await api(`/api/teacher/questions/generated${query}`);
+    state.generatedQuestions = result.questions;
+    renderGeneratedQuestions();
+  } finally {
+    el.generatedQuestionRows.removeAttribute("aria-busy");
+  }
+}
+
+async function generateQuestions(event) {
+  event.preventDefault();
+  const counts = [
+    Number(el.generatedEasyCount.value),
+    Number(el.generatedMediumCount.value),
+    Number(el.generatedHardCount.value),
+  ];
+  if (counts.some((value) => !Number.isInteger(value) || value < 0) || counts.reduce((sum, value) => sum + value, 0) < 1) {
+    toast("Hãy chọn ít nhất một câu hỏi cần sinh.", true);
+    return;
+  }
+  el.generateQuestionsButton.disabled = true;
+  el.generateQuestionsButton.textContent = "Đang sinh và chạy rubric...";
+  try {
+    const result = await api("/api/teacher/questions/generate", jsonOptions("POST", {
+      language: el.generatedQuestionLanguage.value,
+      subject: el.generatedQuestionSubject.value,
+      topic: el.generatedQuestionTopic.value.trim() || null,
+      easy_count: counts[0],
+      medium_count: counts[1],
+      hard_count: counts[2],
+    }));
+    el.generatedQuestionStatus.value = "draft";
+    await loadGeneratedQuestions();
+    const accepted = result.questions.filter((item) => item.status === "draft").length;
+    toast(`Đã sinh ${result.questions.length} câu; ${accepted} câu đạt kiểm định và đang chờ duyệt.`);
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    el.generateQuestionsButton.disabled = false;
+    el.generateQuestionsButton.textContent = "Sinh và kiểm tra câu hỏi";
+  }
+}
+
+async function decideGeneratedQuestion(button) {
+  const action = button.dataset.generatedAction;
+  const generatedId = button.dataset.generatedId;
+  if (action === "approve" && !window.confirm("Duyệt câu hỏi này vào ngân hàng chính thức?")) return;
+  button.disabled = true;
+  try {
+    await api(`/api/teacher/questions/generated/${encodeURIComponent(generatedId)}`, jsonOptions("PATCH", { action }));
+    await Promise.all([loadGeneratedQuestions(), refreshSummary()]);
+    toast(action === "approve" ? "Đã duyệt câu hỏi vào ngân hàng." : "Đã từ chối câu hỏi.");
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    button.disabled = false;
   }
 }
 
@@ -505,7 +617,7 @@ function renderResults() {
       <td><strong>${escapeHtml(result.exam_code)}</strong><br><small>${escapeHtml(result.subject)}</small></td>
       <td>${escapeHtml(result.candidate_name)}<br><small>${escapeHtml(result.student_id || result.email || result.username)}</small></td>
       <td>${result.answered_count}/${result.requested_count} câu · ${result.status === "completed" ? "Hoàn tất" : "Đang làm"}</td>
-      <td><strong>${result.average_score == null ? "—" : `${Math.round(result.average_score)}/100`}</strong></td>
+      <td><strong>${result.average_score == null ? "—" : `${Math.round(result.average_score)}/100`}</strong>${result.pending_review_count ? `<br><small class="needs-review">${result.pending_review_count} câu chờ chấm lại</small>` : ""}</td>
       <td>${formatDate(result.finished_at || result.created_at)}</td>
       <td><div class="table-actions"><button class="button secondary compact" data-result-session="${escapeHtml(result.session_id)}">Xem chi tiết</button><button class="button secondary danger compact" data-delete-result-session="${escapeHtml(result.session_id)}">Xóa</button></div></td>
     </tr>`).join("")
@@ -526,6 +638,75 @@ async function deleteTeacherResult(sessionId) {
     toast("Đã xóa kết quả Interview.");
   } catch (error) {
     toast(error.message, true);
+  }
+}
+
+function renderReviewQueue() {
+  el.reviewQueueCount.textContent = `${state.reviewQueue.length} câu chờ chấm`;
+  el.teacherReviewRows.innerHTML = state.reviewQueue.length
+    ? state.reviewQueue.map((item) => {
+      const audio = item.transcription_id
+        ? `<audio controls preload="none" src="/api/teacher/transcriptions/${encodeURIComponent(item.transcription_id)}/audio">Trình duyệt không phát được voice.</audio>`
+        : '<div class="audio-missing">Không có file voice</div>';
+      return `<article class="teacher-review-item" data-review-card="${item.answer_id}">
+        <div class="review-item-head">
+          <div><span class="review-exam-code">${escapeHtml(item.exam_code || "INTERVIEW")}</span><h3>${escapeHtml(item.candidate_name)}</h3><p>${escapeHtml(item.title || item.subject)} · Câu ${item.sequence_number}</p></div>
+          <div class="ai-score"><span>Điểm AI</span><strong>${Math.round(Number(item.ai_score || 0))}</strong><small>Tin cậy ${Math.round(Number(item.confidence || 0) * 100)}%</small></div>
+        </div>
+        <div class="review-question"><span>Câu hỏi</span><strong>${escapeHtml(item.question)}</strong></div>
+        <div class="review-evidence-grid">
+          <div><span>Voice gốc</span>${audio}</div>
+          <div><span>Bản ghi hệ thống</span><blockquote>${escapeHtml(item.answer_text)}</blockquote></div>
+        </div>
+        <div class="ai-feedback"><strong>Nhận xét của AI</strong><p>${escapeHtml(item.feedback || "Chưa có nhận xét.")}</p></div>
+        <div class="teacher-score-form">
+          <label>Điểm cuối cùng
+            <input data-review-score type="number" min="0" max="100" step="0.5" value="${Math.round(Number(item.final_score ?? item.ai_score ?? 0))}" required>
+          </label>
+          <label>Nhận xét của giảng viên
+            <textarea data-review-feedback rows="3" maxlength="2000" placeholder="Nêu căn cứ điều chỉnh hoặc xác nhận điểm..." required></textarea>
+          </label>
+          <button class="button primary" type="button" data-submit-review="${item.answer_id}">Lưu điểm cuối cùng</button>
+        </div>
+      </article>`;
+    }).join("")
+    : '<div class="empty-state success-empty"><strong>Không còn câu cần chấm lại</strong><span>Các câu trả lời hiện đã đủ độ tin cậy hoặc đã được giảng viên xử lý.</span></div>';
+}
+
+async function loadReviewQueue() {
+  el.teacherReviewRows.setAttribute("aria-busy", "true");
+  try {
+    const result = await api("/api/teacher/reviews");
+    state.reviewQueue = result.answers;
+    el.reviewThresholdValue.textContent = `Dưới ${Math.round(result.score_threshold)} điểm`;
+    renderReviewQueue();
+  } finally {
+    el.teacherReviewRows.removeAttribute("aria-busy");
+  }
+}
+
+async function submitTeacherReview(button) {
+  const card = button.closest("[data-review-card]");
+  const score = Number(card.querySelector("[data-review-score]").value);
+  const feedback = card.querySelector("[data-review-feedback]").value.trim();
+  if (!Number.isFinite(score) || score < 0 || score > 100) {
+    toast("Điểm giảng viên phải từ 0 đến 100.", true);
+    return;
+  }
+  if (!feedback) {
+    toast("Hãy nhập nhận xét hoặc căn cứ chấm điểm.", true);
+    return;
+  }
+  button.disabled = true;
+  button.textContent = "Đang lưu...";
+  try {
+    await api(`/api/teacher/answers/${button.dataset.submitReview}/review`, jsonOptions("PATCH", { score, feedback }));
+    await loadReviewQueue();
+    toast("Đã lưu điểm giảng viên làm điểm cuối cùng.");
+  } catch (error) {
+    toast(error.message, true);
+    button.disabled = false;
+    button.textContent = "Lưu điểm cuối cùng";
   }
 }
 
@@ -941,7 +1122,14 @@ function renderReport(report) {
         ? '<div class="review-notice">Cần giáo viên xem lại kết quả và bằng chứng của câu này.</div>'
         : "";
       const assessments = pointAssessmentHtml(item.evaluation.point_assessments);
-      return `<details class="detail-item"><summary><span class="detail-number">${item.sequence_number}</span><span>${escapeHtml(item.question.question)}</span><span class="detail-score">${Math.round(item.evaluation.score)}/100</span></summary><div class="detail-content">${review}<h4>Câu trả lời</h4><p>${escapeHtml(item.answer)}</p><h4>Phản hồi</h4><p>${escapeHtml(item.evaluation.feedback)}</p>${assessments ? `<h4>Đối chiếu rubric</h4><div class="assessment-list">${assessments}</div>` : ""}<h4>Đáp án tham khảo</h4><p>${escapeHtml(item.reference_answer)}</p><h4>Bộ chấm</h4><p>${escapeHtml(item.evaluation.evaluator)} · độ tin cậy ${Math.round(item.evaluation.confidence * 100)}% · rubric ${escapeHtml(item.evaluation.rubric_version || "mặc định")}</p></div></details>`;
+      const voice = state.reportOrigin === "teacher" && item.voice?.audio_available
+        ? `<div class="report-voice"><h4>Voice gốc</h4><audio controls preload="none" src="/api/teacher/transcriptions/${encodeURIComponent(item.voice.transcription_id)}/audio">Trình duyệt không phát được voice.</audio><div class="transcript-compare"><div><span>STT gốc</span><p>${escapeHtml(item.voice.raw_transcript || "—")}</p></div><div><span>Bản xác minh</span><p>${escapeHtml(item.voice.verified_transcript || item.answer)}</p></div></div></div>`
+        : "";
+      const scoreAudit = `<div class="score-audit"><div><span>Điểm AI</span><strong>${Math.round(item.evaluation.ai_score ?? item.evaluation.score)}</strong></div><div><span>Điểm cuối</span><strong>${Math.round(item.evaluation.final_score ?? item.evaluation.score)}</strong></div>${item.evaluation.teacher_score == null ? "" : `<div><span>Giảng viên</span><strong>${Math.round(item.evaluation.teacher_score)}</strong></div>`}</div>`;
+      const teacherFeedback = item.evaluation.teacher_feedback
+        ? `<div class="teacher-feedback"><strong>Nhận xét của giảng viên</strong><p>${escapeHtml(item.evaluation.teacher_feedback)}</p></div>`
+        : "";
+      return `<details class="detail-item"><summary><span class="detail-number">${item.sequence_number}</span><span>${escapeHtml(item.question.question)}</span><span class="detail-score">${Math.round(item.evaluation.score)}/100</span></summary><div class="detail-content">${review}${scoreAudit}${voice}<h4>Câu trả lời</h4><p>${escapeHtml(item.answer)}</p>${teacherFeedback}<h4>Phản hồi của AI</h4><p>${escapeHtml(item.evaluation.feedback)}</p>${assessments ? `<h4>Đối chiếu rubric</h4><div class="assessment-list">${assessments}</div>` : ""}<h4>Đáp án tham khảo</h4><p>${escapeHtml(item.reference_answer)}</p><h4>Bộ chấm</h4><p>${escapeHtml(item.evaluation.evaluator)} · độ tin cậy ${Math.round(item.evaluation.confidence * 100)}% · rubric ${escapeHtml(item.evaluation.rubric_version || "mặc định")}</p></div></details>`;
     }).join("")
     : '<div class="empty-state">Phiên kết thúc trước khi có câu trả lời.</div>';
 }
@@ -958,6 +1146,70 @@ function reportBack() {
     loadPracticeHistory().catch((error) => toast(error.message, true));
   } else {
     showView("practiceSetupView");
+  }
+}
+
+function renderMicrophoneResult(result, mode = "microphone") {
+  const isRecording = mode === "recording";
+  const score = isRecording
+    ? Number(result.recording_quality_percent || 0)
+    : Number(result.microphone_score_percent || 0);
+  const status = isRecording
+    ? (score >= 80 ? "good" : score >= 60 ? "acceptable" : "poor")
+    : result.status;
+  const title = isRecording
+    ? `Chất lượng bản ghi ${Math.round(score)}%`
+    : result.status_label;
+  const noise = result.noise || {};
+  const accuracy = isRecording && Number.isFinite(Number(result.estimated_recognition_accuracy_percent))
+    ? `<div><span>Độ chính xác ước tính</span><strong>${Math.round(result.estimated_recognition_accuracy_percent)}%</strong></div>`
+    : "";
+  const recommendations = Array.isArray(result.recommendations) ? result.recommendations : [];
+  el.microphoneCheckResult.className = `microphone-result ${status || "acceptable"}`;
+  el.microphoneCheckResult.innerHTML = `<div class="microphone-result-head"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(noise.label || "Chưa đo tiếng nền")}</span></div><div class="microphone-metrics"><div><span>Điểm mic</span><strong>${Math.round(score)}%</strong></div><div><span>Tiếng nền</span><strong>${noise.dbfs == null ? "—" : `${Number(noise.dbfs).toFixed(1)} dBFS`}</strong></div>${accuracy}</div>${recommendations.length ? `<p>${recommendations.map(escapeHtml).join(" ")}</p>` : ""}`;
+}
+
+async function checkMicrophone() {
+  if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+    toast("Trình duyệt chưa hỗ trợ kiểm tra microphone.", true);
+    return;
+  }
+  el.checkMicrophoneButton.disabled = true;
+  el.microphoneCheckResult.className = "microphone-result checking";
+  el.microphoneCheckResult.innerHTML = "<strong>Đang đo tiếng nền...</strong><span>Giữ im lặng trong giây đầu tiên.</span>";
+  let stream = null;
+  try {
+    const constraints = { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+    if (state.selectedMicrophoneId) constraints.deviceId = { exact: state.selectedMicrophoneId };
+    stream = await navigator.mediaDevices.getUserMedia({ audio: constraints });
+    const ambient = await measureAmbientNoise(stream, 1200);
+    el.microphoneCheckResult.innerHTML = "<strong>Hãy nói một câu trong 4 giây...</strong><span>Hệ thống đang đo âm lượng và độ tách giọng.</span>";
+    const preferred = typeof MediaRecorder.isTypeSupported === "function"
+      ? ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find((type) => MediaRecorder.isTypeSupported(type))
+      : null;
+    const recorder = preferred ? new MediaRecorder(stream, { mimeType: preferred }) : new MediaRecorder(stream);
+    const chunks = [];
+    recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
+    const stopped = new Promise((resolve) => { recorder.onstop = resolve; });
+    recorder.start(250);
+    await new Promise((resolve) => setTimeout(resolve, 4000));
+    recorder.stop();
+    await stopped;
+    const mimeType = recorder.mimeType || "audio/webm";
+    const extension = mimeType.includes("mp4") ? "m4a" : "webm";
+    const form = new FormData();
+    form.append("file", new Blob(chunks, { type: mimeType }), `microphone-check.${extension}`);
+    form.append("ambient_noise_dbfs", String(ambient.dbfs));
+    const result = await api("/api/speech/microphone-check", { method: "POST", body: form });
+    renderMicrophoneResult(result);
+    toast(result.ready ? "Microphone sẵn sàng để ghi âm." : "Microphone cần điều chỉnh trước khi ghi.", !result.ready);
+  } catch (error) {
+    el.microphoneCheckResult.className = "microphone-result poor";
+    el.microphoneCheckResult.innerHTML = `<strong>Không kiểm tra được microphone</strong><span>${escapeHtml(error.message)}</span>`;
+    toast(error.message, true);
+  } finally {
+    stream?.getTracks().forEach((track) => track.stop());
+    el.checkMicrophoneButton.disabled = false;
   }
 }
 
@@ -1001,6 +1253,7 @@ async function toggleRecording() {
       state.mediaStream.getTracks().forEach((track) => track.stop());
       state.mediaStream = null;
       el.microphoneSelect.disabled = false;
+      el.checkMicrophoneButton.disabled = false;
       el.recordingStatus.textContent = `Môi trường quá ồn (${ambient.dbfs.toFixed(1)} dBFS)`;
       setVoiceStage("error");
       toast("Âm thanh đang quá lớn hoặc bị vỡ tiếng. Hãy đưa microphone xa hơn nguồn ồn rồi thử lại.", true);
@@ -1014,6 +1267,7 @@ async function toggleRecording() {
     state.recorder.ondataavailable = (event) => { if (event.data.size) state.audioChunks.push(event.data); };
     state.recorder.onstop = transcribeRecording;
     state.recorder.start(250);
+    el.checkMicrophoneButton.disabled = true;
     el.recordButton.classList.add("recording");
     el.recordButton.textContent = "■ Dừng ghi";
     el.recordingStatus.textContent = ambient.dbfs > -28
@@ -1029,7 +1283,10 @@ async function toggleRecording() {
         : `Không mở được microphone: ${error.message}`;
     toast(message, true);
     setVoiceStage("error");
+    state.mediaStream?.getTracks().forEach((track) => track.stop());
+    state.mediaStream = null;
     el.microphoneSelect.disabled = false;
+    el.checkMicrophoneButton.disabled = false;
   }
 }
 
@@ -1070,6 +1327,7 @@ async function transcribeRecording() {
   state.mediaStream?.getTracks().forEach((track) => track.stop());
   state.mediaStream = null;
   el.microphoneSelect.disabled = false;
+  el.checkMicrophoneButton.disabled = false;
   el.recordButton.classList.remove("recording");
   el.recordButton.textContent = "● Ghi âm";
   el.recordButton.disabled = true;
@@ -1102,6 +1360,7 @@ async function transcribeRecording() {
     const correction = result.correction_applied ? " · đã sửa lỗi ASR an toàn" : "";
     const warning = result.quality_warnings?.length ? " · đã xử lý vùng chưa chắc chắn" : "";
     el.recordingStatus.textContent = `Đã xác minh · tin cậy ${confidence}% · chất lượng ${quality}%${correction}${warning}`;
+    if (result.recording_report) renderMicrophoneResult(result.recording_report, "recording");
     el.recordButton.textContent = "● Ghi âm lại";
     setVoiceStage("verify");
   } catch (error) {
@@ -1112,6 +1371,7 @@ async function transcribeRecording() {
     state.recorder = null;
     state.audioChunks = [];
     el.recordButton.disabled = !sttAvailable();
+    el.checkMicrophoneButton.disabled = false;
   }
 }
 
@@ -1119,6 +1379,8 @@ async function handleNavigation(viewId) {
   showView(viewId);
   try {
     if (viewId === "teacherDashboardView") await loadExams();
+    if (viewId === "teacherQuestionsView") await loadGeneratedQuestions();
+    if (viewId === "teacherReviewsView") await loadReviewQueue();
     if (viewId === "teacherAccountsView") await loadAccounts();
     if (viewId === "teacherResultsView") await loadResults();
     if (viewId === "practiceHistoryView") await loadPracticeHistory();
@@ -1142,6 +1404,14 @@ function bindEvents() {
   el.questionFile.addEventListener("change", () => { el.questionFileName.textContent = el.questionFile.files[0]?.name || "Tối đa 25 MB · kiểm tra toàn bộ trước khi ghi"; });
   el.questionUploadForm.addEventListener("submit", importQuestions);
   el.reloadDemoButton.addEventListener("click", reloadDemo);
+  el.generatedQuestionLanguage.addEventListener("change", () => updateSubjectSelect(el.generatedQuestionLanguage, el.generatedQuestionSubject, false));
+  el.questionGeneratorForm.addEventListener("submit", generateQuestions);
+  el.generatedQuestionStatus.addEventListener("change", () => loadGeneratedQuestions().catch((error) => toast(error.message, true)));
+  el.refreshGeneratedQuestionsButton.addEventListener("click", () => loadGeneratedQuestions().catch((error) => toast(error.message, true)));
+  el.generatedQuestionRows.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-generated-action]");
+    if (button) decideGeneratedQuestion(button);
+  });
   el.examLanguage.addEventListener("change", () => updateSubjectSelect(el.examLanguage, el.examSubject, false));
   el.examStartsAt.addEventListener("input", updateExamEndPreview);
   el.examDuration.addEventListener("change", updateExamEndPreview);
@@ -1173,6 +1443,11 @@ function bindEvents() {
     if (viewButton) showTeacherResult(viewButton.dataset.resultSession);
     if (deleteButton) deleteTeacherResult(deleteButton.dataset.deleteResultSession);
   });
+  el.refreshReviewQueueButton.addEventListener("click", () => loadReviewQueue().catch((error) => toast(error.message, true)));
+  el.teacherReviewRows.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-submit-review]");
+    if (button) submitTeacherReview(button);
+  });
 
   el.refreshPracticeHistoryButton.addEventListener("click", refreshPracticeHistory);
   el.practiceHistoryRows.addEventListener("click", (event) => {
@@ -1191,6 +1466,7 @@ function bindEvents() {
   el.nextQuestionButton.addEventListener("click", nextPracticeQuestion);
   el.finishPracticeButton.addEventListener("click", finishPractice);
   el.recordButton.addEventListener("click", toggleRecording);
+  el.checkMicrophoneButton.addEventListener("click", checkMicrophone);
   el.microphoneSelect.addEventListener("change", selectMicrophone);
   navigator.mediaDevices?.addEventListener?.("devicechange", () => refreshMicrophones());
   el.backToRealButton.addEventListener("click", () => {

@@ -1,0 +1,338 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M 28 0 L 0 0 0 28" fill="none" stroke="#132235" stroke-width="1" opacity="0.34"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000814" flood-opacity="0.45"/>
+    </filter>
+    <filter id="glow-cyan" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#39d0e6"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9b87f5"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f6a84b"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#43d19e"/>
+    </marker>
+    <style>
+      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #f7fafc; letter-spacing: 1px; }
+      .subtitle { font: 400 16px 'Segoe UI', Arial, sans-serif; fill: #8ea4ba; }
+      .section-label { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #7fd8e7; letter-spacing: 2px; }
+      .node-title { font: 650 17px 'Segoe UI', Arial, sans-serif; fill: #f3f7fb; }
+      .node-sub { font: 400 13px 'Segoe UI', Arial, sans-serif; fill: #9fb1c4; }
+      .small { font: 600 12px 'Segoe UI', Arial, sans-serif; fill: #b9c7d5; }
+      .tag { font: 700 11px 'Segoe UI', Arial, sans-serif; letter-spacing: 1px; }
+      .region { fill: #091522; stroke: #274058; stroke-width: 1.5; stroke-dasharray: 7 8; rx: 18; }
+      .node { fill: #111f2e; stroke: #31506b; stroke-width: 1.5; rx: 12; filter: url(#shadow); }
+      .node-cyan { fill: #10232e; stroke: #39d0e6; stroke-width: 1.8; rx: 12; filter: url(#shadow); }
+      .node-purple { fill: #1b1830; stroke: #9b87f5; stroke-width: 1.8; rx: 12; filter: url(#shadow); }
+      .node-orange { fill: #2a2015; stroke: #f6a84b; stroke-width: 1.8; rx: 12; filter: url(#shadow); }
+      .node-green { fill: #10271f; stroke: #43d19e; stroke-width: 1.8; rx: 12; filter: url(#shadow); }
+      .node-red { fill: #2b171d; stroke: #ec7181; stroke-width: 1.8; rx: 12; filter: url(#shadow); }
+      .store { fill: #101b2a; stroke: #6b87a3; stroke-width: 1.5; rx: 6; filter: url(#shadow); }
+      .flow-cyan { fill: none; stroke: #39d0e6; stroke-width: 2.4; marker-end: url(#arrow-cyan); }
+      .flow-purple { fill: none; stroke: #9b87f5; stroke-width: 2.4; marker-end: url(#arrow-purple); }
+      .flow-orange { fill: none; stroke: #f6a84b; stroke-width: 2.4; marker-end: url(#arrow-orange); }
+      .flow-green { fill: none; stroke: #43d19e; stroke-width: 2.4; marker-end: url(#arrow-green); }
+      .flow-dashed { stroke-dasharray: 7 7; }
+    </style>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#070f19"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <rect x="0" y="0" width="1920" height="100" fill="#0a1522"/>
+  <rect x="0" y="98" width="1920" height="2" fill="#223a50"/>
+
+  <g transform="translate(54 25)">
+    <circle cx="25" cy="25" r="24" fill="#0d806f"/>
+    <path d="M13 27v-5M20 34V16M27 38V12M34 32V18M41 28v-7" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+    <text x="66" y="25" class="title">AI INTERVIEWER LOCAL</text>
+    <text x="67" y="51" class="subtitle">Kiến trúc hệ thống đánh giá vấn đáp bằng giọng nói · Local-first · VI / EN</text>
+  </g>
+  <g transform="translate(1645 30)">
+    <rect width="218" height="40" rx="20" fill="#11273a" stroke="#2f526c"/>
+    <circle cx="24" cy="20" r="6" fill="#43d19e"/>
+    <text x="42" y="25" class="small">VOICE-FIRST ASSESSMENT</text>
+  </g>
+
+  <!-- Region 1: Authoring -->
+  <rect class="region" x="48" y="130" width="615" height="345"/>
+  <text x="72" y="159" class="section-label">01 · TẠO ĐỀ VÀ XUẤT BẢN KỲ THI</text>
+
+  <g transform="translate(76 190)">
+    <rect class="node-cyan" width="155" height="82"/>
+    <circle cx="28" cy="28" r="12" fill="none" stroke="#39d0e6" stroke-width="2"/>
+    <path d="M11 64c2-17 32-17 34 0" fill="none" stroke="#39d0e6" stroke-width="2"/>
+    <text x="52" y="29" class="node-title">Giảng viên</text>
+    <text x="52" y="52" class="node-sub">Thiết lập kỳ thi</text>
+  </g>
+
+  <g transform="translate(280 177)">
+    <rect class="node" width="170" height="58"/>
+    <text x="85" y="25" text-anchor="middle" class="node-title">Model tự sinh</text>
+    <text x="85" y="45" text-anchor="middle" class="node-sub">Qwen3 8B</text>
+  </g>
+  <g transform="translate(280 252)">
+    <rect class="node" width="170" height="58"/>
+    <text x="85" y="25" text-anchor="middle" class="node-title">Tải đề JSON</text>
+    <text x="85" y="45" text-anchor="middle" class="node-sub">Cấu trúc chuẩn hóa</text>
+  </g>
+
+  <g transform="translate(495 177)">
+    <rect class="node-purple" width="140" height="133"/>
+    <path d="M51 24h38l14 14v56H51z" fill="none" stroke="#9b87f5" stroke-width="2"/>
+    <path d="M89 24v16h14M62 55h30M62 67h30M62 79h22" stroke="#9b87f5" stroke-width="2"/>
+    <text x="70" y="111" text-anchor="middle" class="node-title">Rubric câu hỏi</text>
+    <text x="70" y="129" text-anchor="middle" class="node-sub">Nguồn · độ khó · trùng</text>
+  </g>
+
+  <g transform="translate(184 359)">
+    <path class="store" d="M0 12C0 5 31 0 88 0s88 5 88 12v69c0 7-31 12-88 12S0 88 0 81z"/>
+    <ellipse cx="88" cy="12" rx="88" ry="12" fill="#17283a" stroke="#6b87a3" stroke-width="1.5"/>
+    <text x="88" y="47" text-anchor="middle" class="node-title">Ngân hàng câu hỏi</text>
+    <text x="88" y="69" text-anchor="middle" class="node-sub">Đã duyệt và có phiên bản</text>
+  </g>
+  <g transform="translate(430 359)">
+    <rect class="node-green" width="175" height="92"/>
+    <path d="M22 42l12 12 24-26" fill="none" stroke="#43d19e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="72" y="35" class="node-title">Đóng băng đề</text>
+    <text x="72" y="58" class="node-sub">Dễ · Trung bình · Khó</text>
+    <text x="72" y="76" class="node-sub">Xuất bản kỳ thi</text>
+  </g>
+
+  <path class="flow-cyan" d="M231 231H262"/>
+  <path class="flow-cyan" d="M231 231H251V281H262"/>
+  <path class="flow-purple" d="M450 206H478"/>
+  <path class="flow-purple" d="M450 281H478"/>
+  <path class="flow-purple" d="M565 310V336H272V351"/>
+  <path class="flow-green" d="M360 405H412"/>
+
+  <!-- Region 2: Student runtime -->
+  <rect class="region" x="48" y="505" width="615" height="495"/>
+  <text x="72" y="534" class="section-label">02 · PHỎNG VẤN SINH VIÊN</text>
+
+  <g transform="translate(76 565)">
+    <rect class="node-cyan" width="155" height="82"/>
+    <circle cx="28" cy="28" r="12" fill="none" stroke="#39d0e6" stroke-width="2"/>
+    <path d="M11 64c2-17 32-17 34 0" fill="none" stroke="#39d0e6" stroke-width="2"/>
+    <text x="52" y="29" class="node-title">Sinh viên</text>
+    <text x="52" y="52" class="node-sub">Đăng nhập hệ thống</text>
+  </g>
+
+  <g transform="translate(286 553)">
+    <rect class="node" width="152" height="58"/>
+    <text x="76" y="25" text-anchor="middle" class="node-title">Luyện tập</text>
+    <text x="76" y="45" text-anchor="middle" class="node-sub">Thích ứng độ khó</text>
+  </g>
+  <g transform="translate(286 626)">
+    <rect class="node" width="152" height="58"/>
+    <text x="76" y="25" text-anchor="middle" class="node-title">Thi chính thức</text>
+    <text x="76" y="45" text-anchor="middle" class="node-sub">Đề đã đóng băng</text>
+  </g>
+
+  <g transform="translate(483 553)">
+    <rect class="node-orange" width="150" height="131"/>
+    <path d="M75 24c-11 0-18 8-18 19v17c0 11 7 19 18 19s18-8 18-19V43c0-11-7-19-18-19z" fill="none" stroke="#f6a84b" stroke-width="2.5"/>
+    <path d="M49 61c0 18 10 27 26 27s26-9 26-27M75 88v13M59 101h32" fill="none" stroke="#f6a84b" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="75" y="119" text-anchor="middle" class="node-title">Kiểm tra mic</text>
+  </g>
+
+  <g transform="translate(103 754)">
+    <rect class="node" width="188" height="95"/>
+    <path d="M25 25h29v24H35l-10 10z" fill="none" stroke="#39d0e6" stroke-width="2"/>
+    <text x="70" y="36" class="node-title">Nhận câu hỏi</text>
+    <text x="70" y="59" class="node-sub">Theo cấu trúc kỳ thi</text>
+    <text x="70" y="77" class="node-sub">VI / EN</text>
+  </g>
+  <g transform="translate(360 754)">
+    <rect class="node-orange" width="220" height="95"/>
+    <circle cx="36" cy="44" r="18" fill="#f6a84b" opacity="0.2"/>
+    <circle cx="36" cy="44" r="8" fill="#f6a84b"/>
+    <text x="70" y="36" class="node-title">Ghi câu trả lời</text>
+    <text x="70" y="59" class="node-sub">Chỉ sử dụng voice</text>
+    <text x="70" y="77" class="node-sub">Không sửa transcript</text>
+  </g>
+
+  <g transform="translate(185 908)">
+    <rect class="node-green" width="310" height="62"/>
+    <text x="155" y="27" text-anchor="middle" class="node-title">Câu tiếp theo / Hoàn thành phiên</text>
+    <text x="155" y="48" text-anchor="middle" class="node-sub">Lộ trình Dễ → Trung bình → Khó</text>
+  </g>
+
+  <path class="flow-cyan" d="M231 606H268"/>
+  <path class="flow-cyan" d="M231 606H255V655H268"/>
+  <path class="flow-cyan" d="M438 582H465"/>
+  <path class="flow-cyan" d="M438 655H465"/>
+  <path class="flow-cyan" d="M558 684V718H197V736"/>
+  <path class="flow-orange" d="M291 801H342"/>
+  <path class="flow-green" d="M470 849V890"/>
+
+  <!-- Region 3: Voice AI pipeline -->
+  <rect class="region" x="700" y="130" width="525" height="870"/>
+  <text x="724" y="159" class="section-label">03 · PIPELINE VOICE VÀ AI LOCAL</text>
+
+  <g transform="translate(744 190)">
+    <path class="store" d="M0 12C0 5 31 0 96 0s96 5 96 12v79c0 7-31 12-96 12S0 98 0 91z"/>
+    <ellipse cx="96" cy="12" rx="96" ry="12" fill="#17283a" stroke="#6b87a3" stroke-width="1.5"/>
+    <text x="96" y="47" text-anchor="middle" class="node-title">Kho voice gốc</text>
+    <text x="96" y="69" text-anchor="middle" class="node-sub">Bằng chứng không chỉnh sửa</text>
+    <text x="96" y="87" text-anchor="middle" class="node-sub">Audio hash + metadata</text>
+  </g>
+
+  <g transform="translate(986 190)">
+    <rect class="node-orange" width="195" height="103"/>
+    <path d="M21 62c10-36 20 22 30-9s20 28 30-11 20 22 30-4 20 12 30-12" fill="none" stroke="#f6a84b" stroke-width="2.5"/>
+    <text x="98" y="30" text-anchor="middle" class="node-title">Xử lý âm thanh</text>
+    <text x="98" y="82" text-anchor="middle" class="node-sub">Độ ồn · VAD · khử nhiễu</text>
+  </g>
+
+  <g transform="translate(744 357)">
+    <rect class="node-cyan" width="192" height="113"/>
+    <text x="96" y="33" text-anchor="middle" class="tag" fill="#7fd8e7">STT · LẦN 1</text>
+    <text x="96" y="62" text-anchor="middle" class="node-title">Whisper Turbo</text>
+    <text x="96" y="86" text-anchor="middle" class="node-sub">Nhanh · VI / EN</text>
+  </g>
+  <g transform="translate(986 357)">
+    <rect class="node-purple" width="195" height="113"/>
+    <text x="98" y="33" text-anchor="middle" class="tag" fill="#c4b8ff">STT · FALLBACK</text>
+    <text x="98" y="62" text-anchor="middle" class="node-title">Whisper Large-v3</text>
+    <text x="98" y="86" text-anchor="middle" class="node-sub">Ưu tiên độ chính xác</text>
+  </g>
+
+  <g transform="translate(825 527)">
+    <path d="M137 0l137 62-137 62L0 62z" fill="#222034" stroke="#9b87f5" stroke-width="1.8" filter="url(#shadow)"/>
+    <text x="137" y="53" text-anchor="middle" class="node-title">Độ tin cậy đạt?</text>
+    <text x="137" y="77" text-anchor="middle" class="node-sub">Từ quan trọng · số liệu · phủ định</text>
+  </g>
+
+  <g transform="translate(744 711)">
+    <rect class="node-purple" width="437" height="105"/>
+    <circle cx="48" cy="52" r="25" fill="#9b87f5" opacity="0.18"/>
+    <path d="M37 52h22M48 41v22" stroke="#c4b8ff" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="88" y="38" class="node-title">Qwen kiểm tra transcript có ràng buộc</text>
+    <text x="88" y="63" class="node-sub">Chỉ sửa vùng nghi ngờ và thuật ngữ đã duyệt</text>
+    <text x="88" y="83" class="node-sub">Không được thay đổi ý nghĩa, số liệu hoặc từ phủ định</text>
+  </g>
+
+  <g transform="translate(807 877)">
+    <rect class="node-green" width="310" height="78"/>
+    <path d="M25 38l12 12 25-28" fill="none" stroke="#43d19e" stroke-width="3" stroke-linecap="round"/>
+    <text x="79" y="32" class="node-title">Transcript đã xác minh</text>
+    <text x="79" y="56" class="node-sub">Giữ bản gốc + bản sửa + confidence</text>
+  </g>
+
+  <path class="flow-orange" d="M936 241H968"/>
+  <path class="flow-orange" d="M1084 293V325H840V339"/>
+  <path class="flow-cyan" d="M840 470V500H894"/>
+  <path class="flow-purple" d="M1030 527V488H1084V470"/>
+  <text x="1092" y="510" class="tag" fill="#ec7181">THẤP</text>
+  <path class="flow-green" d="M962 651V693"/>
+  <text x="976" y="683" class="tag" fill="#43d19e">ĐẠT</text>
+  <path class="flow-purple" d="M1084 470V672H1110V693"/>
+  <path class="flow-green" d="M962 816V859"/>
+
+  <!-- Region 4: Scoring and reports -->
+  <rect class="region" x="1262" y="130" width="610" height="870"/>
+  <text x="1286" y="159" class="section-label">04 · CHẤM ĐIỂM, DUYỆT VÀ BÁO CÁO</text>
+
+  <g transform="translate(1305 190)">
+    <rect class="node-cyan" width="220" height="105"/>
+    <text x="110" y="32" text-anchor="middle" class="tag" fill="#7fd8e7">SCORING ENGINE</text>
+    <text x="110" y="62" text-anchor="middle" class="node-title">Chấm theo key points</text>
+    <text x="110" y="85" text-anchor="middle" class="node-sub">Điểm do backend tính</text>
+  </g>
+
+  <g transform="translate(1605 190)">
+    <rect class="node-purple" width="220" height="105"/>
+    <text x="110" y="32" text-anchor="middle" class="tag" fill="#c4b8ff">LLM EVALUATOR</text>
+    <text x="110" y="62" text-anchor="middle" class="node-title">Đánh giá từng tiêu chí</text>
+    <text x="110" y="85" text-anchor="middle" class="node-sub">Met · Partial · Missing</text>
+  </g>
+
+  <g transform="translate(1410 354)">
+    <path d="M158 0l158 67-158 67L0 67z" fill="#2b1d20" stroke="#ec7181" stroke-width="1.8" filter="url(#shadow)"/>
+    <text x="158" y="52" text-anchor="middle" class="node-title">Cần giảng viên kiểm tra?</text>
+    <text x="158" y="76" text-anchor="middle" class="node-sub">Điểm thấp · STT thấp · audio kém</text>
+    <text x="158" y="98" text-anchor="middle" class="node-sub">hoặc model không chắc chắn</text>
+  </g>
+
+  <g transform="translate(1305 553)">
+    <rect class="node" width="220" height="116"/>
+    <text x="110" y="35" text-anchor="middle" class="tag" fill="#8ea4ba">AI RESULT</text>
+    <text x="110" y="67" text-anchor="middle" class="node-title">Điểm AI tạm thời</text>
+    <text x="110" y="92" text-anchor="middle" class="node-sub">Kèm bằng chứng và confidence</text>
+  </g>
+
+  <g transform="translate(1605 553)">
+    <rect class="node-red" width="220" height="116"/>
+    <path d="M25 40c18-18 37-18 55 0-18 18-37 18-55 0z" fill="none" stroke="#ec7181" stroke-width="2"/>
+    <circle cx="52" cy="40" r="7" fill="none" stroke="#ec7181" stroke-width="2"/>
+    <text x="92" y="36" style="font:650 15px 'Segoe UI',Arial,sans-serif;fill:#f3f7fb">Giảng viên nghe voice</text>
+    <text x="92" y="61" class="node-sub">Đối chiếu transcript</text>
+    <text x="92" y="83" class="node-sub">Chấm lại và ghi lý do</text>
+  </g>
+
+  <g transform="translate(1410 734)">
+    <rect class="node-green" width="316" height="83"/>
+    <path d="M25 40l12 12 25-29" fill="none" stroke="#43d19e" stroke-width="3"/>
+    <text x="78" y="34" class="node-title">Kết quả cuối cùng</text>
+    <text x="78" y="58" class="node-sub">Điểm giảng viên được ưu tiên</text>
+  </g>
+
+  <g transform="translate(1305 878)">
+    <rect class="node-cyan" width="240" height="79"/>
+    <text x="120" y="31" text-anchor="middle" class="node-title">Báo cáo năng lực</text>
+    <text x="120" y="56" text-anchor="middle" class="node-sub">Điểm mạnh · điểm yếu · chủ đề</text>
+  </g>
+  <g transform="translate(1585 878)">
+    <path class="store" d="M0 10C0 4 28 0 120 0s120 4 120 10v59c0 6-28 10-120 10S0 75 0 69z"/>
+    <ellipse cx="120" cy="10" rx="120" ry="10" fill="#17283a" stroke="#6b87a3" stroke-width="1.5"/>
+    <text x="120" y="42" text-anchor="middle" class="node-title">Lịch sử và audit log</text>
+    <text x="120" y="63" text-anchor="middle" class="node-sub">Voice · điểm AI · điểm GV</text>
+  </g>
+
+  <path class="flow-purple" d="M1525 242H1587"/>
+  <path class="flow-cyan" d="M1715 295V322H1568V336"/>
+  <path class="flow-green" d="M1487 488V520H1415V535"/>
+  <text x="1416" y="515" class="tag" fill="#43d19e">KHÔNG</text>
+  <path d="M1648 488V520H1715V535" fill="none" stroke="#ec7181" stroke-width="2.4" marker-end="url(#arrow-orange)"/>
+  <text x="1727" y="515" class="tag" fill="#ec7181">CÓ</text>
+  <path class="flow-green" d="M1415 669V704H1497V716"/>
+  <path class="flow-green" d="M1715 669V704H1639V716"/>
+  <path class="flow-cyan" d="M1497 817V846H1425V860"/>
+  <path class="flow-green" d="M1639 817V846H1705V860"/>
+
+  <!-- Cross-region connections -->
+  <path class="flow-cyan flow-dashed" d="M605 405H676V801H598"/>
+  <text x="672" y="600" transform="rotate(-90 672 600)" class="tag" fill="#39d0e6">CÂU HỎI ĐÃ DUYỆT</text>
+  <path class="flow-orange" d="M580 801H686V241H726"/>
+  <text x="688" y="462" transform="rotate(-90 688 462)" class="tag" fill="#f6a84b">VOICE GỐC</text>
+  <path class="flow-cyan" d="M1117 916H1240V242H1287"/>
+  <text x="1239" y="606" transform="rotate(-90 1239 606)" class="tag" fill="#39d0e6">TRANSCRIPT XÁC MINH</text>
+  <path class="flow-orange flow-dashed" d="M840 293V324H1218V611H1587"/>
+  <text x="1214" y="430" transform="rotate(-90 1214 430)" class="tag" fill="#f6a84b">QUYỀN NGHE VOICE</text>
+  <path class="flow-green flow-dashed" d="M1305 917H1198V977H513"/>
+  <text x="939" y="971" class="tag" fill="#43d19e">PHẢN HỒI LUYỆN TẬP VÀ CHỌN CÂU TIẾP THEO</text>
+
+  <!-- Legend -->
+  <g transform="translate(60 1033)">
+    <text x="0" y="0" class="small">LUỒNG:</text>
+    <line x1="62" y1="-5" x2="96" y2="-5" stroke="#39d0e6" stroke-width="3"/>
+    <text x="105" y="0" class="small">Dữ liệu hệ thống</text>
+    <line x1="250" y1="-5" x2="284" y2="-5" stroke="#9b87f5" stroke-width="3"/>
+    <text x="293" y="0" class="small">AI / Model</text>
+    <line x1="395" y1="-5" x2="429" y2="-5" stroke="#f6a84b" stroke-width="3"/>
+    <text x="438" y="0" class="small">Voice / bằng chứng</text>
+    <line x1="605" y1="-5" x2="639" y2="-5" stroke="#43d19e" stroke-width="3"/>
+    <text x="648" y="0" class="small">Đã duyệt / kết quả</text>
+  </g>
+  <text x="1860" y="1035" text-anchor="end" class="small">Architecture draft · v1.0</text>
+</svg>
