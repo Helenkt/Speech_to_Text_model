@@ -1,5 +1,57 @@
 # Changelog
 
+## 1.12.0
+
+- Hoàn thiện màn hình chấm lại theo ba lớp điểm: AI ban đầu, AI chấm lại và điểm cuối.
+- Trình bày voice là bằng chứng tùy chọn, cho phép bỏ qua hoặc phát lại không giới hạn.
+- Nối lịch sử chấm vào giao diện và hiển thị từng lần thay đổi điểm, người chấm, thời gian.
+- Bổ sung trạng thái chờ AI, đang xử lý, chờ quyết định và đã chốt trong danh sách câu.
+- Cân chỉnh lại responsive, biểu mẫu quyết định và màn hình đăng nhập.
+
+## 1.11.0
+
+- Điểm AI của bài thi voice chỉ là đề xuất cho đến khi Giáo viên xác nhận hoặc tự chấm.
+- Cho phép nghe, bỏ qua hoặc phát lại voice không giới hạn khi chấm; bỏ khóa nghe hết.
+- Cho phép Giáo viên dùng điểm AI mạnh ở mọi mức điểm và luôn lưu lịch sử quyết định.
+- Backend tự đo tiếng nền, gắn kiểm tra mic đúng phiên và tự đóng phiên hết hạn.
+- Chống chạy trùng model mạnh, thêm cache có phiên bản và chính sách giữ model theo tài nguyên.
+
+## 1.10.0
+
+- Tự nhận diện CPU, tổng RAM, RAM còn trống, mức sử dụng RAM, CUDA và VRAM.
+- Tự chọn profile Tiết kiệm, Cân bằng, Hiệu năng hoặc Độ chính xác cao.
+- Chỉ cho phép model STT thứ hai ở profile đủ tài nguyên và luôn tải theo nhu cầu.
+- Giới hạn một model nặng trong bộ nhớ; tiếp tục tự hạ cấp khi CUDA hoặc VRAM lỗi.
+- Công khai chính sách khử nhiễu, phát hiện chồng giọng và bộ nhớ qua `/api/health`.
+- Cho phép đặt `RUNTIME_PROFILE` nhưng vẫn hạ xuống CPU khi máy không có CUDA.
+
+## 1.9.0
+
+- Thêm adaptive VAD theo tiếng nền thực tế: quiet, moderate, noisy và very noisy.
+- Lưu cấu hình VAD đã dùng trong metadata của từng transcript để kiểm tra lại.
+- Bắt buộc evidence quote của câu hỏi AI phải khớp nguyên văn nguồn đã duyệt.
+- Lưu file nguồn, SHA-256 nguồn, trích đoạn, model và SHA-256 prompt cho câu hỏi AI.
+- Thêm benchmark WER/CER với mục tiêu clean <= 8%, noisy <= 15% và 0 lỗi quan trọng.
+- Benchmark tự phát hiện mất số liệu, phủ định và thuật ngữ bắt buộc.
+- Benchmark thực tế đạt WER 7,48% trên audio sạch, 11,54% trên audio có tiếng nền
+  và 0 lỗi quan trọng với Faster-Whisper medium CUDA/float16.
+
+## 1.8.2
+
+- Cho phép Giáo viên chấm lại bất kỳ câu trả lời voice nào, kể cả câu đã chấm trước đó.
+- Cho phép dùng nguyên điểm AI khi điểm đạt ngưỡng trung bình.
+- Bắt buộc nghe hết voice trước khi chấm tay; tự phát voice với câu dưới trung bình.
+- Giữ trình phát để Giáo viên nghe lại voice nhiều lần.
+- Lưu một bản ghi lịch sử riêng cho mỗi lần Giáo viên xác nhận hoặc thay đổi điểm.
+
+## 1.8.1
+
+- Thay giao diện quản lý và thi vấn đáp bằng bố cục mới, đồng đều trên desktop và mobile.
+- Gộp Kết quả và Chấm lại thành một không gian làm việc dành cho Giáo viên.
+- Chuẩn hóa toàn bộ nội dung đăng nhập sang tiếng Việt.
+- Chuẩn hóa icon giao diện theo bộ Lucide nội bộ, không phụ thuộc Internet.
+- Mở rộng màn hình kiểm tra microphone và báo cáo kết quả.
+
 ## 1.8.0
 
 - Thêm màn hình sinh câu hỏi Easy, Medium, Hard bằng Qwen3:8B từ nguồn nội bộ.

@@ -57,5 +57,6 @@ class GeneratedQuestionDecisionRequest(BaseModel):
 
 
 class TeacherAnswerReviewRequest(BaseModel):
-    score: float = Field(ge=0, le=100)
-    feedback: str = Field(min_length=1, max_length=2_000)
+    action: Literal["accept_ai", "manual"] = "manual"
+    score: float | None = Field(default=None, ge=0, le=100)
+    feedback: str = Field(default="", max_length=2_000)

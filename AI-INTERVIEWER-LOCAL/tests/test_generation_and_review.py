@@ -2,6 +2,7 @@ import hashlib
 import json
 from datetime import datetime, timedelta, timezone
 
+import app.main as main_module
 from app.services.transcription_store import save_transcription
 
 
@@ -44,6 +45,7 @@ def _generated_candidate():
         "source_evidence": [
             {
                 "source_question_id": "AI_SOURCE_001",
+                "evidence_quote": "Mô hình học máy học quy luật từ dữ liệu",
                 "supported_claim": "Vai trò của mô hình được nêu trong đáp án nguồn",
             }
         ],
@@ -88,6 +90,9 @@ def test_teacher_can_generate_review_and_approve_question(
     generated = response.json()["questions"][0]
     assert generated["status"] == "draft"
     assert generated["rubric"]["score"] == 100
+    assert generated["question"]["generation_provenance"]["prompt_sha256"]
+    assert generated["question"]["source_provenance"][0]["source_name"] == "source.json"
+    assert len(generated["question"]["source_provenance"][0]["source_sha256"]) == 64
 
     approved = client.patch(
         f"/api/teacher/questions/generated/{generated['generated_id']}",
@@ -99,7 +104,7 @@ def test_teacher_can_generate_review_and_approve_question(
 
 
 def test_voice_evidence_and_teacher_score_become_final(
-    client, login_teacher, test_settings
+    client, login_teacher, test_settings, monkeypatch
 ):
     source = json.dumps([_source_question()], ensure_ascii=False).encode("utf-8")
     assert client.post(
@@ -159,7 +164,59 @@ def test_voice_evidence_and_teacher_score_become_final(
     assert _login(client, "teacher", "Teacher@123").status_code == 200
     queue = client.get("/api/teacher/reviews").json()["answers"]
     assert len(queue) == 1
+    assert queue[0]["review_policy"] == "ai_reanalysis_required"
+    assert queue[0]["can_accept_ai"] is False
     answer_id = queue[0]["answer_id"]
+    provisional_report = client.get(
+        f"/api/teacher/results/{started['session_id']}"
+    ).json()
+    assert provisional_report["answers"][0]["evaluation"]["final_score"] is None
+    assert provisional_report["answers"][0]["evaluation"]["score_status"] == "proposed"
+
+    monkeypatch.setattr(
+        main_module,
+        "transcribe_review_audio",
+        lambda *_args, **_kwargs: {
+            "text": "Tôi không biết",
+            "model": "large-v3",
+            "runtime": "cpu/int8",
+            "metrics": {"confidence": 0.96},
+            "uncertain_spans": [],
+        },
+    )
+
+    async def no_review_correction(_settings, raw_text, **_kwargs):
+        return {
+            "raw_text": raw_text,
+            "corrected_text": raw_text,
+            "correction_applied": False,
+            "correction_engine": "none",
+            "correction_rejected_reason": None,
+            "edit_ratio": 0.0,
+            "corrections": [],
+            "rejected_corrections": [],
+        }
+
+    async def low_review_score(*_args, **_kwargs):
+        return {
+            "score": 20,
+            "feedback": "Câu trả lời chưa thể hiện kiến thức.",
+            "point_assessments": [],
+        }
+
+    monkeypatch.setattr(main_module, "correct_transcript", no_review_correction)
+    monkeypatch.setattr(main_module, "evaluate_answer", low_review_score)
+    strong_review = client.post(
+        f"/api/teacher/answers/{answer_id}/ai-review"
+    )
+    assert strong_review.status_code == 200
+    assert strong_review.json()["review_model"] == "large-v3"
+    assert strong_review.json()["review_ai_score"] == 20
+
+    queue = client.get("/api/teacher/reviews").json()["answers"]
+    assert queue[0]["review_policy"] == "teacher_decision_recommended"
+    assert queue[0]["audio_required"] is False
+    assert queue[0]["can_accept_ai"] is True
 
     audio = client.get(f"/api/teacher/transcriptions/{transcription_id}/audio")
     assert audio.status_code == 200
@@ -168,19 +225,40 @@ def test_voice_evidence_and_teacher_score_become_final(
 
     reviewed = client.patch(
         f"/api/teacher/answers/{answer_id}/review",
-        json={"score": 72, "feedback": "Sinh viên hiểu ý chính sau khi nghe lại voice."},
+        json={
+            "action": "manual",
+            "score": 72,
+            "feedback": "Giảng viên tự chấm theo transcript và rubric.",
+        },
     )
     assert reviewed.status_code == 200
     assert reviewed.json()["final_score"] == 72
-    assert client.get("/api/teacher/reviews").json()["answers"] == []
+    reviewed_queue = client.get("/api/teacher/reviews").json()["answers"]
+    assert len(reviewed_queue) == 1
+    assert reviewed_queue[0]["final_score"] == 72
+    assert reviewed_queue[0]["reviewed_at"] is not None
+
+    reviewed_again = client.patch(
+        f"/api/teacher/answers/{answer_id}/review",
+        json={
+            "action": "manual",
+            "score": 68,
+            "feedback": "Giảng viên nghe lại voice lần hai và điều chỉnh điểm.",
+        },
+    )
+    assert reviewed_again.status_code == 200
+    assert reviewed_again.json()["previous_final_score"] == 72
+    assert reviewed_again.json()["final_score"] == 68
 
     report = client.get(f"/api/teacher/results/{started['session_id']}").json()
-    assert report["summary"]["average_score"] == 72
-    assert report["answers"][0]["evaluation"]["final_score"] == 72
-    assert report["answers"][0]["evaluation"]["teacher_score"] == 72
+    assert report["summary"]["average_score"] == 68
+    assert report["answers"][0]["evaluation"]["final_score"] == 68
+    assert report["answers"][0]["evaluation"]["teacher_score"] == 68
     assert report["answers"][0]["voice"]["audio_available"] is True
     history = client.get(f"/api/teacher/answers/{answer_id}/reviews").json()
-    assert len(history["reviews"]) == 1
+    assert len(history["reviews"]) == 2
+    assert history["reviews"][0]["teacher_score"] == 72
+    assert history["reviews"][1]["teacher_score"] == 68
 
     deleted = client.delete(f"/api/teacher/results/{started['session_id']}")
     assert deleted.status_code == 200

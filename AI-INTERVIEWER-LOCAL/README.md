@@ -196,6 +196,12 @@ Quy tắc kiểm định câu hỏi do LLM sinh nằm trong
 được bổ sung kiến thức Internet. Backend kiểm tra nguồn, cấu trúc, độ trùng và bằng
 chứng độ khó trước khi cho phép sử dụng câu hỏi.
 
+Mỗi câu sinh mới còn được backend gắn `source_provenance` gồm UID/ID câu nguồn,
+tên file, SHA-256 file, trạng thái duyệt và trích đoạn tham chiếu. Model phải trả
+`evidence_quote` khớp nguyên văn đáp án hoặc key point nguồn; nếu không khớp, câu
+bị từ chối. `generation_provenance` lưu model, thời điểm sinh và SHA-256 prompt để
+có thể tái kiểm tra mà không phải công khai toàn bộ prompt.
+
 Độ khó không được xác định chỉ bằng độ dài câu. Rubric đo mức Bloom, số khái niệm,
 số bước suy luận, số ràng buộc, thời lượng trả lời và số key points. Câu luyện tập cần
 đạt tối thiểu 85/100 và không vi phạm điều kiện bắt buộc; câu dùng trong Interview
@@ -224,15 +230,82 @@ Mỗi câu trả lời bằng giọng nói lưu file voice gốc trong `data/aud
 transcript ban đầu, transcript đã xác minh và độ tin cậy. Thư mục voice được loại khỏi
 Git để không công khai dữ liệu cá nhân của sinh viên.
 
-Điểm AI là điểm tạm thời. Trong kỳ thi chính thức, câu có điểm dưới
-`TEACHER_REVIEW_SCORE_THRESHOLD` hoặc có cảnh báo STT được đưa vào hàng chờ. Giáo viên
-có quyền nghe voice, đối chiếu transcript và nhập điểm mới. Báo cáo dùng điểm Giáo viên
-làm điểm cuối, đồng thời vẫn giữ điểm AI và lịch sử thay đổi để kiểm tra.
+Điểm AI ban đầu là điểm tạm thời. Khi Giáo viên mở một câu trong phần chấm lại,
+backend dùng Faster-Whisper `large-v3` chạy Beam 5 trên voice gốc, sửa an toàn các vùng
+không chắc chắn rồi chấm lại theo cùng rubric. Giao diện giữ song song text cũ và text
+do model mạnh chuyển lại. Kết quả được lưu để không chạy lại model khi mở lần sau.
+
+Điểm từ model mạnh luôn là điểm đề xuất. Giáo viên có thể dùng điểm này hoặc tự nhập
+điểm và nhận xét, kể cả khi kết quả dưới `TEACHER_REVIEW_SCORE_THRESHOLD`. Việc nghe
+voice là tùy chọn, có thể phát lại không giới hạn và không khóa thao tác chấm. Chỉ sau
+quyết định của Giáo viên, điểm mới được ghi vào `final_score`; mọi lần đổi điểm đều có
+lịch sử riêng.
+
+Kết quả model mạnh dùng cache có phiên bản theo STT, LLM và rubric. Cùng một câu trả
+lời không bị xử lý trùng khi có nhiều yêu cầu đồng thời. `REVIEW_MODEL_CACHE_POLICY`
+cho phép tự giữ model trên máy đủ RAM/VRAM và tự giải phóng trên máy yếu.
 
 - `GET /api/teacher/reviews`: hàng chờ cần chấm lại.
+- `POST /api/teacher/answers/{id}/ai-review`: chạy hoặc lấy lại kết quả `large-v3` đã lưu.
 - `GET /api/teacher/transcriptions/{id}/audio`: nghe hoặc tải voice gốc.
 - `PATCH /api/teacher/answers/{id}/review`: nhập điểm và nhận xét của Giáo viên.
 - `GET /api/teacher/answers/{id}/reviews`: xem lịch sử chấm lại.
+
+### Adaptive VAD và chuẩn WER
+
+Hệ thống chọn cấu hình Silero VAD theo mức tiếng nền đo được thay vì dùng một
+ngưỡng cố định. Bốn profile `quiet`, `moderate`, `noisy`, `very_noisy` điều chỉnh
+ngưỡng speech, thời gian im lặng, thời lượng speech tối thiểu và padding. Profile
+đã dùng được lưu trong metadata transcript.
+
+Kiểm tra microphone được gắn với đúng `session_id` đang thi. Backend tự đo tiếng nền
+từ audio; số đo phía trình duyệt chỉ dùng để đối chiếu. Phiên luyện tập bị bỏ quên được
+tự đóng sau `ACTIVE_SESSION_TTL_HOURS`, còn phiên thi thật tự đóng khi đợt thi hết hạn.
+
+Chuẩn chấp nhận STT:
+
+- Audio sạch: `WER <= 8%`.
+- Audio có tiếng nền: `WER <= 15%`.
+- Không được làm mất hoặc thay đổi số liệu, phủ định và thuật ngữ được đánh dấu.
+
+Đây là tiêu chí benchmark, không phải con số ước lượng trên giao diện. Đặt các
+file voice có transcript chuẩn theo mẫu `test_audio/benchmark_manifest.example.json`,
+sau đó chạy:
+
+```powershell
+python -m app.stt_benchmark test_audio/benchmark_manifest.json `
+  --output data/stt_benchmark_report.json
+```
+
+Lệnh trả exit code `0` chỉ khi cả hai nhóm clean/noisy đạt WER và tổng lỗi quan
+trọng bằng 0. Báo cáo lưu WER, CER và lỗi của từng mẫu.
+
+Kết quả benchmark gần nhất với Faster-Whisper `medium`, CUDA/float16:
+
+| Điều kiện | Mẫu | Số từ | Lỗi từ | WER | Mục tiêu | Kết quả |
+|---|---:|---:|---:|---:|---:|---|
+| Audio sạch | 3 | 147 | 11 | 7,48% | <= 8% | Đạt |
+| Phòng có tiếng nền | 1 | 104 | 12 | 11,54% | <= 15% | Đạt |
+
+Số lỗi ở số liệu, phủ định và thuật ngữ quan trọng: `0`. Chi tiết từng mẫu nằm
+trong `data/stt_benchmark_report.json`.
+
+### Tự nhận diện cấu hình máy
+
+Khi khởi động, backend đọc số luồng CPU, tổng RAM, RAM còn trống, mức sử dụng RAM,
+CUDA, số GPU và VRAM rồi tự chọn profile:
+
+| Profile | Model chính | Chính sách |
+|---|---|---|
+| Tiết kiệm | `small/cpu/int8` | Một model, ghi lại khi audio khó |
+| Cân bằng | `medium/cpu/int8` | Khử nhiễu theo nhu cầu nếu đã cài engine |
+| Hiệu năng | `medium/cuda/float16` | Xử lý nặng theo nhu cầu, không giữ song song model |
+| Độ chính xác cao | `medium/cuda/float16` | Giải mã thích ứng: lượt nhanh trước, Beam 5 khi độ tin cậy thấp |
+
+`GET /api/health` trả cả phần cứng, profile, tính năng thực sự có sẵn và chính sách
+bộ nhớ. DeepFilterNet hoặc pyannote chỉ được báo là có khi thư viện tương ứng đã
+cài; hệ thống không giả định chúng đang hoạt động. Có thể đặt `RUNTIME_PROFILE`
+trong `.env`, nhưng profile cần GPU vẫn tự hạ xuống CPU nếu CUDA không tồn tại.
 
 ## 7. Cấu trúc chính
 

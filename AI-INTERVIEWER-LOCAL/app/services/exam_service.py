@@ -372,7 +372,7 @@ def list_exam_attempts(
             SELECT s.session_id, s.candidate_name, s.status, s.answered_count,
                    s.requested_count, s.created_at, s.finished_at, u.username,
                    u.email, u.student_id, r.exam_code, r.title, r.subject,
-                   ROUND(AVG(COALESCE(a.final_score, a.score)), 1) AS average_score,
+                   ROUND(AVG(a.final_score), 1) AS average_score,
                    SUM(CASE WHEN a.review_required = 1 AND a.reviewed_at IS NULL
                             THEN 1 ELSE 0 END) AS pending_review_count
             FROM interview_sessions AS s

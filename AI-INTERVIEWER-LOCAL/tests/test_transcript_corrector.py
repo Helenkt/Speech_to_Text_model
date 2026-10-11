@@ -1,3 +1,4 @@
+from app.config import Settings
 from app.services.transcript_corrector import (
     _acronym_corrections,
     _apply_audited_corrections,
@@ -6,6 +7,27 @@ from app.services.transcript_corrector import (
     _source_is_uncertain,
     _validate_correction,
 )
+
+
+def _settings(tmp_path):
+    return Settings(
+        root_dir=tmp_path,
+        database_path=tmp_path / "test.db",
+        static_dir=tmp_path,
+        demo_data_dir=tmp_path,
+        whisper_download_root=tmp_path / "models",
+    )
+
+
+def _run_without_await(coroutine):
+    """Resolve an async fast path and fail if it tries to perform network I/O."""
+    try:
+        coroutine.send(None)
+    except StopIteration as completed:
+        return completed.value
+    finally:
+        coroutine.close()
+    raise AssertionError("Expected the deterministic correction path to avoid awaits")
 
 
 def test_acronym_finds_vietnamese_and_spaced_english_pronunciations():
@@ -143,3 +165,37 @@ def test_common_word_is_fixed_only_inside_uncertain_span():
     assert _uncertain_language_corrections("dới 2TB", None) == []
     changes = _uncertain_language_corrections("dới 2TB", ["dới hai tê bê"])
     assert changes[0]["target"] == "với"
+
+
+def test_clean_transcript_skips_llm(tmp_path):
+    from app.services.transcript_corrector import correct_transcript
+
+    result = _run_without_await(
+        correct_transcript(
+            _settings(tmp_path),
+            "Cấu trúc dữ liệu tổ chức dữ liệu trong bộ nhớ.",
+            language="vi",
+            approved_terms=["cấu trúc dữ liệu"],
+            uncertain_spans=[],
+        )
+    )
+
+    assert result["correction_engine"] == "skipped-high-confidence"
+    assert result["corrected_text"] == result["raw_text"]
+
+
+def test_deterministic_term_correction_does_not_wait_for_llm(tmp_path):
+    from app.services.transcript_corrector import correct_transcript
+
+    result = _run_without_await(
+        correct_transcript(
+            _settings(tmp_path),
+            "Giao thức hát tê tê pê được sử dụng.",
+            language="vi",
+            approved_terms=["HTTP"],
+            uncertain_spans=["hát tê tê pê"],
+        )
+    )
+
+    assert result["correction_engine"] == "deterministic-glossary"
+    assert "HTTP" in result["corrected_text"]

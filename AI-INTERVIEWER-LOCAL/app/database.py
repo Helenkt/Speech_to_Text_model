@@ -117,6 +117,8 @@ CREATE TABLE IF NOT EXISTS interview_sessions (
     evaluator_requested TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'active',
     finish_reason TEXT,
+    mic_checked_at TEXT,
+    mic_check_result_json TEXT,
     created_at TEXT NOT NULL,
     finished_at TEXT,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
@@ -145,6 +147,10 @@ CREATE TABLE IF NOT EXISTS interview_answers (
     final_score REAL,
     teacher_score REAL,
     teacher_feedback TEXT,
+    review_ai_score REAL,
+    review_ai_feedback TEXT,
+    review_ai_evaluation_json TEXT,
+    review_ai_at TEXT,
     reviewed_by INTEGER,
     reviewed_at TEXT,
     created_at TEXT NOT NULL,
@@ -172,6 +178,15 @@ CREATE TABLE IF NOT EXISTS speech_transcriptions (
     audio_size INTEGER,
     accepted INTEGER NOT NULL DEFAULT 1,
     consumed INTEGER NOT NULL DEFAULT 0,
+    attempt_number INTEGER NOT NULL DEFAULT 1,
+    retry_reason TEXT,
+    superseded_by TEXT,
+    review_transcript TEXT,
+    review_model TEXT,
+    review_runtime TEXT,
+    review_confidence REAL,
+    review_metadata_json TEXT,
+    review_processed_at TEXT,
     created_at TEXT NOT NULL,
     FOREIGN KEY (session_id) REFERENCES interview_sessions(session_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -240,6 +255,8 @@ SESSION_COLUMNS = {
     "interview_mode": "TEXT NOT NULL DEFAULT 'practice'",
     "exam_round_id": "TEXT REFERENCES exam_rounds(exam_round_id)",
     "answer_mode": "TEXT NOT NULL DEFAULT 'voice'",
+    "mic_checked_at": "TEXT",
+    "mic_check_result_json": "TEXT",
 }
 
 
@@ -312,20 +329,38 @@ def _migrate_existing_database(connection: sqlite3.Connection) -> None:
         "final_score": "REAL",
         "teacher_score": "REAL",
         "teacher_feedback": "TEXT",
+        "review_ai_score": "REAL",
+        "review_ai_feedback": "TEXT",
+        "review_ai_evaluation_json": "TEXT",
+        "review_ai_at": "TEXT",
         "reviewed_by": "INTEGER",
         "reviewed_at": "TEXT",
     }
+    new_answer_columns: set[str] = set()
     for name, definition in answer_additions.items():
         if name not in answer_columns:
             connection.execute(
                 f"ALTER TABLE interview_answers ADD COLUMN {name} {definition}"
             )
+            new_answer_columns.add(name)
 
     connection.execute(
         "UPDATE interview_answers SET ai_score = score WHERE ai_score IS NULL"
     )
+    if "final_score" in new_answer_columns:
+        connection.execute(
+            "UPDATE interview_answers SET final_score = score WHERE final_score IS NULL"
+        )
     connection.execute(
-        "UPDATE interview_answers SET final_score = score WHERE final_score IS NULL"
+        """
+        UPDATE interview_answers
+        SET final_score = NULL, review_required = 1
+        WHERE reviewed_at IS NULL
+          AND session_id IN (
+              SELECT session_id FROM interview_sessions
+              WHERE interview_mode = 'real' AND answer_mode = 'voice'
+          )
+        """
     )
 
     transcription_columns = {
@@ -337,6 +372,15 @@ def _migrate_existing_database(connection: sqlite3.Connection) -> None:
         "audio_sha256": "TEXT",
         "audio_mime_type": "TEXT",
         "audio_size": "INTEGER",
+        "attempt_number": "INTEGER NOT NULL DEFAULT 1",
+        "retry_reason": "TEXT",
+        "superseded_by": "TEXT",
+        "review_transcript": "TEXT",
+        "review_model": "TEXT",
+        "review_runtime": "TEXT",
+        "review_confidence": "REAL",
+        "review_metadata_json": "TEXT",
+        "review_processed_at": "TEXT",
     }
     for name, definition in transcription_additions.items():
         if name not in transcription_columns:

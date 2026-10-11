@@ -352,9 +352,12 @@ def test_voice_interview_uses_server_transcript_instead_of_submitted_text(
     assert login(client, "candidate01", "Candidate@123").status_code == 200
     started = client.post("/api/candidate/exams/VOICE2026/start").json()
 
-    def fake_transcription(_, content, *, filename, language, hotwords):
+    def fake_transcription(
+        _, content, *, filename, language, hotwords, ambient_noise_dbfs=None
+    ):
         assert content == b"voice-data"
         assert hotwords
+        assert ambient_noise_dbfs is None
         return {
             "text": "HTTP status code mô tả kết quả request.",
             "language": language,
@@ -379,6 +382,17 @@ def test_voice_interview_uses_server_transcript_instead_of_submitted_text(
 
     monkeypatch.setattr(main_module, "transcribe_bytes", fake_transcription)
     monkeypatch.setattr(main_module, "correct_transcript", no_correction)
+    monkeypatch.setattr(
+        main_module,
+        "analyze_microphone_sample",
+        lambda *_args, **_kwargs: {"ready": True, "status": "good"},
+    )
+    mic_check = client.post(
+        "/api/speech/microphone-check",
+        data={"session_id": started["session_id"]},
+        files={"file": ("mic.webm", b"microphone-data", "audio/webm")},
+    )
+    assert mic_check.status_code == 200
     transcript = client.post(
         "/api/speech/transcribe",
         data={"language": "vi", "session_id": started["session_id"]},

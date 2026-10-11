@@ -5,10 +5,11 @@ import importlib.util
 import json
 import math
 import os
+import subprocess
 import tempfile
 import threading
 import wave
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -22,6 +23,7 @@ _REQUESTED_MODEL_KEY: tuple[str, str, str] | None = None
 _ACTIVE_PROFILE: "STTRuntimeProfile | None" = None
 _FAILED_PROFILE_KEYS: set[tuple[str, str, str]] = set()
 _MODEL_LOCK = threading.Lock()
+_INFERENCE_LOCK = threading.Lock()
 _DLL_DIRECTORY_HANDLES: list[Any] = []
 
 
@@ -36,6 +38,21 @@ class STTRuntimeProfile:
     compute_type: str
     tier: str
     reason: str
+    label: str = "Tương thích"
+    denoise_policy: str = "browser_only"
+    overlap_policy: str = "retry"
+    max_parallel_models: int = 1
+
+
+@dataclass(frozen=True, slots=True)
+class HardwareCapabilities:
+    cpu_threads: int
+    total_memory_gb: float
+    available_memory_gb: float
+    memory_load_percent: float
+    cuda_available: bool
+    cuda_device_count: int
+    cuda_vram_gb: float | None
 
 
 def is_installed() -> bool:
@@ -57,7 +74,7 @@ def _configure_local_cuda_runtime() -> None:
         _DLL_DIRECTORY_HANDLES.append(os.add_dll_directory(runtime_text))
 
 
-def _memory_gb() -> float:
+def _memory_stats_gb() -> tuple[float, float, float]:
     try:
         if os.name == "nt":
             class MemoryStatus(ctypes.Structure):
@@ -76,13 +93,23 @@ def _memory_gb() -> float:
             status = MemoryStatus()
             status.length = ctypes.sizeof(MemoryStatus)
             ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status))
-            return round(status.total_physical / (1024**3), 1)
+            total = status.total_physical / (1024**3)
+            available = status.available_physical / (1024**3)
+            return round(total, 1), round(available, 1), round(float(status.memory_load), 1)
 
         pages = os.sysconf("SC_PHYS_PAGES")
         page_size = os.sysconf("SC_PAGE_SIZE")
-        return round((pages * page_size) / (1024**3), 1)
+        total = (pages * page_size) / (1024**3)
+        available_pages = os.sysconf("SC_AVPHYS_PAGES")
+        available = (available_pages * page_size) / (1024**3)
+        load = 100.0 * (1.0 - (available / max(total, 0.1)))
+        return round(total, 1), round(available, 1), round(load, 1)
     except (AttributeError, OSError, ValueError):
-        return 0.0
+        return 0.0, 0.0, 0.0
+
+
+def _memory_gb() -> float:
+    return _memory_stats_gb()[0]
 
 
 def _cuda_available() -> bool:
@@ -95,26 +122,108 @@ def _cuda_available() -> bool:
         return False
 
 
-def resolve_runtime_profile(settings: Settings) -> STTRuntimeProfile:
-    cpu_threads = os.cpu_count() or 1
-    memory_gb = _memory_gb()
-    has_cuda = _cuda_available()
+def _cuda_device_count() -> int:
+    try:
+        _configure_local_cuda_runtime()
+        import ctranslate2
 
-    if has_cuda:
-        recommended = STTRuntimeProfile(
-            "medium", "cuda", "float16", "validated_gpu",
-            "Có GPU CUDA; dùng Whisper medium đã cho WER tốt nhất trên bộ kiểm thử cục bộ.",
+        return int(ctranslate2.get_cuda_device_count())
+    except Exception:
+        return 0
+
+
+def _cuda_vram_gb() -> float | None:
+    try:
+        startup = None
+        if os.name == "nt":
+            startup = subprocess.STARTUPINFO()
+            startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        completed = subprocess.run(
+            [
+                "nvidia-smi",
+                "--query-gpu=memory.total",
+                "--format=csv,noheader,nounits",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=3,
+            startupinfo=startup,
         )
-    elif cpu_threads >= 8 and memory_gb >= 12:
-        recommended = STTRuntimeProfile(
-            "medium", "cpu", "int8", "balanced_cpu",
-            "CPU/RAM đủ dùng model medium lượng tử hóa INT8.",
+        values = [float(line.strip()) / 1024 for line in completed.stdout.splitlines() if line.strip()]
+        return round(max(values), 1) if values else None
+    except (FileNotFoundError, OSError, ValueError, subprocess.SubprocessError):
+        return None
+
+
+def detect_hardware() -> HardwareCapabilities:
+    total, available, load = _memory_stats_gb()
+    cuda = _cuda_available()
+    count = _cuda_device_count() if cuda else 0
+    return HardwareCapabilities(
+        cpu_threads=os.cpu_count() or 1,
+        total_memory_gb=total,
+        available_memory_gb=available,
+        memory_load_percent=load,
+        cuda_available=cuda,
+        cuda_device_count=count,
+        cuda_vram_gb=_cuda_vram_gb() if cuda else None,
+    )
+
+
+def _profile_for_tier(tier: str, hardware: HardwareCapabilities) -> STTRuntimeProfile:
+    if tier == "high_accuracy" and hardware.cuda_available:
+        return STTRuntimeProfile(
+            "medium", "cuda", "float16", "high_accuracy",
+            "GPU và bộ nhớ đủ để Whisper medium giải mã chính xác khi cần.",
+            "Độ chính xác cao", "deepfilter_on_demand",
+            "detect_and_retry", 1,
         )
-    else:
-        recommended = STTRuntimeProfile(
-            "small", "cpu", "int8", "compatible_cpu",
-            "Máy không có CUDA hoặc tài nguyên hạn chế; dùng small INT8.",
+    if tier in {"performance", "high_accuracy"} and hardware.cuda_available:
+        return STTRuntimeProfile(
+            "medium", "cuda", "float16", "performance",
+            "Có CUDA; dùng Whisper medium FP16 và chỉ bật xử lý nặng khi cần.",
+            "Hiệu năng", "deepfilter_on_demand", "detect_and_retry", 1,
         )
+    if tier in {"balanced", "performance", "high_accuracy"}:
+        return STTRuntimeProfile(
+            "medium", "cpu", "int8", "balanced",
+            "CPU/RAM phù hợp với Whisper medium lượng tử hóa INT8.",
+            "Cân bằng", "deepfilter_on_demand", "detect_and_retry", 1,
+        )
+    return STTRuntimeProfile(
+        "small", "cpu", "int8", "low",
+        "Tài nguyên hạn chế; dùng Whisper small INT8 và yêu cầu ghi lại khi âm thanh khó.",
+        "Tiết kiệm", "browser_only", "retry", 1,
+    )
+
+
+def resolve_runtime_profile(
+    settings: Settings, hardware: HardwareCapabilities | None = None
+) -> STTRuntimeProfile:
+    hardware = hardware or detect_hardware()
+    requested_tier = settings.runtime_profile
+    if requested_tier == "auto":
+        if (
+            hardware.cuda_available
+            and hardware.cuda_vram_gb is not None
+            and hardware.cuda_vram_gb >= 8.0
+            and hardware.available_memory_gb >= 8.0
+        ):
+            requested_tier = "high_accuracy"
+        elif hardware.cuda_available and (
+            hardware.cuda_vram_gb is None or hardware.cuda_vram_gb >= 4.0
+        ):
+            requested_tier = "performance"
+        elif (
+            hardware.cpu_threads >= 8
+            and hardware.total_memory_gb >= 12.0
+            and hardware.available_memory_gb >= 4.0
+        ):
+            requested_tier = "balanced"
+        else:
+            requested_tier = "low"
+    recommended = _profile_for_tier(requested_tier, hardware)
 
     model = recommended.model if settings.whisper_model == "auto" else settings.whisper_model
     device = recommended.device if settings.whisper_device == "auto" else settings.whisper_device
@@ -132,7 +241,19 @@ def resolve_runtime_profile(settings: Settings) -> STTRuntimeProfile:
             settings.whisper_compute_type,
         )
     ) else "manual"
-    return STTRuntimeProfile(model, device, compute_type, tier, recommended.reason)
+    if tier == recommended.tier:
+        return recommended
+    return STTRuntimeProfile(
+        model,
+        device,
+        compute_type,
+        tier,
+        "Cấu hình model được đặt thủ công; hệ thống vẫn giám sát lỗi bộ nhớ để hạ cấp.",
+        "Thủ công",
+        recommended.denoise_policy,
+        recommended.overlap_policy,
+        1,
+    )
 
 
 def _marker_path(settings: Settings) -> Path:
@@ -140,7 +261,12 @@ def _marker_path(settings: Settings) -> Path:
 
 
 def _requested_key(settings: Settings) -> list[str]:
-    return [settings.whisper_model, settings.whisper_device, settings.whisper_compute_type]
+    return [
+        settings.runtime_profile,
+        settings.whisper_model,
+        settings.whisper_device,
+        settings.whisper_compute_type,
+    ]
 
 
 def _write_ready_marker(
@@ -165,7 +291,8 @@ def _write_ready_marker(
 
 def stt_status(settings: Settings) -> dict[str, Any]:
     installed = is_installed()
-    selected = _ACTIVE_PROFILE or resolve_runtime_profile(settings)
+    hardware = detect_hardware()
+    selected = _ACTIVE_PROFILE or resolve_runtime_profile(settings, hardware)
     marker = _marker_path(settings)
     ready = False
     if installed and marker.exists():
@@ -190,17 +317,59 @@ def stt_status(settings: Settings) -> dict[str, Any]:
                     compute_type=str(data["compute_type"]),
                     tier=str(data["tier"]),
                     reason=str(data.get("reason") or selected.reason),
+                    label=str(data.get("label") or selected.label),
+                    denoise_policy=str(
+                        data.get("denoise_policy") or selected.denoise_policy
+                    ),
+                    overlap_policy=str(
+                        data.get("overlap_policy") or selected.overlap_policy
+                    ),
+                    max_parallel_models=int(data.get("max_parallel_models") or 1),
                 )
         except (OSError, json.JSONDecodeError):
             ready = False
+    deepfilter_available = importlib.util.find_spec("df") is not None
+    try:
+        pyannote_available = importlib.util.find_spec("pyannote.audio") is not None
+    except ModuleNotFoundError:
+        pyannote_available = False
     return {
         "installed": installed,
         "ready": ready,
         "initialization_required": installed and not ready,
         **asdict(selected),
-        "cpu_threads": os.cpu_count() or 1,
-        "memory_gb": _memory_gb(),
+        "cpu_threads": hardware.cpu_threads,
+        "memory_gb": hardware.total_memory_gb,
+        "available_memory_gb": hardware.available_memory_gb,
+        "memory_load_percent": hardware.memory_load_percent,
+        "cuda_available": hardware.cuda_available,
+        "cuda_device_count": hardware.cuda_device_count,
+        "cuda_vram_gb": hardware.cuda_vram_gb,
         "noise_suppression": "browser",
+        "adaptive_vad": True,
+        "adaptive_decode": True,
+        "features": {
+            "denoise": {
+                "policy": selected.denoise_policy,
+                "engine": "deepfilternet" if deepfilter_available else "browser",
+                "deepfilter_available": deepfilter_available,
+                "load_on_demand": selected.denoise_policy == "deepfilter_on_demand",
+            },
+            "overlap_detection": {
+                "policy": selected.overlap_policy,
+                "engine": "pyannote" if pyannote_available else "quality_gate",
+                "pyannote_available": pyannote_available,
+            },
+            "memory": {
+                "max_parallel_models": selected.max_parallel_models,
+                "release_between_stages": selected.max_parallel_models == 1,
+            },
+        },
+        "acceptance_targets": {
+            "clean_wer_max": 0.08,
+            "noisy_wer_max": 0.15,
+            "critical_error_max": 0,
+        },
     }
 
 
@@ -384,6 +553,27 @@ def _quality_metrics(segments: list[Any]) -> dict[str, Any]:
 WORD_CONFIDENCE_THRESHOLD = 0.45
 
 
+def adaptive_vad_profile(ambient_noise_dbfs: float | None) -> dict[str, Any]:
+    """Choose conservative Silero VAD settings from the measured noise floor."""
+    if ambient_noise_dbfs is None or ambient_noise_dbfs <= -45.0:
+        name, threshold, silence, speech, padding = "quiet", 0.42, 650, 180, 250
+    elif ambient_noise_dbfs <= -32.0:
+        name, threshold, silence, speech, padding = "moderate", 0.50, 500, 220, 350
+    elif ambient_noise_dbfs <= -20.0:
+        name, threshold, silence, speech, padding = "noisy", 0.62, 350, 300, 500
+    else:
+        name, threshold, silence, speech, padding = "very_noisy", 0.72, 300, 350, 650
+    return {
+        "name": name,
+        "ambient_noise_dbfs": ambient_noise_dbfs,
+        "threshold": threshold,
+        "neg_threshold": max(0.15, round(threshold - 0.15, 2)),
+        "min_silence_duration_ms": silence,
+        "min_speech_duration_ms": speech,
+        "speech_pad_ms": padding,
+    }
+
+
 def _dbfs(value: float) -> float:
     if value <= 0:
         return -80.0
@@ -523,7 +713,9 @@ def analyze_microphone_sample(
         sum(value * value for value in ambient_samples) / len(ambient_samples)
     )
     measured_noise = _dbfs(ambient_rms)
-    noise = measured_noise if ambient_noise_dbfs is None else ambient_noise_dbfs
+    # The browser reading is useful for diagnostics, but only the decoded audio
+    # is authoritative for the microphone gate.
+    noise = measured_noise
     signal_dbfs = _dbfs(rms)
     metrics = {
         "duration_seconds": len(normalized) / sample_rate,
@@ -532,13 +724,17 @@ def analyze_microphone_sample(
         "peak_dbfs": _dbfs(peak),
         "ambient_noise_dbfs": noise,
         "measured_ambient_noise_dbfs": measured_noise,
+        "client_ambient_noise_dbfs": ambient_noise_dbfs,
+        "noise_measurement_source": "backend_audio",
         "clipping_ratio": clipping_ratio,
         "silence_ratio": silence_ratio,
         "signal_to_noise_db": max(0.0, signal_dbfs - noise),
     }
-    return assess_microphone_quality(
+    result = assess_microphone_quality(
         metrics, maximum_ambient_noise_dbfs=maximum_ambient_noise_dbfs
     )
+    result["recommended_vad"] = adaptive_vad_profile(noise)
+    return result
 
 
 def build_recording_report(
@@ -705,13 +901,16 @@ def assess_transcription_quality(
     }
 
 
-def transcribe_bytes(
+def _transcribe_bytes_locked(
     settings: Settings,
     content: bytes,
     *,
     filename: str,
     language: str | None = None,
     hotwords: list[str] | None = None,
+    ambient_noise_dbfs: float | None = None,
+    force_accurate: bool = False,
+    write_ready_marker: bool = True,
 ) -> dict[str, Any]:
     suffix = Path(filename).suffix or ".webm"
     temporary_path: str | None = None
@@ -721,53 +920,101 @@ def transcribe_bytes(
             temporary_path = temporary.name
 
         selected_language = language if language in {"vi", "en"} else None
-        segments, info = _decode_with_fallback(
-            settings,
-            lambda model: model.transcribe(
-                temporary_path,
-                language=selected_language,
-                beam_size=5,
-                best_of=5,
-                temperature=0,
-                vad_filter=True,
-                vad_parameters={"min_silence_duration_ms": 500},
-                condition_on_previous_text=True,
-                word_timestamps=True,
-                hallucination_silence_threshold=2.0,
-                hotwords=" ".join(hotwords or []) or None,
-            ),
-        )
-        text = " ".join(segment.text.strip() for segment in segments).strip()
-        metrics = _quality_metrics(segments)
-        segment_details, uncertain_spans = _segment_diagnostics(segments)
-        word_details = [
-            word for segment in segment_details for word in segment["words"]
-        ]
-        uncertain_word_count = sum(word["uncertain"] for word in word_details)
-        metrics["word_count"] = len(word_details)
-        metrics["uncertain_word_count"] = uncertain_word_count
-        metrics["word_confidence_threshold"] = WORD_CONFIDENCE_THRESHOLD
-        metrics["uncertain_word_ratio"] = round(
-            uncertain_word_count / max(1, len(word_details)), 3
-        )
-        _write_ready_marker(settings)
-        active = _ACTIVE_PROFILE or resolve_runtime_profile(settings)
-        result = {
-            "text": text,
-            "language": getattr(info, "language", selected_language),
-            "language_probability": round(
-                float(getattr(info, "language_probability", 0.0)), 3
-            ),
-            "model": active.model,
-            "runtime": f"{active.device}/{active.compute_type}",
-            "profile": active.tier,
-            "metrics": metrics,
-            "segments": segment_details,
-            "uncertain_spans": uncertain_spans,
+        vad_profile = adaptive_vad_profile(ambient_noise_dbfs)
+        vad_parameters = {
+            key: value
+            for key, value in vad_profile.items()
+            if key not in {"name", "ambient_noise_dbfs"}
         }
-        return assess_transcription_quality(
-            result, minimum_confidence=settings.stt_min_confidence
+        def decode(beam_size: int, best_of: int) -> dict[str, Any]:
+            segments, info = _decode_with_fallback(
+                settings,
+                lambda model: model.transcribe(
+                    temporary_path,
+                    language=selected_language,
+                    beam_size=beam_size,
+                    best_of=best_of,
+                    temperature=0,
+                    vad_filter=True,
+                    vad_parameters=vad_parameters,
+                    condition_on_previous_text=vad_profile["name"] in {"quiet", "moderate"},
+                    word_timestamps=True,
+                    hallucination_silence_threshold=2.0,
+                    hotwords=" ".join(hotwords or []) or None,
+                ),
+            )
+            text = " ".join(segment.text.strip() for segment in segments).strip()
+            metrics = _quality_metrics(segments)
+            metrics["vad_profile"] = vad_profile
+            segment_details, uncertain_spans = _segment_diagnostics(segments)
+            word_details = [
+                word for segment in segment_details for word in segment["words"]
+            ]
+            uncertain_word_count = sum(word["uncertain"] for word in word_details)
+            metrics["word_count"] = len(word_details)
+            metrics["uncertain_word_count"] = uncertain_word_count
+            metrics["word_confidence_threshold"] = WORD_CONFIDENCE_THRESHOLD
+            metrics["uncertain_word_ratio"] = round(
+                uncertain_word_count / max(1, len(word_details)), 3
+            )
+            active = _ACTIVE_PROFILE or resolve_runtime_profile(settings)
+            result = {
+                "text": text,
+                "language": getattr(info, "language", selected_language),
+                "language_probability": round(
+                    float(getattr(info, "language_probability", 0.0)), 3
+                ),
+                "model": active.model,
+                "runtime": f"{active.device}/{active.compute_type}",
+                "profile": active.tier,
+                "metrics": metrics,
+                "segments": segment_details,
+                "uncertain_spans": uncertain_spans,
+            }
+            return assess_transcription_quality(
+                result,
+                minimum_confidence=settings.stt_min_confidence,
+                ambient_noise_dbfs=ambient_noise_dbfs,
+                maximum_ambient_noise_dbfs=settings.stt_max_ambient_noise_dbfs,
+            )
+
+        selected_profile = resolve_runtime_profile(settings)
+        if force_accurate:
+            fast_beam = 5
+        elif selected_profile.tier in {"low", "fallback_small"}:
+            fast_beam = 2
+        else:
+            fast_beam = 3
+        result = decode(fast_beam, fast_beam)
+        metrics = result["metrics"]
+        noisy = (
+            ambient_noise_dbfs is not None
+            and ambient_noise_dbfs > settings.stt_max_ambient_noise_dbfs
         )
+        needs_accurate_pass = not force_accurate and (
+            result.get("needs_retry")
+            or float(metrics.get("confidence") or 0.0) < 0.70
+            or float(metrics.get("uncertain_word_ratio") or 0.0) > 0.20
+            or (
+                noisy
+                and float(metrics.get("quality_score") or 0.0) < 0.72
+            )
+        )
+        if force_accurate:
+            result["decode_passes"] = 1
+            result["decode_strategy"] = "forced_accurate"
+        elif needs_accurate_pass:
+            result = decode(5, 5)
+            result["decode_passes"] = 2
+            result["decode_strategy"] = "quality_retry"
+        else:
+            result["decode_passes"] = 1
+            result["decode_strategy"] = "adaptive_fast"
+        result["metrics"]["initial_beam_size"] = fast_beam
+        result["metrics"]["final_beam_size"] = 5 if needs_accurate_pass else fast_beam
+        if write_ready_marker:
+            _write_ready_marker(settings)
+        return result
     except SpeechToTextError:
         raise
     except Exception as exc:
@@ -775,3 +1022,88 @@ def transcribe_bytes(
     finally:
         if temporary_path:
             Path(temporary_path).unlink(missing_ok=True)
+
+
+def _clear_loaded_model() -> None:
+    global _MODEL, _MODEL_KEY, _REQUESTED_MODEL_KEY, _ACTIVE_PROFILE
+    with _MODEL_LOCK:
+        _MODEL = None
+        _MODEL_KEY = None
+        _REQUESTED_MODEL_KEY = None
+        _ACTIVE_PROFILE = None
+
+
+def transcribe_bytes(
+    settings: Settings,
+    content: bytes,
+    *,
+    filename: str,
+    language: str | None = None,
+    hotwords: list[str] | None = None,
+    ambient_noise_dbfs: float | None = None,
+    force_accurate: bool = False,
+    release_after: bool = False,
+    write_ready_marker: bool = True,
+) -> dict[str, Any]:
+    with _INFERENCE_LOCK:
+        try:
+            return _transcribe_bytes_locked(
+                settings,
+                content,
+                filename=filename,
+                language=language,
+                hotwords=hotwords,
+                ambient_noise_dbfs=ambient_noise_dbfs,
+                force_accurate=force_accurate,
+                write_ready_marker=write_ready_marker,
+            )
+        finally:
+            if release_after:
+                _clear_loaded_model()
+
+
+def transcribe_review_audio(
+    settings: Settings,
+    content: bytes,
+    *,
+    filename: str,
+    language: str,
+    hotwords: list[str] | None = None,
+    ambient_noise_dbfs: float | None = None,
+) -> dict[str, Any]:
+    review_settings = replace(
+        settings,
+        whisper_model=settings.review_whisper_model,
+        whisper_device="auto",
+        whisper_compute_type="auto",
+    )
+    hardware = detect_hardware()
+    if settings.review_model_cache_policy == "keep":
+        release_after = False
+    elif settings.review_model_cache_policy == "release":
+        release_after = True
+    else:
+        release_after = not (
+            hardware.available_memory_gb >= 10.0
+            or (
+                hardware.cuda_available
+                and (hardware.cuda_vram_gb or 0.0) >= 8.0
+                and hardware.available_memory_gb >= 6.0
+            )
+        )
+    result = transcribe_bytes(
+        review_settings,
+        content,
+        filename=filename,
+        language=language,
+        hotwords=hotwords,
+        ambient_noise_dbfs=ambient_noise_dbfs,
+        force_accurate=True,
+        release_after=release_after,
+        write_ready_marker=False,
+    )
+    result["purpose"] = "teacher_review"
+    result["model_cache_policy"] = (
+        "released_after_request" if release_after else "kept_for_next_review"
+    )
+    return result

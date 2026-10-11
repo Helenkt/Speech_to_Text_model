@@ -91,6 +91,24 @@ def test_unknown_source_and_duplicate_are_rejected():
     assert any("G6_UNIQUENESS" in failure for failure in result["hard_gate_failures"])
 
 
+def test_evidence_quote_must_exist_verbatim_in_approved_source():
+    candidate = _candidate("Easy")
+    candidate["source_evidence"][0]["evidence_quote"] = "Nội dung không có trong nguồn"
+    result = validate_generated_question(
+        candidate,
+        approved_source_ids={"AI101_VI_001"},
+        approved_sources={
+            "AI101_VI_001": {
+                "reference_answer": "Mô hình học quy luật từ dữ liệu.",
+                "key_points": ["Học từ dữ liệu"],
+            }
+        },
+    )
+
+    assert result["status"] == "rejected"
+    assert any("evidence_quote" in failure for failure in result["hard_gate_failures"])
+
+
 def test_progression_never_skips_a_level():
     assert next_difficulty("Easy", 90, 0.9) == "Medium"
     assert next_difficulty("Medium", 90, 0.9) == "Hard"

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import uuid
 from datetime import datetime, timezone
@@ -27,6 +28,7 @@ def _now() -> str:
 
 def _source_question(row: Any) -> dict[str, Any]:
     return {
+        "uid": row["uid"],
         "id": row["question_id"],
         "language": row["language"],
         "subject": row["subject"],
@@ -37,6 +39,9 @@ def _source_question(row: Any) -> dict[str, Any]:
         "question": row["question"],
         "reference_answer": row["reference_answer"],
         "key_points": json.loads(row["key_points_json"]),
+        "source_name": row["source_name"],
+        "source_sha256": row["source_sha256"],
+        "verification_status": row["verification_status"],
     }
 
 
@@ -58,8 +63,15 @@ def _load_sources(
     with database(settings.database_path) as connection:
         rows = connection.execute(
             f"""
-            SELECT * FROM questions
-            WHERE {' AND '.join(clauses)}
+            SELECT q.*,
+                   COALESCE((
+                       SELECT qs.source_sha256
+                       FROM question_sources AS qs
+                       WHERE qs.source_name = q.source_name
+                       ORDER BY qs.imported_at DESC LIMIT 1
+                   ), '') AS source_sha256
+            FROM questions AS q
+            WHERE {' AND '.join(f'q.{clause}' for clause in clauses)}
             ORDER BY CASE WHEN difficulty = ? THEN 0 ELSE 1 END,
                      difficulty_rank, question_id
             LIMIT ?
@@ -210,12 +222,32 @@ async def generate_question_drafts(
                 subject=subject,
             )
             candidate = await _generate_with_ollama(settings, prompt)
+            prompt_sha256 = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
             candidate.update(
                 {
                     "id": f"GEN_{uuid.uuid4().hex[:12].upper()}",
                     "language": language,
                     "subject": subject,
                     "difficulty": difficulty,
+                    "source_provenance": [
+                        {
+                            "source_question_uid": source["uid"],
+                            "source_question_id": source["id"],
+                            "source_name": source["source_name"],
+                            "source_sha256": source["source_sha256"],
+                            "verification_status": source["verification_status"],
+                            "topic": source["topic"],
+                            "concept": source["concept"],
+                            "reference_excerpt": source["reference_answer"],
+                        }
+                        for source in sources
+                    ],
+                    "generation_provenance": {
+                        "model": settings.question_generation_model,
+                        "prompt_sha256": prompt_sha256,
+                        "generated_at": _now(),
+                        "source_policy": "approved-internal-only",
+                    },
                 }
             )
             source_ids = {item["id"] for item in sources}
@@ -223,6 +255,7 @@ async def generate_question_drafts(
                 candidate,
                 existing_questions=existing_questions,
                 approved_source_ids=source_ids,
+                approved_sources={item["id"]: item for item in sources},
             )
             stored = _store_candidate(
                 settings,

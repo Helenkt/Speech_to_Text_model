@@ -45,7 +45,7 @@ def test_stt_status_reports_verified_fallback_profile(test_settings, monkeypatch
     marker.write_text(
         json.dumps(
             {
-                "requested": ["small", "cpu", "int8"],
+                "requested": ["auto", "small", "cpu", "int8"],
                 "model": "medium",
                 "device": "cpu",
                 "compute_type": "int8",
@@ -94,11 +94,57 @@ def test_first_transcription_marks_stt_ready_without_manual_setup(
     assert speech_module.stt_status(test_settings)["ready"] is True
 
 
+def test_teacher_review_uses_large_v3_with_single_accurate_pass(
+    test_settings, monkeypatch
+):
+    calls = []
+
+    class Segment:
+        text = " HTTP là giao thức truyền tải siêu văn bản. "
+        start = 0.0
+        end = 3.0
+        avg_logprob = -0.05
+        no_speech_prob = 0.01
+        compression_ratio = 1.0
+        words = []
+
+    class Info:
+        language = "vi"
+        language_probability = 0.99
+
+    class FakeModel:
+        def transcribe(self, _path, **kwargs):
+            calls.append(kwargs)
+            return iter([Segment()]), Info()
+
+    def fake_get_model(settings):
+        assert settings.whisper_model == "large-v3"
+        return FakeModel()
+
+    monkeypatch.setattr(speech_module, "_get_model", fake_get_model)
+    result = speech_module.transcribe_review_audio(
+        test_settings,
+        b"voice",
+        filename="answer.webm",
+        language="vi",
+        hotwords=["HTTP"],
+    )
+
+    assert len(calls) == 1
+    assert calls[0]["beam_size"] == 5
+    assert result["model"] == "large-v3"
+    assert result["decode_strategy"] == "forced_accurate"
+    assert result["purpose"] == "teacher_review"
+
+
 def test_transcription_endpoint_returns_text(client, login_candidate, monkeypatch):
-    def fake_transcription(_, content, *, filename, language):
+    def fake_transcription(
+        _, content, *, filename, language, ambient_noise_dbfs=None
+    ):
         assert content == b"fake-audio"
         assert filename == "answer.webm"
         assert language == "vi"
+        assert ambient_noise_dbfs is None
         return {
             "text": "Đây là câu trả lời bằng giọng nói.",
             "language": "vi",
@@ -130,6 +176,127 @@ def test_auto_runtime_prefers_validated_medium_when_cuda_is_available(
     assert (profile.model, profile.device, profile.compute_type) == (
         "medium", "cuda", "float16"
     )
+
+
+def test_auto_runtime_uses_low_profile_for_resource_limited_cpu(
+    test_settings, monkeypatch
+):
+    test_settings.whisper_model = "auto"
+    test_settings.whisper_device = "auto"
+    test_settings.whisper_compute_type = "auto"
+    hardware = speech_module.HardwareCapabilities(
+        cpu_threads=4,
+        total_memory_gb=8.0,
+        available_memory_gb=2.0,
+        memory_load_percent=75.0,
+        cuda_available=False,
+        cuda_device_count=0,
+        cuda_vram_gb=None,
+    )
+    monkeypatch.setattr(speech_module, "detect_hardware", lambda: hardware)
+
+    profile = speech_module.resolve_runtime_profile(test_settings)
+
+    assert (profile.model, profile.device, profile.compute_type) == (
+        "small", "cpu", "int8"
+    )
+    assert profile.tier == "low"
+    assert profile.max_parallel_models == 1
+
+
+def test_auto_runtime_uses_balanced_profile_for_capable_cpu(
+    test_settings, monkeypatch
+):
+    test_settings.whisper_model = "auto"
+    test_settings.whisper_device = "auto"
+    test_settings.whisper_compute_type = "auto"
+    hardware = speech_module.HardwareCapabilities(
+        cpu_threads=12,
+        total_memory_gb=16.0,
+        available_memory_gb=7.0,
+        memory_load_percent=56.0,
+        cuda_available=False,
+        cuda_device_count=0,
+        cuda_vram_gb=None,
+    )
+    monkeypatch.setattr(speech_module, "detect_hardware", lambda: hardware)
+
+    profile = speech_module.resolve_runtime_profile(test_settings)
+
+    assert profile.tier == "balanced"
+    assert profile.model == "medium"
+    assert profile.denoise_policy == "deepfilter_on_demand"
+
+
+def test_auto_runtime_keeps_medium_on_high_accuracy_gpu(
+    test_settings, monkeypatch
+):
+    test_settings.whisper_model = "auto"
+    test_settings.whisper_device = "auto"
+    test_settings.whisper_compute_type = "auto"
+    hardware = speech_module.HardwareCapabilities(
+        cpu_threads=16,
+        total_memory_gb=32.0,
+        available_memory_gb=20.0,
+        memory_load_percent=37.0,
+        cuda_available=True,
+        cuda_device_count=1,
+        cuda_vram_gb=12.0,
+    )
+    monkeypatch.setattr(speech_module, "detect_hardware", lambda: hardware)
+
+    profile = speech_module.resolve_runtime_profile(test_settings)
+
+    assert profile.tier == "high_accuracy"
+    assert profile.model == "medium"
+    assert profile.device == "cuda"
+    assert profile.compute_type == "float16"
+    assert profile.max_parallel_models == 1
+
+
+def test_forced_gpu_profile_is_downgraded_when_cuda_is_missing(
+    test_settings, monkeypatch
+):
+    test_settings.runtime_profile = "performance"
+    test_settings.whisper_model = "auto"
+    test_settings.whisper_device = "auto"
+    test_settings.whisper_compute_type = "auto"
+    hardware = speech_module.HardwareCapabilities(
+        cpu_threads=8,
+        total_memory_gb=16.0,
+        available_memory_gb=6.0,
+        memory_load_percent=62.0,
+        cuda_available=False,
+        cuda_device_count=0,
+        cuda_vram_gb=None,
+    )
+    monkeypatch.setattr(speech_module, "detect_hardware", lambda: hardware)
+
+    profile = speech_module.resolve_runtime_profile(test_settings)
+
+    assert profile.tier == "balanced"
+    assert profile.device == "cpu"
+
+
+def test_stt_status_exposes_hardware_and_memory_policy(test_settings, monkeypatch):
+    hardware = speech_module.HardwareCapabilities(
+        cpu_threads=4,
+        total_memory_gb=8.0,
+        available_memory_gb=2.0,
+        memory_load_percent=75.0,
+        cuda_available=False,
+        cuda_device_count=0,
+        cuda_vram_gb=None,
+    )
+    monkeypatch.setattr(speech_module, "detect_hardware", lambda: hardware)
+    monkeypatch.setattr(speech_module, "is_installed", lambda: True)
+
+    status = speech_module.stt_status(test_settings)
+
+    assert status["cpu_threads"] == 4
+    assert status["available_memory_gb"] == 2.0
+    assert status["cuda_available"] is False
+    assert status["features"]["memory"]["max_parallel_models"] == 1
 
 
 def test_low_confidence_transcript_with_content_is_sent_to_correction(test_settings, monkeypatch):
@@ -318,6 +485,52 @@ def test_noisy_environment_warns_when_recognition_is_uncertain():
     assert "Tiếng nền" in result["quality_warnings"][-1]
 
 
+def test_adaptive_vad_becomes_stricter_as_noise_increases():
+    quiet = speech_module.adaptive_vad_profile(-50.0)
+    noisy = speech_module.adaptive_vad_profile(-18.0)
+
+    assert quiet["name"] == "quiet"
+    assert noisy["name"] == "very_noisy"
+    assert noisy["threshold"] > quiet["threshold"]
+    assert noisy["speech_pad_ms"] > quiet["speech_pad_ms"]
+    assert noisy["min_silence_duration_ms"] < quiet["min_silence_duration_ms"]
+
+
+def test_transcription_passes_adaptive_vad_to_faster_whisper(test_settings, monkeypatch):
+    captured = {}
+
+    class Segment:
+        text = " câu trả lời rõ ràng "
+        start = 0.0
+        end = 2.0
+        avg_logprob = -0.1
+        no_speech_prob = 0.02
+        compression_ratio = 1.0
+        words = []
+
+    class Info:
+        language = "vi"
+        language_probability = 0.99
+
+    class FakeModel:
+        def transcribe(self, *_args, **kwargs):
+            captured.update(kwargs)
+            return iter([Segment()]), Info()
+
+    monkeypatch.setattr(speech_module, "_get_model", lambda _: FakeModel())
+    result = speech_module.transcribe_bytes(
+        test_settings,
+        b"audio",
+        filename="answer.webm",
+        language="vi",
+        ambient_noise_dbfs=-18.0,
+    )
+
+    assert captured["vad_parameters"]["threshold"] == 0.72
+    assert captured["condition_on_previous_text"] is False
+    assert result["metrics"]["vad_profile"]["name"] == "very_noisy"
+
+
 def test_quiet_environment_passes_quality_gate():
     result = speech_module.assess_transcription_quality(
         {
@@ -386,6 +599,28 @@ def test_analyze_microphone_sample_reads_real_wav():
     assert result["microphone_score_percent"] >= 80
 
 
+def test_microphone_analysis_does_not_trust_client_noise_value():
+    output = io.BytesIO()
+    sample_rate = 16_000
+    samples = [int(0.15 * 32767)] * (sample_rate * 3)
+    with wave.open(output, "wb") as audio:
+        audio.setnchannels(1)
+        audio.setsampwidth(2)
+        audio.setframerate(sample_rate)
+        audio.writeframes(struct.pack(f"<{len(samples)}h", *samples))
+
+    result = speech_module.analyze_microphone_sample(
+        output.getvalue(),
+        filename="microphone-check.wav",
+        ambient_noise_dbfs=-80.0,
+        maximum_ambient_noise_dbfs=-28.0,
+    )
+
+    assert result["metrics"]["ambient_noise_dbfs"] > -20
+    assert result["metrics"]["client_ambient_noise_dbfs"] == -80.0
+    assert result["metrics"]["noise_measurement_source"] == "backend_audio"
+
+
 def test_recording_report_exposes_ui_ready_percentages():
     report = speech_module.build_recording_report(
         {
@@ -420,9 +655,23 @@ def test_microphone_check_endpoint_returns_backend_assessment(
         }
 
     monkeypatch.setattr(main_module, "analyze_microphone_sample", fake_analysis)
+    monkeypatch.setattr(
+        main_module,
+        "microphone_check_session",
+        lambda *_args, **_kwargs: {"session_id": "session-1", "result": {}},
+    )
+    monkeypatch.setattr(
+        main_module,
+        "save_microphone_check",
+        lambda *_args, result, **_kwargs: {
+            **result,
+            "session_id": "session-1",
+            "already_checked": False,
+        },
+    )
     response = client.post(
         "/api/speech/microphone-check",
-        data={"ambient_noise_dbfs": "-42"},
+        data={"session_id": "session-1", "ambient_noise_dbfs": "-42"},
         files={"file": ("mic.webm", b"microphone-audio", "audio/webm")},
     )
 

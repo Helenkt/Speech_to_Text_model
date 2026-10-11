@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import functools
+import time
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -42,7 +44,7 @@ from app.services.auth import (
     get_user_by_token,
     revoke_session,
 )
-from app.services.evaluator import ollama_status
+from app.services.evaluator import evaluate_answer, ollama_status
 from app.services.transcript_corrector import correct_transcript
 from app.services.exam_service import (
     ExamError,
@@ -84,27 +86,39 @@ from app.services.speech_to_text import (
     SpeechToTextError,
     stt_status,
     transcribe_bytes,
+    transcribe_review_audio,
 )
 from app.services.transcription_store import (
     TranscriptionError,
+    expire_stale_sessions,
+    microphone_check_session,
+    save_microphone_check,
     save_transcription,
+    transcription_attempt_status,
     transcription_context,
 )
 from app.services.teacher_review import (
     TeacherReviewError,
     list_review_queue,
+    review_reanalysis_context,
     review_answer,
     review_history,
+    save_review_reanalysis,
     transcription_audio,
 )
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     app_settings = settings or Settings.from_env()
+    review_locks: dict[int, asyncio.Lock] = {}
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
         init_database(app_settings.database_path)
+        expire_stale_sessions(
+            app_settings.database_path,
+            ttl_hours=app_settings.active_session_ttl_hours,
+        )
         if app_settings.auto_seed_demo:
             if active_question_count(app_settings.database_path) == 0:
                 load_demo_banks(app_settings.database_path, app_settings.demo_data_dir)
@@ -114,7 +128,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(
         title="AI Interview Local",
-        version="1.8.0",
+        version="1.12.0",
         description="Hệ thống AI Interview local với phân quyền Giáo viên và Ứng viên.",
         lifespan=lifespan,
     )
@@ -187,6 +201,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "raw_transcript_preserved": True,
             },
             "speech_to_text": stt_status(app_settings),
+            "teacher_review": {
+                "stt_model": app_settings.review_whisper_model,
+                "on_demand": True,
+                "result_cached": True,
+                "manual_required_below": app_settings.teacher_review_score_threshold,
+            },
         }
 
     @app.post("/api/auth/login")
@@ -602,11 +622,71 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 app_settings,
                 answer_id=answer_id,
                 teacher_id=user["user_id"],
+                action=payload.action,
                 score=payload.score,
                 feedback=payload.feedback,
             )
         except TeacherReviewError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.post("/api/teacher/answers/{answer_id}/ai-review")
+    async def run_teacher_ai_review(
+        answer_id: int,
+        _: dict[str, Any] = Depends(teacher_user),
+    ) -> dict[str, Any]:
+        lock = review_locks.setdefault(answer_id, asyncio.Lock())
+        async with lock:
+            try:
+                # Recheck after acquiring the per-answer lock. Another request may
+                # already have completed the expensive STT pass while we waited.
+                context = review_reanalysis_context(
+                    app_settings, answer_id=answer_id
+                )
+                if context["cached"]:
+                    return context["cached_result"]
+
+                content = await run_in_threadpool(
+                    context["audio_path_resolved"].read_bytes
+                )
+                operation = functools.partial(
+                    transcribe_review_audio,
+                    app_settings,
+                    content,
+                    filename=context["audio_path_resolved"].name,
+                    language=context["language"],
+                    hotwords=context["approved_terms"],
+                    ambient_noise_dbfs=context["ambient_noise_dbfs"],
+                )
+                transcription = await run_in_threadpool(operation)
+                if not str(transcription.get("text") or "").strip():
+                    raise TeacherReviewError(
+                        "Model STT mạnh không nhận dạng được nội dung voice"
+                    )
+                correction = await correct_transcript(
+                    app_settings,
+                    transcription["text"],
+                    language=context["language"],
+                    approved_terms=context["approved_terms"],
+                    question_text=str(context["question"].get("question") or ""),
+                    uncertain_spans=transcription.get("uncertain_spans", []),
+                )
+                transcription.update(correction)
+                transcription["text"] = correction["corrected_text"]
+                transcription["original_transcript"] = context["original_transcript"]
+                evaluation = await evaluate_answer(
+                    app_settings, context["question"], transcription["text"]
+                )
+                return save_review_reanalysis(
+                    app_settings,
+                    answer_id=answer_id,
+                    transcription_id=context["transcription_id"],
+                    transcription=transcription,
+                    evaluation=evaluation,
+                )
+            except TeacherReviewError as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+            except SpeechToTextError as exc:
+                raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     @app.get("/api/teacher/answers/{answer_id}/reviews")
     async def answer_review_history(
@@ -651,8 +731,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         language: str | None = Form(None),
         session_id: str | None = Form(None),
         ambient_noise_dbfs: float | None = Form(None),
+        retry_reason: str | None = Form(None),
         user: dict[str, Any] = Depends(candidate_user),
     ) -> dict[str, Any]:
+        request_started = time.perf_counter()
         content = await read_upload(file)
         try:
             context = None
@@ -668,9 +750,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 content,
                 filename=file.filename or "recording.webm",
                 language=language,
+                ambient_noise_dbfs=ambient_noise_dbfs,
                 **({"hotwords": context["approved_terms"]} if context else {}),
             )
+            stt_started = time.perf_counter()
             result = await run_in_threadpool(operation)
+            stt_seconds = time.perf_counter() - stt_started
             result = assess_transcription_quality(
                 result,
                 minimum_confidence=app_settings.stt_min_confidence,
@@ -689,6 +774,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     ]),
                 )
 
+            correction_started = time.perf_counter()
             correction = await correct_transcript(
                 app_settings,
                 result["text"],
@@ -706,10 +792,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "corrections": [],
                 "rejected_corrections": [],
             }
+            correction_seconds = time.perf_counter() - correction_started
             result.update(correction)
             result["text"] = correction["corrected_text"]
+            result["processing_time"] = {
+                "stt_seconds": round(stt_seconds, 3),
+                "correction_seconds": round(correction_seconds, 3),
+                "total_seconds": round(time.perf_counter() - request_started, 3),
+            }
 
             if context:
+                storage_started = time.perf_counter()
                 result["transcription_id"] = save_transcription(
                     app_settings.database_path,
                     session_id=context["session_id"],
@@ -726,6 +819,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     audio_content=content,
                     audio_filename=file.filename or "recording.webm",
                     audio_mime_type=file.content_type,
+                    retry_reason=retry_reason,
+                )
+                result["attempt"] = transcription_attempt_status(
+                    app_settings.database_path,
+                    transcription_id=result["transcription_id"],
+                )
+                result["processing_time"]["storage_seconds"] = round(
+                    time.perf_counter() - storage_started, 3
+                )
+                result["processing_time"]["total_seconds"] = round(
+                    time.perf_counter() - request_started, 3
                 )
             return result
         except TranscriptionError as exc:
@@ -736,11 +840,25 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.post("/api/speech/microphone-check")
     async def microphone_check(
         file: UploadFile = File(...),
+        session_id: str = Form(...),
         ambient_noise_dbfs: float | None = Form(None),
-        _: dict[str, Any] = Depends(candidate_user),
+        user: dict[str, Any] = Depends(candidate_user),
     ) -> dict[str, Any]:
-        content = await read_upload(file)
         try:
+            expire_stale_sessions(
+                app_settings.database_path,
+                ttl_hours=app_settings.active_session_ttl_hours,
+            )
+            check_session = microphone_check_session(
+                app_settings.database_path,
+                user_id=user["user_id"],
+                session_id=session_id,
+            )
+            previous = check_session["result"]
+            if previous.get("ready"):
+                return {**previous, "already_checked": True}
+
+            content = await read_upload(file)
             operation = functools.partial(
                 analyze_microphone_sample,
                 content,
@@ -748,7 +866,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 ambient_noise_dbfs=ambient_noise_dbfs,
                 maximum_ambient_noise_dbfs=app_settings.stt_max_ambient_noise_dbfs,
             )
-            return await run_in_threadpool(operation)
+            result = await run_in_threadpool(operation)
+            return save_microphone_check(
+                app_settings.database_path,
+                session_id=check_session["session_id"],
+                user_id=user["user_id"],
+                result=result,
+            )
+        except TranscriptionError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
         except SpeechToTextError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 

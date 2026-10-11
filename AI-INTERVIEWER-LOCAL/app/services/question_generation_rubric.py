@@ -79,6 +79,8 @@ def build_generation_prompt(
     compact_sources = [
         {
             "id": item.get("id"),
+            "source_name": item.get("source_name"),
+            "source_sha256": item.get("source_sha256"),
             "topic": item.get("topic"),
             "concept": item.get("concept"),
             "question": item.get("question"),
@@ -100,7 +102,8 @@ def build_generation_prompt(
         f"Các trường JSON bắt buộc: {json.dumps(required_fields, ensure_ascii=False)}\n"
         f"difficulty_evidence phải có: {json.dumps(evidence_fields, ensure_ascii=False)}\n"
         "source_question_ids chỉ được chứa ID xuất hiện trong SOURCE_QUESTIONS.\n"
-        "source_evidence phải chỉ ra từng ý trong đáp án được hỗ trợ bởi ID nguồn nào.\n"
+        "Mỗi source_evidence phải có source_question_id, evidence_quote là trích dẫn "
+        "nguyên văn từ reference_answer hoặc key_points của nguồn, và supported_claim.\n"
         "Không đưa đáp án vào câu hỏi. Chỉ trả về một JSON object hợp lệ, không Markdown.\n"
         f"SOURCE_QUESTIONS={json.dumps(compact_sources, ensure_ascii=False)}"
     )
@@ -127,6 +130,7 @@ def validate_generated_question(
     *,
     existing_questions: Iterable[str] = (),
     approved_source_ids: set[str] | None = None,
+    approved_sources: dict[str, dict[str, Any]] | None = None,
     rubric: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     config = rubric or load_question_rubric()
@@ -159,6 +163,33 @@ def validate_generated_question(
     source_evidence = candidate.get("source_evidence")
     if not isinstance(source_evidence, list) or not source_evidence:
         failures.append("G1_SOURCE: thiếu bằng chứng truy vết về nguồn")
+    elif approved_sources is not None:
+        invalid_evidence: list[str] = []
+        for item in source_evidence:
+            if not isinstance(item, dict):
+                invalid_evidence.append("sai định dạng")
+                continue
+            source_id = str(item.get("source_question_id") or "")
+            quote = _normalized_text(item.get("evidence_quote"))
+            source = approved_sources.get(source_id)
+            if not source or not quote:
+                invalid_evidence.append(source_id or "thiếu ID")
+                continue
+            source_text = _normalized_text(
+                " ".join(
+                    [
+                        str(source.get("reference_answer") or ""),
+                        *[str(point) for point in source.get("key_points") or []],
+                    ]
+                )
+            )
+            if quote not in source_text:
+                invalid_evidence.append(source_id)
+        if invalid_evidence:
+            failures.append(
+                "G1_SOURCE: evidence_quote không khớp nguồn: "
+                + ", ".join(invalid_evidence)
+            )
 
     difficulty_checks: list[bool] = []
     if profile:

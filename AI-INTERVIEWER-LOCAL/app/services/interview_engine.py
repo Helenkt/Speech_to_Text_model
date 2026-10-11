@@ -285,6 +285,8 @@ async def submit_answer(
         and float(evaluation["score"]) < settings.teacher_review_score_threshold
     ):
         evaluation["review_required"] = True
+    if session["interview_mode"] == "real" and session["answer_mode"] == "voice":
+        evaluation["review_required"] = True
 
     with database(settings.database_path) as connection:
         session = connection.execute(
@@ -325,7 +327,12 @@ async def submit_answer(
                 evaluation.get("rubric_version", "key-points-v2"),
                 transcription_id,
                 evaluation["score"],
-                evaluation["score"],
+                (
+                    None
+                    if session["interview_mode"] == "real"
+                    and session["answer_mode"] == "voice"
+                    else evaluation["score"]
+                ),
                 _now(),
             ),
         )
@@ -450,7 +457,9 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
         answer_rows = connection.execute(
             """
             SELECT a.*, t.audio_path, t.audio_sha256, t.audio_mime_type,
-                   t.audio_size, t.raw_text, t.corrected_text
+                   t.audio_size, t.raw_text, t.corrected_text,
+                   t.review_transcript, t.review_model, t.review_runtime,
+                   t.review_confidence, t.review_processed_at
             FROM interview_answers AS a
             LEFT JOIN speech_transcriptions AS t
                 ON t.transcription_id = a.transcription_id
@@ -468,14 +477,26 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
     for row in answer_rows:
         question = json.loads(row["question_json"])
         ai_score = float(row["ai_score"] if row["ai_score"] is not None else row["score"])
-        score = float(row["final_score"] if row["final_score"] is not None else ai_score)
-        scores.append(score)
-        competency_scores[question["competency"]].append(score)
+        final_score = (
+            float(row["final_score"])
+            if row["final_score"] is not None
+            else None
+        )
+        score = final_score if final_score is not None else ai_score
+        if session["interview_mode"] == "practice" or final_score is not None:
+            scores.append(score)
+            competency_scores[question["competency"]].append(score)
         matched = json.loads(row["matched_points_json"])
         missing = json.loads(row["missing_points_json"])
         assessments = json.loads(row["assessment_json"] or "{}")
         if not isinstance(assessments, list):
             assessments = []
+        try:
+            review_evaluation = json.loads(row["review_ai_evaluation_json"] or "{}")
+        except (TypeError, json.JSONDecodeError):
+            review_evaluation = {}
+        if not isinstance(review_evaluation, dict):
+            review_evaluation = {}
         matched_counter.update(matched)
         missing_counter.update(missing)
         details.append(
@@ -494,11 +515,21 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
                     "audio_size": row["audio_size"],
                     "raw_transcript": row["raw_text"],
                     "verified_transcript": row["corrected_text"],
+                    "review_transcript": row["review_transcript"],
+                    "review_model": row["review_model"],
+                    "review_runtime": row["review_runtime"],
+                    "review_confidence": row["review_confidence"],
+                    "review_processed_at": row["review_processed_at"],
                 },
                 "evaluation": {
                     "score": score,
                     "ai_score": ai_score,
-                    "final_score": score,
+                    "review_ai_score": row["review_ai_score"],
+                    "review_ai_feedback": row["review_ai_feedback"],
+                    "review_ai_evaluation": review_evaluation,
+                    "review_ai_at": row["review_ai_at"],
+                    "final_score": final_score,
+                    "score_status": "final" if final_score is not None else "proposed",
                     "teacher_score": row["teacher_score"],
                     "teacher_feedback": row["teacher_feedback"],
                     "reviewed_by": row["reviewed_by"],
@@ -536,6 +567,8 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
         },
         "summary": {
             "average_score": average_score,
+            "scored_answer_count": len(scores),
+            "pending_answer_count": max(0, len(answer_rows) - len(scores)),
             "overall_verdict": (
                 _report_verdict(average_score, session["language"])
                 if scores

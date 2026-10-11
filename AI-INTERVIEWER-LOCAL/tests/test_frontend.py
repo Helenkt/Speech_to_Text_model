@@ -11,9 +11,12 @@ def test_frontend_has_unique_ids_and_both_role_flows(project_root):
         "loginForm",
         "teacherDashboardView",
         "teacherQuestionsView",
-        "teacherReviewsView",
         "teacherAccountsView",
         "teacherResultsView",
+        "teacherResultsPanel",
+        "teacherReviewsPanel",
+        "teacherResultsButton",
+        "teacherReviewsButton",
         "practiceSetupView",
         "practiceHistoryView",
         "practiceHistoryRows",
@@ -30,6 +33,15 @@ def test_frontend_has_unique_ids_and_both_role_flows(project_root):
         "questionGeneratorForm",
         "generatedQuestionRows",
         "teacherReviewRows",
+        "reviewPolicyNotice",
+        "reviewStrongTranscript",
+        "reviewStrongModel",
+        "reviewAcceptAiButton",
+        "reviewOriginalScore",
+        "reviewFinalScore",
+        "reviewDecisionStatus",
+        "reviewHistoryRows",
+        "reviewHistoryCount",
         "checkMicrophoneButton",
         "microphoneCheckResult",
         "evaluationReview",
@@ -39,9 +51,13 @@ def test_frontend_has_unique_ids_and_both_role_flows(project_root):
         "answerDetails",
     } <= set(ids)
     assert "Đăng ký" not in html
-    assert "Tạo và mở đợt Interview" in html
-    assert "Kết quả Interview thật chỉ hiển thị cho Giáo viên" in html
+    assert "Quản lý bài thi" in html
+    assert "Kết quả &amp; chấm lại" in html
     assert "Lịch sử luyện tập" in html
+    assert "USER LOGIN" not in html
+    assert ">ĐĂNG NHẬP<" not in html
+    assert 'data-lucide="mic"' in html
+    assert 'data-lucide="search"' in html
     assert '<option value="text">' not in html
     assert '<option value="both">' not in html
     assert 'id="answerText" maxlength="20000" readonly' in html
@@ -52,6 +68,7 @@ def test_frontend_has_unique_ids_and_both_role_flows(project_root):
     referenced_ids = set(re.findall(r"\bel\.([A-Za-z][A-Za-z0-9_]*)", javascript))
     assert referenced_ids <= set(ids)
     assert "function refreshExams()" in javascript
+    assert "function renderLucideIcons(" in javascript
     assert "function sttAvailable()" in javascript
     assert "function deleteTeacherResult(sessionId)" in javascript
     assert "function deleteCandidatePracticeHistory(sessionId)" in javascript
@@ -64,7 +81,17 @@ def test_frontend_has_unique_ids_and_both_role_flows(project_root):
     assert "function setVoiceStage(stage)" in javascript
     assert "function renderPointAssessments(assessments)" in javascript
     assert "async function generateQuestions(event)" in javascript
-    assert "async function submitTeacherReview(button)" in javascript
+    assert 'async function submitTeacherReview(event, action = "manual")' in javascript
+    assert "async function acceptAiReview()" in javascript
+    assert "async function loadStrongReview(item)" in javascript
+    assert "async function loadReviewHistory(item" in javascript
+    assert 'api(`/api/teacher/answers/${encodeURIComponent(answerId)}/reviews`)' in javascript
+    assert 'method: "POST"' in javascript
+    assert 'action: "manual"' not in javascript
+    assert '"accept_ai"' in javascript
+    assert 'el.reviewAudio.addEventListener("ended"' not in javascript
+    assert 'form.append("session_id", state.session.session_id)' in javascript
+    assert "Cần nghe hết voice" not in javascript
     assert "async function checkMicrophone()" in javascript
     assert 'api("/api/speech/microphone-check"' in javascript
     assert "item.evidence_quote" in javascript
