@@ -188,6 +188,14 @@ Giáo viên có hai lựa chọn:
 Hệ thống kiểm tra toàn bộ file trước khi ghi. Nếu có một câu sai cấu trúc, toàn bộ lần import bị hủy.
 Mỗi ngôn ngữ hiện có 900 câu, chia đều 300 câu cho từng mức Easy, Medium và Hard.
 
+### Dữ liệu gán nhãn chấm rubric
+
+Bốn bộ dữ liệu AI101, DB101, DSA101 và OOP101 dùng để huấn luyện hoặc đánh giá
+bộ chấm điểm nằm tại `data/training/`. Dữ liệu này ghi quan hệ giữa câu trả lời
+sinh viên và từng tiêu chí rubric, không được nhập như ngân hàng câu hỏi. Chi tiết
+định dạng, quy mô và cách phân tách bộ đầy đủ/bộ mẫu nằm trong
+`data/training/README.md`.
+
 ### Rubric sinh câu hỏi bằng LLM
 
 Quy tắc kiểm định câu hỏi do LLM sinh nằm trong
