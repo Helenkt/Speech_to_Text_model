@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="AI Interview chạy local với hai vai trò Giáo viên và Ứng viên">
   <title>AI Interview</title>
-  <link rel="stylesheet" href="/static/styles.css?v=1.12.0">
+  <link rel="stylesheet" href="/static/styles.css?v=1.17.0">
 </head>
 
 <body>
@@ -338,10 +338,10 @@
             <div id="voicePipeline" class="voice-pipeline" aria-label="Tiến trình xử lý giọng nói">
               <span data-voice-stage="record">Ghi âm</span>
               <span data-voice-stage="transcribe">Nhận dạng</span>
-              <span data-voice-stage="verify">Xác minh</span>
+              <span data-voice-stage="verify">Hoàn tất xử lý</span>
             </div>
             <div id="answerRecordingQuality" class="microphone-result hidden" aria-live="polite"></div>
-            <label class="transcript-label" for="answerText">Bản ghi đã xác minh</label>
+            <label class="transcript-label" for="answerText">Bản chuyển giọng nói</label>
             <textarea id="answerText" maxlength="20000" readonly aria-label="Bản chuyển giọng nói"
               placeholder="Bản chuyển giọng nói sẽ xuất hiện tại đây..."></textarea>
             <div class="answer-footer">
@@ -350,11 +350,15 @@
                 <button id="recordButton" class="button secondary" type="button">● Ghi âm</button>
                 <span id="recordingStatus" aria-live="polite">Bấm Ghi âm để trả lời</span>
               </div>
-              <button id="submitAnswerButton" class="button primary" type="button">Gửi câu trả lời</button>
+              <button id="submitAnswerButton" class="button primary" type="button">Xác nhận và tiếp tục</button>
+            </div>
+            <div class="recording-recovery" aria-live="polite">
+              <button id="retryRecordingButton" class="button secondary hidden" type="button" data-lucide="refresh-cw">Xử lý lại bản ghi</button>
+              <button id="cancelRecordingJobButton" class="button secondary hidden" type="button" data-lucide="x">Hủy xử lý</button>
             </div>
           </article>
           <article id="evaluationCard" class="card evaluation hidden">
-            <div class="score"><strong id="evaluationScore">0</strong><span>/100</span></div>
+            <div class="score"><strong id="evaluationScore">0</strong><span id="evaluationScoreUnit">/100</span></div>
             <div class="evaluation-main">
               <h2 id="evaluationVerdict"></h2>
               <p id="evaluationFeedback"></p><small id="evaluationEngine"></small>
@@ -377,6 +381,10 @@
                 <h3>Thiếu</h3>
                 <ul id="missingPoints" class="gap-list"></ul>
               </div>
+              <div>
+                <h3>Chưa xác minh</h3>
+                <ul id="unresolvedPoints" class="unresolved-list"></ul>
+              </div>
             </div>
             <div id="pointAssessmentList" class="assessment-list"></div>
             <button id="nextQuestionButton" class="button primary full" type="button">Câu tiếp theo →</button>
@@ -392,6 +400,7 @@
           <div class="completion-icon">✓</div>
           <h1>Đã nộp bài Interview</h1>
           <p>Hệ thống đã lưu toàn bộ câu trả lời. Kết quả chi tiết sẽ được gửi cho Giáo viên.</p>
+          <p id="realGradingStatus" class="muted" role="status" aria-live="polite"></p>
           <button id="backToRealButton" class="button primary" type="button">Quay về trang mã đề</button>
         </article>
       </section>
@@ -409,6 +418,14 @@
         <h1 id="reportTitle" class="report-course-title">Báo cáo</h1>
         <p id="reportCandidate" class="report-candidate"></p>
         <p id="reportMeta" class="report-meta"></p>
+        <section id="reportGradingPanel" class="grading-panel hidden" aria-label="Tiến độ chấm bài">
+          <h2 id="reportGradingTitle">Đang chấm bài</h2>
+          <p id="reportGradingStatus" role="status" aria-live="polite"></p>
+          <progress id="reportGradingProgress" max="1" value="0" aria-label="Số câu đã chấm"></progress>
+          <button id="retrySessionGradingButton" class="button secondary hidden" type="button" data-lucide="refresh-cw">Thử chấm tiếp</button>
+          <button id="refreshSessionGradingButton" class="button secondary hidden" type="button" data-lucide="refresh-cw">Kiểm tra lại</button>
+        </section>
+        <div id="reportContent">
         <div class="report-stat-grid">
           <article><strong id="reportTotalScore">—</strong><span>Tổng điểm đã chấm</span></article>
           <article><strong id="reportPercentage">—</strong><span>Tỷ lệ điểm</span></article>
@@ -420,13 +437,14 @@
         <section class="report-feedback-section"><h2>Cần cải thiện</h2><ul id="gapList"></ul></section>
         <details class="report-competencies"><summary>Tổng hợp năng lực</summary><div id="competencyRows"></div></details>
         <section class="report-question-section"><h2>Chi tiết từng câu</h2><div id="answerDetails"></div></section>
+        </div>
         <div class="report-dialog-footer"><button id="reportBackButton" class="button secondary" type="button">Đóng báo cáo</button></div>
       </div>
     </div>
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/static/app.js?v=1.12.0" defer></script>
+  <script src="/static/app.js?v=1.17.0" defer></script>
 </body>
 
 </html>

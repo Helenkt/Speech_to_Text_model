@@ -1,5 +1,55 @@
 # Changelog
 
+## 1.18.0
+
+- Backend chỉ chuẩn bị STT/VAD sau API Bắt đầu hoặc khôi phục phiên đang làm, không nạp model khi mở web/đăng nhập.
+- Chuẩn bị chạy nền, tái sử dụng worker đã nạp và dùng chung khóa suy luận với ghi âm, sinh câu hỏi và chấm bài.
+- Không nạp LLM cùng bước Bắt đầu; chỉ gọi khi cần sửa transcript hoặc chấm.
+- Luyện tập tự chấm cuối phiên bằng AI, không yêu cầu giảng viên duyệt; kết quả thiếu bằng chứng không có điểm cuối hoặc điểm trung bình giả 0.
+- Bài thi chính thức giữ chấm lại/voice/lịch sử. Kết quả model mạnh dưới ngưỡng phải giảng viên tự chấm, không chấp nhận trực tiếp điểm AI.
+- Giữ cảnh báo chất lượng, transcript đã xác nhận, rubric, profile RAM và trọng số model. Không thay frontend.
+
+## 1.17.0
+
+- Nối frontend với preview, xác nhận bằng fingerprint và chuyển câu trực tiếp cho phiên mới.
+- Giữ transcript chỉ đọc; cho ghi lại trước xác nhận và phục hồi bản tạm từ server khi tải lại trang.
+- Không hiện bảng điểm giữa các câu; cuối phiên tự theo dõi tiến độ và tải báo cáo hoàn chỉnh.
+- Ẩn tổng điểm khi chấm chưa hoàn tất, có nút thử chấm tiếp hoặc kiểm tra lại khi gián đoạn.
+- Chặn kết thúc khi đang ghi/nhận dạng/xác nhận; kết thúc sớm chỉ chấm câu đã xác nhận.
+- Giữ phân quyền thi thật: sinh viên chỉ thấy đã nộp/trạng thái chấm, báo cáo điểm dành cho giảng viên.
+- Không thay trọng số, thuật toán STT, rubric hoặc dữ liệu bài làm cũ.
+
+## 1.16.1
+
+- Ghi âm lưu bản tạm trên đĩa; STT và sửa transcript trước khi sinh viên xem/xác nhận. Không cho sửa chữ trực tiếp.
+- API đọc lại bản tạm và xác nhận bằng fingerprint; cho ghi âm lại theo yêu cầu, chỉ bản hiện hành được xác nhận.
+- Xác nhận khóa voice/transcript, tăng số câu và chuyển sang câu tiếp theo; không chấm giữa phiên.
+- Chấm cuối phiên chỉ đọc bản đã xác nhận, không sửa transcript hoặc nhận dạng lại ngầm.
+- Từ chối xác nhận bản đã bị thay thế, thiếu voice hoặc khi bản ghi mới còn xử lý. Xác nhận lại cùng bản không tạo bài trùng.
+- Máy ít RAM giải phóng LLM sau khi sửa preview. Đổi STT/LLM khi cần có thể làm preview chậm hơn bản 1.16.0.
+- Chỉ sửa backend; frontend cần nối API xác nhận, chuyển câu trực tiếp và poll report.
+
+## 1.16.0
+
+- RAM 8 GB thuộc luồng máy yếu; RAM 4 GB giải phóng worker giữa STT và LLM.
+- Giới hạn luồng CPU/batch LLM; giữ nguyên context, ngân sách output, trọng số và ngưỡng rubric/STT.
+- Phiên mới lưu toàn bộ đề và rubric ngay từ đầu, không chọn câu theo điểm câu trước.
+- Trong phiên chỉ nhận dạng/lưu voice và transcript; cuối phiên mới sửa bằng LLM, chấm từng câu và tạo report.
+- Hàng đợi chấm lưu SQLite, có tiến độ, thử lại có giới hạn và tiếp tục phần chưa chấm sau gián đoạn.
+- Không ghi đè điểm giáo viên khi AI về muộn; giữ nguyên cơ chế cho đề/phiên lịch sử.
+- Chỉ thay backend và tài liệu. Giao diện cũ vẫn cần nối trạng thái chấm cuối phiên để chuyển câu/report tự động.
+
+## 1.15.0
+
+- Sửa transcript bằng span trên bản gốc; tách hotwords STT khỏi quyền sửa thuật ngữ.
+- Chuẩn bị STT/VAD và LLM có trạng thái riêng; một worker STT/Transformer tái sử dụng, máy ít RAM nạp theo giai đoạn.
+- Đồng hồ chờ không phụ thuộc vào phản hồi poll; tách lỗi hệ thống, âm thanh và bằng chứng chấm.
+- Cho giảng viên lưu điểm khi AI còn chạy; kết quả về muộn không ghi đè quyết định đã lưu.
+- Cách ly ngân hàng thử CTX bằng bank_scope, không xóa câu hoặc sửa bài thi cũ.
+- Sửa metric mic có giá trị 0 và phân biệt nguy cơ đỉnh cao với clipping thực sự.
+- Tìm lại span bằng chứng và kiểm tra lại có giới hạn; cho thử chấm lại lỗi kỹ thuật trên câu trả lời luyện tập đã lưu.
+- Không thay trọng số model, không hạ ngưỡng chất lượng STT, không thiết kế lại giao diện mobile.
+
 ## 1.12.0
 
 - Hoàn thiện màn hình chấm lại theo ba lớp điểm: AI ban đầu, AI chấm lại và điểm cuối.

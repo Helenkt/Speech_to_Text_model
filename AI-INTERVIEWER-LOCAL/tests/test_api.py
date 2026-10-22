@@ -252,7 +252,8 @@ def test_candidate_can_delete_only_their_own_practice_history(
     assert login(client, "candidate01", "Candidate@123").status_code == 200
     deleted = client.delete(f"/api/candidate/practice-history/{session_id}")
     assert deleted.status_code == 200
-    assert deleted.json() == {"deleted": True, "session_id": session_id}
+    assert deleted.json() == {"deleted": True, "session_id": session_id,
+                              "audio_cleanup_complete": True, "audio_cleanup_pending": 0}
     assert client.get("/api/candidate/practice-history").json()["sessions"] == []
     assert client.get(f"/api/interviews/{session_id}/report").status_code == 404
 

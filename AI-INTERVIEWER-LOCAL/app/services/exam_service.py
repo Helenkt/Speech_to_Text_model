@@ -10,10 +10,12 @@ from typing import Any
 
 from app.config import Settings
 from app.database import database
+from app.services.rubric_contract import attach_published_contract
+from app.services.audio_lifecycle import deletion_result, schedule_session_audio
 from app.services.interview_engine import (
     InterviewError,
     _row_to_question,
-    public_question,
+    resume_interview,
     start_interview,
 )
 
@@ -111,7 +113,7 @@ def create_exam_round(
         rows = connection.execute(
             """
             SELECT * FROM questions
-            WHERE active = 1 AND language = ? AND subject = ?
+            WHERE active = 1 AND bank_scope = 'learning' AND language = ? AND subject = ?
             ORDER BY difficulty_rank, question_id
             """,
             (language, subject),
@@ -150,7 +152,7 @@ def create_exam_round(
 
         snapshots = []
         for row in rows:
-            question = _row_to_question(row)
+            question = attach_published_contract(connection, _row_to_question(row))
             snapshots.append(
                 (
                     round_id,
@@ -213,15 +215,19 @@ def set_exam_status(
     return _round_dict(row)
 
 
-def delete_exam_round(database_path: Path, exam_round_id: str) -> dict[str, Any]:
+def delete_exam_round(database_path: Path, exam_round_id: str, *, audio_storage_dir: Path | None = None) -> dict[str, Any]:
     """Delete an Interview round and every record that depends on it."""
     with database(database_path) as connection:
+        connection.execute("BEGIN IMMEDIATE")
         exam = connection.execute(
             "SELECT exam_code FROM exam_rounds WHERE exam_round_id = ?",
             (exam_round_id,),
         ).fetchone()
         if not exam:
             raise ExamError("Không tìm thấy đợt Interview")
+        audio_keys = []
+        for session in connection.execute("SELECT session_id FROM interview_sessions WHERE exam_round_id=?", (exam_round_id,)).fetchall():
+            audio_keys.extend(schedule_session_audio(connection, session[0], audio_storage_dir or database_path.parent / "audio"))
 
         counts = connection.execute(
             """
@@ -288,6 +294,7 @@ def delete_exam_round(database_path: Path, exam_round_id: str) -> dict[str, Any]
         "deleted_attempts": int(counts["attempt_count"] or 0),
         "deleted_answers": int(counts["answer_count"] or 0),
         "deleted_question_snapshots": int(question_count or 0),
+        **deletion_result(database_path, audio_keys),
     }
 
 
@@ -306,6 +313,15 @@ def start_real_interview(
     settings: Settings, *, user: dict[str, Any], exam_code: str
 ) -> dict[str, Any]:
     exam = find_candidate_exam(settings.database_path, exam_code)
+    with database(settings.database_path) as connection:
+        previous = connection.execute("SELECT * FROM interview_sessions WHERE exam_round_id=? AND user_id=?",
+                                      (exam["exam_round_id"], user["user_id"])).fetchone()
+    if previous and previous["status"] == "active" and previous["current_question_json"]:
+        try:
+            resumed = resume_interview(settings, previous["session_id"], user_id=user["user_id"])
+        except InterviewError as exc:
+            raise ExamError(str(exc)) from exc
+        return {**resumed, "exam": exam}
     if exam["availability"] != "available":
         messages = {
             "not_started": "Đợt Interview chưa đến giờ bắt đầu",
@@ -315,28 +331,7 @@ def start_real_interview(
         }
         raise ExamError(messages.get(exam["availability"], "Chưa thể bắt đầu Interview"))
 
-    with database(settings.database_path) as connection:
-        previous = connection.execute(
-            """
-            SELECT * FROM interview_sessions
-            WHERE exam_round_id = ? AND user_id = ?
-            """,
-            (exam["exam_round_id"], user["user_id"]),
-        ).fetchone()
     if previous:
-        if previous["status"] == "active" and previous["current_question_json"]:
-            return {
-                "session_id": previous["session_id"],
-                "candidate_name": previous["candidate_name"],
-                "requested_count": int(previous["requested_count"]),
-                "answered_count": int(previous["answered_count"]),
-                "interview_mode": "real",
-                "answer_mode": previous["answer_mode"],
-                "language": previous["language"],
-                "exam": exam,
-                "resumed": True,
-                "question": public_question(json.loads(previous["current_question_json"])),
-            }
         raise ExamError("Bạn đã sử dụng lượt làm bài cho mã đề này")
 
     try:
@@ -372,7 +367,7 @@ def list_exam_attempts(
             SELECT s.session_id, s.candidate_name, s.status, s.answered_count,
                    s.requested_count, s.created_at, s.finished_at, u.username,
                    u.email, u.student_id, r.exam_code, r.title, r.subject,
-                   ROUND(AVG(a.final_score), 1) AS average_score,
+                   ROUND(AVG(CASE WHEN a.reviewed_at IS NOT NULL THEN a.final_score END), 1) AS average_score,
                    SUM(CASE WHEN a.review_required = 1 AND a.reviewed_at IS NULL
                             THEN 1 ELSE 0 END) AS pending_review_count
             FROM interview_sessions AS s

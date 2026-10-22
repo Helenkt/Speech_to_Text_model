@@ -96,7 +96,11 @@ def test_frontend_has_unique_ids_and_both_role_flows(project_root):
     assert 'api("/api/speech/microphone-check"' in javascript
     assert "item.evidence_quote" in javascript
     assert 'select.value = "vi"' in javascript
-    assert 'state.session?.language || state.currentQuestion?.language || "vi"' in javascript
+    assert 'speechApi("/api/speech/jobs"' in javascript
+    assert "async function restoreRecording()" in javascript
+    assert 'can_accept_ai: e.can_accept_ai === true' in javascript
+    assert 'id="retryRecordingButton"' in html
+    assert "Bản ghi đã xác minh" not in html
     assert "async function refreshMicrophones" in javascript
     assert 'localStorage.setItem("ai-interview-microphone"' in javascript
 
@@ -106,3 +110,28 @@ def test_project_has_direct_main_entrypoint(project_root):
     assert "uvicorn.run" in main_file
     assert 'host="127.0.0.1"' in main_file
     assert (project_root / "data" / "account_template.xlsx").exists()
+
+
+def test_frontend_connects_preview_confirmation_and_final_grading(project_root):
+    javascript = (project_root / "app/static/app.js").read_text(encoding="utf-8")
+    html = (project_root / "app/static/index.html").read_text(encoding="utf-8")
+    assert 'function deferredSession()' in javascript
+    assert 'jsonOptions("POST", { preview_sha256: state.currentPreviewSha256 })' in javascript
+    assert '/transcriptions/${encodeURIComponent(transcriptionId)}/confirm' in javascript
+    assert '/interviews/${encodeURIComponent(sessionId)}/draft' in javascript
+    assert 'async function watchSessionGrading(sessionId, origin)' in javascript
+    assert '/interviews/${encodeURIComponent(sessionId)}/grading' in javascript
+    assert '/interviews/${encodeURIComponent(target.sessionId)}/grading/retry' in javascript
+    assert 'el.reportContent.classList.toggle("hidden", !ready)' in javascript
+    assert 'Xác nhận và tiếp tục' in html
+    assert 'id="reportGradingProgress"' in html
+    assert 'id="realGradingStatus"' in html
+
+
+def test_frontend_blocks_finish_during_recording_and_stale_confirmations(project_root):
+    javascript = (project_root / "app/static/app.js").read_text(encoding="utf-8")
+    assert 'state.draftLoading || state.sessionFinishing || state.recorder' in javascript
+    assert 'el.submitAnswerButton.disabled = !response.can_confirm' in javascript
+    assert '["confirmed", "superseded"].includes(job.result?.answer_stage)' in javascript
+    assert 'state.currentPreviewSha256 = null' in javascript
+    assert 'function stopGradingWatch()' in javascript

@@ -1,0 +1,316 @@
+{
+  "schema_version": "semantic-rehearsal-fixture-v1",
+  "data_origin": "agent_authored_synthetic_not_teacher_gold",
+  "source_report_sha256": "796f3ba86f5106a9b4e5307537b0a7c62a790fdb7c0ce98921bc84d80ace8206",
+  "purpose": "Known regression only; not independent validation or training",
+  "cases": [
+    {
+      "id": "DSA_paraphrase",
+      "question": {
+        "question": "Ngăn xếp (Stack) hoạt động theo nguyên lý nào, và hai thao tác cơ bản nhất của Stack là gì?"
+      },
+      "answer": "Em hình dung nó như chồng đĩa, cái đặt lên sau thì nhấc ra trước. Push là thêm lên trên cùng, còn pop lấy cái trên cùng ra và bỏ nó khỏi chồng.",
+      "expected_relations": {
+        "Stack hoạt động theo nguyên lý LIFO: phần tử thêm vào sau cùng được lấy ra đầu tiên": "met",
+        "Hai thao tác cơ bản là PUSH (thêm vào đỉnh) và POP (lấy ra từ đỉnh)": "met"
+      }
+    },
+    {
+      "id": "DSA_incomplete",
+      "question": {
+        "question": "Ngăn xếp (Stack) hoạt động theo nguyên lý nào, và hai thao tác cơ bản nhất của Stack là gì?"
+      },
+      "answer": "Theo em là phần tử mới bỏ vào sẽ được lấy ra trước, giống một chồng sách. Hai thao tác tên gì thì em chưa nhớ.",
+      "expected_relations": {
+        "Stack hoạt động theo nguyên lý LIFO: phần tử thêm vào sau cùng được lấy ra đầu tiên": "met",
+        "Hai thao tác cơ bản là PUSH (thêm vào đỉnh) và POP (lấy ra từ đỉnh)": "missing"
+      }
+    },
+    {
+      "id": "DSA_wrong_order",
+      "question": {
+        "question": "Ngăn xếp (Stack) hoạt động theo nguyên lý nào, và hai thao tác cơ bản nhất của Stack là gì?"
+      },
+      "answer": "Em hiểu stack lấy cái vào đầu tiên ra trước. Push để thêm phần tử lên đỉnh, pop lấy và xóa phần tử trên đỉnh.",
+      "expected_relations": {
+        "Stack hoạt động theo nguyên lý LIFO: phần tử thêm vào sau cùng được lấy ra đầu tiên": "contradicted",
+        "Hai thao tác cơ bản là PUSH (thêm vào đỉnh) và POP (lấy ra từ đỉnh)": "met"
+      }
+    },
+    {
+      "id": "DSA_self_correction",
+      "question": {
+        "question": "Ngăn xếp (Stack) hoạt động theo nguyên lý nào, và hai thao tác cơ bản nhất của Stack là gì?"
+      },
+      "answer": "Em vừa nói stack vào trước ra trước là nhầm. Em xin sửa lại: cái đưa vào sau sẽ lấy ra trước. Push thêm lên đỉnh còn pop lấy và bỏ phần tử ở đỉnh.",
+      "expected_relations": {
+        "Stack hoạt động theo nguyên lý LIFO: phần tử thêm vào sau cùng được lấy ra đầu tiên": "met",
+        "Hai thao tác cơ bản là PUSH (thêm vào đỉnh) và POP (lấy ra từ đỉnh)": "met"
+      }
+    },
+    {
+      "id": "OOP_paraphrase",
+      "question": {
+        "question": "Kế thừa (Inheritance) trong OOP là gì?"
+      },
+      "answer": "Em hiểu là lớp con lấy lại những thuộc tính và hàm lớp cha đã có, nên không phải viết lại hết. Nó còn thêm phần riêng hoặc viết lại cách chạy một hàm đã thừa hưởng.",
+      "expected_relations": {
+        "Lớp con tái sử dụng thuộc tính/phương thức của lớp cha": "met",
+        "Lớp con có thể bổ sung hoặc ghi đè hành vi riêng": "met"
+      }
+    },
+    {
+      "id": "OOP_incomplete",
+      "question": {
+        "question": "Kế thừa (Inheritance) trong OOP là gì?"
+      },
+      "answer": "Lớp con dùng lại các biến thuộc tính và phương thức của lớp cha, đỡ phải viết trùng code. Phần còn lại em chưa biết.",
+      "expected_relations": {
+        "Lớp con tái sử dụng thuộc tính/phương thức của lớp cha": "met",
+        "Lớp con có thể bổ sung hoặc ghi đè hành vi riêng": "missing"
+      }
+    },
+    {
+      "id": "OOP_reversed",
+      "question": {
+        "question": "Kế thừa (Inheritance) trong OOP là gì?"
+      },
+      "answer": "Em nghĩ lớp cha lấy lại các thuộc tính và phương thức từ lớp con. Còn lớp con có thể thêm chức năng riêng hoặc ghi đè phương thức.",
+      "expected_relations": {
+        "Lớp con tái sử dụng thuộc tính/phương thức của lớp cha": "contradicted",
+        "Lớp con có thể bổ sung hoặc ghi đè hành vi riêng": "met"
+      }
+    },
+    {
+      "id": "OOP_near_but_wrong",
+      "question": {
+        "question": "Kế thừa (Inheritance) trong OOP là gì?"
+      },
+      "answer": "Lớp con sử dụng lại thuộc tính và phương thức của lớp cha. Nhưng theo em lớp con bắt buộc giữ nguyên tất cả hành vi, không được bổ sung hay ghi đè.",
+      "expected_relations": {
+        "Lớp con tái sử dụng thuộc tính/phương thức của lớp cha": "met",
+        "Lớp con có thể bổ sung hoặc ghi đè hành vi riêng": "contradicted"
+      }
+    },
+    {
+      "id": "DB_paraphrase",
+      "question": {
+        "question": "Giá trị NULL trong SQL có ý nghĩa gì, và tại sao không thể dùng '= NULL' để kiểm tra một cột có giá trị NULL hay không?"
+      },
+      "answer": "Theo em NULL là mình chưa biết hoặc chưa có thông tin ở ô đó, chứ không phải số không hay chuỗi rỗng. Muốn lọc thì dùng IS NULL hoặc IS NOT NULL, không so sánh bằng dấu bằng với NULL.",
+      "expected_relations": {
+        "NULL đại diện cho giá trị không xác định/chưa có dữ liệu": "met",
+        "Phải dùng IS NULL / IS NOT NULL, không dùng '= NULL' để kiểm tra": "met"
+      }
+    },
+    {
+      "id": "DB_incomplete",
+      "question": {
+        "question": "Giá trị NULL trong SQL có ý nghĩa gì, và tại sao không thể dùng '= NULL' để kiểm tra một cột có giá trị NULL hay không?"
+      },
+      "answer": "Em hiểu NULL là chưa có dữ liệu hoặc chưa xác định được giá trị. Còn cách viết điều kiện SQL thì em không nhớ.",
+      "expected_relations": {
+        "NULL đại diện cho giá trị không xác định/chưa có dữ liệu": "met",
+        "Phải dùng IS NULL / IS NOT NULL, không dùng '= NULL' để kiểm tra": "missing"
+      }
+    },
+    {
+      "id": "DB_wrong_meaning",
+      "question": {
+        "question": "Giá trị NULL trong SQL có ý nghĩa gì, và tại sao không thể dùng '= NULL' để kiểm tra một cột có giá trị NULL hay không?"
+      },
+      "answer": "Em nghĩ NULL chính là số 0. Còn khi kiểm tra cột thì dùng IS NULL hoặc IS NOT NULL, không dùng bằng NULL.",
+      "expected_relations": {
+        "NULL đại diện cho giá trị không xác định/chưa có dữ liệu": "contradicted",
+        "Phải dùng IS NULL / IS NOT NULL, không dùng '= NULL' để kiểm tra": "met"
+      }
+    },
+    {
+      "id": "DB_wrong_both",
+      "question": {
+        "question": "Giá trị NULL trong SQL có ý nghĩa gì, và tại sao không thể dùng '= NULL' để kiểm tra một cột có giá trị NULL hay không?"
+      },
+      "answer": "NULL theo em là chuỗi rỗng, tức đã có một giá trị cụ thể. Muốn tìm nó thì cứ viết cột bằng NULL, không cần IS NULL hay IS NOT NULL.",
+      "expected_relations": {
+        "NULL đại diện cho giá trị không xác định/chưa có dữ liệu": "contradicted",
+        "Phải dùng IS NULL / IS NOT NULL, không dùng '= NULL' để kiểm tra": "contradicted"
+      }
+    },
+    {
+      "id": "AI_paraphrase",
+      "question": {
+        "question": "Học có giám sát (Supervised Learning) là gì, và khác Học không giám sát (Unsupervised Learning) ở điểm nào?"
+      },
+      "answer": "Có giám sát thì mỗi ví dụ đưa vào đã đi kèm đáp án, máy học mối liên hệ để sau này đoán đáp án cho mẫu chưa gặp. Không giám sát thì chưa cho đáp án sẵn, máy tự tìm các nhóm hay quy luật trong dữ liệu.",
+      "expected_relations": {
+        "Học có giám sát huấn luyện từ dữ liệu đã có nhãn, học hàm ánh xạ đầu vào-đầu ra để dự đoán nhãn cho dữ liệu mới": "met",
+        "Khác Học không giám sát: dữ liệu không có nhãn, mục tiêu là tìm cấu trúc/mẫu ẩn (như phân cụm) mà không có đáp án đúng cho trước": "met"
+      }
+    },
+    {
+      "id": "AI_incomplete",
+      "question": {
+        "question": "Học có giám sát (Supervised Learning) là gì, và khác Học không giám sát (Unsupervised Learning) ở điểm nào?"
+      },
+      "answer": "Em chỉ nhớ có giám sát là cho dữ liệu kèm đáp án đúng để nó học quan hệ giữa đầu vào và đầu ra, rồi dự đoán cho dữ liệu mới. Còn không giám sát em chưa hiểu.",
+      "expected_relations": {
+        "Học có giám sát huấn luyện từ dữ liệu đã có nhãn, học hàm ánh xạ đầu vào-đầu ra để dự đoán nhãn cho dữ liệu mới": "met",
+        "Khác Học không giám sát: dữ liệu không có nhãn, mục tiêu là tìm cấu trúc/mẫu ẩn (như phân cụm) mà không có đáp án đúng cho trước": "missing"
+      }
+    },
+    {
+      "id": "AI_swapped",
+      "question": {
+        "question": "Học có giám sát (Supervised Learning) là gì, và khác Học không giám sát (Unsupervised Learning) ở điểm nào?"
+      },
+      "answer": "Có giám sát theo em là dữ liệu không cần nhãn, máy tự chia nhóm. Không giám sát thì mỗi mẫu lại có đáp án đi kèm để máy học dự đoán nhãn.",
+      "expected_relations": {
+        "Học có giám sát huấn luyện từ dữ liệu đã có nhãn, học hàm ánh xạ đầu vào-đầu ra để dự đoán nhãn cho dữ liệu mới": "contradicted",
+        "Khác Học không giám sát: dữ liệu không có nhãn, mục tiêu là tìm cấu trúc/mẫu ẩn (như phân cụm) mà không có đáp án đúng cho trước": "contradicted"
+      }
+    },
+    {
+      "id": "AI_everyday_words",
+      "question": {
+        "question": "Học có giám sát (Supervised Learning) là gì, và khác Học không giám sát (Unsupervised Learning) ở điểm nào?"
+      },
+      "answer": "Một bên giống học bằng ví dụ đã có lời giải: nhìn đầu vào với lời giải để biết làm bài mới. Bên không giám sát chỉ đưa nguyên dữ liệu chưa gắn lời giải, nó tự xem những thứ nào giống nhau để gom nhóm và tìm cấu trúc ẩn.",
+      "expected_relations": {
+        "Học có giám sát huấn luyện từ dữ liệu đã có nhãn, học hàm ánh xạ đầu vào-đầu ra để dự đoán nhãn cho dữ liệu mới": "met",
+        "Khác Học không giám sát: dữ liệu không có nhãn, mục tiêu là tìm cấu trúc/mẫu ẩn (như phân cụm) mà không có đáp án đúng cho trước": "met"
+      }
+    },
+    {
+      "id": "new_DSA_queue",
+      "question": {
+        "question": "Hàng đợi (Queue) hoạt động theo nguyên lý nào, khác gì với Stack?"
+      },
+      "answer": "Hàng đợi như xếp hàng mua vé, ai đến trước được phục vụ trước. Ngăn xếp thì ngược lại, cái mới cho vào lấy ra trước; hàng đợi giữ thứ tự vào.",
+      "expected_relations": {
+        "Queue hoạt động theo nguyên lý FIFO: phần tử thêm vào đầu tiên được lấy ra đầu tiên": "met",
+        "Khác với Stack (LIFO), Queue giữ đúng thứ tự các phần tử theo thứ tự chúng được thêm vào": "met"
+      }
+    },
+    {
+      "id": "new_DSA_queue_reversed",
+      "question": {
+        "question": "Hàng đợi (Queue) hoạt động theo nguyên lý nào, khác gì với Stack?"
+      },
+      "answer": "Queue lấy phần tử vừa vào sau cùng ra trước. Nó giống Stack vì cả hai đều đảo ngược thứ tự thêm vào.",
+      "expected_relations": {
+        "Queue hoạt động theo nguyên lý FIFO: phần tử thêm vào đầu tiên được lấy ra đầu tiên": "contradicted",
+        "Khác với Stack (LIFO), Queue giữ đúng thứ tự các phần tử theo thứ tự chúng được thêm vào": "contradicted"
+      }
+    },
+    {
+      "id": "new_DSA_big_o",
+      "question": {
+        "question": "Ký hiệu Big-O biểu diễn điều gì trong phân tích thuật toán và bản thân nó có đồng nghĩa với trường hợp xấu nhất không?"
+      },
+      "answer": "Nó mô tả một mức chặn phía trên cho độ tăng chi phí khi đầu vào đủ lớn. Không tự nói là tình huống tệ nhất, phải ghi rõ đang xét tốt nhất, trung bình hay xấu nhất.",
+      "expected_relations": {
+        "Big-O là cận trên tiệm cận của một hàm chi phí đã xác định": "met",
+        "Nó không mặc định là worst-case; loại trường hợp phân tích phải được nêu riêng": "met"
+      }
+    },
+    {
+      "id": "new_DSA_big_o_wrong",
+      "question": {
+        "question": "Ký hiệu Big-O biểu diễn điều gì trong phân tích thuật toán và bản thân nó có đồng nghĩa với trường hợp xấu nhất không?"
+      },
+      "answer": "Big O cho cận trên tiệm cận của hàm chi phí. Nhưng cứ ghi Big O là bắt buộc đang xét trường hợp xấu nhất, không thể là trung bình.",
+      "expected_relations": {
+        "Big-O là cận trên tiệm cận của một hàm chi phí đã xác định": "met",
+        "Nó không mặc định là worst-case; loại trường hợp phân tích phải được nêu riêng": "contradicted"
+      }
+    },
+    {
+      "id": "new_OOP_objects",
+      "question": {
+        "question": "Lớp (class) và đối tượng (object) khác nhau như thế nào?"
+      },
+      "answer": "Class như bản thiết kế, object là một sản phẩm cụ thể tạo theo bản đó. Một bản thiết kế tạo được nhiều object riêng, mỗi cái có dữ liệu của nó.",
+      "expected_relations": {
+        "Lớp là khuôn mẫu/kiểu dữ liệu, đối tượng là thể hiện cụ thể": "met",
+        "Một lớp có thể tạo ra nhiều đối tượng khác nhau": "met"
+      }
+    },
+    {
+      "id": "new_OOP_objects_mixed",
+      "question": {
+        "question": "Lớp (class) và đối tượng (object) khác nhau như thế nào?"
+      },
+      "answer": "Lớp giống bản thiết kế còn đối tượng là thứ cụ thể làm ra từ bản ấy. Tuy nhiên một lớp chỉ tạo được đúng một đối tượng, không thể có cái thứ hai.",
+      "expected_relations": {
+        "Lớp là khuôn mẫu/kiểu dữ liệu, đối tượng là thể hiện cụ thể": "met",
+        "Một lớp có thể tạo ra nhiều đối tượng khác nhau": "contradicted"
+      }
+    },
+    {
+      "id": "new_DB_entity",
+      "question": {
+        "question": "Thực thể (Entity) trong mô hình ER là gì? Cho ví dụ."
+      },
+      "answer": "Đó là thứ trong thực tế mình muốn ghi lại thông tin để quản lý. Ví dụ từng sinh viên cụ thể mà hệ thống lưu hồ sơ.",
+      "expected_relations": {
+        "Thực thể đại diện cho một đối tượng cần quản lý dữ liệu": "met",
+        "Ví dụ: SinhVien, MonHoc, DonHang": "met"
+      }
+    },
+    {
+      "id": "new_DB_entity_missing",
+      "question": {
+        "question": "Thực thể (Entity) trong mô hình ER là gì? Cho ví dụ."
+      },
+      "answer": "Là đối tượng mình muốn lưu và quản lý thông tin. Em chưa nghĩ ra ví dụ.",
+      "expected_relations": {
+        "Thực thể đại diện cho một đối tượng cần quản lý dữ liệu": "met",
+        "Ví dụ: SinhVien, MonHoc, DonHang": "missing"
+      }
+    },
+    {
+      "id": "new_AI_definition",
+      "question": {
+        "question": "Trí tuệ nhân tạo (Artificial Intelligence - AI) là gì?"
+      },
+      "answer": "Theo em đây là lĩnh vực máy tính làm ra hệ thống đảm nhận việc vốn cần trí tuệ con người. Nó học từ kinh nghiệm, suy luận, giải bài toán, nhận biết hình ảnh lời nói rồi đưa ra quyết định.",
+      "expected_relations": {
+        "AI là nhánh khoa học máy tính xây dựng hệ thống thực hiện các nhiệm vụ đòi hỏi trí thông minh của con người": "met",
+        "Bao gồm các khả năng như học hỏi, suy luận, giải quyết vấn đề, nhận thức và ra quyết định": "met"
+      }
+    },
+    {
+      "id": "new_AI_definition_missing",
+      "question": {
+        "question": "Trí tuệ nhân tạo (Artificial Intelligence - AI) là gì?"
+      },
+      "answer": "AI là một ngành của khoa học máy tính tạo ra hệ thống làm các nhiệm vụ cần trí thông minh của con người. Cụ thể nó có khả năng gì thì em không nhớ.",
+      "expected_relations": {
+        "AI là nhánh khoa học máy tính xây dựng hệ thống thực hiện các nhiệm vụ đòi hỏi trí thông minh của con người": "met",
+        "Bao gồm các khả năng như học hỏi, suy luận, giải quyết vấn đề, nhận thức và ra quyết định": "missing"
+      }
+    },
+    {
+      "id": "new_OOP_unresolved_conflict",
+      "question": {
+        "question": "Kế thừa (Inheritance) trong OOP là gì?"
+      },
+      "answer": "Lớp con nhận lại thuộc tính và phương thức từ lớp cha. Nhưng lớp con cũng không nhận thuộc tính và phương thức nào từ lớp cha. Em chưa biết bổ sung gì nữa.",
+      "expected_relations": {
+        "Lớp con tái sử dụng thuộc tính/phương thức của lớp cha": "unresolved",
+        "Lớp con có thể bổ sung hoặc ghi đè hành vi riêng": "missing"
+      }
+    },
+    {
+      "id": "new_AI_english",
+      "question": {
+        "question": "Học có giám sát (Supervised Learning) là gì, và khác Học không giám sát (Unsupervised Learning) ở điểm nào?"
+      },
+      "answer": "Supervised learning learns from inputs with known target answers and uses the learned mapping to predict targets for new inputs. Unsupervised learning has no target labels; it discovers groups and hidden structure in the data.",
+      "expected_relations": {
+        "Học có giám sát huấn luyện từ dữ liệu đã có nhãn, học hàm ánh xạ đầu vào-đầu ra để dự đoán nhãn cho dữ liệu mới": "met",
+        "Khác Học không giám sát: dữ liệu không có nhãn, mục tiêu là tìm cấu trúc/mẫu ẩn (như phân cụm) mà không có đáp án đúng cho trước": "met"
+      }
+    }
+  ]
+}

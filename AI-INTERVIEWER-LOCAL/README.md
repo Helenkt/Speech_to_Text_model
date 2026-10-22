@@ -83,8 +83,8 @@ Mật khẩu gốc chỉ nằm trong file do bạn quản lý. Sau khi import, S
 1. Đăng nhập bằng tài khoản Ứng viên.
 2. Chọn **Luyện tập**.
 3. Chọn ngôn ngữ, môn, số câu và độ khó ban đầu.
-4. Trả lời từng câu; hệ thống hiển thị điểm và góp ý ngay.
-5. Xem báo cáo cuối phiên.
+4. Bấm Bắt đầu để chuẩn bị STT/VAD ở nền; ghi âm, xem transcript và xác nhận từng câu.
+5. Kết thúc phiên để AI tự chấm theo rubric, trả điểm và báo cáo; không cần giảng viên duyệt luyện tập.
 6. Mở **Lịch sử** để xem lại điểm và báo cáo của các buổi trước.
 7. Có thể xóa từng buổi luyện tập của chính mình bằng nút **Xóa**.
 
@@ -139,6 +139,28 @@ Kiểm tra model đã có trên máy:
 ollama list
 ```
 
+### Transformer chấm theo rubric
+
+Backend có thêm `RubricGuard Lite`: `FactGuard` kiểm tra số, đơn vị, phủ định và
+quan hệ so sánh; MiniLM Transformer ONNX INT8 đối chiếu từng ý trong câu trả lời
+với rubric. Model chỉ được tự chốt khi vượt quality gate. Nếu chưa đủ tin cậy, hệ
+thống tự chuyển sang Qwen. Chỉ bài thi chính thức có luồng giảng viên chấm lại;
+luyện tập thiếu bằng chứng được ghi rõ là chưa đủ cơ sở chấm, không tự gán điểm 0.
+
+Tải model Transformer cho máy mới:
+
+```powershell
+.\.venv\Scripts\python.exe tools\setup_rubricguard_lite.py
+```
+
+Model INT8 khoảng 102 MB và được nạp khi chấm lần đầu, không chạy trong lúc ghi âm
+hay chuyển giọng nói thành văn bản. Xem chi tiết tại [RUBRICGUARD_LITE.md](RUBRICGUARD_LITE.md).
+
+Bản local đã được fine-tune ngày 16/10/2026. Các ý tiếng Việt vượt ngưỡng đã kiểm định
+được chấm bằng Transformer, Qwen chỉ xử lý các ý chưa rõ. Lệnh setup ở trên tải model
+gốc, không tải checkpoint fine-tune. Xem kết quả thực nghiệm và cách tái lập tại
+[FINETUNE_REPORT_20261016.md](FINETUNE_REPORT_20261016.md).
+
 Lệnh pull chỉ cần chạy một lần khi máy đang có Internet. Sau khi tải xong, Ollama và
 `qwen2.5:3b` có thể chạy hoàn toàn local.
 
@@ -149,11 +171,53 @@ và lập luận tốt hơn. Có thể đổi model bằng biến `QUESTION_GENE
 Luồng xử lý:
 
 ```text
-Ghi âm -> Faster-Whisper + hotwords -> transcript + độ tin cậy từng từ
-        -> Qwen đề xuất lỗi trong vùng nghi ngờ
-        -> kiểm tra vùng sửa/thuật ngữ/phủ định/số liệu/mức độ chắc chắn
-        -> transcript đã xác minh -> chấm rubric
+Bắt đầu -> chuẩn bị và lưu toàn bộ câu hỏi/rubric/độ khó của phiên
+Trong phiên: ghi âm từng câu -> STT -> sửa transcript có kiểm soát (LLM khi cần)
+             -> lưu voice/transcript tạm -> sinh viên xem lại, không sửa chữ
+             -> ghi âm lại hoặc xác nhận -> khóa bản đang xem -> câu tiếp theo
+Kết thúc -> hàng đợi chấm -> giải phóng STT -> chấm đúng bản đã xác nhận
+         -> tổng hợp báo cáo; điểm thi voice vẫn cần quyết định của giảng viên
 ```
+
+Luồng mới mặc định bật qua `DEFER_GRADING_UNTIL_FINISH=true` và chỉ áp dụng khi
+tạo phiên mới. Phiên cũ giữ nguyên cách xử lý, không chấm lại lịch sử. STT xử lý
+từng bản ghi và giữ model qua các lượt, không ghép voice của nhiều câu thành một
+câu trả lời. Câu hỏi do LLM sinh vẫn qua luồng chuẩn bị/duyệt hiện có trước khi thi.
+Từ bản 1.16.1, sửa transcript diễn ra trước xác nhận; bước chấm cuối không sửa
+text thêm lần nữa. Bản tạm được giữ trên đĩa local, không giữ toàn bộ audio trong
+RAM. Các lần ghi lại không tự trở thành câu trả lời; chỉ bản đã xác nhận được chấm.
+
+`GET /api/interviews/{id}/draft` phục hồi preview hiện tại, fingerprint,
+`can_confirm` và `can_record`. `POST /api/interviews/{id}/transcriptions/{tid}/confirm`
+nhận JSON chỉ gồm `preview_sha256`, không nhận text sinh viên sửa. Server khóa
+voice/transcript trong cùng transaction với việc chuyển câu; bản cũ bị thay thế,
+voice mất hoặc fingerprint sai sẽ không được xác nhận. `/answer` giữ tương thích
+như một alias xác nhận, luôn dùng transcript server chứ không dùng text client.
+
+API `GET /api/interviews/{id}/grading` trả trạng thái/progress/report_ready;
+`POST /api/interviews/{id}/grading/retry` thử lại lỗi kỹ thuật, tối đa ba lượt tổng.
+Báo cáo ứng viên/giảng viên có thêm trường `grading`. Từ bản 1.17.0, giao diện đã
+nối luồng này: xem transcript chỉ đọc, ghi âm lại hoặc xác nhận để chuyển thẳng
+sang câu tiếp theo, không hiện điểm giữa các câu ở phiên mới. Cuối phiên hiển
+thị tiến độ chấm rồi tự mở nội dung báo cáo; lỗi kỹ thuật có nút thử tiếp trong
+giới hạn backend. Tải lại trang có thể khôi phục bản tạm từ server hoặc tiếp tục
+theo dõi báo cáo đã nộp. Thi chính thức chỉ báo trạng thái cho sinh viên, không
+hiện điểm riêng của giảng viên. Phiên cũ vẫn dùng luồng chấm từng câu.
+
+Từ backend 1.18.0, mở web, đăng nhập hoặc đọc trạng thái không nạp sẵn model AI.
+API Bắt đầu luyện tập/Interview mới khởi động chuẩn bị STT/VAD ở nền; mở lại phiên
+đang làm cũng chuẩn bị lại nếu model chưa sẵn sàng. Bộ câu hỏi trả về ngay để
+sinh viên đọc/kiểm tra mic trong lúc model chuẩn bị. Worker đã nạp được tái sử dụng,
+không tạo lượt nạp trùng. LLM sửa transcript và chấm chỉ nạp khi thực sự cần.
+`RUNTIME_WARMUP=false` tắt bước chuẩn bị theo phiên, không tắt nhận dạng theo nhu cầu.
+Tác vụ chấm đã nộp từ trước vẫn được hàng đợi khôi phục khi backend khởi động;
+đây là tiếp tục yêu cầu đã lưu, không phải nạp trước model cho một phiên chưa bắt đầu.
+
+Luyện tập có `grading_owner=ai`, không vào hàng chờ giáo viên và không cho giảng viên
+ghi đè điểm qua API chấm lại. Điểm thiếu bằng chứng có `final_score=null`,
+`score_status=insufficient_evidence` và không được tính vào điểm trung bình.
+Điểm 0 chỉ là kết quả chính thức khi AI đã đối chiếu được rubric, không phải do lỗi
+kỹ thuật/voice không rõ. Không chỉnh lại transcript đã xác nhận trong bước chấm.
 
 Khởi động cả Ollama portable và ứng dụng trên cổng 8001:
 
@@ -161,10 +225,12 @@ Khởi động cả Ollama portable và ứng dụng trên cổng 8001:
 .\start_local.ps1
 ```
 
-Kiểm thử đầu-cuối trên 7 file tiếng Việt, 299 từ tham chiếu, cho WER `6,02%`,
+Một bài kiểm thử cũ trên 7 file tiếng Việt, 299 từ tham chiếu, cho WER `6,02%`,
 không có mẫu nào bị Qwen sửa tệ hơn. Thời gian STT trung bình trên RTX 4060 là
 `2,41 giây/file`; Qwen sau khi được nạp mất khoảng `0,32 giây`. Báo cáo chi tiết
 nằm tại `test_audio/end_to_end_pipeline_evaluation.json`.
+Đây không phải WER đã xác nhận trên máy 4/8 GB hoặc giọng sinh viên thực tế;
+các bài audit khác có kết quả khác và không chứng minh mục tiêu WER đã đạt chung.
 
 Bộ chấm mặc định thử Ollama `qwen2.5:3b`; nếu Ollama chưa chạy, hệ thống tự chuyển sang bộ chấm rubric local. Vì vậy Ollama không bắt buộc để demo.
 
@@ -187,14 +253,6 @@ Giáo viên có hai lựa chọn:
 
 Hệ thống kiểm tra toàn bộ file trước khi ghi. Nếu có một câu sai cấu trúc, toàn bộ lần import bị hủy.
 Mỗi ngôn ngữ hiện có 900 câu, chia đều 300 câu cho từng mức Easy, Medium và Hard.
-
-### Dữ liệu gán nhãn chấm rubric
-
-Bốn bộ dữ liệu AI101, DB101, DSA101 và OOP101 dùng để huấn luyện hoặc đánh giá
-bộ chấm điểm nằm tại `data/training/`. Dữ liệu này ghi quan hệ giữa câu trả lời
-sinh viên và từng tiêu chí rubric, không được nhập như ngân hàng câu hỏi. Chi tiết
-định dạng, quy mô và cách phân tách bộ đầy đủ/bộ mẫu nằm trong
-`data/training/README.md`.
 
 ### Rubric sinh câu hỏi bằng LLM
 
@@ -238,13 +296,16 @@ Mỗi câu trả lời bằng giọng nói lưu file voice gốc trong `data/aud
 transcript ban đầu, transcript đã xác minh và độ tin cậy. Thư mục voice được loại khỏi
 Git để không công khai dữ liệu cá nhân của sinh viên.
 
+Quy trình dưới đây chỉ áp dụng cho kiểm tra Interview chính thức, không áp dụng luyện tập.
 Điểm AI ban đầu là điểm tạm thời. Khi Giáo viên mở một câu trong phần chấm lại,
 backend dùng Faster-Whisper `large-v3` chạy Beam 5 trên voice gốc, sửa an toàn các vùng
 không chắc chắn rồi chấm lại theo cùng rubric. Giao diện giữ song song text cũ và text
 do model mạnh chuyển lại. Kết quả được lưu để không chạy lại model khi mở lần sau.
 
-Điểm từ model mạnh luôn là điểm đề xuất. Giáo viên có thể dùng điểm này hoặc tự nhập
-điểm và nhận xét, kể cả khi kết quả dưới `TEACHER_REVIEW_SCORE_THRESHOLD`. Việc nghe
+Điểm từ model mạnh luôn là điểm đề xuất. Khi kết quả đã xác minh và đạt ngưỡng
+`TEACHER_REVIEW_SCORE_THRESHOLD`, Giáo viên có thể dùng điểm này hoặc tự nhập điểm
+và nhận xét. Nếu model mạnh chấm lại vẫn dưới ngưỡng, bắt buộc giảng viên tự chấm;
+API từ chối thao tác dùng nguyên điểm AI. Việc nghe
 voice là tùy chọn, có thể phát lại không giới hạn và không khóa thao tác chấm. Chỉ sau
 quyết định của Giáo viên, điểm mới được ghi vào `final_score`; mọi lần đổi điểm đều có
 lịch sử riêng.
@@ -300,7 +361,7 @@ trong `data/stt_benchmark_report.json`.
 
 ### Tự nhận diện cấu hình máy
 
-Khi khởi động, backend đọc số luồng CPU, tổng RAM, RAM còn trống, mức sử dụng RAM,
+Khi chọn profile/chuẩn bị suy luận, backend đọc số luồng CPU, tổng RAM, RAM còn trống, mức sử dụng RAM,
 CUDA, số GPU và VRAM rồi tự chọn profile:
 
 | Profile | Model chính | Chính sách |
@@ -309,6 +370,25 @@ CUDA, số GPU và VRAM rồi tự chọn profile:
 | Cân bằng | `medium/cpu/int8` | Khử nhiễu theo nhu cầu nếu đã cài engine |
 | Hiệu năng | `medium/cuda/float16` | Xử lý nặng theo nhu cầu, không giữ song song model |
 | Độ chính xác cao | `medium/cuda/float16` | Giải mã thích ứng: lượt nhanh trước, Beam 5 khi độ tin cậy thấp |
+
+RAM vật lý khoảng 8 GB trở xuống luôn thuộc luồng tiết kiệm tài nguyên, kể cả
+khi còn nhiều RAM trống. Nếu máy 8 GB có CUDA/VRAM phù hợp, vẫn giữ medium trên
+GPU thay vì hạ model không cần thiết. CPU dùng small INT8. RAM 4 GB có ngân sách
+CPU/batch nhỏ hơn và đóng worker suy luận ở bước chuyển STT sang LLM để trả bộ
+nhớ native cho hệ điều hành. Máy lớn hơn nhưng RAM còn trống dưới 4 GB cũng nạp
+model theo giai đoạn. Kiểm tra RAM được cập nhật ở mỗi lần chuyển công đoạn.
+
+Whisper/Transformer/LLM được giới hạn luồng CPU; LLM dùng batch nhỏ hơn nhưng
+không cắt context/rubric hoặc giảm ngân sách output để làm nhanh. Với preview,
+chỉ gọi LLM nếu cần sửa; máy ít RAM giải phóng LLM sau preview. Do yêu cầu xem
+bản sửa trước xác nhận, có thể phải đổi model STT/LLM giữa các câu; không còn
+cam kết giữ STT trong bộ nhớ suốt phiên khi đã gọi LLM. Model sinh câu
+hỏi không chạy song song với STT/chấm. Large-v3 và Qwen3:8b vẫn là tác vụ nặng
+theo yêu cầu, chưa được chứng nhận chạy thuận tiện trên máy 4/8 GB.
+
+Các chính sách tài nguyên được kiểm thử mô phỏng; chưa phải benchmark tốc độ,
+RAM đỉnh hoặc WER trên máy yếu thật. RAM 8 GB là cấu hình mục tiêu, 4 GB là mục
+tiêu hỗ trợ chậm hơn, không phải bảo đảm mọi CPU/ổ đĩa đều đáp ứng.
 
 `GET /api/health` trả cả phần cứng, profile, tính năng thực sự có sẵn và chính sách
 bộ nhớ. DeepFilterNet hoặc pyannote chỉ được báo là có khi thư viện tương ứng đã

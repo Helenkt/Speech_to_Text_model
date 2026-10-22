@@ -1,0 +1,27 @@
+{
+  "subjects": {
+    "AI101": 100,
+    "DB101": 100,
+    "DSA101": 100,
+    "OOP101": 100
+  },
+  "questions": 40,
+  "answers": 400,
+  "criterion_pairs": 1160,
+  "draft_label_counts": {
+    "supported": 532,
+    "missing": 408,
+    "contradicted": 179,
+    "needs_review": 41
+  },
+  "answer_splits": {
+    "regression_only": 60,
+    "test": 80,
+    "train": 180,
+    "validation": 80
+  },
+  "source_provenance_verified": true,
+  "protected_production_files_unchanged": null,
+  "production_audit_requested": false,
+  "validation_scope": "Structure, evidence, weights and provenance; NOT semantic correctness of AI labels"
+}

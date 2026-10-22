@@ -633,8 +633,69 @@ def test_recording_report_exposes_ui_ready_percentages():
 
     assert report["recognition_confidence_percent"] == 82
     assert report["recording_quality_percent"] == 76
-    assert report["estimated_recognition_accuracy_percent"] == 83
+    assert report["estimated_recognition_accuracy_percent"] is None
+    assert report["accuracy_calibrated"] is False
     assert report["noise"]["level"] == "moderate"
+
+
+def test_selective_retry_preserves_unaffected_segments_and_global_timestamps(test_settings, monkeypatch):
+    from types import SimpleNamespace as NS
+
+    def segment(index, uncertain=False, start=None, text=None):
+        start = index * 2 if start is None else start
+        text = text or f"part{index}"
+        return NS(text=text, start=start, end=start + 2, avg_logprob=-.3 if uncertain else -.01,
+                  no_speech_prob=.01, compression_ratio=1,
+                  words=[NS(word=text, start=start, end=start + 2, probability=.1 if uncertain else .99)])
+
+    initial = [segment(i, uncertain=i == 3) for i in range(8)]
+    info = NS(language="en", language_probability=.99)
+    calls = []
+
+    class Model:
+        def transcribe(self, source, **kwargs):
+            calls.append((source, kwargs))
+            if len(calls) == 1:
+                return iter(initial), info
+            assert len(source) == 6 * 16000
+            return iter([segment(2, start=0), segment(3, start=2, text="repaired"), segment(4, start=4)]), info
+
+    output = io.BytesIO()
+    with wave.open(output, "wb") as stream:
+        stream.setnchannels(1)
+        stream.setsampwidth(2)
+        stream.setframerate(16000)
+        stream.writeframes(b"\0\0" * (16000 * 16))
+    monkeypatch.setattr(speech_module, "_get_model", lambda _: Model())
+    result = speech_module.transcribe_bytes(test_settings, output.getvalue(), filename="test.wav", language="en")
+    assert result["decode_strategy"] == "selective_retry"
+    assert result["text"] == "part0 part1 part2 repaired part4 part5 part6 part7"
+    assert result["retry_windows"] == [{"start": 4.0, "end": 10.0}]
+    assert result["segments"][3]["start"] == 6 and result["segments"][-1]["end"] == 16
+    assert len(calls) == 2 and calls[1][1]["beam_size"] == 5
+    for item in initial:
+        item.words[0].probability = .1
+    assert speech_module.selective_retry_windows(initial) == []
+
+
+def test_disagreement_about_numbers_is_preserved_as_a_quality_warning(test_settings, monkeypatch):
+    from types import SimpleNamespace as NS
+    calls = []
+
+    class Model:
+        def transcribe(self, *_args, **_kwargs):
+            calls.append(1)
+            segment = NS(text="RAM 2GB" if len(calls) == 1 else "RAM 3GB", start=0, end=2,
+                         avg_logprob=-1 if len(calls) == 1 else -.1, no_speech_prob=.01,
+                         compression_ratio=1, words=[])
+            return iter([segment]), NS(language="en", language_probability=.99)
+
+    monkeypatch.setattr(speech_module, "_get_model", lambda _: Model())
+    result = speech_module.transcribe_bytes(test_settings, b"audio", filename="test.webm", language="en")
+    assert result["recognition_alternatives"] == ["RAM 2GB", "RAM 3GB"]
+    assert any("phủ định" in warning for warning in result["quality_warnings"])
+    checked = speech_module.assess_transcription_quality(result, minimum_confidence=.48)
+    assert any("phủ định" in warning for warning in checked["quality_warnings"])
 
 
 def test_microphone_check_endpoint_returns_backend_assessment(

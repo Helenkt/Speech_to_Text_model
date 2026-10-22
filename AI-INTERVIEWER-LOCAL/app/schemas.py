@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class LoginRequest(BaseModel):
@@ -21,6 +21,11 @@ class StartInterviewRequest(BaseModel):
 class SubmitAnswerRequest(BaseModel):
     answer: str = Field(min_length=1, max_length=20_000)
     transcription_id: str | None = Field(default=None, max_length=64)
+
+
+class ConfirmRecordingRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    preview_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
 
 
 class AccountActiveRequest(BaseModel):
@@ -58,5 +63,5 @@ class GeneratedQuestionDecisionRequest(BaseModel):
 
 class TeacherAnswerReviewRequest(BaseModel):
     action: Literal["accept_ai", "manual"] = "manual"
-    score: float | None = Field(default=None, ge=0, le=100)
+    score: float | None = Field(default=None, ge=0, le=100, strict=True, allow_inf_nan=False)
     feedback: str = Field(default="", max_length=2_000)

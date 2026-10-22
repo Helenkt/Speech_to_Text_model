@@ -97,6 +97,9 @@ def normalize_question(
     topic = _text(_first(raw, "topic") or subject, "topic")
     concept = _text(_first(raw, "concept") or topic, "concept")
     competency = _text(_first(raw, "competency", "skill") or subject, "competency")
+    bank_scope = str(raw.get("bank_scope", "learning"))
+    if bank_scope not in {"learning", "test"}:
+        raise QuestionBankError("'bank_scope' chỉ nhận learning hoặc test")
     question_id = _text(_first(raw, "id", "question_id"), "id", required=False)
     if not question_id:
         digest = hashlib.sha256(
@@ -117,6 +120,7 @@ def normalize_question(
         "question": question_text,
         "reference_answer": reference_answer,
         "key_points": _key_points(raw),
+        "bank_scope": bank_scope,
         "_row": index,
     }
 
@@ -209,8 +213,8 @@ def import_question_bank(
                     uid, question_id, language, subject, competency, topic, concept,
                     difficulty, difficulty_rank, question, reference_answer,
                     key_points_json, source_name, verification_status, active,
-                    created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'unverified', 1, ?, ?)
+                    created_at, updated_at, bank_scope
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'unverified', 1, ?, ?, ?)
                 ON CONFLICT(uid) DO UPDATE SET
                     question_id = excluded.question_id,
                     language = excluded.language,
@@ -226,6 +230,7 @@ def import_question_bank(
                     source_name = excluded.source_name,
                     verification_status = 'unverified',
                     active = 1,
+                    bank_scope = CASE WHEN questions.bank_scope='test' THEN 'test' ELSE excluded.bank_scope END,
                     updated_at = excluded.updated_at
                 """,
                 (
@@ -244,6 +249,8 @@ def import_question_bank(
                     Path(filename).name,
                     now,
                     now,
+                    "test" if Path(filename).name == "cau_hoi_import.json" and re.match(r"^CTX\d{2} -", item["subject"])
+                    else item["bank_scope"],
                 ),
             )
 

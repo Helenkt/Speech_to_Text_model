@@ -10,6 +10,7 @@ from typing import Any
 import httpx
 
 from app.config import Settings
+from app.services.resource_policy import ollama_request_resources
 from app.database import database
 from app.services.question_generation_rubric import (
     build_generation_prompt,
@@ -54,7 +55,7 @@ def _load_sources(
     topic: str | None,
     limit: int = 3,
 ) -> list[dict[str, Any]]:
-    clauses = ["active = 1", "language = ?", "subject = ?"]
+    clauses = ["active = 1", "bank_scope = 'learning'", "language = ?", "subject = ?"]
     parameters: list[Any] = [language, subject]
     if topic:
         clauses.append("topic = ?")
@@ -98,12 +99,13 @@ def _parse_json_object(content: str) -> dict[str, Any]:
 async def _generate_with_ollama(
     settings: Settings, prompt: str
 ) -> dict[str, Any]:
+    resources = ollama_request_resources(settings)
     payload = {
         "model": settings.question_generation_model,
         "stream": False,
         "think": False,
         "format": "json",
-        "keep_alive": settings.ollama_keep_alive,
+        **resources,
         "messages": [
             {
                 "role": "system",
@@ -115,6 +117,7 @@ async def _generate_with_ollama(
             {"role": "user", "content": prompt},
         ],
         "options": {
+            **resources["options"],
             "temperature": 0.2,
             "top_p": 0.85,
             "num_predict": 1_200,
@@ -196,7 +199,7 @@ async def generate_question_drafts(
         existing_questions = [
             row["question"]
             for row in connection.execute(
-                "SELECT question FROM questions WHERE active = 1 AND language = ? AND subject = ?",
+                "SELECT question FROM questions WHERE active = 1 AND bank_scope = 'learning' AND language = ? AND subject = ?",
                 (language, subject),
             ).fetchall()
         ]

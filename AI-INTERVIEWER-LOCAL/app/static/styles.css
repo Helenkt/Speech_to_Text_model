@@ -1303,6 +1303,9 @@ tbody tr:last-child td {
   background: #fff6df;
 }
 
+.assessment-status.unresolved { background: #edf1f5; color: #405164; }
+.unresolved-list { color: #405164; }
+
 .evaluation>.button {
   grid-column: 1 / -1;
 }
@@ -2743,3 +2746,13 @@ body.report-modal-open { overflow: hidden; }
 .teacher-workspace-view .generated-actions { margin-top: 0; flex-shrink: 0; }
 .teacher-workspace-view .generated-question-footer details { margin-top: 0; }
 .teacher-workspace-view .generated-question-list, .teacher-workspace-view .teacher-review-list { border-top: 0; }
+
+.recording-recovery { display: flex; flex-wrap: wrap; gap: 8px; }
+.recording-recovery .button { display: inline-flex; align-items: center; gap: 6px; }
+.recording-recovery:has(button:not(.hidden)) { margin-top: 12px; }
+#recordingStatus { overflow-wrap: anywhere; }
+.grading-panel { border-block: 1px solid #d8e2e6; padding: 24px 0; margin: 16px 0; }
+.grading-panel h2 { font-size: 20px; margin: 0 0 8px; }
+.grading-panel p { line-height: 1.6; overflow-wrap: anywhere; }
+.grading-panel progress { display: block; width: 100%; height: 10px; margin: 16px 0; accent-color: #147d6b; }
+.grading-panel .button { margin: 8px 8px 0 0; }

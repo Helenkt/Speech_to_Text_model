@@ -197,11 +197,11 @@ def test_voice_evidence_and_teacher_score_become_final(
             "rejected_corrections": [],
         }
 
-    async def low_review_score(*_args, **_kwargs):
+    async def low_review_score(_settings, question, _answer):
         return {
-            "score": 20,
+            "score": 0,
             "feedback": "Câu trả lời chưa thể hiện kiến thức.",
-            "point_assessments": [],
+            "point_assessments": [{"point": point, "status": "missing"} for point in question["key_points"]],
         }
 
     monkeypatch.setattr(main_module, "correct_transcript", no_review_correction)
@@ -211,17 +211,29 @@ def test_voice_evidence_and_teacher_score_become_final(
     )
     assert strong_review.status_code == 200
     assert strong_review.json()["review_model"] == "large-v3"
-    assert strong_review.json()["review_ai_score"] == 20
+    assert strong_review.json()["review_ai_score"] == 0
+    cached_review = client.post(f"/api/teacher/answers/{answer_id}/ai-review")
+    assert cached_review.status_code == 200
+    assert cached_review.json()["cached"] is True
+    assert cached_review.json()["can_accept_ai"] is False
+    assert cached_review.json()["manual_review_required"] is True
 
     queue = client.get("/api/teacher/reviews").json()["answers"]
-    assert queue[0]["review_policy"] == "teacher_decision_recommended"
+    assert queue[0]["review_policy"] == "teacher_manual_required"
     assert queue[0]["audio_required"] is False
-    assert queue[0]["can_accept_ai"] is True
+    assert queue[0]["can_accept_ai"] is False
+    rejected = client.patch(f"/api/teacher/answers/{answer_id}/review",
+                            json={"action": "accept_ai"})
+    assert rejected.status_code == 422
+    assert "dưới trung bình" in rejected.json()["detail"]
+    assert client.get(f"/api/teacher/answers/{answer_id}/reviews").json()["reviews"] == []
 
     audio = client.get(f"/api/teacher/transcriptions/{transcription_id}/audio")
     assert audio.status_code == 200
     assert audio.content == voice
     assert audio.headers["x-audio-sha256"] == hashlib.sha256(voice).hexdigest()
+    for _ in range(3):
+        assert client.get(f"/api/teacher/transcriptions/{transcription_id}/audio").content == voice
 
     reviewed = client.patch(
         f"/api/teacher/answers/{answer_id}/review",

@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import functools
+import io
+import json
 import time
+import uuid
+from weakref import WeakValueDictionary
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -10,16 +14,20 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Upload
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.datastructures import Headers
 
 from app.config import Settings
+from app.quality_routes import quality_router
 from app.database import (
     active_question_count,
+    database,
     active_user_count,
     init_database,
     total_user_count,
 )
 from app.schemas import (
     AccountActiveRequest,
+    ConfirmRecordingRequest,
     ExamRoundCreateRequest,
     ExamStatusRequest,
     GeneratedQuestionDecisionRequest,
@@ -45,6 +53,7 @@ from app.services.auth import (
     revoke_session,
 )
 from app.services.evaluator import evaluate_answer, ollama_status
+from app.services.rubric_transformer import transformer_status
 from app.services.transcript_corrector import correct_transcript
 from app.services.exam_service import (
     ExamError,
@@ -67,6 +76,7 @@ from app.services.interview_engine import (
     session_metadata,
     start_interview,
     submit_answer,
+    resume_interview,
 )
 from app.services.question_importer import (
     QuestionBankError,
@@ -87,6 +97,7 @@ from app.services.speech_to_text import (
     stt_status,
     transcribe_bytes,
     transcribe_review_audio,
+    transcript_assurance,
 )
 from app.services.transcription_store import (
     TranscriptionError,
@@ -96,6 +107,8 @@ from app.services.transcription_store import (
     save_transcription,
     transcription_attempt_status,
     transcription_context,
+    transcript_sha256,
+    draft_transcription,
 )
 from app.services.teacher_review import (
     TeacherReviewError,
@@ -106,11 +119,18 @@ from app.services.teacher_review import (
     save_review_reanalysis,
     transcription_audio,
 )
+from app.services.speech_jobs import SpeechJobs, SpeechJobError
+from app.services.runtime_readiness import RuntimeReadiness
+from app.services.grading_retry import retry_practice_grade
+from app.services.session_grading import SessionGrading
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     app_settings = settings or Settings.from_env()
     review_locks: dict[int, asyncio.Lock] = {}
+    answer_locks = WeakValueDictionary()
+    readiness = RuntimeReadiness(app_settings)
+    session_grading = SessionGrading(app_settings, readiness)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -124,15 +144,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 load_demo_banks(app_settings.database_path, app_settings.demo_data_dir)
             if total_user_count(app_settings.database_path) == 0:
                 seed_demo_accounts(app_settings.database_path, app_settings.demo_data_dir)
-        yield
+        jobs.start()
+        session_grading.start()
+        try:
+            yield
+        finally:
+            await jobs.stop()
+            await session_grading.stop()
+            await readiness.stop()
 
     app = FastAPI(
         title="AI Interview Local",
-        version="1.12.0",
+        version="1.18.0",
         description="Hệ thống AI Interview local với phân quyền Giáo viên và Ứng viên.",
         lifespan=lifespan,
     )
     app.state.settings = app_settings
+    app.state.readiness = readiness
+    app.state.session_grading = session_grading
     app.mount("/static", StaticFiles(directory=app_settings.static_dir), name="static")
 
     def current_user(request: Request) -> dict[str, Any]:
@@ -149,6 +178,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 status_code=403, detail="Chức năng này chỉ dành cho Giáo viên"
             )
         return user
+
+    app.include_router(quality_router(app_settings, teacher_user))
 
     def candidate_user(user: dict[str, Any] = Depends(current_user)) -> dict[str, Any]:
         if user["role"] != "candidate":
@@ -176,14 +207,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/health")
     async def health() -> dict[str, Any]:
         ollama = await ollama_status(app_settings)
+        transformer = await run_in_threadpool(transformer_status,
+            app_settings.rubric_transformer_path or app_settings.root_dir / "models" / "rubricguard-lite")
+        if readiness.pool is not None:
+            transformer["loaded"] = readiness.states["transformer"]["state"] == "ready"
         return {
             "status": "ok",
+            "runtime_readiness": readiness.snapshot(),
             "database": {
                 "ready": True,
                 "questions": active_question_count(app_settings.database_path),
                 "users": active_user_count(app_settings.database_path),
             },
             "evaluator_mode": app_settings.evaluator_mode,
+            "rubric_transformer": transformer,
             "ollama": ollama,
             "question_generation": {
                 "model": app_settings.question_generation_model,
@@ -200,7 +237,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 ),
                 "raw_transcript_preserved": True,
             },
-            "speech_to_text": stt_status(app_settings),
+            "speech_to_text": await run_in_threadpool(stt_status, app_settings),
             "teacher_review": {
                 "stt_model": app_settings.review_whisper_model,
                 "on_demand": True,
@@ -208,6 +245,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "manual_required_below": app_settings.teacher_review_score_threshold,
             },
         }
+
+    @app.get("/api/runtime/readiness")
+    async def runtime_readiness(_: dict[str, Any] = Depends(current_user)):
+        return readiness.snapshot()
 
     @app.post("/api/auth/login")
     async def login(payload: LoginRequest) -> JSONResponse:
@@ -301,18 +342,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         user: dict[str, Any] = Depends(teacher_user),
     ) -> dict[str, Any]:
         try:
-            generated = await generate_question_drafts(
-                app_settings,
-                generated_by=user["user_id"],
-                language=payload.language,
-                subject=payload.subject,
-                topic=payload.topic,
-                counts={
-                    "Easy": payload.easy_count,
-                    "Medium": payload.medium_count,
-                    "Hard": payload.hard_count,
-                },
-            )
+            async with readiness.inference_lock:
+                await readiness.before_generation()
+                try:
+                    generated = await generate_question_drafts(
+                        app_settings,
+                        generated_by=user["user_id"],
+                        language=payload.language,
+                        subject=payload.subject,
+                        topic=payload.topic,
+                        counts={
+                            "Easy": payload.easy_count,
+                            "Medium": payload.medium_count,
+                            "Hard": payload.hard_count,
+                        },
+                    )
+                finally:
+                    await readiness.after_generation()
             return {
                 "questions": generated,
                 "model": app_settings.question_generation_model,
@@ -320,6 +366,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             }
         except QuestionGenerationError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except SpeechToTextError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     @app.get("/api/teacher/questions/generated")
     async def generated_questions(
@@ -416,7 +464,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         user: dict[str, Any] = Depends(candidate_user),
     ) -> dict[str, Any]:
         try:
-            return start_interview(
+            session = start_interview(
                 app_settings,
                 user_id=user["user_id"],
                 candidate_name=user["full_name"],
@@ -427,6 +475,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 interview_mode="practice",
                 answer_mode="voice",
             )
+            readiness.start()
+            return {**session, "runtime_readiness": readiness.snapshot()}
         except InterviewError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
@@ -450,11 +500,52 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 app_settings.database_path,
                 session_id=session_id,
                 user_id=user["user_id"],
+                audio_storage_dir=app_settings.audio_storage_dir,
             )
         except InterviewError as exc:
             message = str(exc)
             status_code = 403 if "không có quyền" in message else 404
             raise HTTPException(status_code=status_code, detail=message) from exc
+
+    @app.get("/api/interviews/{session_id}/resume")
+    async def resume_session(session_id: str, user: dict[str, Any] = Depends(candidate_user)):
+        try:
+            session = resume_interview(app_settings, session_id, user_id=user["user_id"])
+            readiness.start()
+            return {**session, "runtime_readiness": readiness.snapshot()}
+        except InterviewError as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    async def confirm_answer(session_id, user, transcription_id, *, answer="", preview_sha256=None):
+        async with answer_locks.setdefault(session_id, asyncio.Lock()):
+            metadata = session_metadata(app_settings.database_path, session_id)
+            operation = functools.partial(submit_answer, app_settings, session_id, answer,
+                user_id=user["user_id"], transcription_id=transcription_id,
+                expected_preview_sha256=preview_sha256, ensure_model=readiness.ensure_llm,
+                inference_runner=readiness.run_inference)
+            if metadata and metadata["grading_strategy"] == "end_of_session":
+                result = await operation()
+            else:
+                async with readiness.inference_lock:
+                    result = await operation()
+            session_grading.wake.set()
+            return result
+
+    @app.get("/api/interviews/{session_id}/draft")
+    def get_current_draft(session_id: str, user: dict[str, Any] = Depends(candidate_user)):
+        try:
+            return draft_transcription(app_settings.database_path, session_id=session_id, user_id=user["user_id"],
+                                       audio_storage_dir=app_settings.audio_storage_dir)
+        except TranscriptionError as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+    @app.post("/api/interviews/{session_id}/transcriptions/{transcription_id}/confirm")
+    async def confirm_recording(session_id: str, transcription_id: str, payload: ConfirmRecordingRequest,
+                                user: dict[str, Any] = Depends(candidate_user)):
+        try:
+            return await confirm_answer(session_id, user, transcription_id, preview_sha256=payload.preview_sha256)
+        except InterviewError as exc:
+            raise HTTPException(409, str(exc)) from exc
 
     @app.post("/api/interviews/{session_id}/answer")
     async def answer_question(
@@ -463,15 +554,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         user: dict[str, Any] = Depends(candidate_user),
     ) -> dict[str, Any]:
         try:
-            return await submit_answer(
-                app_settings,
-                session_id,
-                payload.answer,
-                user_id=user["user_id"],
-                transcription_id=payload.transcription_id,
-            )
+            return await confirm_answer(session_id, user, payload.transcription_id, answer=payload.answer)
         except InterviewError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+    @app.post("/api/interviews/{session_id}/transcriptions/{transcription_id}/retry-grade")
+    async def retry_grade(session_id: str, transcription_id: str, user: dict[str, Any] = Depends(candidate_user)):
+        try:
+            async with answer_locks.setdefault(session_id, asyncio.Lock()), readiness.inference_lock:
+                return await retry_practice_grade(app_settings, session_id, transcription_id, user["user_id"],
+                    ensure_model=readiness.ensure_llm, inference_runner=readiness.run_inference)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from exc
 
     @app.post("/api/interviews/{session_id}/finish")
     async def end_interview(
@@ -479,9 +573,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         user: dict[str, Any] = Depends(candidate_user),
     ) -> dict[str, Any]:
         try:
-            return finish_interview(
+            result = finish_interview(
                 app_settings, session_id, user_id=user["user_id"]
             )
+            session_grading.wake.set()
+            return result
         except InterviewError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
 
@@ -501,7 +597,29 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     status_code=403,
                     detail="Kết quả Interview thật chỉ hiển thị cho Giáo viên",
                 )
-        return interview_report(app_settings, session_id)
+        report = interview_report(app_settings, session_id)
+        report["grading"] = session_grading.status(session_id)
+        return report
+
+    def authorize_grading(session_id, user):
+        metadata = session_metadata(app_settings.database_path, session_id)
+        if not metadata:
+            raise HTTPException(404, "Không tìm thấy phiên phỏng vấn")
+        if user["role"] != "teacher" and metadata["user_id"] != user["user_id"]:
+            raise HTTPException(403, "Bạn không có quyền xem phiên này")
+
+    @app.get("/api/interviews/{session_id}/grading")
+    async def session_grading_status(session_id: str, user: dict = Depends(current_user)):
+        authorize_grading(session_id, user)
+        return await run_in_threadpool(session_grading.status, session_id)
+
+    @app.post("/api/interviews/{session_id}/grading/retry")
+    async def session_grading_retry(session_id: str, user: dict = Depends(current_user)):
+        authorize_grading(session_id, user)
+        try:
+            return session_grading.retry(session_id)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from exc
 
     @app.post("/api/teacher/exams", status_code=201)
     async def create_exam(
@@ -539,7 +657,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         _: dict[str, Any] = Depends(teacher_user),
     ) -> dict[str, Any]:
         try:
-            return delete_exam_round(app_settings.database_path, exam_round_id)
+            return delete_exam_round(app_settings.database_path, exam_round_id, audio_storage_dir=app_settings.audio_storage_dir)
         except ExamError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
@@ -577,7 +695,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         user: dict[str, Any] = Depends(candidate_user),
     ) -> dict[str, Any]:
         try:
-            return start_real_interview(app_settings, user=user, exam_code=exam_code)
+            session = start_real_interview(app_settings, user=user, exam_code=exam_code)
+            readiness.start()
+            return {**session, "runtime_readiness": readiness.snapshot()}
         except ExamError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
 
@@ -598,7 +718,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         _: dict[str, Any] = Depends(teacher_user),
     ) -> dict[str, Any]:
         try:
-            return interview_report(app_settings, session_id)
+            report = interview_report(app_settings, session_id)
+            report["grading"] = session_grading.status(session_id)
+            return report
         except InterviewError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
@@ -635,7 +757,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         _: dict[str, Any] = Depends(teacher_user),
     ) -> dict[str, Any]:
         lock = review_locks.setdefault(answer_id, asyncio.Lock())
-        async with lock:
+        async with lock, readiness.inference_lock:
             try:
                 # Recheck after acquiring the per-answer lock. Another request may
                 # already have completed the expensive STT pass while we waited.
@@ -654,10 +776,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     content,
                     filename=context["audio_path_resolved"].name,
                     language=context["language"],
-                    hotwords=context["approved_terms"],
+                    hotwords=context["hotwords"],
                     ambient_noise_dbfs=context["ambient_noise_dbfs"],
                 )
-                transcription = await run_in_threadpool(operation)
+                await readiness.before_speech()
+                transcription = await readiness.run_inference(operation)
                 if not str(transcription.get("text") or "").strip():
                     raise TeacherReviewError(
                         "Model STT mạnh không nhận dạng được nội dung voice"
@@ -669,13 +792,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     approved_terms=context["approved_terms"],
                     question_text=str(context["question"].get("question") or ""),
                     uncertain_spans=transcription.get("uncertain_spans", []),
+                    ensure_model=readiness.ensure_llm,
                 )
                 transcription.update(correction)
                 transcription["text"] = correction["corrected_text"]
                 transcription["original_transcript"] = context["original_transcript"]
+                transcription.update(transcript_assurance(transcription))
                 evaluation = await evaluate_answer(
-                    app_settings, context["question"], transcription["text"]
+                    app_settings, context["question"], transcription["text"],
+                    **({"ensure_model": readiness.ensure_llm, "inference_runner": readiness.run_inference}
+                       if app_settings.runtime_warmup or app_settings.inference_worker else {})
                 )
+                if transcription["transcript_status"] == "needs_review":
+                    evaluation.update(score_provisional=True, review_required=True)
                 return save_review_reanalysis(
                     app_settings,
                     answer_id=answer_id,
@@ -720,19 +849,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     ) -> dict[str, Any]:
         try:
             return delete_real_interview_result(
-                app_settings.database_path, session_id=session_id
+                app_settings.database_path, session_id=session_id, audio_storage_dir=app_settings.audio_storage_dir
             )
         except InterviewError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    @app.post("/api/speech/transcribe")
-    async def transcribe(
-        file: UploadFile = File(...),
-        language: str | None = Form(None),
-        session_id: str | None = Form(None),
-        ambient_noise_dbfs: float | None = Form(None),
-        retry_reason: str | None = Form(None),
-        user: dict[str, Any] = Depends(candidate_user),
+    async def process_recording(
+        file: UploadFile, *, user: dict[str, Any], language: str | None = None,
+        session_id: str | None = None, ambient_noise_dbfs: float | None = None,
+        retry_reason: str | None = None, job: dict | None = None, progress=lambda _: None,
     ) -> dict[str, Any]:
         request_started = time.perf_counter()
         content = await read_upload(file)
@@ -743,7 +868,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     app_settings.database_path,
                     session_id=session_id,
                     user_id=user["user_id"],
+                    received_job_id=job["job_id"] if job else None,
                 )
+                if job and context["question_uid"] != job["question_uid"]:
+                    raise TranscriptionError("Câu hỏi đã thay đổi trong lúc chờ xử lý")
+                language = context["language"]
+            progress("transcribing")
             operation = functools.partial(
                 transcribe_bytes,
                 app_settings,
@@ -751,10 +881,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 filename=file.filename or "recording.webm",
                 language=language,
                 ambient_noise_dbfs=ambient_noise_dbfs,
-                **({"hotwords": context["approved_terms"]} if context else {}),
+                **({"hotwords": context["hotwords"]} if context else {}),
             )
             stt_started = time.perf_counter()
-            result = await run_in_threadpool(operation)
+            await readiness.before_speech()
+            result = await readiness.run_inference(operation)
             stt_seconds = time.perf_counter() - stt_started
             result = assess_transcription_quality(
                 result,
@@ -774,6 +905,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     ]),
                 )
 
+            progress("correcting")
             correction_started = time.perf_counter()
             correction = await correct_transcript(
                 app_settings,
@@ -782,6 +914,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 approved_terms=context["approved_terms"] if context else [],
                 question_text=context["question_text"] if context else "",
                 uncertain_spans=result.get("uncertain_spans", []),
+                ensure_model=readiness.ensure_llm,
+                allow_llm=True,
             ) if context else {
                 "raw_text": result["text"],
                 "corrected_text": result["text"],
@@ -795,6 +929,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             correction_seconds = time.perf_counter() - correction_started
             result.update(correction)
             result["text"] = correction["corrected_text"]
+            result.update(transcript_assurance(result))
             result["processing_time"] = {
                 "stt_seconds": round(stt_seconds, 3),
                 "correction_seconds": round(correction_seconds, 3),
@@ -802,6 +937,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             }
 
             if context:
+                progress("saving")
                 storage_started = time.perf_counter()
                 result["transcription_id"] = save_transcription(
                     app_settings.database_path,
@@ -816,7 +952,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     ambient_noise_dbfs=ambient_noise_dbfs,
                     metadata=result,
                     audio_storage_dir=app_settings.audio_storage_dir,
-                    audio_content=content,
+                    audio_content=content if job is None else None,
+                    audio_source_path=jobs.audio_path(job) if job else None,
+                    transcription_id=job["job_id"] if job else None,
                     audio_filename=file.filename or "recording.webm",
                     audio_mime_type=file.content_type,
                     retry_reason=retry_reason,
@@ -825,6 +963,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     app_settings.database_path,
                     transcription_id=result["transcription_id"],
                 )
+                result.update(requires_confirmation=True, transcript_editable=False,
+                              preview_sha256=transcript_sha256(result["text"]), answer_stage="draft")
+                if not await readiness.end_preview():
+                    result["resource_warning"] = "Chưa giải phóng được LLM; bản ghi tạm vẫn được giữ"
                 result["processing_time"]["storage_seconds"] = round(
                     time.perf_counter() - storage_started, 3
                 )
@@ -836,6 +978,98 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         except SpeechToTextError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    async def process_job(job: dict, progress) -> dict:
+        with database(app_settings.database_path) as connection:
+            saved = connection.execute("""SELECT metadata_json, corrected_text FROM speech_transcriptions
+                WHERE transcription_id=? AND session_id=? AND user_id=? AND question_uid=?""",
+                (job["job_id"], job["session_id"], job["user_id"], job["question_uid"])).fetchone()
+        if saved:
+            # A crash after the transcription commit must replay the canonical text, not infer it again.
+            progress("saving")
+            result = json.loads(saved["metadata_json"])
+            result.update(text=saved["corrected_text"], transcription_id=job["job_id"],
+                attempt=transcription_attempt_status(app_settings.database_path, transcription_id=job["job_id"]))
+            return result
+        path = jobs.audio_path(job)
+        content = await run_in_threadpool(path.read_bytes)
+        upload = UploadFile(filename=path.name, file=io.BytesIO(content),
+                            headers=Headers({"content-type": job["audio_mime_type"] or "audio/webm"}))
+        try:
+            async with readiness.inference_lock:
+                return await process_recording(upload, user={"user_id": job["user_id"]}, session_id=job["session_id"],
+                    ambient_noise_dbfs=job["ambient_noise_dbfs"], retry_reason=job["retry_reason"], job=job, progress=progress)
+        except HTTPException as exc:
+            raise SpeechJobError(str(exc.detail), exc.status_code, exc.status_code >= 500) from exc
+        finally:
+            await upload.close()
+
+    jobs = SpeechJobs(app_settings, process_job)
+    app.state.speech_jobs = jobs
+
+    async def enqueue_recording(file, session_id, request_key, ambient_noise_dbfs, retry_reason, user):
+        content = await read_upload(file)
+        try:
+            return jobs.create(user_id=user["user_id"], session_id=session_id, request_key=request_key, content=content,
+                filename=file.filename or "recording.webm", mime_type=file.content_type,
+                ambient_noise_dbfs=ambient_noise_dbfs, retry_reason=retry_reason)
+        except (SpeechJobError, TranscriptionError) as exc:
+            raise HTTPException(getattr(exc, "status", 409), str(exc)) from exc
+
+    @app.post("/api/speech/jobs", status_code=202)
+    async def create_speech_job(file: UploadFile = File(...), session_id: str = Form(...),
+        request_key: str = Form(...), ambient_noise_dbfs: float | None = Form(None, ge=-100, le=0, allow_inf_nan=False),
+        retry_reason: str | None = Form(None), user: dict[str, Any] = Depends(candidate_user)):
+        return await enqueue_recording(file, session_id, request_key, ambient_noise_dbfs, retry_reason, user)
+
+    @app.get("/api/speech/jobs/{job_id}")
+    def speech_job_status(job_id: str, user: dict[str, Any] = Depends(candidate_user)):
+        try:
+            return jobs.status(job_id, user["user_id"])
+        except SpeechJobError as exc:
+            raise HTTPException(exc.status, str(exc)) from exc
+
+    @app.get("/api/speech/jobs")
+    def latest_speech_job(session_id: str, user: dict[str, Any] = Depends(candidate_user)):
+        try:
+            context = transcription_context(app_settings.database_path, session_id=session_id, user_id=user["user_id"], require_open=False)
+            with database(app_settings.database_path) as connection:
+                row = connection.execute("SELECT job_id FROM speech_jobs WHERE session_id=? AND user_id=? AND question_uid=? ORDER BY rowid DESC LIMIT 1",
+                    (session_id, user["user_id"], context["question_uid"])).fetchone()
+            return {"job": jobs.status(row[0], user["user_id"]) if row else None}
+        except (SpeechJobError, TranscriptionError) as exc:
+            raise HTTPException(getattr(exc, "status", 409), str(exc)) from exc
+
+    @app.post("/api/speech/jobs/{job_id}/retry")
+    async def retry_speech_job(job_id: str, user: dict[str, Any] = Depends(candidate_user)):
+        try:
+            return jobs.retry(job_id, user["user_id"])
+        except (SpeechJobError, TranscriptionError) as exc:
+            raise HTTPException(getattr(exc, "status", 409), str(exc)) from exc
+
+    @app.post("/api/speech/jobs/{job_id}/cancel")
+    async def cancel_speech_job(job_id: str, user: dict[str, Any] = Depends(candidate_user)):
+        try:
+            return jobs.cancel(job_id, user["user_id"])
+        except SpeechJobError as exc:
+            raise HTTPException(exc.status, str(exc)) from exc
+
+    @app.post("/api/speech/transcribe")
+    async def transcribe(file: UploadFile = File(...), language: str | None = Form(None),
+        session_id: str | None = Form(None), ambient_noise_dbfs: float | None = Form(None, ge=-100, le=0, allow_inf_nan=False),
+        retry_reason: str | None = Form(None), request_key: str | None = Form(None),
+        user: dict[str, Any] = Depends(candidate_user)):
+        if not session_id:
+            async with readiness.inference_lock:
+                return await process_recording(file, user=user, language=language, ambient_noise_dbfs=ambient_noise_dbfs)
+        job = await enqueue_recording(file, session_id, request_key or str(uuid.uuid4()), ambient_noise_dbfs, retry_reason, user)
+        while job["state"] not in {"completed", "failed", "cancelled"}:
+            await asyncio.sleep(0.05)
+            job = jobs.status(job["job_id"], user["user_id"])
+        if job["state"] != "completed":
+            raise HTTPException(job["error_status"] or 409, job["error"] or "Đã hủy xử lý bản ghi",
+                                headers={"X-Speech-Job-ID": job["job_id"]})
+        return job["result"]
 
     @app.post("/api/speech/microphone-check")
     async def microphone_check(

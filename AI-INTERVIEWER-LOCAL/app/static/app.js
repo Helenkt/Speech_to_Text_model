@@ -51,9 +51,19 @@ const state = {
   reportOrigin: "practice",
   recorder: null,
   audioChunks: [],
+  savedRecording: null,
+  speechBusy: false,
+  speechRun: 0,
+  answerSubmitting: false,
   mediaStream: null,
   ambientNoiseDbfs: null,
   currentTranscriptionId: null,
+  currentPreviewSha256: null,
+  draftLoading: false,
+  sessionFinishing: false,
+  gradingWatchSequence: 0,
+  gradingTarget: null,
+  gradingRetrying: false,
   selectedMicrophoneId: "",
   microphoneSelectionInitialized: false,
   microphoneRefreshSequence: 0,
@@ -92,6 +102,7 @@ const state = {
   reviewHistoryLoading: new Set(),
   currentTeacherReport: null,
   currentTeacherReportSessionId: "",
+  runtimeRefreshSequence: 0,
 };
 
 const el = Object.fromEntries(
@@ -136,7 +147,9 @@ async function api(path, options = {}) {
   if (!response.ok) {
     if (response.status === 401 && !path.endsWith("/auth/login")) showLogin();
     const detail = payload?.detail;
-    throw new Error(Array.isArray(detail) ? detail.map((item) => item.msg).join("; ") : detail || `HTTP ${response.status}`);
+    const error = new Error(Array.isArray(detail) ? detail.map((item) => item.msg).join("; ") : detail || `HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
   return payload;
 }
@@ -150,6 +163,10 @@ function jsonOptions(method, body) {
 }
 
 function showLogin() {
+  stopGradingWatch();
+  state.speechRun += 1;
+  state.speechBusy = false;
+  state.savedRecording = null;
   dismissReportDialog();
   state.micTestController?.abort();
   if (state.recorder?.state === "recording") {
@@ -225,6 +242,40 @@ async function enterApp(user) {
       await loadExams();
     } else {
       showView("practiceSetupView");
+      const key = `ai-interview-active:${user.user_id}`;
+      let sessionId;
+      try { sessionId = localStorage.getItem(key); } catch (_) { /* Storage is optional. */ }
+      if (sessionId) {
+        try { beginSession(await api(`/api/interviews/${encodeURIComponent(sessionId)}/resume`)); }
+        catch (error) {
+          if (error.status === 409) {
+            try {
+              const grading = await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/grading`);
+              if (grading.state !== "collecting") {
+                // A rejected candidate report identifies an official exam; never expose its score.
+                const report = await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/report`).catch(e => {
+                  if (e.status === 403) return null;
+                  throw e;
+                });
+                if (report) {
+                  state.session = { session_id: sessionId, interview_mode: "practice" };
+                  state.completed = true;
+                  state.reportOrigin = "practice";
+                  renderReport(report);
+                  openReportDialog();
+                  void watchSessionGrading(sessionId, "practice");
+                } else {
+                  state.session = { session_id: sessionId, interview_mode: "real" };
+                  completeRealInterview();
+                }
+              }
+            } catch (resumeError) {
+              if (resumeError.status === 404) forgetActiveSession(sessionId);
+              else toast("Chưa khôi phục được trạng thái bài đã lưu. Hãy tải lại trang.", true);
+            }
+          } else if (error.status === 404) forgetActiveSession(sessionId);
+        }
+      }
     }
   } catch (error) {
     toast(`Không thể tải dữ liệu: ${error.message}`, true);
@@ -251,6 +302,7 @@ async function login(event) {
 }
 
 async function logout() {
+  if (state.savedRecording) await recordingCache("delete", state.savedRecording).catch(() => {});
   try { await api("/api/auth/logout", { method: "POST" }); } catch (_) { /* local logout still applies */ }
   showLogin();
 }
@@ -778,7 +830,7 @@ async function deleteExamRound(examRoundId) {
   try {
     const result = await api(`/api/teacher/exams/${encodeURIComponent(examRoundId)}`, { method: "DELETE" });
     await loadExams();
-    toast(`Đã xóa bài Interview ${result.exam_code} cùng ${result.deleted_attempts} lượt làm liên quan.`);
+    toast(result.audio_cleanup_pending ? "Đã xóa dữ liệu bài thi · đang dọn file ghi âm." : `Đã xóa bài Interview ${result.exam_code} cùng ${result.deleted_attempts} lượt làm liên quan.`);
   } catch (error) {
     toast(error.message, true);
   }
@@ -938,7 +990,7 @@ async function deleteTeacherResult(sessionId) {
   if (!window.confirm("Xóa vĩnh viễn bài làm, câu trả lời và báo cáo này? Nếu bài thi vẫn mở, sinh viên có thể làm lại mã bài thi.")) return;
   state.teacherDeleting.add(String(sessionId)); renderResults();
   try {
-    await api(`/api/teacher/results/${encodeURIComponent(sessionId)}`, { method: "DELETE" });
+    const deleted = await api(`/api/teacher/results/${encodeURIComponent(sessionId)}`, { method: "DELETE" });
     state.results = state.results.filter((r) => r.session_id !== sessionId);
     for (const item of state.reviewQueue.filter((item) => item.session_id === sessionId)) {
       delete state.reviewDrafts[String(item.answer_id)];
@@ -952,7 +1004,7 @@ async function deleteTeacherResult(sessionId) {
     if (state.lastReviewedSessionId === sessionId) state.lastReviewedSessionId = "";
     renderResults(); renderReviewQueue(); renderReviewDetail();
     const refreshed = await loadTeacherWorkspace();
-    toast(refreshed ? "Đã xóa bài làm và các câu chờ chấm liên quan." : "Đã xóa bài làm. Một số dữ liệu chưa tải lại được.");
+    toast(deleted.audio_cleanup_pending ? "Đã xóa dữ liệu bài làm · đang dọn file ghi âm." : refreshed ? "Đã xóa bài làm và các câu chờ chấm liên quan." : "Đã xóa bài làm. Một số dữ liệu chưa tải lại được.");
   } catch (error) { toast(error.message, true); }
   finally { state.teacherDeleting.delete(String(sessionId)); renderResults(); }
 }
@@ -1004,7 +1056,7 @@ function reviewFromReport(report, answer, sessionId) {
     candidate_name: report.session?.candidate_name || r.candidate_name, exam_code: r.exam_code,
     title: r.title || report.session?.subject, subject: report.session?.subject,
     question: answer.question?.question || "", answer_text: answer.answer,
-    original_ai_score: e.ai_score ?? e.score, ai_score: e.review_ai_score ?? e.ai_score ?? e.score,
+    original_ai_score: e.ai_score ?? e.score, ai_score: e.strong_review_ready ? e.review_ai_score : e.ai_score ?? e.score,
     review_ai_score: e.review_ai_score, final_score: e.final_score, confidence: e.confidence,
     feedback: e.feedback, teacher_feedback: e.teacher_feedback, reviewed_at: e.reviewed_at,
     transcription_id: answer.voice?.transcription_id, audio_available: Boolean(answer.voice?.audio_available),
@@ -1012,10 +1064,10 @@ function reviewFromReport(report, answer, sessionId) {
     review_transcript: answer.voice?.review_transcript, review_model: answer.voice?.review_model,
     review_runtime: answer.voice?.review_runtime, review_confidence: answer.voice?.review_confidence,
     review_ai_feedback: e.review_ai_feedback, review_ai_evaluation: e.review_ai_evaluation,
-    strong_review_ready: Boolean(answer.voice?.review_processed_at && e.review_ai_at),
+    strong_review_ready: e.strong_review_ready === true,
     audio_required: false,
     below_threshold: e.review_ai_score != null && Number(e.review_ai_score) < state.reviewThreshold,
-    can_accept_ai: e.review_ai_score != null };
+    can_accept_ai: e.can_accept_ai === true };
 }
 
 function renderReviewDetail() {
@@ -1045,7 +1097,8 @@ function renderReviewDetail() {
   el.reviewFinalScore.textContent = finalScore == null ? "Chờ duyệt" : `${reportNumber(finalScore)}/100`;
   el.reviewFinalScore.closest(".final")?.classList.toggle("confirmed", finalScore != null);
   el.reviewDecisionStatus.textContent = finalScore == null ? "Giảng viên quyết định" : `Đã chốt ${formatDate(item.reviewed_at || evaluation.reviewed_at)}`;
-  el.reviewConfidence.textContent = analyzing ? "Đang chạy model mạnh…" : strongReady ? `Tin cậy STT ${reportNumber(Number(item.review_confidence || answer?.voice?.review_confidence || 0) * 100)}%` : "Chưa xử lý";
+  el.reviewConfidence.textContent = analyzing ? "Đang chạy model mạnh…"
+    : strongReady ? item.score_provisional ? "Cần xác minh" : "Đã xử lý" : "Chưa xử lý";
   el.reviewQuestion.textContent = item.question || "";
   el.reviewAnswerText.textContent = item.original_transcript || answer?.voice?.verified_transcript || answer?.answer || item.answer_text || "Chưa có nội dung";
   el.reviewStrongTranscript.textContent = analyzing ? "Đang chuyển lại voice thành text…" : item.review_transcript || answer?.voice?.review_transcript || "Chưa xử lý";
@@ -1057,16 +1110,19 @@ function renderReviewDetail() {
   el.reviewRubric.innerHTML = pointAssessmentHtml(strongEvaluation.point_assessments || []);
   el.reviewEvidenceStatus.textContent = report ? "" : "Đang tải chi tiết…";
   el.reviewManualLabel.classList.toggle("hidden", !state.manualReviewItem || String(state.manualReviewItem.answer_id) !== String(item.answer_id));
-  el.reviewScore.value = draft ? draft.score : String(finalScore ?? strongScore ?? item.ai_score ?? 0);
+  el.reviewScore.value = draft ? draft.score : finalScore != null ? String(finalScore)
+    : item.can_accept_ai === true ? String(strongScore) : "";
   el.reviewFeedback.value = draft ? draft.feedback : evaluation.teacher_feedback || item.teacher_feedback || item.review_ai_feedback || "";
   const audioId = answer ? answer.voice?.audio_available ? answer.voice.transcription_id : "" : item.audio_available === false ? "" : item.transcription_id;
   const belowThreshold = strongReady && (item.below_threshold ?? Number(strongScore || 0) < state.reviewThreshold);
-  const canAcceptAi = strongReady && (item.can_accept_ai ?? true);
+  const canAcceptAi = strongReady && item.can_accept_ai === true;
   el.reviewPolicyNotice.classList.toggle("required", belowThreshold || !strongReady);
   el.reviewPolicyNotice.textContent = analyzing
-    ? "Model large-v3 đang chuyển lại voice và chấm lại theo rubric."
+    ? "AI đang xử lý lại voice. Giảng viên vẫn có thể nghe và lưu điểm tự chấm ngay."
     : !strongReady
     ? "Chưa có kết quả từ model mạnh. Hệ thống sẽ xử lý lại voice trước khi cho phép dùng điểm AI."
+    : !canAcceptAi
+    ? "Điểm AI còn cần xác minh bằng chứng nên chưa thể dùng. Giảng viên có thể tự chấm; nghe voice là tùy chọn."
     : belowThreshold
     ? "Điểm AI dưới trung bình. Giảng viên có thể nghe voice bao nhiêu lần tùy ý, dùng điểm AI hoặc tự chấm lại."
     : "Giảng viên có thể dùng điểm AI, tự chấm lại, hoặc nghe voice bao nhiêu lần tùy ý.";
@@ -1081,7 +1137,7 @@ function renderReviewDetail() {
   el.reviewAudioStatus.classList.toggle("hidden", Boolean(audioId)); el.reviewAudioStatus.textContent = "Không có ghi âm";
   [el.reviewScore, el.reviewFeedback].forEach((node) => { node.disabled = state.reviewSaving; });
   el.reviewAcceptAiButton.disabled = state.reviewSaving || analyzing || !strongReady;
-  el.reviewSaveButton.disabled = state.reviewSaving || analyzing;
+  el.reviewSaveButton.disabled = state.reviewSaving;
   el.reviewSaveButton.textContent = state.reviewSaving ? "Đang lưu…" : "Lưu điểm chấm lại";
   renderReviewHistory(item);
 }
@@ -1141,6 +1197,9 @@ async function loadStrongReview(item) {
   renderReviewQueue(); renderReviewDetail();
   try {
     const result = await api(`/api/teacher/answers/${encodeURIComponent(answerId)}/ai-review`, { method: "POST" });
+    const current = state.reviewQueue.find(entry => String(entry.answer_id) === answerId);
+    if (current && current !== item) Object.assign(current, result);
+    if (state.manualReviewItem && String(state.manualReviewItem.answer_id) === answerId) Object.assign(state.manualReviewItem, result);
     Object.assign(item, result, {
       ai_score: result.review_ai_score,
       feedback: result.review_ai_feedback,
@@ -1160,6 +1219,7 @@ async function loadStrongReview(item) {
     teacherFeedback(el.reviewFormFeedback, `Không thể chạy model mạnh: ${error.message}`);
   } finally {
     state.reviewAnalyzing.delete(answerId);
+    rememberReviewDraft();
     renderReviewQueue(); renderReviewDetail();
   }
 }
@@ -1292,9 +1352,9 @@ async function refreshPracticeHistory() {
 async function deleteCandidatePracticeHistory(sessionId) {
   if (!window.confirm("Xóa vĩnh viễn buổi luyện tập này và toàn bộ câu trả lời?")) return;
   try {
-    await api(`/api/candidate/practice-history/${encodeURIComponent(sessionId)}`, { method: "DELETE" });
+    const deleted = await api(`/api/candidate/practice-history/${encodeURIComponent(sessionId)}`, { method: "DELETE" });
     await loadPracticeHistory();
-    toast("Đã xóa lịch sử luyện tập.");
+    toast(deleted.audio_cleanup_pending ? "Đã xóa lịch sử · đang dọn file ghi âm." : "Đã xóa lịch sử luyện tập và bản ghi âm.");
   } catch (error) {
     toast(error.message, true);
   }
@@ -1306,6 +1366,7 @@ async function showPracticeHistoryReport(sessionId) {
     state.reportOrigin = "history";
     renderReport(report);
     openReportDialog();
+    void watchSessionGrading(sessionId, "history");
   } catch (error) {
     toast(error.message, true);
   }
@@ -1323,6 +1384,7 @@ async function showTeacherResult(sessionId) {
     state.reportOrigin = "teacher";
     renderReport(report);
     openReportDialog();
+    void watchSessionGrading(sessionId, "teacher");
   } catch (error) { if (sequence === state.teacherReportSequence) toast(error.message, true); }
 }
 
@@ -1395,6 +1457,21 @@ function sttReady() {
 
 function sttAvailable() {
   return Boolean(state.health?.speech_to_text?.installed);
+}
+
+function canRecordAnswer() {
+  return !state.completed && !state.draftLoading && !state.sessionFinishing && sttAvailable() && state.session?.recording_allowed !== false && Boolean(state.sessionMicCheck?.ready);
+}
+
+function deferredSession() {
+  return state.session?.grading_strategy === "end_of_session";
+}
+
+function forgetActiveSession(sessionId) {
+  try {
+    const key = `ai-interview-active:${state.user?.user_id}`;
+    if (localStorage.getItem(key) === sessionId) localStorage.removeItem(key);
+  } catch (_) { /* Storage is optional. */ }
 }
 
 function setVoiceStage(stage) {
@@ -1504,8 +1581,18 @@ async function pinTestMicrophone(stream, signal) {
 }
 
 function beginSession(session) {
+  stopGradingWatch();
   state.session = session;
+  try { localStorage.setItem(`ai-interview-active:${state.user.user_id}`, session.session_id); } catch (_) { /* Storage is optional. */ }
   resetMicTestPanel();
+  if (session.microphone_check?.ready) {
+    state.ambientNoiseDbfs = session.microphone_check.noise?.dbfs ?? session.microphone_check.metrics?.ambient_noise_dbfs ?? null;
+    state.sessionMicCheck = { ready: true, result: session.microphone_check, baselineDbfs: state.ambientNoiseDbfs,
+      deviceId: savedMicrophoneId() };
+    el.micTestBadge.textContent = "Đã kiểm tra";
+    el.micCheckButtonLabel.textContent = "Đã kiểm tra";
+    renderMicrophoneResult(session.microphone_check);
+  }
   state.currentQuestion = session.question;
   state.pendingResult = null;
   state.completed = false;
@@ -1516,6 +1603,11 @@ function beginSession(session) {
 }
 
 function renderQuestion() {
+  state.speechRun += 1;
+  state.speechBusy = false;
+  state.savedRecording = null;
+  el.retryRecordingButton.classList.add("hidden");
+  el.cancelRecordingJobButton.classList.add("hidden");
   const question = state.currentQuestion;
   el.answerRecordingQuality.className = "microphone-result hidden";
   el.answerRecordingQuality.replaceChildren();
@@ -1534,17 +1626,22 @@ function renderQuestion() {
   el.answerText.value = "";
   setVoiceStage("idle");
   state.currentTranscriptionId = null;
+  state.currentPreviewSha256 = null;
+  state.draftLoading = true;
   el.charCount.textContent = "0 ký tự";
   el.submitAnswerButton.disabled = true;
 
   el.answerText.readOnly = true;
   el.answerText.placeholder = "Bản chuyển giọng nói sẽ xuất hiện tại đây...";
+  el.submitAnswerButton.textContent = deferredSession()
+    ? answered + 1 >= requested ? "Xác nhận và kết thúc" : "Xác nhận và tiếp tục"
+    : "Gửi câu trả lời";
   el.answerModeHint.textContent = "Chỉ trả lời bằng ghi âm";
   el.recordButton.classList.remove("hidden");
   el.recordButton.textContent = "● Ghi âm";
   el.microphoneSelect.disabled = false;
   refreshMicrophones();
-  el.recordButton.disabled = !sttAvailable() || !state.sessionMicCheck?.ready;
+  el.recordButton.disabled = !canRecordAnswer();
   const runtimeLabel = state.health?.speech_to_text?.label || "Tự động";
   if (sttReady()) {
     el.sttStatus.textContent = `${state.health.speech_to_text.model} · ${runtimeLabel} · ${languageName(sessionLanguage)}`;
@@ -1553,13 +1650,31 @@ function renderQuestion() {
   } else if (sttAvailable()) {
     el.sttStatus.textContent = `${state.health.speech_to_text.model} · ${runtimeLabel} · khởi tạo khi dùng`;
     el.sttStatus.className = "status-pill warn";
-    el.recordingStatus.textContent = "Lần đầu cần Internet và có thể mất vài phút";
+    el.recordingStatus.textContent = "Model chưa sẵn sàng; lần xử lý đầu có thể cần chuẩn bị.";
   } else {
     el.sttStatus.textContent = "Thiếu thư viện Voice/STT";
     el.sttStatus.className = "status-pill warn";
     el.recordingStatus.textContent = "Cài lại requirements.txt để dùng ghi âm";
   }
   setTimeout(() => el.recordButton.focus(), 0);
+  void restoreRecording();
+  void watchRuntimeReadiness(state.session.session_id);
+}
+
+async function watchRuntimeReadiness(sessionId, sequence = ++state.runtimeRefreshSequence) {
+  const active = () => state.session?.session_id === sessionId && state.runtimeRefreshSequence === sequence;
+  try {
+    const runtime = await api("/api/runtime/readiness");
+    if (!active()) return;
+    if (state.health) state.health.runtime_readiness = runtime;
+    const loading = runtime.speech.state === "loading";
+    const ready = runtime.speech.state === "ready";
+    el.sttStatus.textContent = loading ? "Đang chuẩn bị nhận dạng" : ready
+      ? `Nhận dạng · ${languageName(state.session.language || "vi")}`
+      : ["missing", "unavailable"].includes(runtime.speech.state) ? "Model nhận dạng chưa sẵn sàng" : "Nhận dạng · khởi tạo khi xử lý";
+    el.sttStatus.className = `status-pill${ready ? "" : " warn"}`;
+    if (loading) setTimeout(() => { if (active()) void watchRuntimeReadiness(sessionId, sequence); }, 3000);
+  } catch (_) { /* A temporary status failure must not discard a recording. */ }
 }
 
 function fillList(list, values, fallback) {
@@ -1573,6 +1688,7 @@ const ASSESSMENT_STATUS = {
   partial: { label: "Một phần", className: "partial" },
   contradicted: { label: "Mâu thuẫn", className: "contradicted" },
   missing: { label: "Thiếu", className: "missing" },
+  unresolved: { label: "Chưa xác minh", className: "unresolved" },
 };
 
 function assessmentGroups(evaluation) {
@@ -1582,13 +1698,14 @@ function assessmentGroups(evaluation) {
       met: evaluation.matched_points || [],
       partial: [],
       contradicted: [],
-      missing: evaluation.missing_points || [],
+      missing: (evaluation.missing_points || []).filter(point => !(evaluation.unresolved_points || []).includes(point)),
+      unresolved: evaluation.unresolved_points || [],
     };
   }
   return Object.fromEntries(
     Object.keys(ASSESSMENT_STATUS).map((status) => [
       status,
-      assessments.filter((item) => item.status === status).map((item) => item.point),
+      assessments.filter((item) => (item.needs_review ? "unresolved" : ASSESSMENT_STATUS[item.status] ? item.status : "unresolved") === status).map((item) => item.point),
     ]),
   );
 }
@@ -1596,10 +1713,10 @@ function assessmentGroups(evaluation) {
 function pointAssessmentHtml(assessments) {
   if (!Array.isArray(assessments) || !assessments.length) return "";
   return assessments.map((item) => {
-    const status = ASSESSMENT_STATUS[item.status] || ASSESSMENT_STATUS.missing;
+    const status = item.needs_review ? ASSESSMENT_STATUS.unresolved : ASSESSMENT_STATUS[item.status] || ASSESSMENT_STATUS.unresolved;
     const evidence = item.evidence_quote
       ? `<q>${escapeHtml(item.evidence_quote)}</q>`
-      : "<span class=\"no-evidence\">Không tìm thấy bằng chứng trong câu trả lời.</span>";
+      : "<span class=\"no-evidence\">Chưa có đoạn trích bằng chứng được xác minh cho tiêu chí này.</span>";
     return `<div class="assessment-row"><span class="assessment-status ${status.className}">${status.label}</span><div><strong>${escapeHtml(item.point)}</strong><p>${escapeHtml(item.reason || "Chưa có giải thích.")}</p>${evidence}</div></div>`;
   }).join("");
 }
@@ -1610,19 +1727,25 @@ function renderPointAssessments(assessments) {
 }
 
 function renderEvaluation(evaluation, completed) {
-  el.evaluationScore.textContent = Math.round(evaluation.score);
-  el.evaluationVerdict.textContent = evaluation.verdict;
-  el.evaluationFeedback.textContent = evaluation.feedback;
-  el.evaluationEngine.textContent = `${evaluation.evaluator} · độ tin cậy ${Math.round(evaluation.confidence * 100)}%`;
+  const provisional = evaluation.score_provisional === true;
+  el.evaluationScore.textContent = provisional ? "Chờ" : Math.round(evaluation.score);
+  el.evaluationScoreUnit.classList.toggle("hidden", provisional);
+  const reasons = evaluation.review_reasons || [];
+  const technical = reasons.some((reason) => reason.category === "system");
+  el.evaluationVerdict.textContent = provisional ? technical ? "Bộ chấm chưa sẵn sàng" : "Điểm đề xuất cần xác minh" : evaluation.verdict;
+  el.evaluationFeedback.textContent = provisional
+    ? `${reasons.map((reason) => reason.message).join(" ") || "Còn tiêu chí cần kiểm tra lại bằng chứng."} Điểm tạm chưa được tính vào tổng kết.` : evaluation.feedback;
+  el.evaluationEngine.textContent = `${evaluation.evaluator} · ${provisional ? "cần xác minh bằng chứng" : "đối chiếu theo rubric"}`;
   const groups = assessmentGroups(evaluation);
   fillList(el.matchedPoints, groups.met, "Chưa có tiêu chí đạt hoàn toàn");
   fillList(el.partialPoints, groups.partial, "Không có");
   fillList(el.contradictedPoints, groups.contradicted, "Không có");
   fillList(el.missingPoints, groups.missing, "Không có tiêu chí bị thiếu");
+  fillList(el.unresolvedPoints, groups.unresolved, "Không có");
   renderPointAssessments(evaluation.point_assessments);
   el.evaluationReview.classList.toggle("hidden", !evaluation.review_required);
   el.evaluationReview.textContent = evaluation.review_required
-    ? "Kết quả này có độ tin cậy thấp hoặc chứa nội dung mâu thuẫn. Giáo viên cần xem lại bằng chứng trước khi dùng điểm."
+    ? "Kết quả cần xem lại bằng chứng; trạng thái này không có nghĩa câu trả lời của bạn sai."
     : "";
   el.nextQuestionButton.textContent = completed ? "Xem báo cáo →" : "Câu tiếp theo →";
   el.answerCard.classList.add("hidden");
@@ -1630,26 +1753,66 @@ function renderEvaluation(evaluation, completed) {
 }
 
 async function submitCurrentAnswer() {
+  if (state.speechBusy || state.answerSubmitting || state.draftLoading || state.sessionFinishing || state.recorder) return;
   const answer = el.answerText.value.trim();
   if (!answer || !state.currentTranscriptionId) {
     toast("Vui lòng ghi âm câu trả lời trước khi gửi.", true);
     return;
   }
+  const deferred = deferredSession();
+  if (deferred && !state.currentPreviewSha256) {
+    toast("Chưa lấy được bản chuyển giọng nói hiện tại. Hãy tải lại bản ghi.", true);
+    return;
+  }
   el.submitAnswerButton.disabled = true;
-  el.submitAnswerButton.textContent = "Đang đánh giá...";
+  state.answerSubmitting = true;
+  el.recordButton.disabled = true;
+  const originalLabel = el.submitAnswerButton.textContent;
+  el.submitAnswerButton.textContent = deferred ? "Đang xác nhận..." : "Đang đánh giá...";
+  el.finishPracticeButton.disabled = true;
+  el.microphoneSelect.disabled = true;
+  el.checkMicrophoneButton.disabled = true;
+  const sessionId = state.session.session_id, transcriptionId = state.currentTranscriptionId;
+  const gradingStarted = performance.now();
+  let gradingStage = "Đang đối chiếu câu trả lời theo rubric";
+  let checkingRuntime = false;
+  const gradingTimer = deferred ? null : setInterval(async () => {
+    if (!state.answerSubmitting || state.session?.session_id !== sessionId) return;
+    el.recordingStatus.textContent = `${gradingStage} · ${Math.floor((performance.now() - gradingStarted) / 1000)} giây`;
+    if (checkingRuntime) return;
+    checkingRuntime = true;
+    try {
+      const readiness = await api("/api/runtime/readiness");
+      gradingStage = readiness.llm.state === "loading" ? "Đang chuẩn bị bộ chấm · bản ghi đã được lưu"
+        : "Đang đối chiếu câu trả lời theo rubric";
+    } catch (_) {} finally { checkingRuntime = false; }
+  }, 1000);
   try {
-    const result = await api(
-      `/api/interviews/${state.session.session_id}/answer`,
-      jsonOptions("POST", {
-        answer,
-        transcription_id: state.currentTranscriptionId,
-      }),
-    );
+    const result = deferred
+      ? await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/transcriptions/${encodeURIComponent(transcriptionId)}/confirm`,
+        jsonOptions("POST", { preview_sha256: state.currentPreviewSha256 }))
+      : await api(`/api/interviews/${encodeURIComponent(sessionId)}/answer`, jsonOptions("POST", { answer, transcription_id: transcriptionId }));
+    if (state.session?.session_id !== sessionId) return;
+    if (state.savedRecording) await recordingCache("delete", state.savedRecording).catch(() => {});
+    state.savedRecording = null;
     state.session.answered_count = result.answered_count;
     state.pendingResult = result;
     el.progressBar.style.width = `${Math.round((result.answered_count / result.requested_count) * 100)}%`;
-    if (state.session.interview_mode === "practice") {
+    if (deferred) {
+      state.pendingResult = null;
+      state.currentTranscriptionId = null;
+      state.currentPreviewSha256 = null;
+      if (result.completed) {
+        if (state.session.interview_mode === "real") completeRealInterview();
+        else await loadPracticeReport();
+      } else {
+        state.currentQuestion = result.next_question;
+        renderQuestion();
+        toast("Đã xác nhận câu trả lời.");
+      }
+    } else if (state.session.interview_mode === "practice") {
       renderEvaluation(result.evaluation, result.completed);
+      void retryTechnicalGrade(result, sessionId, transcriptionId);
     } else if (result.completed) {
       completeRealInterview();
     } else {
@@ -1658,10 +1821,43 @@ async function submitCurrentAnswer() {
       renderQuestion();
     }
   } catch (error) {
-    toast(error.message, true);
-    el.submitAnswerButton.disabled = false;
+    toast(error.name === "AbortError" || error instanceof TypeError
+      ? "Kết nối bị gián đoạn. Bản ghi vẫn được giữ; bạn có thể xác nhận lại."
+      : error.message, true);
+    if (state.session?.session_id === sessionId) {
+      el.submitAnswerButton.disabled = false;
+      if (deferred && error.status === 409) await restoreRecording();
+    }
   } finally {
-    el.submitAnswerButton.textContent = "Gửi câu trả lời";
+    clearInterval(gradingTimer);
+    state.answerSubmitting = false;
+    el.recordButton.disabled = !canRecordAnswer();
+    el.finishPracticeButton.disabled = false;
+    el.microphoneSelect.disabled = false;
+    el.checkMicrophoneButton.disabled = false;
+    if (state.currentTranscriptionId === transcriptionId) el.submitAnswerButton.textContent = originalLabel;
+  }
+}
+
+async function retryTechnicalGrade(result, sessionId, transcriptionId) {
+  const active = () => state.session?.session_id === sessionId && state.pendingResult === result;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    if (!result.evaluation?.review_reasons?.some(reason => reason.action === "retry_grading")) return;
+    await new Promise(resolve => setTimeout(resolve, attempt ? 30000 : 3000));
+    if (!active()) return;
+    try {
+      const retry = await api(`/api/interviews/${encodeURIComponent(sessionId)}/transcriptions/${encodeURIComponent(transcriptionId)}/retry-grade`, { method: "POST" });
+      if (!active()) return;
+      if (retry.evaluation) {
+        result.evaluation = retry.evaluation;
+        renderEvaluation(retry.evaluation, result.completed);
+        if (el.reportDialog.open && state.reportOrigin === "practice") {
+          const report = await api(`/api/interviews/${encodeURIComponent(sessionId)}/report`);
+          if (active() && el.reportDialog.open && state.reportOrigin === "practice") renderReport(report);
+        }
+      }
+      if (!retry.retryable) return;
+    } catch (_) { return; }
   }
 }
 
@@ -1677,34 +1873,145 @@ async function nextPracticeQuestion() {
 }
 
 async function finishPractice() {
-  if (!state.session || !window.confirm("Kết thúc buổi luyện tập và tạo báo cáo với các câu đã trả lời?")) return;
+  if (!state.session || state.speechBusy || state.answerSubmitting || state.sessionFinishing || state.recorder) return;
+  if (!window.confirm("Kết thúc buổi luyện tập và chấm các câu đã xác nhận? Bản ghi chưa xác nhận của câu hiện tại sẽ không được chấm.")) return;
+  const sessionId = state.session.session_id;
+  state.sessionFinishing = true;
+  el.finishPracticeButton.disabled = true;
+  el.recordButton.disabled = true;
+  el.submitAnswerButton.disabled = true;
   try {
-    await api(`/api/interviews/${state.session.session_id}/finish`, { method: "POST" });
+    await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/finish`, { method: "POST" });
     await loadPracticeReport();
   } catch (error) {
     toast(error.message, true);
+  } finally {
+    state.sessionFinishing = false;
+    el.finishPracticeButton.disabled = false;
+    el.recordButton.disabled = !canRecordAnswer();
+    el.submitAnswerButton.disabled = state.completed || !state.currentTranscriptionId;
   }
 }
 
 function completeRealInterview() {
+  const sessionId = state.session?.session_id;
   state.completed = true;
   state.session = null;
   state.currentQuestion = null;
   setNavigationLocked(false);
   showView("realCompleteView");
+  if (sessionId) {
+    forgetActiveSession(sessionId);
+    void watchSessionGrading(sessionId, "real");
+  }
 }
 
 async function loadPracticeReport() {
+  const sessionId = state.session?.session_id;
+  if (!sessionId) return;
+  state.completed = true;
+  state.currentQuestion = null;
+  state.speechRun += 1;
+  state.runtimeRefreshSequence += 1;
+  setNavigationLocked(false);
+  // Open the durable grading status even if the first report request fails.
+  state.reportOrigin = "practice";
+  renderReport({ session: { ...state.session, status: "completed" }, grading: {
+    state: "queued", report_ready: false, processed_count: 0, answer_count: state.session.answered_count,
+  } });
+  openReportDialog();
   try {
-    const report = await api(`/api/interviews/${state.session.session_id}/report`);
-    state.reportOrigin = "practice";
-    state.completed = true;
-    setNavigationLocked(false);
+    const report = await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/report`);
     renderReport(report);
-    openReportDialog();
   } catch (error) {
     toast(error.message, true);
   }
+  void watchSessionGrading(sessionId, "practice");
+}
+
+function stopGradingWatch() {
+  state.gradingWatchSequence += 1;
+  state.gradingTarget = null;
+}
+
+function renderGradingStatus(grading, origin) {
+  const ready = grading.report_ready === true;
+  const failed = grading.state === "failed";
+  const count = Number(grading.answer_count || 0);
+  const processed = Number(grading.processed_count || 0);
+  const message = ready ? "Đã chấm xong và lưu kết quả."
+    : failed ? `Chấm bài bị gián đoạn. ${grading.error || "Câu trả lời và ghi âm vẫn được giữ."}`
+      : `${grading.state === "queued" ? "Đang chờ bộ chấm" : "Đang chấm bài"} · ${processed}/${count} câu. Câu trả lời và ghi âm đã được lưu.`;
+  if (origin === "real") {
+    el.realGradingStatus.textContent = message;
+    return;
+  }
+  el.reportGradingPanel.classList.toggle("hidden", ready);
+  el.reportContent.classList.toggle("hidden", !ready);
+  el.reportGradingTitle.textContent = failed ? "Chưa hoàn tất chấm bài" : "Đang tổng hợp kết quả";
+  el.reportGradingStatus.textContent = message;
+  el.reportGradingProgress.max = Math.max(1, count);
+  el.reportGradingProgress.value = processed;
+  el.retrySessionGradingButton.classList.toggle("hidden", !failed || Number(grading.attempts) >= 3);
+  el.refreshSessionGradingButton.classList.toggle("hidden", !failed);
+}
+
+async function watchSessionGrading(sessionId, origin) {
+  const sequence = ++state.gradingWatchSequence;
+  state.gradingTarget = { sessionId, origin };
+  const active = () => sequence === state.gradingWatchSequence && state.user
+    && (origin === "real" ? state.activeViewId === "realCompleteView" : el.reportDialog.open && state.reportOrigin === origin);
+  let failures = 0;
+  while (active()) {
+    try {
+      const grading = await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/grading`);
+      if (!active()) return;
+      if (!grading.report_ready || origin === "real") renderGradingStatus(grading, origin);
+      failures = 0;
+      if (grading.report_ready) {
+        if (origin !== "real") {
+          const report = await speechApi(origin === "teacher"
+            ? `/api/teacher/results/${encodeURIComponent(sessionId)}` : `/api/interviews/${encodeURIComponent(sessionId)}/report`);
+          if (!active()) return;
+          renderReport(report);
+          if (origin === "teacher") {
+            state.currentTeacherReport = report;
+            state.reviewReportCache.set(sessionId, report);
+          }
+        }
+        forgetActiveSession(sessionId);
+        return;
+      }
+      if (grading.state === "failed" || grading.state === "collecting") return;
+    } catch (error) {
+      if (!active()) return;
+      if ([401, 403, 404].includes(error.status)) {
+        toast(error.message, true);
+        return;
+      }
+      failures += 1;
+      const message = "Chưa lấy được kết quả chấm. Bài đã lưu; hệ thống sẽ thử kết nối lại.";
+      if (origin === "real") el.realGradingStatus.textContent = message;
+      else {
+        el.reportGradingPanel.classList.remove("hidden");
+        el.reportGradingStatus.textContent = message;
+        el.refreshSessionGradingButton.classList.remove("hidden");
+      }
+    }
+    await new Promise(resolve => setTimeout(resolve, document.hidden ? 5000 : Math.min(10000, 2000 + failures * 2000)));
+  }
+}
+
+async function retrySessionGrading() {
+  const target = state.gradingTarget;
+  if (!target || state.gradingRetrying) return;
+  state.gradingRetrying = true;
+  el.retrySessionGradingButton.disabled = true;
+  try {
+    await speechApi(`/api/interviews/${encodeURIComponent(target.sessionId)}/grading/retry`, { method: "POST" });
+    if (state.gradingTarget === target) void watchSessionGrading(target.sessionId, target.origin);
+  } catch (error) { toast(error.message, true); }
+  finally { state.gradingRetrying = false; el.retrySessionGradingButton.disabled = false; }
 }
 
 function reportNumber(value) {
@@ -1713,6 +2020,7 @@ function reportNumber(value) {
 }
 
 function dismissReportDialog() {
+  stopGradingWatch();
   if (!el.reportDialog) return;
   if (el.reportDialog.open) el.reportDialog.close();
   document.body.classList.remove("report-modal-open");
@@ -1727,6 +2035,7 @@ function openReportDialog() {
 }
 
 function renderReport(report) {
+  renderGradingStatus(report.grading || { report_ready: true }, state.reportOrigin);
   const session = report.session || {};
   const summary = report.summary || {};
   const answers = Array.isArray(report.answers) ? report.answers : [];
@@ -1734,6 +2043,7 @@ function renderReport(report) {
   const scoredAnswerCount = Number(summary.scored_answer_count ?? answers.length);
   const total = answers.reduce((sum, item) => {
     const evaluation = item.evaluation || {};
+    if (evaluation.score_provisional && evaluation.final_score == null) return sum;
     const score = Number(session.interview_mode === "real" ? evaluation.final_score : evaluation.final_score ?? evaluation.score);
     return sum + (Number.isFinite(score) ? score : 0);
   }, 0);
@@ -1745,7 +2055,8 @@ function renderReport(report) {
   el.reportTotalScore.textContent = scoredAnswerCount ? `${reportNumber(total)}/${scoredAnswerCount * 100}` : "—";
   el.reportPercentage.textContent = scoredAnswerCount ? `${reportNumber(average)}%` : "—";
   el.reportScore.textContent = scoredAnswerCount ? reportNumber(average) : "—";
-  el.reportVerdict.textContent = scoredAnswerCount ? summary.overall_verdict || "Đã chấm" : "Chờ giảng viên xác nhận";
+  el.reportVerdict.textContent = scoredAnswerCount ? summary.overall_verdict || "Đã chấm"
+    : session.interview_mode === "practice" ? "Chưa có điểm đã xác minh" : "Chờ giảng viên xác nhận";
   el.reportSummaryText.textContent = answers.length
     ? `Báo cáo tổng hợp ${answers.length} câu đã trả lời. Xem các điểm mạnh, nội dung cần cải thiện và nhận xét từng câu bên dưới.`
     : "Phiên kết thúc trước khi có câu trả lời để chấm điểm.";
@@ -1758,7 +2069,7 @@ function renderReport(report) {
   el.answerDetails.innerHTML = answers.length
     ? answers.map((item) => {
       const evaluation = item.evaluation || {};
-      const proposedScore = evaluation.review_ai_score ?? evaluation.ai_score ?? evaluation.score ?? 0;
+      const proposedScore = (evaluation.strong_review_ready ? evaluation.review_ai_score : null) ?? evaluation.ai_score ?? evaluation.score ?? 0;
       const hasFinalScore = evaluation.final_score != null;
       const score = hasFinalScore ? evaluation.final_score : proposedScore;
       const review = evaluation.review_required
@@ -1766,22 +2077,23 @@ function renderReport(report) {
       const assessments = pointAssessmentHtml(evaluation.point_assessments);
       const voice = state.reportOrigin === "teacher" && item.voice?.audio_available
         ? `<div class="report-voice"><h4>Voice gốc</h4><audio controls preload="none" src="/api/teacher/transcriptions/${encodeURIComponent(item.voice.transcription_id)}/audio">Trình duyệt không phát được voice.</audio><div class="transcript-compare"><div><span>STT gốc</span><p>${escapeHtml(item.voice.raw_transcript || "—")}</p></div><div><span>Bản xác minh</span><p>${escapeHtml(item.voice.verified_transcript || item.answer)}</p></div></div></div>` : "";
-      const scoreAudit = `<div class="score-audit"><div><span>Điểm AI đề xuất</span><strong>${reportNumber(proposedScore)}</strong></div><div><span>Điểm cuối</span><strong>${hasFinalScore ? reportNumber(evaluation.final_score) : "Chờ duyệt"}</strong></div>${evaluation.teacher_score == null ? "" : `<div><span>Giảng viên</span><strong>${reportNumber(evaluation.teacher_score)}</strong></div>`}</div>`;
+      const scoreAudit = `<div class="score-audit"><div><span>Điểm AI đề xuất</span><strong>${evaluation.score_provisional ? "Chờ xác minh" : reportNumber(proposedScore)}</strong></div><div><span>Điểm cuối</span><strong>${hasFinalScore ? reportNumber(evaluation.final_score) : "Chờ duyệt"}</strong></div>${evaluation.teacher_score == null ? "" : `<div><span>Giảng viên</span><strong>${reportNumber(evaluation.teacher_score)}</strong></div>`}</div>`;
       const teacherFeedback = evaluation.teacher_feedback
         ? `<div class="teacher-feedback"><strong>Nhận xét của giảng viên</strong><p>${escapeHtml(evaluation.teacher_feedback)}</p></div>` : "";
       return `<article class="report-answer-card">
         <h3>Câu ${escapeHtml(item.sequence_number)}: ${escapeHtml(item.question?.question || "")}</h3>
-        <p class="report-answer-score">${hasFinalScore || session.interview_mode !== "real" ? `${reportNumber(score)}/100 điểm` : `${reportNumber(score)}/100 điểm AI đề xuất · Chờ giảng viên`}${evaluation.verdict ? ` · ${escapeHtml(evaluation.verdict)}` : ""}</p>
+        <p class="report-answer-score">${evaluation.score_provisional && !hasFinalScore ? "Chờ xác minh, chưa có điểm cuối" : `${reportNumber(score)}/100 ${hasFinalScore ? "điểm" : "điểm AI đề xuất · Chờ giảng viên"}`}${evaluation.verdict && !evaluation.score_provisional ? ` · ${escapeHtml(evaluation.verdict)}` : ""}</p>
         ${review}
         ${state.reportOrigin === "teacher" && item.answer_id != null ? `<button type="button" class="button secondary compact report-review-button" data-report-review-session="${escapeHtml(state.currentTeacherReportSessionId)}" data-report-review-answer="${escapeHtml(item.answer_id)}">Chấm lại câu này</button>` : ""}
         <p class="report-answer-text"><strong>Trả lời:</strong> ${escapeHtml(item.answer || "Chưa có nội dung")}</p>
+        ${evaluation.grading_source === "strong_ai" ? `<p class="report-answer-text"><strong>Transcript được dùng chấm:</strong> ${escapeHtml(evaluation.graded_transcript || "—")}</p>` : ""}
         <p class="report-answer-feedback"><strong>Nhận xét:</strong> ${escapeHtml(evaluation.feedback || "Chưa có nhận xét")}</p>
         ${teacherFeedback}
         <p class="report-reference"><strong>Đáp án tham khảo:</strong> ${escapeHtml(item.reference_answer || "Chưa có đáp án tham khảo")}</p>
         <details class="report-answer-extra"><summary>Chi tiết chấm điểm${state.reportOrigin === "teacher" && item.voice?.audio_available ? " và ghi âm" : ""}</summary>
           ${scoreAudit}${voice}
           ${assessments ? `<h4>Đối chiếu rubric</h4><div class="assessment-list">${assessments}</div>` : ""}
-          <p class="report-engine">Bộ chấm: ${escapeHtml(evaluation.evaluator || "—")} · độ tin cậy ${reportNumber(Number(evaluation.confidence || 0) * 100)}% · rubric ${escapeHtml(evaluation.rubric_version || "mặc định")}</p>
+          <p class="report-engine">Bộ chấm: ${escapeHtml(evaluation.evaluator || "—")}${evaluation.confidence == null ? "" : ` · mức tin cậy của bộ chấm ${reportNumber(Number(evaluation.confidence) * 100)}%`} · rubric ${escapeHtml(evaluation.rubric_version || "mặc định")}</p>
         </details>
       </article>`;
     }).join("")
@@ -1789,6 +2101,7 @@ function renderReport(report) {
 }
 
 function reportBack() {
+  if (state.session && state.completed) forgetActiveSession(state.session.session_id);
   dismissReportDialog();
   state.session = null;
   state.currentQuestion = null;
@@ -1805,9 +2118,7 @@ function reportBack() {
 }
 
 function micTestSentence() {
-  const name = state.user?.full_name?.trim() || "[tên của bạn]";
-  const studentId = state.user?.student_id?.trim() || "[mã sinh viên của bạn]";
-  return `Tôi là ${name}, có mã sinh viên là ${studentId}.`;
+  return "Đây là phần kiểm tra microphone trước buổi phỏng vấn.";
 }
 
 function resetMicTestPanel() {
@@ -1914,6 +2225,10 @@ function renderMicrophoneResult(result, mode = "microphone") {
 
 async function checkMicrophone() {
   if (state.micTestController || state.recorder?.state === "recording") return;
+  if (state.sessionMicCheck?.ready) {
+    renderMicrophoneResult(state.sessionMicCheck.result || state.sessionMicCheck);
+    return;
+  }
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined" || !AudioContextClass) {
     toast("Trình duyệt chưa hỗ trợ kiểm tra microphone. Hãy dùng Chrome hoặc Edge.", true);
@@ -2016,7 +2331,7 @@ async function checkMicrophone() {
     throwIfCancelled();
     state.sessionMicCheck = { ready: Boolean(result.ready), baselineDbfs: ambient.dbfs, result, deviceId: state.selectedMicrophoneId };
     state.ambientNoiseDbfs = ambient.dbfs;
-    el.micCheckButtonLabel.textContent = "Kiểm tra lại";
+    el.micCheckButtonLabel.textContent = result.ready ? "Đã kiểm tra" : "Kiểm tra lại";
     renderMicrophoneResult(result);
     showMicTestStage(result.ready ? "done" : "error", "");
     toast(result.ready ? "Microphone sẵn sàng để ghi âm." : "Microphone cần điều chỉnh trước khi ghi.", !result.ready);
@@ -2054,11 +2369,13 @@ async function checkMicrophone() {
     }
     controls.forEach((control, index) => { control.disabled = disabledStates[index]; });
     if (state.micTestController === controller) state.micTestController = null;
-    el.recordButton.disabled = !sttAvailable() || !state.sessionMicCheck?.ready;
+    el.recordButton.disabled = !canRecordAnswer();
   }
 }
 
 async function toggleRecording() {
+  if (state.session?.recording_allowed === false) { toast("Đã hết thời gian ghi âm mới; chỉ xử lý bản ghi đã nhận trước hạn.", true); return; }
+  if (state.speechBusy || state.answerSubmitting || state.draftLoading || state.sessionFinishing || state.completed) return;
   if (state.micTestController) return;
   if (!state.sessionMicCheck?.ready) {
     toast("Hãy kiểm tra microphone và môi trường ở cột bên trái trước khi trả lời.", true);
@@ -2078,11 +2395,7 @@ async function toggleRecording() {
   }
   el.checkMicrophoneButton.disabled = true;
   try {
-    state.currentTranscriptionId = null;
-    el.answerText.value = "";
-    el.answerText.dispatchEvent(new Event("input"));
     el.submitAnswerButton.disabled = true;
-    setVoiceStage("record");
     const audioConstraints = {
       channelCount: 1,
       echoCancellation: true,
@@ -2110,6 +2423,15 @@ async function toggleRecording() {
     state.recorder.ondataavailable = (event) => { if (event.data.size) state.audioChunks.push(event.data); };
     state.recorder.onstop = transcribeRecording;
     state.recorder.start(250);
+    // Keep the old preview intact if microphone permission or device opening fails.
+    state.currentTranscriptionId = null;
+    state.currentPreviewSha256 = null;
+    state.savedRecording = null;
+    el.retryRecordingButton.classList.add("hidden");
+    el.answerText.value = "";
+    el.answerText.dispatchEvent(new Event("input"));
+    setVoiceStage("record");
+    el.finishPracticeButton.disabled = true;
     el.checkMicrophoneButton.disabled = true;
     el.recordButton.classList.add("recording");
     el.recordButton.textContent = "■ Dừng ghi";
@@ -2132,6 +2454,7 @@ async function toggleRecording() {
     state.mediaStream = null;
     el.microphoneSelect.disabled = false;
     el.checkMicrophoneButton.disabled = false;
+    el.submitAnswerButton.disabled = !state.currentTranscriptionId;
   }
 }
 
@@ -2168,7 +2491,177 @@ async function measureAmbientNoise(stream, durationMs) {
   };
 }
 
+function recordingCache(action, recording = null) {
+  const key = recording?.key || `${state.user?.user_id}:${state.session?.session_id}`;
+  return new Promise((resolve, reject) => {
+    const open = indexedDB.open("ai-interview-recordings", 1);
+    open.onupgradeneeded = () => open.result.createObjectStore("recordings", { keyPath: "key" });
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const db = open.result;
+      const tx = db.transaction("recordings", action === "get" ? "readonly" : "readwrite");
+      const store = tx.objectStore("recordings");
+      const request = action === "put" ? store.put(recording) : action === "delete" ? store.delete(key) : store.get(key);
+      tx.oncomplete = () => { db.close(); resolve(request.result); };
+      tx.onerror = () => { db.close(); reject(tx.error); };
+    };
+  });
+}
+
+async function speechApi(path, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try { return await api(path, { ...options, signal: controller.signal }); }
+  finally { clearTimeout(timer); }
+}
+
+async function restoreRecording() {
+  const run = state.speechRun;
+  const sessionId = state.session?.session_id;
+  const questionKey = `${state.currentQuestion?.language}:${state.currentQuestion?.id}`;
+  const active = () => run === state.speechRun && state.session?.session_id === sessionId && !state.completed;
+  state.draftLoading = true;
+  el.recordButton.disabled = true;
+  el.submitAnswerButton.disabled = true;
+  try {
+    let saved = await recordingCache("get").catch(() => null);
+    if (!active()) return;
+    if (saved?.questionKey !== questionKey || saved?.sessionId !== sessionId) saved = null;
+    if (deferredSession()) {
+      const response = await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/draft`);
+      if (!active()) return;
+      state.session.recording_allowed = response.can_record || !state.sessionMicCheck?.ready;
+      if (response.draft && !response.recording_in_progress && !(saved?.blob && !saved.jobId)) {
+        state.savedRecording = saved;
+        applyTranscription(response.draft);
+        el.submitAnswerButton.disabled = !response.can_confirm;
+        if (response.confirmation_error) el.recordingStatus.textContent = response.confirmation_error;
+        return;
+      }
+    }
+    if (!saved && state.sessionMicCheck?.ready) {
+      const response = await speechApi(`/api/speech/jobs?session_id=${encodeURIComponent(sessionId)}`);
+      if (!active()) return;
+      if (response.job) saved = { key: `${state.user.user_id}:${sessionId}`, sessionId, jobId: response.job.job_id, questionKey };
+    }
+    if (!active() || state.speechBusy || state.recorder || !saved) return;
+    state.savedRecording = saved;
+    el.recordingStatus.textContent = "Có bản ghi đã lưu của câu này";
+    el.retryRecordingButton.classList.remove("hidden");
+    if (saved.jobId) await processSavedRecording();
+  } catch (error) {
+    if (!active()) return;
+    el.recordingStatus.textContent = "Chưa khôi phục được bản ghi. Hãy thử tải lại bản ghi hoặc ghi âm lại.";
+    el.retryRecordingButton.classList.remove("hidden");
+    toast(error.message, true);
+  } finally {
+    // processSavedRecording increments speechRun, but still belongs to this question.
+    if (state.session?.session_id === sessionId && `${state.currentQuestion?.language}:${state.currentQuestion?.id}` === questionKey) {
+      state.draftLoading = false;
+      el.recordButton.disabled = state.speechBusy || !canRecordAnswer();
+    }
+  }
+}
+
+function applyTranscription(result) {
+  state.health.speech_to_text.ready = true;
+  state.currentTranscriptionId = result.transcription_id || null;
+  state.currentPreviewSha256 = result.preview_sha256 || null;
+  el.answerText.value = result.text;
+  el.answerText.dispatchEvent(new Event("input"));
+  el.submitAnswerButton.disabled = !state.currentTranscriptionId || result.audio_saved === false
+    || (deferredSession() && (!state.currentPreviewSha256 || (result.answer_stage || result.stage || "draft") !== "draft"));
+  el.recordingStatus.textContent = result.transcript_status === "needs_review"
+    ? "Bản ghi đã lưu · còn đoạn cần xác minh."
+    : "Bản ghi tạm đã lưu · chờ xác nhận";
+  if (result.recording_report) renderMicrophoneResult(result.recording_report, "recording");
+  el.recordButton.textContent = "● Ghi âm lại";
+  setVoiceStage("verify");
+}
+
+async function processSavedRecording() {
+  if (state.speechBusy || state.answerSubmitting || state.sessionFinishing || !state.savedRecording) return;
+  const saved = state.savedRecording;
+  const run = ++state.speechRun;
+  state.speechBusy = true;
+  el.recordButton.disabled = true;
+  el.microphoneSelect.disabled = true;
+  el.checkMicrophoneButton.disabled = true;
+  el.submitAnswerButton.disabled = true;
+  state.currentTranscriptionId = null;
+  state.currentPreviewSha256 = null;
+  el.finishPracticeButton.disabled = true;
+  el.retryRecordingButton.classList.add("hidden");
+  const started = performance.now();
+  const active = () => run === state.speechRun && state.session?.session_id === saved.sessionId;
+  let waitingLabel = "Đang lưu bản ghi vào hệ thống";
+  const updateWaiting = () => {
+    if (active()) el.recordingStatus.textContent = `${waitingLabel} · ${Math.floor((performance.now() - started) / 1000)} giây`;
+  };
+  const waitingTimer = setInterval(updateWaiting, 1000);
+  try {
+    let job;
+    if (!saved.jobId) {
+      el.recordingStatus.textContent = "Đang lưu bản ghi vào hệ thống...";
+      const form = new FormData();
+      form.append("file", saved.blob, saved.filename);
+      form.append("request_key", saved.requestKey);
+      form.append("session_id", saved.sessionId);
+      if (Number.isFinite(saved.noise)) form.append("ambient_noise_dbfs", String(saved.noise));
+      job = await speechApi("/api/speech/jobs", { method: "POST", body: form });
+      saved.jobId = job.job_id;
+      await recordingCache("put", saved).catch(() => {});
+    } else {
+      job = await speechApi(`/api/speech/jobs/${encodeURIComponent(saved.jobId)}`);
+      if (job.state === "failed" && job.retryable) job = await speechApi(`/api/speech/jobs/${encodeURIComponent(saved.jobId)}/retry`, { method: "POST" });
+    }
+    const labels = { queued: "Bản ghi đã lưu · đang chờ xử lý", transcribing: "Đang nhận dạng giọng nói",
+      correcting: "Đang kiểm tra lỗi nhận dạng", saving: "Đang lưu kết quả", interrupted: "Xử lý bị gián đoạn" };
+    while (active() && !["completed", "failed", "cancelled"].includes(job.state)) {
+      el.cancelRecordingJobButton.classList.toggle("hidden", job.stage === "saving");
+      waitingLabel = job.cancel_requested ? "Đã yêu cầu hủy · chờ công đoạn hiện tại kết thúc" : labels[job.stage] || "Đang xử lý";
+      updateWaiting();
+      setVoiceStage("transcribe");
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!active()) return;
+      job = await speechApi(`/api/speech/jobs/${encodeURIComponent(saved.jobId)}`);
+    }
+    if (!active()) return;
+    clearInterval(waitingTimer);
+    if (job.state === "completed") {
+      if (["confirmed", "superseded"].includes(job.result?.answer_stage)) {
+        el.recordingStatus.textContent = "Bản ghi này đã được xác nhận hoặc thay thế. Hãy tải lại trang để lấy câu hiện tại.";
+      } else applyTranscription({ ...job.result, audio_saved: job.audio_saved });
+      if (!job.audio_saved) el.recordingStatus.textContent = "Không tìm thấy file ghi âm. Hãy ghi âm lại trước khi xác nhận.";
+    }
+    else {
+      el.recordingStatus.textContent = job.retryable ? "Xử lý chưa thành công · bản ghi đã được giữ để thử lại"
+        : job.error || "Đã hủy xử lý; bản ghi vẫn được giữ";
+      el.retryRecordingButton.classList.toggle("hidden", !job.retryable);
+      setVoiceStage("error");
+    }
+  } catch (error) {
+    clearInterval(waitingTimer);
+    if (!active()) return;
+    el.recordingStatus.textContent = "Chưa lấy được kết quả · bản ghi vẫn được giữ để thử lại";
+    el.retryRecordingButton.classList.remove("hidden");
+    setVoiceStage("error");
+    toast(error.name === "AbortError" ? "Kết nối quá hạn; bản ghi đã được giữ." : error.message, true);
+  } finally {
+    clearInterval(waitingTimer);
+    if (active()) {
+      state.speechBusy = false;
+      el.cancelRecordingJobButton.classList.add("hidden");
+      el.recordButton.disabled = !canRecordAnswer();
+      el.microphoneSelect.disabled = false;
+      el.checkMicrophoneButton.disabled = false;
+      el.finishPracticeButton.disabled = false;
+    }
+  }
+}
+
 async function transcribeRecording() {
+  const capturedRecorder = state.recorder;
   state.mediaStream?.getTracks().forEach((track) => track.stop());
   state.mediaStream = null;
   el.microphoneSelect.disabled = true;
@@ -2186,38 +2679,24 @@ async function transcribeRecording() {
     if (!recorder || !chunks.length) throw new Error("Không nhận được dữ liệu ghi âm. Hãy thử ghi lâu hơn.");
     const mimeType = recorder.mimeType || "audio/webm";
     const extension = mimeType.includes("mp4") ? "m4a" : "webm";
-    const form = new FormData();
-    form.append("file", new Blob(chunks, { type: mimeType }), `answer.${extension}`);
-    form.append("language", state.session?.language || state.currentQuestion?.language || "vi");
-    form.append("session_id", state.session.session_id);
-    if (Number.isFinite(state.ambientNoiseDbfs)) {
-      form.append("ambient_noise_dbfs", String(state.ambientNoiseDbfs));
-    }
-    const result = await api("/api/speech/transcribe", { method: "POST", body: form });
-    state.health.speech_to_text.ready = true;
-    state.health.speech_to_text.initialization_required = false;
-    state.currentTranscriptionId = result.transcription_id || null;
-    el.answerText.value = result.text;
-    el.answerText.dispatchEvent(new Event("input"));
-    el.submitAnswerButton.disabled = false;
-    const confidence = Math.round(Number(result.metrics?.confidence || 0) * 100);
-    const quality = Math.round(Number(result.metrics?.quality_score || 0) * 100);
-    const correction = result.correction_applied ? " · đã sửa lỗi ASR an toàn" : "";
-    const warning = result.quality_warnings?.length ? " · đã xử lý vùng chưa chắc chắn" : "";
-    el.recordingStatus.textContent = `Đã xác minh · tin cậy ${confidence}% · chất lượng ${quality}%${correction}${warning}`;
-    if (result.recording_report) renderMicrophoneResult(result.recording_report, "recording");
-    el.recordButton.textContent = "● Ghi âm lại";
-    setVoiceStage("verify");
+    state.savedRecording = { key: `${state.user.user_id}:${state.session.session_id}`, sessionId: state.session.session_id,
+      questionKey: `${state.currentQuestion.language}:${state.currentQuestion.id}`, requestKey: crypto.randomUUID(),
+      filename: `answer.${extension}`, blob: new Blob(chunks, { type: mimeType }), noise: state.ambientNoiseDbfs, jobId: null };
+    await recordingCache("put", state.savedRecording).catch(() => {});
+    await processSavedRecording();
   } catch (error) {
     el.recordingStatus.textContent = "Nhận dạng chưa thành công";
     setVoiceStage("error");
     toast(error.message, true);
   } finally {
-    state.recorder = null;
-    state.audioChunks = [];
-    el.recordButton.disabled = !sttAvailable() || !state.sessionMicCheck?.ready;
-    el.microphoneSelect.disabled = false;
-    el.checkMicrophoneButton.disabled = false;
+    if (state.recorder === capturedRecorder) {
+      state.recorder = null;
+      state.audioChunks = [];
+      el.recordButton.disabled = state.speechBusy || !canRecordAnswer();
+      el.microphoneSelect.disabled = false;
+      el.checkMicrophoneButton.disabled = false;
+      el.finishPracticeButton.disabled = false;
+    }
   }
 }
 
@@ -2359,6 +2838,18 @@ function bindEvents() {
   el.nextQuestionButton.addEventListener("click", nextPracticeQuestion);
   el.finishPracticeButton.addEventListener("click", finishPractice);
   el.recordButton.addEventListener("click", toggleRecording);
+  el.retryRecordingButton.addEventListener("click", () => state.savedRecording ? processSavedRecording() : restoreRecording());
+  el.retrySessionGradingButton.addEventListener("click", retrySessionGrading);
+  el.refreshSessionGradingButton.addEventListener("click", () => {
+    const target = state.gradingTarget;
+    if (target) void watchSessionGrading(target.sessionId, target.origin);
+  });
+  el.cancelRecordingJobButton.addEventListener("click", async () => {
+    const id = state.savedRecording?.jobId;
+    if (!id) return;
+    try { await speechApi(`/api/speech/jobs/${encodeURIComponent(id)}/cancel`, { method: "POST" }); }
+    catch (error) { toast(error.message, true); }
+  });
   el.checkMicrophoneButton.addEventListener("click", checkMicrophone);
   el.cancelMicTestButton.addEventListener("click", () => state.micTestController?.abort());
   el.microphoneSelect.addEventListener("change", selectMicrophone);

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import json
-import re
+import math
 from datetime import datetime, timezone
 from typing import Any
 
 from app.config import Settings
 from app.database import database
+from app.services.grade_state import decision_snapshot, json_object
+from app.services.transcription_vocabulary import transcription_vocabulary
 
 
 class TeacherReviewError(ValueError):
@@ -17,10 +19,45 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _valid_score(value: Any) -> bool:
+    return (isinstance(value, (int, float)) and not isinstance(value, bool)
+            and math.isfinite(value) and 0 <= value <= 100)
+
+
+def _evaluation_complete(evaluation: Any, points: list[str] | None = None,
+                         stored_score: float | None = None) -> bool:
+    if not isinstance(evaluation, dict) or not _valid_score(evaluation.get("score")):
+        return False
+    if stored_score is not None and (not _valid_score(stored_score)
+            or abs(evaluation["score"] - stored_score) > 1e-6):
+        return False
+    assessments = evaluation.get("point_assessments")
+    if not isinstance(assessments, list) or not assessments:
+        return False
+    found = []
+    for item in assessments:
+        if (not isinstance(item, dict) or not isinstance(item.get("point"), str)
+                or not item["point"].strip() or not isinstance(item.get("status"), str)
+                or item["status"] not in {
+                    "met", "partial", "missing", "contradicted", "unresolved"}):
+            return False
+        found.append(item["point"])
+    return len(set(found)) == len(found) and (points is None or set(found) == set(points))
+
+
+def _score_is_provisional(evaluation: dict[str, Any], points: list[str] | None = None,
+                           stored_score: float | None = None) -> bool:
+    return not _evaluation_complete(evaluation, points, stored_score) or bool(
+        evaluation.get("score_provisional") or any(
+            item.get("needs_review") or item["status"] == "unresolved"
+            for item in evaluation["point_assessments"]
+        ))
+
+
 def review_cache_key(settings: Settings) -> str:
     return "|".join(
         (
-            "teacher-review-v2",
+            "teacher-review-v7-span-correction-evidence",
             settings.review_whisper_model,
             settings.ollama_model,
             settings.transcript_correction_mode,
@@ -28,6 +65,34 @@ def review_cache_key(settings: Settings) -> str:
             "key-points-v2",
         )
     )
+
+
+def review_readiness(settings: Settings, *, question: dict, score: Any, evaluation_json: str | None,
+                     metadata_json: str | None, ai_at: Any, processed_at: Any,
+                     interview_mode: str = "real") -> dict:
+    if interview_mode == "practice":
+        return {"strong_review_ready": False, "can_accept_ai": False, "review_ai_evaluation": {},
+                "score_provisional": False, "below_threshold": False, "audio_required": False,
+                "manual_review_required": False, "review_policy": "practice_ai_only"}
+    def object_json(value):
+        try:
+            parsed = json.loads(value or "{}")
+            return parsed if isinstance(parsed, dict) else {}
+        except (TypeError, ValueError):
+            return {}
+    evaluation, metadata = object_json(evaluation_json), object_json(metadata_json)
+    points = question.get("key_points", [])
+    ready = bool(ai_at and processed_at and _valid_score(score)
+        and metadata.get("review_cache_key") == review_cache_key(settings)
+        and _evaluation_complete(evaluation, points, score))
+    provisional = _score_is_provisional(evaluation, points, score)
+    below = bool(ready and score < settings.teacher_review_score_threshold)
+    return {"strong_review_ready": ready, "can_accept_ai": ready and not provisional and not below,
+            "review_ai_evaluation": evaluation,
+            "score_provisional": provisional, "below_threshold": below, "audio_required": False,
+            "manual_review_required": below,
+            "review_policy": "ai_reanalysis_required" if not ready else
+                "teacher_manual_required" if below else "teacher_decision_recommended" if provisional else "teacher_choice"}
 
 
 def list_review_queue(settings: Settings) -> list[dict[str, Any]]:
@@ -39,7 +104,7 @@ def list_review_queue(settings: Settings) -> list[dict[str, Any]]:
                    a.teacher_score, a.teacher_feedback, a.reviewed_at,
                    a.review_ai_score, a.review_ai_feedback,
                    a.review_ai_evaluation_json, a.review_ai_at,
-                   a.transcription_id, a.created_at, s.candidate_name,
+                   a.transcription_id, a.created_at, a.question_json, s.candidate_name,
                    s.language, s.subject, r.exam_code, r.title,
                    t.corrected_text AS original_transcript,
                    t.review_transcript, t.review_model, t.review_runtime,
@@ -59,6 +124,7 @@ def list_review_queue(settings: Settings) -> list[dict[str, Any]]:
     answers: list[dict[str, Any]] = []
     for row in rows:
         answer = dict(row)
+        question = json.loads(answer.pop("question_json"))
         original_ai_score = float(
             answer["ai_score"]
             if answer["ai_score"] is not None
@@ -66,55 +132,11 @@ def list_review_queue(settings: Settings) -> list[dict[str, Any]]:
             if answer["final_score"] is not None
             else answer["score"]
         )
-        try:
-            metadata = json.loads(answer.get("review_metadata_json") or "{}")
-            if not isinstance(metadata, dict):
-                metadata = {}
-        except (TypeError, json.JSONDecodeError):
-            metadata = {}
-        strong_ready = bool(
-            answer["review_processed_at"]
-            and answer["review_ai_at"]
-            and metadata.get("review_cache_key") == review_cache_key(settings)
-        )
-        strong_score = (
-            float(answer["review_ai_score"])
-            if answer["review_ai_score"] is not None
-            else None
-        )
-        try:
-            parsed_evaluation = json.loads(
-                answer.get("review_ai_evaluation_json") or "{}"
-            )
-            review_evaluation = (
-                parsed_evaluation if isinstance(parsed_evaluation, dict) else {}
-            )
-        except (TypeError, json.JSONDecodeError):
-            review_evaluation = {}
-        displayed_ai_score = strong_score if strong_score is not None else original_ai_score
-        below_threshold = bool(
-            strong_ready
-            and strong_score is not None
-            and strong_score < settings.teacher_review_score_threshold
-        )
-        answer.update(
-            {
-                "original_ai_score": original_ai_score,
-                "ai_score": displayed_ai_score,
-                "strong_review_ready": strong_ready,
-                "review_ai_evaluation": review_evaluation,
-                "review_policy": (
-                    "ai_reanalysis_required"
-                    if not strong_ready
-                    else "teacher_decision_recommended"
-                    if below_threshold
-                    else "teacher_choice"
-                ),
-                "audio_required": False,
-                "below_threshold": below_threshold,
-                "can_accept_ai": strong_ready,
-            }
-        )
+        answer.update(review_readiness(settings, question=question, score=answer["review_ai_score"],
+            evaluation_json=answer["review_ai_evaluation_json"], metadata_json=answer["review_metadata_json"],
+            ai_at=answer["review_ai_at"], processed_at=answer["review_processed_at"]))
+        answer["original_ai_score"] = original_ai_score
+        answer["ai_score"] = float(answer["review_ai_score"]) if answer["strong_review_ready"] else original_ai_score
         answers.append(answer)
     answers.sort(
         key=lambda item: (
@@ -140,9 +162,11 @@ def review_answer(
         raise TeacherReviewError("Thao tác chấm không hợp lệ")
 
     with database(settings.database_path) as connection:
+        connection.execute("BEGIN IMMEDIATE")
         row = connection.execute(
             """
-            SELECT a.*, s.interview_mode, s.answer_mode, t.audio_path
+            SELECT a.*, s.interview_mode, s.answer_mode, t.audio_path,
+                   t.review_metadata_json, t.review_processed_at, t.review_transcript
             FROM interview_answers AS a
             JOIN interview_sessions AS s ON s.session_id = a.session_id
             LEFT JOIN speech_transcriptions AS t
@@ -162,50 +186,61 @@ def review_answer(
             raise TeacherReviewError(
                 "Cần chạy model STT mạnh và chấm lại trước khi dùng kết quả AI"
             )
-        ai_score = float(
-            row["review_ai_score"]
-            if row["review_ai_score"] is not None
-            else row["ai_score"]
-            if row["ai_score"] is not None
-            else row["score"]
-        )
+        if action == "accept_ai":
+            try:
+                evaluation = json.loads(row["review_ai_evaluation_json"] or "{}")
+                metadata = json.loads(row["review_metadata_json"] or "{}")
+                if not isinstance(evaluation, dict) or not isinstance(metadata, dict):
+                    raise ValueError("Invalid review metadata")
+            except (TypeError, ValueError):
+                raise TeacherReviewError("Kết quả AI không hợp lệ; cần xử lý lại") from None
+            if metadata.get("review_cache_key") != review_cache_key(settings):
+                raise TeacherReviewError("Kết quả AI thuộc phiên bản cũ; cần chấm lại")
+            if not row["review_ai_at"] or not row["review_processed_at"]:
+                raise TeacherReviewError("Kết quả AI chưa xử lý đầy đủ; cần chấm lại")
+            question = json.loads(row["question_json"])
+            if _score_is_provisional(evaluation, question.get("key_points", []), row["review_ai_score"]):
+                raise TeacherReviewError("Điểm AI còn ý chưa xác minh; cần xử lý lại hoặc giảng viên tự chấm")
+            if row["review_ai_score"] < settings.teacher_review_score_threshold:
+                raise TeacherReviewError("Điểm AI chấm lại dưới trung bình; giảng viên cần tự chấm và ghi nhận xét")
+        ai_score = next((float(value) for value in (row["review_ai_score"], row["ai_score"], row["score"])
+                         if _valid_score(value)), 0.0)
         if action == "accept_ai":
             score = ai_score
             feedback = feedback or "Giảng viên xác nhận sử dụng kết quả chấm của AI."
         else:
-            if score is None or not 0 <= float(score) <= 100:
+            if not _valid_score(score):
                 raise TeacherReviewError("Điểm giảng viên phải từ 0 đến 100")
             score = float(score)
             if not feedback:
                 raise TeacherReviewError("Giảng viên cần ghi nhận xét hoặc lý do chấm")
 
-        previous = float(
-            row["final_score"]
-            if row["final_score"] is not None
-            else row["review_ai_score"]
-            if row["review_ai_score"] is not None
-            else row["ai_score"]
-            if row["ai_score"] is not None
-            else row["score"]
-        )
+        previous = next((float(value) for value in (
+            row["final_score"], row["review_ai_score"], row["ai_score"], row["score"]
+        ) if _valid_score(value)), 0.0)
         now = _now()
+        decision = decision_snapshot(source="strong_ai" if action == "accept_ai" else "teacher_manual",
+            score=score, feedback=feedback, question=json.loads(row["question_json"]),
+            transcript=row["review_transcript"] if action == "accept_ai" else None,
+            evaluation=evaluation if action == "accept_ai" else None)
+        serialized_decision = json.dumps(decision, ensure_ascii=False, allow_nan=False)
         connection.execute(
             """
             INSERT INTO answer_reviews (
                 answer_id, previous_final_score, teacher_score, feedback,
-                reviewed_by, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?)
+                reviewed_by, created_at, decision_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (answer_id, previous, score, feedback, teacher_id, now),
+            (answer_id, previous, score, feedback, teacher_id, now, serialized_decision),
         )
         connection.execute(
             """
             UPDATE interview_answers
             SET teacher_score = ?, final_score = ?, teacher_feedback = ?,
-                reviewed_by = ?, reviewed_at = ?, review_required = 0
+                reviewed_by = ?, reviewed_at = ?, review_required = 0, final_decision_json = ?
             WHERE answer_id = ?
             """,
-            (score, score, feedback, teacher_id, now, answer_id),
+            (score, score, feedback, teacher_id, now, serialized_decision, answer_id),
         )
     return {
         "answer_id": answer_id,
@@ -224,10 +259,10 @@ def review_reanalysis_context(
     with database(settings.database_path) as connection:
         row = connection.execute(
             """
-            SELECT a.answer_id, a.question_json, a.answer_text,
+            SELECT a.answer_id, a.question_json, a.answer_text, a.grading_pending,
                    a.review_ai_score, a.review_ai_feedback,
                    a.review_ai_evaluation_json, a.review_ai_at,
-                   s.interview_mode, s.answer_mode, s.language,
+                   s.interview_mode, s.answer_mode, s.language, s.grading_strategy, s.status AS session_status,
                    t.transcription_id, t.corrected_text AS original_transcript,
                    t.audio_path, t.audio_mime_type, t.ambient_noise_dbfs,
                    t.review_transcript, t.review_model, t.review_runtime,
@@ -243,6 +278,8 @@ def review_reanalysis_context(
         ).fetchone()
     if not row:
         raise TeacherReviewError("Không tìm thấy câu trả lời")
+    if row["grading_strategy"] == "end_of_session" and (row["session_status"] == "active" or row["grading_pending"]):
+        raise TeacherReviewError("Hãy chờ phiên kết thúc và chấm lần đầu hoàn tất trước khi chạy model chấm lại")
     if row["interview_mode"] != "real" or row["answer_mode"] != "voice":
         raise TeacherReviewError(
             "Model STT mạnh chỉ áp dụng cho câu trả lời voice của kỳ thi chính thức"
@@ -259,13 +296,6 @@ def review_reanalysis_context(
     if not audio_path.is_relative_to(base) or not audio_path.is_file():
         raise TeacherReviewError("File voice không tồn tại hoặc đường dẫn không hợp lệ")
 
-    phrases = [
-        str(question.get(field) or "").strip()
-        for field in ("subject", "topic", "concept")
-    ]
-    technical_tokens = re.findall(
-        r"[A-Za-z][A-Za-z0-9+#._-]{2,}", str(question.get("question") or "")
-    )
     try:
         review_metadata = json.loads(row["review_metadata_json"] or "{}")
         if not isinstance(review_metadata, dict):
@@ -287,9 +317,11 @@ def review_reanalysis_context(
             cached_evaluation = {}
     strong_score = (
         float(row["review_ai_score"])
-        if row["review_ai_score"] is not None
+        if _valid_score(row["review_ai_score"])
         else None
     )
+    points = question.get("key_points", [])
+    cached = cached and strong_score is not None and _evaluation_complete(cached_evaluation, points, strong_score)
     cached_result = (
         {
             "answer_id": answer_id,
@@ -302,13 +334,9 @@ def review_reanalysis_context(
             "review_ai_feedback": row["review_ai_feedback"],
             "review_ai_evaluation": cached_evaluation,
             "review_processed_at": row["review_processed_at"],
-            "strong_review_ready": True,
-            "audio_required": False,
-            "below_threshold": bool(
-                strong_score is not None
-                and strong_score < settings.teacher_review_score_threshold
-            ),
-            "can_accept_ai": strong_score is not None,
+            **review_readiness(settings, question=question, score=strong_score,
+                evaluation_json=row["review_ai_evaluation_json"], metadata_json=row["review_metadata_json"],
+                ai_at=row["review_ai_at"], processed_at=row["review_processed_at"]),
             "cached": True,
         }
         if cached
@@ -318,9 +346,7 @@ def review_reanalysis_context(
         **dict(row),
         "question": question,
         "audio_path_resolved": audio_path,
-        "approved_terms": list(
-            dict.fromkeys(item for item in phrases + technical_tokens if item)
-        ),
+        **transcription_vocabulary(question),
         "cached": cached,
         "cached_result": cached_result,
     }
@@ -334,6 +360,8 @@ def save_review_reanalysis(
     transcription: dict[str, Any],
     evaluation: dict[str, Any],
 ) -> dict[str, Any]:
+    if not isinstance(evaluation, dict) or not _valid_score(evaluation.get("score")):
+        raise TeacherReviewError("Điểm AI phải là số hữu hạn từ 0 đến 100")
     score = float(evaluation["score"])
     processed_at = _now()
     transcript = str(transcription.get("text") or "").strip()
@@ -346,11 +374,15 @@ def save_review_reanalysis(
     with database(settings.database_path) as connection:
         connection.execute("BEGIN IMMEDIATE")
         row = connection.execute(
-            "SELECT transcription_id FROM interview_answers WHERE answer_id = ?",
+            "SELECT transcription_id, question_json FROM interview_answers WHERE answer_id = ?",
             (answer_id,),
         ).fetchone()
         if not row or row["transcription_id"] != transcription_id:
             raise TeacherReviewError("Câu trả lời đã thay đổi trong lúc xử lý")
+        question = json.loads(row["question_json"])
+        points = question.get("key_points", [])
+        if not _evaluation_complete(evaluation, points):
+            raise TeacherReviewError("Kết quả AI thiếu hoặc sai đối chiếu từng ý rubric; cần xử lý lại")
         connection.execute(
             """
             UPDATE speech_transcriptions
@@ -401,10 +433,9 @@ def save_review_reanalysis(
         "review_ai_feedback": str(evaluation.get("feedback") or ""),
         "review_ai_evaluation": evaluation,
         "review_processed_at": processed_at,
-        "strong_review_ready": True,
-        "audio_required": False,
-        "below_threshold": score < settings.teacher_review_score_threshold,
-        "can_accept_ai": True,
+        **review_readiness(settings, question=question, score=score,
+            evaluation_json=json.dumps(evaluation, ensure_ascii=False), metadata_json=json.dumps(transcription, ensure_ascii=False),
+            ai_at=processed_at, processed_at=processed_at),
     }
 
 
@@ -439,11 +470,11 @@ def review_history(settings: Settings, *, answer_id: int) -> list[dict[str, Any]
         rows = connection.execute(
             """
             SELECT r.review_id, r.previous_final_score, r.teacher_score,
-                   r.feedback, r.created_at, u.full_name AS reviewed_by
+                   r.feedback, r.created_at, r.decision_json, u.full_name AS reviewed_by
             FROM answer_reviews AS r
             JOIN users AS u ON u.user_id = r.reviewed_by
-            WHERE r.answer_id = ? ORDER BY r.created_at
+            WHERE r.answer_id = ? ORDER BY r.review_id
             """,
             (answer_id,),
         ).fetchall()
-    return [dict(row) for row in rows]
+    return [{**dict(row), "decision": json_object(row["decision_json"])} for row in rows]

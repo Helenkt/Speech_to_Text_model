@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "purpose": "Abbreviation hints derived from supplied course data; never student-answer rewriting",
+  "terms": [
+    {"canonical": "hàng đợi", "aliases": ["queue"], "source": "Cau_Truc_Du_Lieu_Va_Giai_Thuat.json", "question_id": "DSA_008"},
+    {"canonical": "ngăn xếp", "aliases": ["stack"], "source": "Cau_Truc_Du_Lieu_Va_Giai_Thuat.json", "question_id": "DSA_008"},
+    {"canonical": "dạng chuẩn 2", "aliases": ["2NF"], "source": "Co_So_Du_Lieu.json", "question_id": "DB_004"},
+    {"canonical": "dạng chuẩn 3", "aliases": ["3NF"], "source": "Co_So_Du_Lieu.json", "question_id": "DB_004"}
+  ]
+}

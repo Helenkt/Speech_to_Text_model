@@ -28,6 +28,8 @@ class Settings:
     audio_storage_dir: Path | None = None
     auto_seed_demo: bool = True
     evaluator_mode: str = "auto"
+    rubric_transformer_path: Path | None = None
+    rubric_transformer_min_confidence: float = 0.68
     ollama_base_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen2.5:3b"
     ollama_timeout_seconds: float = 120.0
@@ -47,6 +49,9 @@ class Settings:
     teacher_review_score_threshold: float = 50.0
     max_upload_mb: int = 25
     active_session_ttl_hours: int = 24
+    runtime_warmup: bool = False
+    inference_worker: bool = False
+    defer_grading_until_finish: bool = False
 
     @classmethod
     def from_env(cls, root_dir: Path | None = None) -> "Settings":
@@ -54,7 +59,7 @@ class Settings:
         load_dotenv(root / ".env", override=False)
 
         evaluator_mode = os.getenv("EVALUATOR_MODE", "auto").strip().lower()
-        if evaluator_mode not in {"auto", "ollama", "rule"}:
+        if evaluator_mode not in {"auto", "transformer", "ollama", "rule"}:
             evaluator_mode = "auto"
 
         correction_mode = os.getenv("TRANSCRIPT_CORRECTION_MODE", "auto").strip().lower()
@@ -91,7 +96,21 @@ class Settings:
                 root, os.getenv("AUDIO_STORAGE_DIR", "data/audio")
             ),
             auto_seed_demo=_as_bool(os.getenv("AUTO_SEED_DEMO"), True),
+            runtime_warmup=_as_bool(os.getenv("RUNTIME_WARMUP"), True),
+            inference_worker=_as_bool(os.getenv("INFERENCE_WORKER"), True),
+            defer_grading_until_finish=_as_bool(os.getenv("DEFER_GRADING_UNTIL_FINISH"), True),
             evaluator_mode=evaluator_mode,
+            rubric_transformer_path=_resolve_path(
+                root,
+                os.getenv("RUBRIC_TRANSFORMER_PATH", "models/rubricguard-lite"),
+            ),
+            rubric_transformer_min_confidence=min(
+                0.95,
+                max(
+                    0.5,
+                    float(os.getenv("RUBRIC_TRANSFORMER_MIN_CONFIDENCE", "0.68")),
+                ),
+            ),
             ollama_base_url=os.getenv(
                 "OLLAMA_BASE_URL", "http://127.0.0.1:11434"
             ).rstrip("/"),

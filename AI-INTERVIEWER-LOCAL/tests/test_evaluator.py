@@ -62,11 +62,13 @@ def test_server_computes_score_from_point_statuses_not_llm_score():
                     "point": "Lớp là khuôn mẫu",
                     "status": "met",
                     "reason": "Được nêu đúng.",
+                    "evidence_quote": "Lớp là khuôn mẫu",
                 },
                 {
                     "point": "Đối tượng là thể hiện cụ thể",
                     "status": "contradicted",
                     "reason": "Ứng viên phủ định ý này.",
+                    "evidence_quote": "Đối tượng không phải là thể hiện cụ thể",
                 },
             ],
             "feedback": "Cần sửa ý về đối tượng.",
@@ -74,6 +76,7 @@ def test_server_computes_score_from_point_statuses_not_llm_score():
         },
         QUESTION,
         "qwen-test",
+        "Lớp là khuôn mẫu. Đối tượng không phải là thể hiện cụ thể.",
     )
 
     assert result["score"] == 50
@@ -81,7 +84,7 @@ def test_server_computes_score_from_point_statuses_not_llm_score():
     assert result["contradicted_points"] == ["Đối tượng là thể hiện cụ thể"]
 
 
-def test_exact_rubric_text_recovers_a_missed_non_contradicted_point():
+def test_exact_rubric_text_never_silently_overrides_a_semantic_judgment():
     result = _coerce_llm_result(
         {
             "point_assessments": [
@@ -94,6 +97,7 @@ def test_exact_rubric_text_recovers_a_missed_non_contradicted_point():
                     "point": "Đối tượng là thể hiện cụ thể",
                     "status": "met",
                     "reason": "Được nêu đúng.",
+                    "evidence_quote": "đối tượng là thể hiện cụ thể",
                 },
             ],
             "feedback": "",
@@ -104,9 +108,9 @@ def test_exact_rubric_text_recovers_a_missed_non_contradicted_point():
         "Lớp là khuôn mẫu và đối tượng là thể hiện cụ thể.",
     )
 
-    assert result["score"] == 100
-    assert result["point_assessments"][0]["status"] == "met"
-    assert result["point_assessments"][0]["evidence_quote"] == "Lớp là khuôn mẫu"
+    assert result["score"] == 50
+    assert result["point_assessments"][0]["status"] == "missing"
+    assert result["point_assessments"][0]["evidence_quote"] == ""
 
 
 def test_llm_evidence_must_be_an_exact_candidate_quote():
@@ -130,6 +134,47 @@ def test_llm_evidence_must_be_an_exact_candidate_quote():
     assert result["point_assessments"][0]["evidence_quote"] == ""
     assert result["review_required"] is True
     assert result["rubric_version"] == "key-points-v2"
+    assert result["point_assessments"][0]["status"] == "unresolved"
+    assert result["score_provisional"] is True
+
+
+def test_partial_disclaimer_does_not_discard_the_rest_of_answer():
+    assert _guard_evaluation(QUESTION,
+        "Em không nhớ phần lớp. Tuy nhiên đối tượng là thể hiện cụ thể của lớp.", evaluator="test") is None
+
+
+def test_blanket_guard_does_not_zero_a_rejected_quote_or_a_negated_claim():
+    for prefix in (
+        "Em bác bỏ nhận định 'tất cả đều sai'. ",
+        "Không phải tất cả nội dung đều sai. ",
+        'The statement "all of this is false" is wrong. ',
+    ):
+        answer = prefix + "Lớp là khuôn mẫu. Đối tượng là thể hiện cụ thể."
+        assert _guard_evaluation(QUESTION, answer, evaluator="test") is None
+        assert evaluate_with_rules(QUESTION, answer)["score"] == 100
+
+
+def test_blanket_guard_does_not_finally_zero_a_later_explicit_correction():
+    assert _guard_evaluation(QUESTION,
+        "Tất cả nội dung sau đều sai. Em xin sửa lại: lớp là khuôn mẫu.", evaluator="test") is None
+
+
+def test_high_self_reported_confidence_does_not_accept_fabricated_evidence():
+    result = _coerce_llm_result({"confidence": 0.999, "point_assessments": [
+        {"point": QUESTION["key_points"][0], "status": "met", "evidence_quote": "không có ở đây"}]},
+        QUESTION, "test", "Tôi đang giải thích một khái niệm khác.")
+    assert result["review_required"] is True
+    assert result["score"] == 0
+    assert len(result["unresolved_points"]) == 2
+
+
+def test_rubric_weights_are_applied_by_backend():
+    result = _coerce_llm_result({"confidence": 0.9, "point_assessments": [
+        {"point": QUESTION["key_points"][0], "status": "met", "evidence_quote": "Lớp là khuôn mẫu"},
+        {"point": QUESTION["key_points"][1], "status": "missing", "evidence_quote": ""}]},
+        {**QUESTION, "key_point_weights": {QUESTION["key_points"][0]: 3, QUESTION["key_points"][1]: 1}},
+        "test", "Lớp là khuôn mẫu.")
+    assert result["score"] == 75
 
 
 def test_exact_rubric_text_is_not_recovered_when_explicitly_negated():
@@ -150,4 +195,26 @@ def test_exact_rubric_text_is_not_recovered_when_explicitly_negated():
         "Điều này sai: lớp là khuôn mẫu.",
     )
 
+    assert result["point_assessments"][0]["status"] == "contradicted"
+
+
+def test_exact_text_never_overrides_llm_contradiction():
+    result = _coerce_llm_result(
+        {
+            "point_assessments": [
+                {
+                    "point": "Lớp là khuôn mẫu",
+                    "status": "contradicted",
+                    "reason": "Quan hệ trong câu trả lời bị đảo.",
+                    "evidence_quote": "Lớp là khuôn mẫu",
+                }
+            ],
+            "confidence": 0.95,
+        },
+        QUESTION,
+        "qwen-test",
+        "Lớp là khuôn mẫu nhưng kết luận được dùng theo quan hệ ngược.",
+    )
+
+    assert result["score"] == 0
     assert result["point_assessments"][0]["status"] == "contradicted"

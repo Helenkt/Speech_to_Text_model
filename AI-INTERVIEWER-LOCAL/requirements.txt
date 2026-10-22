@@ -4,4 +4,10 @@ python-dotenv>=1.0,<2.0
 python-multipart>=0.0.9,<1.0
 openpyxl>=3.1,<4.0
 faster-whisper==1.2.1
+# PyAV 19 removed metadata_errors, still used by faster-whisper 1.2.1.
+av>=11,<19
+numpy>=1.26,<3.0
+onnx>=1.17,<2.0
+onnxruntime>=1.20,<2.0
+tokenizers>=0.20,<1.0
 pytest>=8,<10

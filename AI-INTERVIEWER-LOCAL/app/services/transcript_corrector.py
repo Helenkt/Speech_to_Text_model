@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from time import perf_counter
+
 import json
 import re
 import unicodedata
@@ -10,6 +12,7 @@ from typing import Any
 import httpx
 
 from app.config import Settings
+from app.services.resource_policy import ollama_request_resources
 
 
 NEGATIONS = {
@@ -117,6 +120,8 @@ def _safe_replacement(source: str, target: str, approved_terms: list[str]) -> bo
         or _is_pronounced_technical_token(source, target)
     ):
         return True
+    if re.search(r"\d", source + target) and source_plain != target_plain:
+        return False
     if abs(len(_words(source)) - len(_words(target))) > 1:
         return False
 
@@ -143,10 +148,11 @@ def _acronym_corrections(
                         {
                             "source": source,
                             "target": term,
+                            "start": first.start(),
+                            "end": last.end(),
                             "reason": "Cách đọc số và đơn vị kỹ thuật đã được duyệt.",
                         }
                     )
-                    break
             continue
         acronym = re.sub(r"[^A-Za-z]", "", term).upper()
         if not acronym or len(acronym) != len(term.strip()) or len(acronym) > 8:
@@ -162,10 +168,11 @@ def _acronym_corrections(
                     {
                         "source": source,
                         "target": term,
+                        "start": first.start(),
+                        "end": last.end(),
                         "reason": "Cách đọc từng chữ cái của thuật ngữ đã được duyệt.",
                     }
                 )
-                break
     return changes
 
 
@@ -174,6 +181,8 @@ def _glossary_corrections(
     approved_terms: list[str],
     uncertain_spans: list[str] | None = None,
 ) -> list[dict[str, str]]:
+    if uncertain_spans is not None and not uncertain_spans:
+        return []
     matches = list(re.finditer(r"[^\W_]+(?:['-][^\W_]+)*", raw_text, flags=re.UNICODE))
     candidates: list[tuple[float, int, int, dict[str, str]]] = []
     for term in approved_terms:
@@ -207,6 +216,13 @@ def _glossary_corrections(
             source_is_uncertain = bool(uncertain_spans) and _source_is_uncertain(
                 source, uncertain_spans
             )
+            if uncertain_spans is not None and not source_is_uncertain:
+                continue
+            if source.isascii() and term.isascii() and any(
+                source_plain + suffix == target_plain or target_plain + suffix == source_plain
+                for suffix in ("s", "es", "ing", "ed")
+            ):
+                continue
             minimum_word_similarity = 0.35 if source_is_uncertain else 0.45
             if (
                 not word_similarities
@@ -226,6 +242,8 @@ def _glossary_corrections(
                         {
                             "source": source,
                             "target": term,
+                            "start": start,
+                            "end": end,
                             "reason": "Gần âm với thuật ngữ đã được duyệt.",
                         },
                     )
@@ -267,6 +285,7 @@ def _apply_audited_corrections(
     approved_terms: list[str],
 ) -> tuple[str, list[dict[str, str]], list[dict[str, str]]]:
     corrected = raw_text
+    patches: list[tuple[int, int, str]] = []
     applied: list[dict[str, str]] = []
     rejected: list[dict[str, str]] = []
     number_normalized = False
@@ -277,9 +296,16 @@ def _apply_audited_corrections(
             rejected.append(change)
             continue
 
-        pattern = re.compile(re.escape(source), flags=re.IGNORECASE)
-        candidate, count = pattern.subn(target, corrected)
-        if count == 0:
+        pattern = re.compile(rf"(?<!\w){re.escape(source)}(?!\w)", flags=re.IGNORECASE)
+        if "start" in change or "end" in change:
+            start, end = change.get("start"), change.get("end")
+            matches = [(start, end)] if (type(start) is int and type(end) is int
+                and 0 <= start < end <= len(raw_text) and pattern.fullmatch(raw_text[start:end])
+                and (start == 0 or not raw_text[start - 1].isalnum())
+                and (end == len(raw_text) or not raw_text[end].isalnum())) else []
+        else:
+            matches = [(match.start(), match.end()) for match in pattern.finditer(raw_text)]
+        if not matches:
             rejected.append(change)
             continue
 
@@ -289,17 +315,25 @@ def _apply_audited_corrections(
             }
             and _is_pronounced_technical_token(source, target)
         )
-        accepted, _, _ = _validate_correction(
-            raw_text,
-            candidate,
-            allow_number_normalization=(number_normalized or current_normalizes_number),
-        )
-        if not accepted:
-            rejected.append(change)
-            continue
-        corrected = candidate
-        applied.append(change)
-        number_normalized = number_normalized or current_normalizes_number
+        for start, end in matches:
+            if any(start < used_end and end > used_start for used_start, used_end, _ in patches):
+                if (start, end, target) not in patches:
+                    rejected.append(change)
+                continue
+            proposed = patches + [(start, end, target)]
+            candidate = raw_text
+            # Spans always refer to the immutable ASR output, never to generated text.
+            for left, right, replacement in sorted(proposed, reverse=True):
+                candidate = candidate[:left] + replacement + candidate[right:]
+            accepted, _, _ = _validate_correction(raw_text, candidate,
+                allow_number_normalization=number_normalized or current_normalizes_number)
+            if not accepted:
+                rejected.append(change)
+                continue
+            patches = proposed
+            corrected = candidate
+            applied.append({**change, "start": start, "end": end})
+            number_normalized = number_normalized or current_normalizes_number
     return corrected, applied, rejected
 
 
@@ -344,7 +378,7 @@ def _validate_correction(
     return True, "", edit_ratio
 
 
-async def correct_transcript(
+async def _correct_transcript_impl(
     settings: Settings,
     raw_text: str,
     *,
@@ -352,6 +386,8 @@ async def correct_transcript(
     approved_terms: list[str],
     question_text: str = "",
     uncertain_spans: list[str] | None = None,
+    ensure_model=None,
+    allow_llm: bool = True,
 ) -> dict[str, Any]:
     base = {
         "raw_text": raw_text,
@@ -409,6 +445,18 @@ async def correct_transcript(
             "corrections": deterministic_applied,
             "rejected_corrections": deterministic_rejected,
         }
+    if not allow_llm:
+        return {
+            **base,
+            "corrected_text": deterministic_text if deterministic_accepted else raw_text,
+            "correction_applied": deterministic_accepted and deterministic_text != raw_text,
+            "correction_engine": "deferred:session",
+            "correction_deferred": True,
+            "edit_ratio": deterministic_edit_ratio,
+            "corrections": deterministic_applied if deterministic_accepted else [],
+            "rejected_corrections": deterministic_rejected,
+            "correction_rejected_reason": deterministic_reason if not deterministic_accepted else None,
+        }
     if not uncertain_spans:
         return {
             **base,
@@ -439,10 +487,11 @@ When uncertain_spans is present, propose ordinary-language corrections only when
 exact source occurs inside one of those spans. Approved technical terms may still be
 corrected when they are an obvious phonetic match. Never infer a better interview answer.
 """.strip()
+    resources = ollama_request_resources(settings)
     request_payload = {
         "model": settings.ollama_model,
         "stream": False,
-        "keep_alive": settings.ollama_keep_alive,
+        **resources,
         "format": {
             "type": "object",
             "properties": {
@@ -479,9 +528,11 @@ corrected when they are an obvious phonetic match. Never infer a better intervie
                 ),
             },
         ],
-        "options": {"temperature": 0, "num_predict": 512},
+        "options": {**resources["options"], "temperature": 0, "num_predict": 512},
     }
     try:
+        if ensure_model:
+            await ensure_model()
         timeout = httpx.Timeout(settings.ollama_correction_timeout_seconds)
         async with httpx.AsyncClient(timeout=timeout, trust_env=False) as client:
             response = await client.post(
@@ -512,7 +563,9 @@ corrected when they are an obvious phonetic match. Never infer a better intervie
             permitted: list[dict[str, str]] = []
             for change in audit_changes:
                 if (
-                    _plain_text(change["target"]) in approved_plain
+                    (_plain_text(change["target"]) in approved_plain and (
+                        _is_pronounced_acronym(change["source"], change["target"])
+                        or _is_pronounced_technical_token(change["source"], change["target"])))
                     or _source_is_uncertain(change["source"], uncertain_spans)
                 ):
                     permitted.append(change)
@@ -535,9 +588,9 @@ corrected when they are an obvious phonetic match. Never infer a better intervie
                 "corrections": audit_changes,
             }
         unique_changes: list[dict[str, str]] = []
-        seen_changes: set[tuple[str, str]] = set()
+        seen_changes: set[tuple] = set()
         for change in deterministic_changes + audit_changes:
-            key = (change["source"].casefold(), change["target"].casefold())
+            key = (change["source"].casefold(), change["target"].casefold(), change.get("start"), change.get("end"))
             if key not in seen_changes:
                 unique_changes.append(change)
                 seen_changes.add(key)
@@ -577,3 +630,16 @@ corrected when they are an obvious phonetic match. Never infer a better intervie
             "correction_engine": f"ollama:{settings.ollama_model}",
             "correction_rejected_reason": "LLM local không khả dụng; giữ nguyên transcript.",
         }
+
+
+async def correct_transcript(
+    settings: Settings, raw_text: str, *, language: str, approved_terms: list[str],
+    question_text: str = "", uncertain_spans: list[str] | None = None, ensure_model=None,
+    allow_llm: bool = True,
+) -> dict[str, Any]:
+    started = perf_counter()
+    result = await _correct_transcript_impl(settings, raw_text, language=language,
+        approved_terms=approved_terms, question_text=question_text, uncertain_spans=uncertain_spans,
+        ensure_model=ensure_model, allow_llm=allow_llm)
+    result["correction_elapsed_seconds"] = round(perf_counter() - started, 4)
+    return result

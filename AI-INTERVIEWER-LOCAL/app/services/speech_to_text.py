@@ -1,20 +1,25 @@
 from __future__ import annotations
 
 import ctypes
+import gc
 import importlib.util
 import json
 import math
 import os
+import re
 import subprocess
 import tempfile
 import threading
+import time
 import wave
 from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from types import SimpleNamespace
 
 from app.config import Settings
+from app.services.resource_policy import resolve_resource_policy
 
 
 _MODEL: Any = None
@@ -29,6 +34,28 @@ _DLL_DIRECTORY_HANDLES: list[Any] = []
 
 class SpeechToTextError(RuntimeError):
     pass
+
+
+class SpeechToTextMemoryError(SpeechToTextError):
+    pass
+
+
+def _host_memory_error(exc: Exception) -> bool:
+    message = str(exc).lower()
+    return isinstance(exc, MemoryError) or any(token in message for token in (
+        "mkl_malloc", "failed to allocate memory", "not enough memory", "paging file is too small",
+        "bad allocation", "bad_alloc", "defaultcpuallocator", "cannot allocate memory",
+    )) or ("out of memory" in message and "cuda" not in message and "gpu" not in message)
+
+
+def _memory_failure(errors: list[str]) -> SpeechToTextMemoryError:
+    _, available, load = _memory_stats_gb()
+    return SpeechToTextMemoryError(
+        f"Không đủ RAM/bộ nhớ hệ thống để xử lý giọng nói "
+        f"(RAM khả dụng {available:.1f} GB, sử dụng {load:.0f}%). "
+        "Đã dừng lượt xử lý, không tạo transcript hoặc điểm mới. "
+        "Hãy đóng ứng dụng nặng rồi thử lại bản ghi. Chi tiết: " + " | ".join(errors)[-600:]
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -191,6 +218,13 @@ def _profile_for_tier(tier: str, hardware: HardwareCapabilities) -> STTRuntimePr
             "CPU/RAM phù hợp với Whisper medium lượng tử hóa INT8.",
             "Cân bằng", "deepfilter_on_demand", "detect_and_retry", 1,
         )
+    if (hardware.cuda_available and hardware.total_memory_gb > 4.5
+            and (hardware.cuda_vram_gb or 0) >= 4):
+        return STTRuntimeProfile(
+            "medium", "cuda", "float16", "low",
+            "RAM hạn chế; giữ medium trên GPU nhưng nạp các model theo lượt.",
+            "Tiết kiệm", "browser_only", "retry", 1,
+        )
     return STTRuntimeProfile(
         "small", "cpu", "int8", "low",
         "Tài nguyên hạn chế; dùng Whisper small INT8 và yêu cầu ghi lại khi âm thanh khó.",
@@ -204,7 +238,12 @@ def resolve_runtime_profile(
     hardware = hardware or detect_hardware()
     requested_tier = settings.runtime_profile
     if requested_tier == "auto":
-        if (
+        budget = resolve_resource_policy(hardware.total_memory_gb,
+                                         hardware.available_memory_gb,
+                                         hardware.cpu_threads)
+        if budget.staged:
+            requested_tier = "low"
+        elif (
             hardware.cuda_available
             and hardware.cuda_vram_gb is not None
             and hardware.cuda_vram_gb >= 8.0
@@ -342,6 +381,8 @@ def stt_status(settings: Settings) -> dict[str, Any]:
         "memory_gb": hardware.total_memory_gb,
         "available_memory_gb": hardware.available_memory_gb,
         "memory_load_percent": hardware.memory_load_percent,
+        "resource_policy": resolve_resource_policy(hardware.total_memory_gb,
+            hardware.available_memory_gb, hardware.cpu_threads).snapshot(),
         "cuda_available": hardware.cuda_available,
         "cuda_device_count": hardware.cuda_device_count,
         "cuda_vram_gb": hardware.cuda_vram_gb,
@@ -375,7 +416,7 @@ def stt_status(settings: Settings) -> dict[str, Any]:
 
 def _fallback_profiles(primary: STTRuntimeProfile) -> list[STTRuntimeProfile]:
     profiles = [primary]
-    if primary.device == "cuda":
+    if primary.device == "cuda" and primary.tier != "low":
         profiles.append(
             STTRuntimeProfile(
                 "medium", "cpu", "int8", "fallback_cpu",
@@ -395,7 +436,7 @@ def _fallback_profiles(primary: STTRuntimeProfile) -> list[STTRuntimeProfile]:
     return list(unique.values())
 
 
-def _get_model(settings: Settings) -> Any:
+def _get_model(settings: Settings, *, local_only: bool = False) -> Any:
     global _MODEL, _MODEL_KEY, _REQUESTED_MODEL_KEY, _ACTIVE_PROFILE
     if not is_installed():
         raise SpeechToTextError(
@@ -418,6 +459,14 @@ def _get_model(settings: Settings) -> Any:
         os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
         from faster_whisper import WhisperModel
 
+        # Drop the old weights before allocating a different model/profile.
+        _MODEL = None
+        _MODEL_KEY = _REQUESTED_MODEL_KEY = _ACTIVE_PROFILE = None
+        gc.collect()
+        hardware = detect_hardware()
+        budget = resolve_resource_policy(hardware.total_memory_gb,
+                                         hardware.available_memory_gb,
+                                         hardware.cpu_threads)
         settings.whisper_download_root.mkdir(parents=True, exist_ok=True)
         for profile in _fallback_profiles(primary):
             key = (profile.model, profile.device, profile.compute_type)
@@ -428,7 +477,10 @@ def _get_model(settings: Settings) -> Any:
                     profile.model,
                     device=profile.device,
                     compute_type=profile.compute_type,
+                    cpu_threads=budget.cpu_threads,
+                    num_workers=1,
                     download_root=str(settings.whisper_download_root),
+                    **({"local_files_only": True} if local_only else {}),
                 )
                 _MODEL_KEY = key
                 _REQUESTED_MODEL_KEY = (
@@ -438,6 +490,9 @@ def _get_model(settings: Settings) -> Any:
                 return _MODEL
             except Exception as exc:
                 errors.append(f"{'/'.join(key)}: {exc}")
+                gc.collect()
+                if _host_memory_error(exc):
+                    raise _memory_failure(errors) from exc
 
         raise SpeechToTextError(
             "Không thể khởi tạo model Voice/STT. Lần đầu cần Internet để tải model. "
@@ -465,15 +520,28 @@ def _invalidate_active_model(exc: Exception) -> bool:
     return True
 
 
-def _decode_with_fallback(settings: Settings, decode: Any) -> tuple[list[Any], Any]:
+def _decode_with_fallback(settings: Settings, decode: Any,
+                          trace: list[dict[str, Any]] | None = None) -> tuple[list[Any], Any]:
     last_error: Exception | None = None
     for _ in range(3):
+        started = time.perf_counter()
         model = _get_model(settings)
+        ready = time.perf_counter()
         try:
             segments, info = decode(model)
-            return list(segments), info
+            segments = list(segments)
+            if trace is not None:
+                trace.append({"model_ready_seconds": round(ready - started, 4),
+                              "decode_seconds": round(time.perf_counter() - ready, 4), "succeeded": True})
+            return segments, info
         except Exception as exc:
+            if trace is not None:
+                trace.append({"model_ready_seconds": round(ready - started, 4),
+                              "decode_seconds": round(time.perf_counter() - ready, 4), "succeeded": False})
             last_error = exc
+            if _host_memory_error(exc):
+                _clear_loaded_model()
+                raise _memory_failure([str(exc)]) from exc
             if not _invalidate_active_model(exc):
                 raise
     raise SpeechToTextError(
@@ -597,9 +665,9 @@ def assess_microphone_quality(
 ) -> dict[str, Any]:
     """Score a short microphone sample without loading the speech model."""
     duration = float(metrics.get("duration_seconds") or 0.0)
-    input_level = float(metrics.get("input_level_dbfs") or -80.0)
-    peak = float(metrics.get("peak_dbfs") or -80.0)
-    noise = float(metrics.get("ambient_noise_dbfs") or -80.0)
+    input_level = float(metrics["input_level_dbfs"] if metrics.get("input_level_dbfs") is not None else -80.0)
+    peak = float(metrics["peak_dbfs"] if metrics.get("peak_dbfs") is not None else -80.0)
+    noise = float(metrics["ambient_noise_dbfs"] if metrics.get("ambient_noise_dbfs") is not None else -80.0)
     clipping = float(metrics.get("clipping_ratio") or 0.0)
     silence = float(metrics.get("silence_ratio") or 0.0)
     snr = float(metrics.get("signal_to_noise_db") or 0.0)
@@ -615,9 +683,12 @@ def assess_microphone_quality(
     elif input_level > -6:
         score -= 10
         recommendations.append("Âm lượng khá lớn; nên đưa microphone xa hơn một chút.")
-    if peak > -1.0 or clipping > 0.01:
+    if clipping > 0.01:
         score -= 35
         recommendations.append("Âm thanh bị vỡ; hãy giảm gain hoặc tăng khoảng cách tới microphone.")
+    elif peak > -1.0:
+        score -= 10
+        recommendations.append("Đỉnh âm thanh gần giới hạn; có thể giảm gain nếu xuất hiện méo tiếng.")
     if noise > maximum_ambient_noise_dbfs:
         score -= 20 if noise <= -20 else 35
         recommendations.append("Tiếng nền cao; hãy giảm nguồn ồn hoặc đổi vị trí microphone.")
@@ -749,13 +820,12 @@ def build_recording_report(
     noise_value = metrics.get("ambient_noise_dbfs")
     noise = float(noise_value) if noise_value is not None else None
     noise_code, noise_label = _noise_level(noise)
-    estimated_accuracy = 0.70 * confidence + 0.20 * (1.0 - uncertain_ratio) + 0.10 * quality
     return {
         "recognition_confidence_percent": round(confidence * 100),
         "recording_quality_percent": round(quality * 100),
-        "estimated_recognition_accuracy_percent": round(
-            max(0.0, min(1.0, estimated_accuracy)) * 100
-        ),
+        "estimated_recognition_accuracy_percent": None,
+        "accuracy_calibrated": False,
+        "confidence_is_accuracy": False,
         "noise": {
             "dbfs": round(noise, 1) if noise is not None else None,
             "level": noise_code,
@@ -763,8 +833,7 @@ def build_recording_report(
             "limit_dbfs": maximum_ambient_noise_dbfs,
         },
         "accuracy_note": (
-            "Đây là độ chính xác ước tính từ độ tin cậy của model và chất lượng bản ghi; "
-            "độ chính xác thực chỉ đo được khi có transcript chuẩn để đối chiếu."
+            "Chưa đo độ chính xác. Confidence và điểm âm thanh không phải tỷ lệ từ nhận dạng đúng."
         ),
     }
 
@@ -845,7 +914,7 @@ def assess_transcription_quality(
     duration = float(metrics.get("speech_duration_seconds") or 0.0)
 
     reasons: list[str] = []
-    warnings: list[str] = []
+    warnings: list[str] = list(result.get("quality_warnings") or [])
     if not text:
         reasons.append("Không phát hiện được giọng nói rõ ràng.")
     if text and "speech_duration_seconds" in metrics and duration < 0.5:
@@ -853,7 +922,7 @@ def assess_transcription_quality(
     if text and "confidence" in metrics and confidence < minimum_confidence and (
         "word_count" not in metrics or word_count == 0 or uncertain_ratio > 0.25
     ):
-        warnings.append("Độ tin cậy nhận dạng thấp; hệ thống đã chuyển các vùng chưa chắc chắn sang bước hiệu chỉnh.")
+        warnings.append("Độ tin cậy nhận dạng thấp; còn vùng cần đối chiếu với bản ghi.")
     if "average_no_speech_probability" in metrics and no_speech > 0.85:
         reasons.append("Âm thanh chủ yếu là im lặng hoặc tiếng nền.")
     elif "average_no_speech_probability" in metrics and no_speech > 0.65:
@@ -861,7 +930,7 @@ def assess_transcription_quality(
     if "maximum_compression_ratio" in metrics and compression > 2.6:
         reasons.append("Kết quả có dấu hiệu lặp từ bất thường.")
     if word_count >= 4 and uncertain_ratio > 0.45:
-        warnings.append("Nhiều từ có độ tin cậy nhận dạng thấp; đã chuyển sang bước hiệu chỉnh.")
+        warnings.append("Nhiều từ có độ tin cậy nhận dạng thấp; cần đối chiếu bản ghi.")
     noisy_environment = (
         ambient_noise_dbfs is not None
         and ambient_noise_dbfs > maximum_ambient_noise_dbfs
@@ -901,6 +970,50 @@ def assess_transcription_quality(
     }
 
 
+def transcript_assurance(result: dict[str, Any]) -> dict[str, Any]:
+    metrics = result.get("metrics") or {}
+    uncertain = bool(result.get("uncertain_spans") or result.get("quality_warnings")
+        or result.get("correction_rejected_reason") or result.get("rejected_corrections")
+        or float(metrics.get("uncertain_word_ratio") or 0) > .20
+        or (metrics.get("quality_score") is not None and float(metrics["quality_score"]) < .55))
+    return {"transcript_status": "needs_review" if uncertain else "processed",
+            "confidence_is_accuracy": False, "accuracy_percent": None}
+
+
+def selective_retry_windows(segments: list[Any]) -> list[tuple[int, int, float, float]]:
+    if len(segments) < 5:
+        return []
+    details, _ = _segment_diagnostics(segments)
+    bad = [i for i, item in enumerate(details) if item["confidence"] < 0.70
+           or any(word["uncertain"] for word in item["words"])]
+    selected = {j for i in bad for j in range(max(0, i - 1), min(len(segments), i + 2))}
+    if not selected:
+        return []
+    groups: list[list[int]] = []
+    for index in sorted(selected):
+        if not groups or index != groups[-1][-1] + 1:
+            groups.append([])
+        groups[-1].append(index)
+    windows = [(g[0], g[-1], float(segments[g[0]].start), float(segments[g[-1]].end)) for g in groups]
+    duration = float(segments[-1].end) - float(segments[0].start)
+    # Broad uncertainty still needs a full accurate pass. Do not cut away context for speed.
+    if len(windows) > 2 or sum(end - start for _, _, start, end in windows) > 0.60 * duration:
+        return []
+    return windows
+
+
+def offset_segment(segment: Any, offset: float) -> Any:
+    words = [SimpleNamespace(word=w.word, probability=w.probability, start=w.start + offset, end=w.end + offset)
+             for w in (getattr(segment, "words", None) or [])]
+    return SimpleNamespace(text=segment.text, start=segment.start + offset, end=segment.end + offset, words=words,
+        avg_logprob=getattr(segment, "avg_logprob", -1), no_speech_prob=getattr(segment, "no_speech_prob", 0),
+        compression_ratio=getattr(segment, "compression_ratio", 1))
+
+
+def _critical_decode_tokens(text: str) -> list[str]:
+    return re.findall(r"\b\d+(?:[.,]\d+)?[a-z]*\b|\b(?:không|chưa|chẳng|not|never|cannot|can't|no)\b", text.casefold())
+
+
 def _transcribe_bytes_locked(
     settings: Settings,
     content: bytes,
@@ -912,6 +1025,7 @@ def _transcribe_bytes_locked(
     force_accurate: bool = False,
     write_ready_marker: bool = True,
 ) -> dict[str, Any]:
+    decode_trace: list[dict[str, Any]] = []
     suffix = Path(filename).suffix or ".webm"
     temporary_path: str | None = None
     try:
@@ -926,11 +1040,13 @@ def _transcribe_bytes_locked(
             for key, value in vad_profile.items()
             if key not in {"name", "ambient_noise_dbfs"}
         }
-        def decode(beam_size: int, best_of: int) -> dict[str, Any]:
-            segments, info = _decode_with_fallback(
+        captured = {}
+
+        def decode(beam_size: int, best_of: int, source=None, assembled=None) -> dict[str, Any]:
+            segments, info = assembled if assembled is not None else _decode_with_fallback(
                 settings,
                 lambda model: model.transcribe(
-                    temporary_path,
+                    temporary_path if source is None else source,
                     language=selected_language,
                     beam_size=beam_size,
                     best_of=best_of,
@@ -942,7 +1058,9 @@ def _transcribe_bytes_locked(
                     hallucination_silence_threshold=2.0,
                     hotwords=" ".join(hotwords or []) or None,
                 ),
+                trace=decode_trace,
             )
+            captured.update(segments=segments, info=info)
             text = " ".join(segment.text.strip() for segment in segments).strip()
             metrics = _quality_metrics(segments)
             metrics["vad_profile"] = vad_profile
@@ -986,6 +1104,8 @@ def _transcribe_bytes_locked(
         else:
             fast_beam = 3
         result = decode(fast_beam, fast_beam)
+        initial = result
+        initial_segments, initial_info = captured["segments"], captured["info"]
         metrics = result["metrics"]
         noisy = (
             ambient_noise_dbfs is not None
@@ -993,6 +1113,7 @@ def _transcribe_bytes_locked(
         )
         needs_accurate_pass = not force_accurate and (
             result.get("needs_retry")
+            or bool(result.get("uncertain_spans"))
             or float(metrics.get("confidence") or 0.0) < 0.70
             or float(metrics.get("uncertain_word_ratio") or 0.0) > 0.20
             or (
@@ -1004,14 +1125,41 @@ def _transcribe_bytes_locked(
             result["decode_passes"] = 1
             result["decode_strategy"] = "forced_accurate"
         elif needs_accurate_pass:
-            result = decode(5, 5)
-            result["decode_passes"] = 2
-            result["decode_strategy"] = "quality_retry"
+            windows = selective_retry_windows(initial_segments)
+            if windows:
+                from faster_whisper.audio import decode_audio
+                samples = decode_audio(temporary_path, sampling_rate=16000)
+                merged, cursor = [], 0
+                for first, last, start, end in windows:
+                    decode(5, 5, source=samples[int(start * 16000):int(end * 16000)])
+                    replacements = [offset_segment(s, start) for s in captured["segments"]]
+                    if not replacements or any(s.start < start - .1 or s.end > end + .1 for s in replacements):
+                        replacements = initial_segments[first:last + 1]
+                    merged.extend(initial_segments[cursor:first])
+                    merged.extend(replacements)
+                    cursor = last + 1
+                merged.extend(initial_segments[cursor:])
+                result = decode(5, 5, assembled=(merged, initial_info))
+                strategy, passes = "selective_retry", 1 + len(windows)
+            else:
+                result = decode(5, 5)
+                strategy, passes = "quality_retry", 2
+            alternate = result
+            if float(result["metrics"].get("quality_score") or 0) < float(initial["metrics"].get("quality_score") or 0):
+                result = initial
+                strategy += "_retained_initial"
+            if _critical_decode_tokens(initial["text"]) != _critical_decode_tokens(alternate["text"]):
+                result["quality_warnings"].append("Các lượt nhận dạng khác nhau ở số hoặc phủ định; cần đối chiếu voice.")
+                result["recognition_alternatives"] = [initial["text"], alternate["text"]]
+            result["decode_passes"] = passes
+            result["decode_strategy"] = strategy
+            result["retry_windows"] = [{"start": a, "end": b} for _, _, a, b in windows]
         else:
             result["decode_passes"] = 1
             result["decode_strategy"] = "adaptive_fast"
         result["metrics"]["initial_beam_size"] = fast_beam
         result["metrics"]["final_beam_size"] = 5 if needs_accurate_pass else fast_beam
+        result["timings"] = {"decode_attempts": decode_trace}
         if write_ready_marker:
             _write_ready_marker(settings)
         return result
@@ -1031,6 +1179,7 @@ def _clear_loaded_model() -> None:
         _MODEL_KEY = None
         _REQUESTED_MODEL_KEY = None
         _ACTIVE_PROFILE = None
+    gc.collect()
 
 
 def transcribe_bytes(
@@ -1045,9 +1194,13 @@ def transcribe_bytes(
     release_after: bool = False,
     write_ready_marker: bool = True,
 ) -> dict[str, Any]:
+    requested_at = time.perf_counter()
     with _INFERENCE_LOCK:
+        acquired_at = time.perf_counter()
+        # A failed GPU profile may be retried on a new request, not in a tight loop.
+        _FAILED_PROFILE_KEYS.clear()
         try:
-            return _transcribe_bytes_locked(
+            result = _transcribe_bytes_locked(
                 settings,
                 content,
                 filename=filename,
@@ -1057,6 +1210,12 @@ def transcribe_bytes(
                 force_accurate=force_accurate,
                 write_ready_marker=write_ready_marker,
             )
+            result.setdefault("timings", {}).update({
+                "queue_wait_seconds": round(acquired_at - requested_at, 4),
+                "processing_seconds": round(time.perf_counter() - acquired_at, 4),
+                "total_seconds": round(time.perf_counter() - requested_at, 4),
+            })
+            return result
         finally:
             if release_after:
                 _clear_loaded_model()
