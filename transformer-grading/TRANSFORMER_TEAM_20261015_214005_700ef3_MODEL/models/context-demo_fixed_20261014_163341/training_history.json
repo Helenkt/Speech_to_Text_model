@@ -1,0 +1,236 @@
+[
+  {
+    "epoch": 1,
+    "mean_train_loss": 1.348353558703314,
+    "validation": {
+      "accuracy": 0.609375,
+      "macro_f1": 0.3829743851153307,
+      "false_met_on_wrong_rate": 0.3333333333333333,
+      "per_label": {
+        "met": {
+          "precision": 0.7,
+          "recall": 0.7241379310344828,
+          "f1": 0.711864406779661,
+          "support": 29
+        },
+        "partial": {
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0,
+          "support": 2
+        },
+        "missing": {
+          "precision": 0.4444444444444444,
+          "recall": 0.8,
+          "f1": 0.5714285714285714,
+          "support": 15
+        },
+        "contradicted": {
+          "precision": 0.8571428571428571,
+          "recall": 0.5,
+          "f1": 0.631578947368421,
+          "support": 12
+        },
+        "uncertain": {
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0,
+          "support": 6
+        }
+      },
+      "confusion_matrix": {
+        "met": {
+          "met": 21,
+          "partial": 0,
+          "missing": 7,
+          "contradicted": 1,
+          "uncertain": 0
+        },
+        "partial": {
+          "met": 0,
+          "partial": 0,
+          "missing": 2,
+          "contradicted": 0,
+          "uncertain": 0
+        },
+        "missing": {
+          "met": 3,
+          "partial": 0,
+          "missing": 12,
+          "contradicted": 0,
+          "uncertain": 0
+        },
+        "contradicted": {
+          "met": 6,
+          "partial": 0,
+          "missing": 0,
+          "contradicted": 6,
+          "uncertain": 0
+        },
+        "uncertain": {
+          "met": 0,
+          "partial": 0,
+          "missing": 6,
+          "contradicted": 0,
+          "uncertain": 0
+        }
+      }
+    }
+  },
+  {
+    "epoch": 2,
+    "mean_train_loss": 0.9491123409022258,
+    "validation": {
+      "accuracy": 0.671875,
+      "macro_f1": 0.5312519936204148,
+      "false_met_on_wrong_rate": 0.18518518518518517,
+      "per_label": {
+        "met": {
+          "precision": 0.8214285714285714,
+          "recall": 0.7931034482758621,
+          "f1": 0.8070175438596492,
+          "support": 29
+        },
+        "partial": {
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0,
+          "support": 2
+        },
+        "missing": {
+          "precision": 0.3888888888888889,
+          "recall": 0.4666666666666667,
+          "f1": 0.42424242424242425,
+          "support": 15
+        },
+        "contradicted": {
+          "precision": 1.0,
+          "recall": 0.6666666666666666,
+          "f1": 0.8,
+          "support": 12
+        },
+        "uncertain": {
+          "precision": 0.5,
+          "recall": 0.8333333333333334,
+          "f1": 0.625,
+          "support": 6
+        }
+      },
+      "confusion_matrix": {
+        "met": {
+          "met": 23,
+          "partial": 0,
+          "missing": 6,
+          "contradicted": 0,
+          "uncertain": 0
+        },
+        "partial": {
+          "met": 0,
+          "partial": 0,
+          "missing": 2,
+          "contradicted": 0,
+          "uncertain": 0
+        },
+        "missing": {
+          "met": 3,
+          "partial": 0,
+          "missing": 7,
+          "contradicted": 0,
+          "uncertain": 5
+        },
+        "contradicted": {
+          "met": 2,
+          "partial": 0,
+          "missing": 2,
+          "contradicted": 8,
+          "uncertain": 0
+        },
+        "uncertain": {
+          "met": 0,
+          "partial": 0,
+          "missing": 1,
+          "contradicted": 0,
+          "uncertain": 5
+        }
+      }
+    }
+  },
+  {
+    "epoch": 3,
+    "mean_train_loss": 0.7947059359071376,
+    "validation": {
+      "accuracy": 0.734375,
+      "macro_f1": 0.46771374764595103,
+      "false_met_on_wrong_rate": 0.18518518518518517,
+      "per_label": {
+        "met": {
+          "precision": 0.8333333333333334,
+          "recall": 0.8620689655172413,
+          "f1": 0.847457627118644,
+          "support": 29
+        },
+        "partial": {
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0,
+          "support": 2
+        },
+        "missing": {
+          "precision": 0.5238095238095238,
+          "recall": 0.7333333333333333,
+          "f1": 0.611111111111111,
+          "support": 15
+        },
+        "contradicted": {
+          "precision": 0.8461538461538461,
+          "recall": 0.9166666666666666,
+          "f1": 0.8799999999999999,
+          "support": 12
+        },
+        "uncertain": {
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0,
+          "support": 6
+        }
+      },
+      "confusion_matrix": {
+        "met": {
+          "met": 25,
+          "partial": 0,
+          "missing": 2,
+          "contradicted": 2,
+          "uncertain": 0
+        },
+        "partial": {
+          "met": 0,
+          "partial": 0,
+          "missing": 2,
+          "contradicted": 0,
+          "uncertain": 0
+        },
+        "missing": {
+          "met": 4,
+          "partial": 0,
+          "missing": 11,
+          "contradicted": 0,
+          "uncertain": 0
+        },
+        "contradicted": {
+          "met": 1,
+          "partial": 0,
+          "missing": 0,
+          "contradicted": 11,
+          "uncertain": 0
+        },
+        "uncertain": {
+          "met": 0,
+          "partial": 0,
+          "missing": 6,
+          "contradicted": 0,
+          "uncertain": 0
+        }
+      }
+    }
+  }
+]

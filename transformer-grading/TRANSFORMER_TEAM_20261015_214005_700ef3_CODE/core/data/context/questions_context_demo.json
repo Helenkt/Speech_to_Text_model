@@ -1,0 +1,47 @@
+[
+  {
+    "id": "CTX_OVERFIT",
+    "language": "vi",
+    "subject": "Kiểm thử ngữ cảnh",
+    "topic": "CTX_OVERFIT",
+    "concept": "CTX_OVERFIT",
+    "difficulty": "Hard",
+    "question": "Overfitting là gì, ảnh hưởng thế nào đến dữ liệu mới và nêu một cách hạn chế?",
+    "reference_answer": "Mô hình học quá sát dữ liệu huấn luyện, kể cả nhiễu hoặc đặc điểm riêng. Khả năng tổng quát hóa trên dữ liệu mới giảm. Nêu ít nhất một cách phù hợp: regularization hoặc early stopping hoặc tăng dữ liệu phù hợp.",
+    "key_points": [
+      "Mô hình học quá sát dữ liệu huấn luyện, kể cả nhiễu hoặc đặc điểm riêng.",
+      "Khả năng tổng quát hóa trên dữ liệu mới giảm.",
+      "Nêu ít nhất một cách phù hợp: regularization hoặc early stopping hoặc tăng dữ liệu phù hợp."
+    ]
+  },
+  {
+    "id": "CTX_BINARY",
+    "language": "vi",
+    "subject": "Kiểm thử ngữ cảnh",
+    "topic": "CTX_BINARY",
+    "concept": "CTX_BINARY",
+    "difficulty": "Hard",
+    "question": "Tìm kiếm nhị phân cần điều kiện gì và có độ phức tạp thời gian thế nào trên mảng?",
+    "reference_answer": "Mảng phải được sắp xếp theo thứ tự tương thích với phép so sánh. So sánh phần tử giữa rồi loại bỏ một nửa miền tìm kiếm phù hợp. Thời gian tìm kiếm trên mảng đã sắp xếp là O(log n), không tính sắp xếp ban đầu.",
+    "key_points": [
+      "Mảng phải được sắp xếp theo thứ tự tương thích với phép so sánh.",
+      "So sánh phần tử giữa rồi loại bỏ một nửa miền tìm kiếm phù hợp.",
+      "Thời gian tìm kiếm trên mảng đã sắp xếp là O(log n), không tính sắp xếp ban đầu."
+    ]
+  },
+  {
+    "id": "CTX_HTTPS",
+    "language": "vi",
+    "subject": "Kiểm thử ngữ cảnh",
+    "topic": "CTX_HTTPS",
+    "concept": "CTX_HTTPS",
+    "difficulty": "Hard",
+    "question": "HTTPS bảo vệ điều gì và có đảm bảo một website không lừa đảo hay không?",
+    "reference_answer": "TLS mã hóa dữ liệu khi truyền giữa trình duyệt và điểm kết thúc TLS của website. Chứng chỉ hợp lệ xác thực máy chủ cho tên miền theo cơ chế tin cậy TLS, không chứng minh doanh nghiệp đáng tin. HTTPS không đảm bảo nội dung website an toàn hoặc không lừa đảo.",
+    "key_points": [
+      "TLS mã hóa dữ liệu khi truyền giữa trình duyệt và điểm kết thúc TLS của website.",
+      "Chứng chỉ hợp lệ xác thực máy chủ cho tên miền theo cơ chế tin cậy TLS, không chứng minh doanh nghiệp đáng tin.",
+      "HTTPS không đảm bảo nội dung website an toàn hoặc không lừa đảo."
+    ]
+  }
+]

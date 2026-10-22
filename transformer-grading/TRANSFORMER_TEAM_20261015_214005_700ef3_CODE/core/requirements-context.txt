@@ -1,0 +1,7 @@
+# Optional dependencies; keep the normal app usable without a Transformer installation.
+# Install a CPU/CUDA torch build appropriate to your server, then install this file.
+torch>=2.6,<3
+transformers==4.57.6
+sentencepiece>=0.2,<1
+protobuf>=4,<7
+safetensors>=0.4,<1

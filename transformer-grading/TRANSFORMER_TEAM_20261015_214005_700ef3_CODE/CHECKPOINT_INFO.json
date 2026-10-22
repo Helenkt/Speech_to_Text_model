@@ -1,0 +1,38 @@
+{
+  "model_directory": "models/context-demo_fixed_20261014_163341",
+  "model_manifest": {
+    "schema_version": "rubric-context-v1",
+    "base_model": "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
+    "labels": [
+      "met",
+      "partial",
+      "missing",
+      "contradicted",
+      "uncertain"
+    ],
+    "max_length": 512,
+    "demo_only": true,
+    "smoke_only": false,
+    "freeze_encoder": false,
+    "created_at": "2026-10-14T10:11:36.761807+00:00",
+    "weights_sha256": "f18002ca2950a0b0d13f07cb0587b1aab0d8a400387f71f5aa0ede48b6dcd155",
+    "dataset_files_sha256": {
+      "train.jsonl": "efb4193e83ca7c1dc87867935103a920946cccc032126eda621178aad3d2a829",
+      "val.jsonl": "22cc859d4d9d8ea5c1654e35c849a9c519582b0bffa850883f1d93c99c8c3cc9",
+      "test.jsonl": "2b003cf9a8cb6c1a57e46ca3c57d527b3c28e13917b69b0b3547cca2b52acfc2"
+    },
+    "best_validation_macro_f1": 0.5312519936204148,
+    "seed": 42,
+    "train_labels": {
+      "met": 129,
+      "missing": 94,
+      "contradicted": 58,
+      "uncertain": 31,
+      "partial": 4
+    },
+    "note": "Validation selects checkpoint; test is not read during training. Confidence is uncalibrated."
+  },
+  "code_only_export": false,
+  "comparison_baseline": "Speech_to_Text_model-main (3).zip supplied 2026-10-15",
+  "tested_status": "User CLI inference succeeded; demo checkpoint; app integration not verified"
+}
