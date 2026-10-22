@@ -1,0 +1,5 @@
+# Optional tests and developer tools, not needed on student machines.
+-r requirements.txt
+pytest==9.1.1
+# Starlette TestClient's preferred client; the application itself uses httpx.
+httpx2==2.16.0

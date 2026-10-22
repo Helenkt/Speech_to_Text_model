@@ -12,35 +12,35 @@ Demo hệ thống AI Interview chạy trực tiếp trên laptop bằng FastAPI,
 Ngân hàng hiện có `1.800` câu song ngữ thuộc 4 môn: Nhập môn Trí tuệ nhân tạo,
 Các hệ cơ sở dữ liệu, Cấu trúc dữ liệu và giải thuật, và Lập trình hướng đối tượng.
 
-## 1. Cài thư viện và chạy trong VS Code
+## 1. Cài đặt và chạy
 
-Yêu cầu: Windows 10/11, VS Code và Python 3.11.
+Hướng dẫn đầy đủ cho máy mới, gồm Python, Ollama, Whisper, Transformer và tài khoản demo:
+**[REQUIREMENTS.md](REQUIREMENTS.md)**. Bản này vẫn cài thủ công, chưa có bộ tự cài một lần bấm.
 
-Mở thư mục này trong VS Code, chọn **Terminal → New Terminal**, sau đó chạy lần lượt:
+Yêu cầu đã kiểm thử: Windows 64-bit và Python 3.11. VS Code không bắt buộc.
+Mở PowerShell trong thư mục `AI-INTERVIEWER-LOCAL`, sau đó chạy:
 
 ```powershell
 py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python main.py
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip check
 ```
 
-Mở <http://127.0.0.1:8000>. Nhấn `Ctrl+C` trong Terminal để dừng. Khi chạy bằng
-`start_local.ps1`, ứng dụng dùng <http://127.0.0.1:8001>.
-
-Từ lần chạy sau chỉ cần:
+Tiếp tục cài/mở Ollama, tải model và kiểm tra STT theo `REQUIREMENTS.md`.
+Sau khi đã chuẩn bị, chạy:
 
 ```powershell
-.\.venv\Scripts\Activate.ps1
-python main.py
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8001
 ```
 
-Bạn cũng có thể nhấn `F5` trong VS Code và chọn **AI Interview Local**.
+Mở <http://127.0.0.1:8001>. Nhấn `Ctrl+C` trong Terminal để dừng.
+`python main.py`, F5 hoặc `CHAY_WEB.bat` vẫn dùng cổng 8000; không phải trình tự cài model.
+Không cần kích hoạt môi trường bằng `Activate.ps1` nếu dùng đường dẫn Python như trên.
 
 ## 2. Tài khoản cục bộ
 
-Ở lần chạy đầu, hệ thống tạo dữ liệu khởi tạo trong cơ sở dữ liệu cục bộ. Không công khai mật khẩu sử dụng thực tế trên GitHub. Sau khi khởi động, hãy dùng thông tin do người quản trị cung cấp và mở trang **Tài khoản** để nhập danh sách người dùng.
+Ở lần chạy đầu, hệ thống tạo dữ liệu khởi tạo trong cơ sở dữ liệu cục bộ. Tài khoản demo công khai nằm trong `data/accounts_demo.csv` và được mô tả ở `REQUIREMENTS.md`; chỉ tự tạo khi database chưa có người dùng. Không công khai mật khẩu sử dụng thực tế trên GitHub. Sau khi khởi động, mở trang **Tài khoản** để nhập danh sách người dùng riêng.
 
 ## 3. File tài khoản
 
@@ -130,8 +130,9 @@ Sau khi cài Ollama trên máy mới, tải model đúng phiên bản trước k
 
 ```powershell
 ollama pull qwen2.5:3b
-ollama pull qwen3:8b
 ```
+
+Chỉ máy giảng viên cần sinh đề mới tải thêm `ollama pull qwen3:8b`; không bắt máy sinh viên tải model này.
 
 Kiểm tra model đã có trên máy:
 
@@ -417,7 +418,8 @@ API docs: <http://127.0.0.1:8000/docs>
 ## 8. Kiểm thử
 
 ```powershell
-python -m pytest -q
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pytest -q
 ```
 
 Database local nằm tại `data/ai_interviewer.db`. Server chỉ lắng nghe `127.0.0.1`, nên mặc định chỉ laptop đang chạy ứng dụng truy cập được.

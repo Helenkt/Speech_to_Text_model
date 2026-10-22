@@ -1,13 +1,30 @@
-fastapi[standard]>=0.115,<1.0
-httpx[socks]>=0.27,<1.0
-python-dotenv>=1.0,<2.0
-python-multipart>=0.0.9,<1.0
-openpyxl>=3.1,<4.0
+# Runtime only. See REQUIREMENTS.md for Python, Ollama, model downloads and launch commands.
+# Tests: pip install -r requirements-dev.txt
+# Training uses a separate .train-venv and requirements-training.txt.
+# External software: Windows x64, Python 3.11 and Ollama (not installed by pip).
+# Models: ollama pull qwen2.5:3b; python -m app.stt_setup;
+#         python tools/setup_rubricguard_lite.py (baseline, NOT the fine-tuned model).
+# Teacher-only generation: ollama pull qwen3:8b. Start the API as documented.
+
+# Local web API and account imports (no FastAPI cloud/CLI extras).
+fastapi==0.159.1
+starlette==1.9.0
+pydantic==2.14.1
+uvicorn==0.54.0
+httpx[socks]==0.28.1
+python-dotenv==1.2.4
+python-multipart==0.0.32
+openpyxl==3.1.5
+
+# Speech-to-text. Model weights and CUDA libraries are NOT pip dependencies here.
 faster-whisper==1.2.1
+ctranslate2==4.8.3
+huggingface-hub==2.2.0
 # PyAV 19 removed metadata_errors, still used by faster-whisper 1.2.1.
-av>=11,<19
-numpy>=1.26,<3.0
-onnx>=1.17,<2.0
-onnxruntime>=1.20,<2.0
-tokenizers>=0.20,<1.0
-pytest>=8,<10
+av==18.1.0
+numpy==2.4.6
+
+# RubricGuard runtime and baseline model setup/quantization.
+onnx==1.23.2
+onnxruntime==1.31.0
+tokenizers==0.23.3

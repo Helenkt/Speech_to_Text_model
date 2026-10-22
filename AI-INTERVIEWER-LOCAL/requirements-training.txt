@@ -1,4 +1,6 @@
 # Optional environment for training/export only. Runtime uses requirements.txt.
+# Create a separate .train-venv with Python 3.11; do not install into .venv.
+# Transformer training and application runtime have different tokenizer constraints.
 torch==2.6.0
 transformers==4.57.6
 sentencepiece>=0.2,<1

@@ -18,6 +18,7 @@ __pycache__/
 models/
 tools/ollama/
 .ollama-home/
+.runtime/
 test_audio/.edge_tts_deps/
 test_audio/*.wav
 test_audio/*.mp3
