@@ -1,0 +1,2252 @@
+[
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database system architecture",
+    "concept": "ANSI/SPARC three-schema architecture",
+    "difficulty": "Easy",
+    "question": "What levels make up the ANSI/SPARC three-level (three-schema) architecture of a DBMS?",
+    "reference_answer": "Three levels: (1) External/view level — separate views for each group of users/applications, showing only the relevant part of the data; (2) Conceptual/logical level — describes the entire logical structure of the database: tables, attributes, relationships, constraints; (3) Internal/physical level — describes how data is physically stored: files, pages, indexes, access methods.",
+    "key_points": [
+      "Three levels: external (view), conceptual (logical), internal (physical)",
+      "Each level hides the details of the level below"
+    ],
+    "id": "Q_DB3_001"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database system architecture",
+    "concept": "Logical and physical data independence",
+    "difficulty": "Easy",
+    "question": "Distinguish physical data independence from logical data independence.",
+    "reference_answer": "Physical data independence: the physical storage can be changed (adding indexes, changing file structures, moving disks) without modifying the conceptual schema or applications. Logical data independence: the conceptual schema can be changed (adding columns, splitting tables) without modifying the external views and the applications using them. Logical independence is harder to achieve because applications often depend directly on table structures.",
+    "key_points": [
+      "Physical independence: storage changes do not affect the logical schema",
+      "Logical independence: logical schema changes do not affect views/applications; harder to achieve"
+    ],
+    "id": "Q_DB3_002"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database system architecture",
+    "concept": "DBMS vs file system",
+    "difficulty": "Easy",
+    "question": "What are the main advantages of using a database management system (DBMS) over storing data in separate files per application?",
+    "reference_answer": "A DBMS reduces redundancy and inconsistency by storing data centrally; provides a declarative query language (SQL) instead of writing a program to read files for every need; enforces integrity constraints; supports safe concurrent access through transactions; offers backup and crash recovery; and controls security and permissions centrally. A file system forces each application to handle these concerns itself.",
+    "key_points": [
+      "A DBMS reduces redundancy, enforces integrity, provides a declarative query language",
+      "Supports concurrency, crash recovery and centralized access control"
+    ],
+    "id": "Q_DB3_003"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Relational model",
+    "concept": "Superkey",
+    "difficulty": "Easy",
+    "question": "What is a superkey and how does it relate to a candidate key?",
+    "reference_answer": "A superkey is a set of attributes whose values uniquely identify each tuple in a relation (no two tuples share the same values on that set). A candidate key is a MINIMAL superkey — removing any attribute from it makes it no longer a superkey. For example, in Student(studentId, email, name): {studentId, name} is a superkey but not minimal; {studentId} and {email} are candidate keys.",
+    "key_points": [
+      "Superkey: a set of attributes uniquely identifying each tuple",
+      "A candidate key is a minimal superkey"
+    ],
+    "id": "Q_DB3_004"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Stored Procedure",
+    "difficulty": "Easy",
+    "question": "What is a Stored Procedure?",
+    "reference_answer": "A Stored Procedure is a named set of SQL statements (with control structures such as variables, IF, loops) that is compiled and stored inside the database. Applications call it by name (CALL/EXEC) with parameters. It encapsulates data processing logic, reduces network round trips between the application and the database, and can be granted execution permission separately.",
+    "key_points": [
+      "A Stored Procedure is a named block of SQL stored in the database",
+      "Called by name with parameters; reduces network round trips and encapsulates logic"
+    ],
+    "id": "Q_DB3_005"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "User-defined functions vs procedures",
+    "difficulty": "Easy",
+    "question": "How does a User-Defined Function differ from a Stored Procedure?",
+    "reference_answer": "A function always RETURNS a value (scalar or table) and can be used directly inside queries (SELECT computeTax(price) FROM ...). A procedure is called as a standalone statement, can return multiple result sets or output parameters, and is usually allowed to modify data and manage transactions; in many DBMSs, functions are restricted from modifying data.",
+    "key_points": [
+      "Functions return a value and can be used inside queries",
+      "Procedures are called standalone and are more flexible for data modification and transactions"
+    ],
+    "id": "Q_DB3_006"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Trigger - concept",
+    "difficulty": "Easy",
+    "question": "What is a trigger in a database? Distinguish BEFORE and AFTER triggers.",
+    "reference_answer": "A trigger is code that the database automatically executes when an event occurs on a table (INSERT, UPDATE, DELETE). A BEFORE trigger runs before the operation is applied — typically used to validate or modify the data about to be written (uppercase normalization, default values). An AFTER trigger runs after the operation — typically used for audit logging or updating related tables.",
+    "key_points": [
+      "A trigger runs automatically on INSERT/UPDATE/DELETE on a table",
+      "BEFORE to validate/modify incoming data; AFTER for auditing or related updates"
+    ],
+    "id": "Q_DB3_007"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Cursor",
+    "difficulty": "Easy",
+    "question": "What is a cursor used for in database programming?",
+    "reference_answer": "SQL is inherently set-based. A cursor allows iterating over the result of a query ONE ROW AT A TIME inside a stored procedure or application: declare a cursor for a SELECT, open it, FETCH each row to process, then close it. It is useful when complex per-row logic is needed, but it is usually much slower than set-based statements.",
+    "key_points": [
+      "A cursor iterates over query results row by row",
+      "Flexible but usually slower than set-based processing"
+    ],
+    "id": "Q_DB3_008"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "SQL DDL",
+    "concept": "Sequences and auto-increment columns",
+    "difficulty": "Easy",
+    "question": "What are auto-increment (AUTO_INCREMENT/IDENTITY) columns and SEQUENCE objects used for?",
+    "reference_answer": "Both generate unique increasing integers, typically used as surrogate primary keys so the application does not have to compute them. An identity column is tied to a specific table; a SEQUENCE is an independent database object that can be shared by several tables, with the next value obtained via NEXTVAL/nextval() anywhere.",
+    "key_points": [
+      "Generate unique increasing values, usually for surrogate keys",
+      "Identity is tied to a table; a Sequence is independent and shareable"
+    ],
+    "id": "Q_DB3_009"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database security",
+    "concept": "GRANT and REVOKE",
+    "difficulty": "Easy",
+    "question": "What are the SQL GRANT and REVOKE statements used for? Give examples.",
+    "reference_answer": "GRANT gives privileges on database objects to users or roles, e.g., GRANT SELECT, INSERT ON Orders TO sales_staff; REVOKE removes previously granted privileges, e.g., REVOKE INSERT ON Orders FROM sales_staff. Common privileges include SELECT, INSERT, UPDATE, DELETE, EXECUTE, and administrative ones such as CREATE, ALTER.",
+    "key_points": [
+      "GRANT gives privileges, REVOKE removes them",
+      "Privileges apply to specific objects for users or roles"
+    ],
+    "id": "Q_DB3_010"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database security",
+    "concept": "Roles",
+    "difficulty": "Easy",
+    "question": "How do roles help in database permission management compared to granting privileges directly to each user?",
+    "reference_answer": "A role is a named group of privileges (e.g., accountant, warehouse_manager). Instead of granting dozens of individual privileges to each person, the administrator grants privileges to the role and then assigns the role to users. When policy changes, only the role's privileges change; when an employee moves departments, only their role changes. This reduces errors and simplifies auditing.",
+    "key_points": [
+      "A role is a named group of privileges assigned to users",
+      "Simplifies administration, reduces errors, eases auditing"
+    ],
+    "id": "Q_DB3_011"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Basic SQL",
+    "concept": "Classifying SQL statements: DDL, DML, DCL, TCL",
+    "difficulty": "Easy",
+    "question": "Into which groups are SQL statements classified? Give examples for each.",
+    "reference_answer": "DDL (Data Definition Language) defines structure: CREATE, ALTER, DROP. DML (Data Manipulation Language) manipulates data: SELECT, INSERT, UPDATE, DELETE (some sources separate SELECT as DQL). DCL (Data Control Language) manages permissions: GRANT, REVOKE. TCL (Transaction Control Language) controls transactions: COMMIT, ROLLBACK, SAVEPOINT.",
+    "key_points": [
+      "DDL: structure; DML: data; DCL: permissions; TCL: transactions",
+      "Examples: CREATE/INSERT/GRANT/COMMIT"
+    ],
+    "id": "Q_DB3_012"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Basic SQL",
+    "concept": "Comparing TRUNCATE, DELETE and DROP",
+    "difficulty": "Easy",
+    "question": "Distinguish TRUNCATE TABLE, DELETE FROM (without WHERE) and DROP TABLE.",
+    "reference_answer": "DELETE FROM removes rows one by one, logs each row, fires triggers, can have a WHERE clause and can be rolled back; the table structure remains. TRUNCATE removes all data by deallocating data pages, much faster, usually does not fire DELETE triggers and resets the auto-increment counter; the table structure remains. DROP TABLE removes the entire table: structure, data, indexes, constraints.",
+    "key_points": [
+      "DELETE removes rows individually, supports WHERE, fires triggers; TRUNCATE removes everything quickly, keeps structure",
+      "DROP removes the table definition itself"
+    ],
+    "id": "Q_DB3_013"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Intermediate SQL",
+    "concept": "CASE expressions",
+    "difficulty": "Easy",
+    "question": "What is the CASE expression in SQL used for? Give an example of classifying scores.",
+    "reference_answer": "CASE returns different values depending on conditions directly inside a query, similar to if-else. Example: SELECT name, CASE WHEN score >= 8 THEN 'Excellent' WHEN score >= 6.5 THEN 'Good' WHEN score >= 5 THEN 'Average' ELSE 'Poor' END AS grade FROM Student; Conditions are evaluated in order and the first true branch is chosen; if none matches and there is no ELSE, NULL is returned.",
+    "key_points": [
+      "CASE returns values based on conditions inside a query",
+      "Conditions are evaluated in order; without ELSE it returns NULL"
+    ],
+    "id": "Q_DB3_014"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Intermediate SQL",
+    "concept": "The COALESCE function",
+    "difficulty": "Easy",
+    "question": "What does COALESCE(a, b, c, ...) return? Give an example use.",
+    "reference_answer": "COALESCE returns the first NON-NULL value among its arguments (NULL if all are NULL). Use: replace NULL with a default value for display or computation, e.g., SELECT name, COALESCE(phone, email, 'No contact') FROM Customer; or SUM(COALESCE(discount, 0)).",
+    "key_points": [
+      "COALESCE returns the first non-NULL argument",
+      "Used to substitute fallback values for NULL"
+    ],
+    "id": "Q_DB3_015"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Intermediate SQL",
+    "concept": "The NULLIF function",
+    "difficulty": "Easy",
+    "question": "How does NULLIF(a, b) work and which error is it commonly used to avoid?",
+    "reference_answer": "NULLIF(a, b) returns NULL if a equals b, otherwise returns a. A common use is avoiding division by zero: SELECT revenue / NULLIF(orderCount, 0) — when orderCount = 0 the denominator becomes NULL so the result is NULL instead of an error. It is also used to turn 'pseudo-empty' values like empty strings into NULL: NULLIF(note, '').",
+    "key_points": [
+      "NULLIF(a, b) returns NULL if a = b, otherwise a",
+      "Used to avoid division by zero and normalize empty values to NULL"
+    ],
+    "id": "Q_DB3_016"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "SQL DDL",
+    "concept": "Date-time types and time zones",
+    "difficulty": "Easy",
+    "question": "Distinguish TIMESTAMP (without time zone) from TIMESTAMP WITH TIME ZONE (e.g., timestamptz in PostgreSQL).",
+    "reference_answer": "TIMESTAMP without time zone only stores the 'wall-clock date and time' as entered, without knowing which time zone it belongs to — 10:00 in Hanoi and 10:00 in Tokyo look identical. TIMESTAMP WITH TIME ZONE stores an absolute instant (usually normalized internally to UTC) and converts to the session's time zone for display, so comparisons and calculations across time zones are correct. For multi-region systems, event instants should be stored with a time-zone-aware type/UTC.",
+    "key_points": [
+      "TIMESTAMP without time zone is just wall-clock time",
+      "TIMESTAMPTZ represents an absolute instant normalized to UTC; suited for multi-time-zone systems"
+    ],
+    "id": "Q_DB3_017"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "SQL DDL",
+    "concept": "CHAR vs VARCHAR",
+    "difficulty": "Easy",
+    "question": "How do CHAR(n) and VARCHAR(n) differ?",
+    "reference_answer": "CHAR(n) has FIXED length: values shorter than n are padded with spaces to n characters, suited for data that always has the same length such as 2-character province codes. VARCHAR(n) has VARIABLE length up to n, storing only the actual characters plus a few length bytes, saving space for data of varying length such as names and addresses.",
+    "key_points": [
+      "CHAR is fixed-length, space-padded",
+      "VARCHAR is variable-length, saving space for varying data"
+    ],
+    "id": "Q_DB3_018"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Basic SQL",
+    "concept": "Basic string functions",
+    "difficulty": "Easy",
+    "question": "Name some common SQL string functions and what they do.",
+    "reference_answer": "UPPER/LOWER convert case; LENGTH (or LEN, CHAR_LENGTH) returns length; SUBSTRING(s, pos, n) extracts a substring; CONCAT or the || operator concatenates; TRIM/LTRIM/RTRIM remove whitespace; REPLACE(s, a, b) replaces substrings; POSITION/INSTR/CHARINDEX find a substring's position. Example: SELECT UPPER(TRIM(lastName)) || ' ' || firstName FROM Employee.",
+    "key_points": [
+      "Common functions: UPPER/LOWER, LENGTH, SUBSTRING, CONCAT/||, TRIM, REPLACE",
+      "Function names may differ between DBMSs"
+    ],
+    "id": "Q_DB3_019"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Intermediate SQL",
+    "concept": "Window functions LAG and LEAD",
+    "difficulty": "Easy",
+    "question": "What are the window functions LAG() and LEAD() used for? Give an example.",
+    "reference_answer": "LAG(col, k) returns the value of the column k rows BEFORE the current row, and LEAD(col, k) the value k rows AFTER, according to the order defined in OVER(ORDER BY ...). Example computing this month's revenue versus last month: SELECT month, revenue, revenue - LAG(revenue) OVER (ORDER BY month) AS diff FROM MonthlyRevenue; The first row has no previous row so LAG returns NULL (or the specified default).",
+    "key_points": [
+      "LAG gets the previous row's value, LEAD the next row's, by window order",
+      "Used to compare with previous/next periods without a self-join"
+    ],
+    "id": "Q_DB3_020"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Intermediate SQL",
+    "concept": "Temporary tables",
+    "difficulty": "Easy",
+    "question": "What are the characteristics of temporary tables and when should they be used?",
+    "reference_answer": "A temporary table exists only within a connection session (or a transaction) and is automatically dropped when the session ends; other sessions cannot see its data. Use it to store intermediate results of complex multi-step processing (e.g., a report requiring filtering and aggregation in several stages), helping break down hard queries and reuse intermediate results multiple times.",
+    "key_points": [
+      "A temporary table exists only within a session/transaction and is dropped automatically",
+      "Used to store intermediate results for multi-step processing"
+    ],
+    "id": "Q_DB3_021"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database system architecture",
+    "concept": "Schema (namespace)",
+    "difficulty": "Easy",
+    "question": "In systems like PostgreSQL or SQL Server, what is a 'schema' (e.g., accounting.Invoice, warehouse.Invoice)?",
+    "reference_answer": "A schema is a logical namespace inside a database used to group related tables, views and functions. It allows two tables with the same name to exist in different schemas, organizes the database by business subsystem, and enables schema-level permissions (e.g., granting the accounting department access to the whole accounting schema).",
+    "key_points": [
+      "A schema is a namespace grouping objects within a database",
+      "Organizes by subsystem, avoids name clashes and enables group-level permissions"
+    ],
+    "id": "Q_DB3_022"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database system architecture",
+    "concept": "System Catalog (data dictionary)",
+    "difficulty": "Easy",
+    "question": "What information does a DBMS's System Catalog (data dictionary) contain?",
+    "reference_answer": "The System Catalog is a set of system tables managed by the DBMS itself, containing metadata about the database: lists of tables, columns, data types, constraints, indexes, views, users, privileges, and data statistics used for query optimization. It can be queried with SQL, e.g., via INFORMATION_SCHEMA.COLUMNS or pg_catalog.",
+    "key_points": [
+      "The System Catalog stores metadata about structure, privileges and statistics",
+      "Queryable with SQL via INFORMATION_SCHEMA or system tables"
+    ],
+    "id": "Q_DB3_023"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "OLTP and OLAP",
+    "difficulty": "Easy",
+    "question": "Distinguish OLTP and OLAP systems.",
+    "reference_answer": "OLTP (Online Transaction Processing) serves day-to-day operations: a very large number of small, short transactions reading/writing a few rows (placing orders, transferring money), requiring low latency and consistency; schemas are usually normalized. OLAP (Online Analytical Processing) serves analysis: fewer but complex queries scanning and aggregating millions of rows (revenue by region by quarter), mostly read-only; schemas are usually denormalized star schemas.",
+    "key_points": [
+      "OLTP: many small read/write transactions, normalized, low latency",
+      "OLAP: large analytical aggregation queries, read-mostly, star schemas"
+    ],
+    "id": "Q_DB3_024"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "Data Warehouse",
+    "difficulty": "Easy",
+    "question": "What is a Data Warehouse and how does it differ from an ordinary operational database?",
+    "reference_answer": "A Data Warehouse is a central repository that integrates data from multiple source systems (sales, inventory, CRM...), organized by subject, keeps long-term history and mainly serves analysis, reporting and decision making. Unlike an operational database (reflecting only the current state, updated continuously), warehouse data is usually loaded periodically, rarely modified and optimized for aggregate queries.",
+    "key_points": [
+      "A Data Warehouse integrates multi-source, subject-oriented, historical data",
+      "Serves analysis, is loaded periodically and optimized for aggregate queries"
+    ],
+    "id": "Q_DB3_025"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "Star schema: fact and dimension tables",
+    "difficulty": "Easy",
+    "question": "In a star schema, what kind of data do fact tables and dimension tables contain?",
+    "reference_answer": "The fact table sits at the center, containing quantitative measures of business events (quantity sold, revenue, cost) plus foreign keys pointing to dimension tables; it usually has a huge number of rows. Dimension tables contain descriptive context for filtering and grouping: Time (day, month, quarter), Product (name, category, brand), Store (name, region), Customer. The dimensions surround the fact table, forming a star.",
+    "key_points": [
+      "Fact tables hold quantitative measures and foreign keys to dimensions",
+      "Dimension tables hold descriptive attributes for filtering/grouping (time, product, location)"
+    ],
+    "id": "Q_DB3_026"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "The ETL process",
+    "difficulty": "Easy",
+    "question": "What does ETL stand for and what does each step do?",
+    "reference_answer": "ETL consists of Extract — pulling data from source systems (operational databases, files, APIs); Transform — cleaning, standardizing formats, deduplicating, converting codes, computing, integrating data from multiple sources; Load — loading the processed data into the target warehouse. The ELT variant loads raw data into the warehouse first and transforms it inside, popular with powerful cloud warehouses.",
+    "key_points": [
+      "Extract: get source data; Transform: clean and standardize; Load: load into the warehouse",
+      "ELT transforms after loading, popular on cloud warehouses"
+    ],
+    "id": "Q_DB3_027"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "NoSQL and comparisons",
+    "concept": "Graph databases",
+    "difficulty": "Easy",
+    "question": "How does a graph database (such as Neo4j) represent data and what kinds of problems is it suited for?",
+    "reference_answer": "A graph database stores data as NODES (entities, e.g., Person, Product) and EDGES (relationships, e.g., FRIEND_OF, PURCHASED), both with properties. It suits problems where relationships are central and multi-hop traversal is needed: social networks (friends of friends), product recommendations, fraud detection through transaction chains, path finding in networks.",
+    "key_points": [
+      "Data are nodes and edges, both with properties",
+      "Suited for relationship-heavy, multi-hop problems: social networks, recommendations, fraud detection"
+    ],
+    "id": "Q_DB3_028"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "NoSQL and comparisons",
+    "concept": "In-memory databases",
+    "difficulty": "Easy",
+    "question": "What are the characteristics of an in-memory database (e.g., Redis) and what is it typically used for?",
+    "reference_answer": "An in-memory database keeps data primarily in RAM instead of on disk, so reads/writes are extremely fast (sub-millisecond latency). Redis offers data structures such as strings, hashes, lists, sets and sorted sets. It is commonly used as a cache in front of the main database, for login sessions, real-time leaderboards, rate limiting and message queues. Drawbacks: capacity is limited by RAM, and persistence (snapshots, append-only logs) must be configured to avoid data loss on restart.",
+    "key_points": [
+      "Stores data in RAM for very high speed",
+      "Used for caching, sessions, leaderboards, rate limiting; needs persistence configuration"
+    ],
+    "id": "Q_DB3_029"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Storage and file organization",
+    "concept": "Row-oriented vs column-oriented storage",
+    "difficulty": "Easy",
+    "question": "Distinguish row-oriented storage (row-store) from column-oriented storage (column-store).",
+    "reference_answer": "A row-store stores all columns of a row contiguously on disk, so reading/writing whole records is efficient — suited for OLTP. A column-store stores all values of the same column contiguously, so queries needing only a few columns across millions of rows (SUM(revenue) by region) read only those columns, and same-typed data compresses very well — suited for OLAP/data warehouses.",
+    "key_points": [
+      "Row-store: a row's columns stored together, good for OLTP",
+      "Column-store: a column's values stored together, reads few columns and compresses well, suits OLAP"
+    ],
+    "id": "Q_DB3_030"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Storage and file organization",
+    "concept": "Data pages (blocks)",
+    "difficulty": "Easy",
+    "question": "Why does a DBMS read/write data in units of 'pages' (usually 4KB-16KB) rather than individual rows?",
+    "reference_answer": "Disks (and SSDs) access data efficiently in blocks; the cost of a disk access lies mostly in positioning, so reading a whole block costs little more than reading a few bytes. Therefore the DBMS organizes data into fixed-size pages, each containing many rows; the page is the unit of I/O between disk and the buffer pool, the unit of locking in some cases, and the basis for estimating query cost (number of page I/Os).",
+    "key_points": [
+      "The page is the unit of I/O between disk and buffer, containing many rows",
+      "Matches how storage devices work; query cost is estimated in page I/Os"
+    ],
+    "id": "Q_DB3_031"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Storage and file organization",
+    "concept": "Heap files",
+    "difficulty": "Easy",
+    "question": "How does a heap file organize data, and what are its pros and cons?",
+    "reference_answer": "A heap file stores records in no particular order: a new record is inserted into any page with free space. Advantage: very fast inserts. Disadvantage: searching for a value requires scanning the entire file (full scan) without a supporting index. In PostgreSQL, tables are heaps by default and indexes point to record locations in the heap.",
+    "key_points": [
+      "A heap file stores records in no particular order",
+      "Fast inserts but searches need full scans without an index"
+    ],
+    "id": "Q_DB3_032"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Primary-replica replication",
+    "difficulty": "Easy",
+    "question": "How does primary-replica (master-slave) replication work and what benefits does it bring?",
+    "reference_answer": "One primary server receives all writes; the changes (usually via the transaction log) are then shipped to and applied on one or more replicas. Replicas serve read queries. Benefits: spreading read load across machines, higher availability (if the primary fails, a replica can be promoted), and placing replicas in other geographic regions closer to users.",
+    "key_points": [
+      "The primary takes writes; replicas receive changes and serve reads",
+      "Benefits: read scaling, high availability, geographic distribution"
+    ],
+    "id": "Q_DB3_033"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Connection pool",
+    "difficulty": "Easy",
+    "question": "What is a connection pool in database applications and why is it needed?",
+    "reference_answer": "A connection pool keeps a set of open database connections; when a query is needed, the application borrows a connection from the pool and returns it afterwards instead of opening/closing a new connection. Opening a connection is expensive (TCP handshake, authentication, server-side resource allocation), and the database can only handle a limited number of concurrent connections, so a pool reduces latency and controls load on the database.",
+    "key_points": [
+      "A pool keeps connections ready for reuse",
+      "Reduces connection-opening cost and limits connections to the database"
+    ],
+    "id": "Q_DB3_034"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Prepared statements",
+    "difficulty": "Easy",
+    "question": "What is a prepared statement?",
+    "reference_answer": "A prepared statement is an SQL statement sent to the database with parameter placeholders (e.g., SELECT * FROM Student WHERE studentId = ?), parsed (and possibly planned) in advance, then executed many times with different parameter values passed separately. Benefits: safe against SQL injection because values are never concatenated into the SQL string, and potentially faster for repeated execution.",
+    "key_points": [
+      "A statement with placeholders, prepared once and executed many times",
+      "Prevents SQL injection and can reuse the execution plan"
+    ],
+    "id": "Q_DB3_035"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Object-Relational Mapping (ORM)",
+    "difficulty": "Easy",
+    "question": "What is ORM (Object-Relational Mapping)? Name some popular ORM tools.",
+    "reference_answer": "ORM is a technique/tool that automatically maps between objects in an object-oriented language and tables in a relational database: class ↔ table, attribute ↔ column, object ↔ row, object relationships ↔ foreign keys. Developers work with objects and the ORM generates the corresponding SQL. Popular tools: Hibernate/JPA (Java), Entity Framework (.NET), SQLAlchemy and Django ORM (Python), Sequelize/Prisma (Node.js).",
+    "key_points": [
+      "ORM maps class-table, object-row and generates SQL",
+      "Examples: Hibernate, Entity Framework, SQLAlchemy, Prisma"
+    ],
+    "id": "Q_DB3_036"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "SQL DDL",
+    "concept": "Database migrations",
+    "difficulty": "Easy",
+    "question": "What is a database migration in software development?",
+    "reference_answer": "Migrations are versioned scripts that change the database schema (creating tables, adding columns, creating indexes...), stored in source control and run in order by tools such as Flyway, Liquibase or Alembic. The tool records the applied versions in a dedicated table, so every environment (dev, test, production) has a consistent schema, changes are reviewed and can be reproduced.",
+    "key_points": [
+      "Migrations are versioned schema-change scripts stored with the source code",
+      "Keep environments consistent and changes trackable and reproducible"
+    ],
+    "id": "Q_DB3_037"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Basic SQL",
+    "concept": "UPSERT (insert or update)",
+    "difficulty": "Easy",
+    "question": "What is an UPSERT operation? Give example syntax in PostgreSQL or MySQL.",
+    "reference_answer": "UPSERT inserts a new row, but if a row with that key already exists it updates it instead of raising a duplicate-key error. PostgreSQL: INSERT INTO Stock(productId, qty) VALUES ('P01', 10) ON CONFLICT (productId) DO UPDATE SET qty = Stock.qty + EXCLUDED.qty; MySQL: INSERT ... ON DUPLICATE KEY UPDATE qty = qty + VALUES(qty); Standard SQL has the MERGE statement with similar functionality.",
+    "key_points": [
+      "UPSERT: insert if absent, update if the key exists",
+      "Syntax: ON CONFLICT (PostgreSQL), ON DUPLICATE KEY UPDATE (MySQL), MERGE (standard)"
+    ],
+    "id": "Q_DB3_038"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Basic SQL",
+    "concept": "The INTERSECT and EXCEPT operators",
+    "difficulty": "Easy",
+    "question": "What are the SQL INTERSECT and EXCEPT (MINUS) operators used for? What conditions apply?",
+    "reference_answer": "INTERSECT returns rows present in BOTH query results; EXCEPT (MINUS in Oracle) returns rows in the first query but NOT in the second. For example, find customers who bought in 2023 but not in 2024 using EXCEPT. Conditions: both queries must have the same number of columns with compatible types in order; by default duplicates are removed from the result.",
+    "key_points": [
+      "INTERSECT: common rows; EXCEPT: rows in the first query but not the second",
+      "Same number of columns, compatible types; duplicates removed by default"
+    ],
+    "id": "Q_DB3_039"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Serial schedules",
+    "difficulty": "Easy",
+    "question": "What is a schedule of transactions? What is a serial schedule?",
+    "reference_answer": "A schedule is an interleaved ordering of the read/write operations of multiple concurrent transactions, preserving the order of operations within each transaction. A serial schedule is one in which transactions run one after another, each finishing completely before the next starts, with no interleaving. Serial schedules always produce correct results but perform poorly because they do not exploit concurrency.",
+    "key_points": [
+      "A schedule is an interleaved ordering of operations of multiple transactions",
+      "A serial schedule has no interleaving: always correct but slow"
+    ],
+    "id": "Q_DB3_040"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Serializability",
+    "difficulty": "Easy",
+    "question": "When is a schedule called serializable? Why is this the correctness criterion for concurrency control?",
+    "reference_answer": "An interleaved schedule is serializable if its effect is EQUIVALENT to that of some serial schedule of the same transactions. Since each transaction alone is assumed correct, running them serially always keeps the database consistent; therefore an interleaved schedule equivalent to a serial one also preserves consistency, while still allowing concurrent execution for better performance.",
+    "key_points": [
+      "Serializable: the result is equivalent to some serial schedule",
+      "Guarantees consistency while allowing interleaving for performance"
+    ],
+    "id": "Q_DB3_041"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Functional dependencies",
+    "concept": "Attribute closure",
+    "difficulty": "Easy",
+    "question": "What is the closure of an attribute set X (denoted X+) with respect to a set of functional dependencies F?",
+    "reference_answer": "X+ is the set of ALL attributes that can be derived (functionally determined) from X using F and Armstrong's axioms. For example, with F = {A → B, B → C}, {A}+ = {A, B, C}. The closure is used to test whether a dependency X → Y follows from F (Y ⊆ X+) and whether X is a superkey (X+ contains all attributes).",
+    "key_points": [
+      "X+ is the set of all attributes determined by X under F",
+      "Used to test derived dependencies and superkeys"
+    ],
+    "id": "Q_DB3_042"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Normalization",
+    "concept": "Lossless-join decomposition",
+    "difficulty": "Easy",
+    "question": "When is the decomposition of a relation into smaller relations called lossless-join?",
+    "reference_answer": "Decomposing R into R1 and R2 is lossless if the natural join R1 ⋈ R2 yields EXACTLY the original relation R — no tuples lost and no 'spurious' tuples generated. If the decomposition is lossy, joining back produces incorrect data. This is a mandatory requirement when normalizing.",
+    "key_points": [
+      "Lossless-join: joining the sub-relations gives back exactly the original",
+      "Lossy decompositions generate spurious tuples; lossless is mandatory when normalizing"
+    ],
+    "id": "Q_DB3_043"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Normalization",
+    "concept": "Dependency preservation",
+    "difficulty": "Easy",
+    "question": "What does dependency-preserving decomposition mean and why does it matter?",
+    "reference_answer": "A decomposition preserves dependencies if every functional dependency of the original relation can be checked (directly or by inference) using only the dependencies contained within each sub-relation. Otherwise, to check a business constraint the DBMS must join the tables on every update — expensive, so the constraint is often skipped and data may violate it.",
+    "key_points": [
+      "Every original dependency can be checked within the sub-relations",
+      "Without it, checking constraints requires joins, which are costly and often skipped"
+    ],
+    "id": "Q_DB3_044"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "NoSQL and comparisons",
+    "concept": "BASE vs ACID",
+    "difficulty": "Easy",
+    "question": "What does the BASE model of distributed NoSQL systems stand for, and how does its philosophy differ from ACID?",
+    "reference_answer": "BASE stands for Basically Available, Soft state (the state may change over time even without new operations, due to gradual synchronization), Eventually consistent. ACID prioritizes the correctness and strict consistency of each transaction; BASE prioritizes availability and scalability, accepting temporary inconsistency between replicas.",
+    "key_points": [
+      "BASE: Basically Available, Soft state, Eventually consistent",
+      "ACID prioritizes strict consistency; BASE prioritizes availability and scalability"
+    ],
+    "id": "Q_DB3_045"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "SQL DDL",
+    "concept": "JSON data types in relational databases",
+    "difficulty": "Easy",
+    "question": "Many modern relational DBMSs support a JSON data type (e.g., JSONB in PostgreSQL). What does it enable?",
+    "reference_answer": "A JSON type allows storing semi-structured data (flexible, nested attributes) in a column of a relational table, while querying inside it with dedicated operators/functions (e.g., attributes->>'color' = 'red'). PostgreSQL's JSONB stores a parsed binary form and supports GIN indexes for fast search. Suited for attributes varying by product type, metadata and event payloads.",
+    "key_points": [
+      "A JSON type stores semi-structured data in a relational column",
+      "Has query operators and indexes (GIN with JSONB)"
+    ],
+    "id": "Q_DB3_046"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database security",
+    "concept": "Encryption at rest and in transit",
+    "difficulty": "Easy",
+    "question": "Distinguish encryption at rest from encryption in transit for databases.",
+    "reference_answer": "Encryption at rest encrypts data stored on disk (data files, logs, backups), protecting against theft of drives or backup files (e.g., Transparent Data Encryption). Encryption in transit encrypts data travelling between the application and the database or between nodes (TLS/SSL), preventing eavesdropping and tampering on the network. The two layers complement each other and do not replace access control.",
+    "key_points": [
+      "At rest: encrypt data on disk and backups",
+      "In transit: encrypt connections with TLS; both complement each other"
+    ],
+    "id": "Q_DB3_047"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database security",
+    "concept": "Principle of least privilege",
+    "difficulty": "Easy",
+    "question": "How should the principle of least privilege be applied to the database account used by a web application?",
+    "reference_answer": "The application's account should have only the privileges its functionality needs: e.g., SELECT, INSERT, UPDATE on the relevant business tables, no DROP, ALTER, GRANT or access to system tables, and never an administrator account (root/sa/postgres). Separate a read-only account for reporting and a dedicated account for migrations. If the application is compromised (e.g., via SQL injection), damage is limited to those privileges.",
+    "key_points": [
+      "The application account has only the minimal privileges needed, never an admin account",
+      "Limits damage when compromised; separate accounts by purpose"
+    ],
+    "id": "Q_DB3_048"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Basic SQL",
+    "concept": "Date-time functions",
+    "difficulty": "Easy",
+    "question": "Name some common SQL date-time functions and give an example of retrieving orders from the last 30 days.",
+    "reference_answer": "Common functions: CURRENT_DATE, CURRENT_TIMESTAMP/NOW() for the current time; EXTRACT(YEAR FROM date) or YEAR(date) for year/month/day parts; DATE_ADD/DATEADD or + INTERVAL for date arithmetic; DATEDIFF for differences. Example (PostgreSQL): SELECT * FROM Orders WHERE orderDate >= CURRENT_DATE - INTERVAL '30 days'; (MySQL): WHERE orderDate >= DATE_SUB(CURDATE(), INTERVAL 30 DAY).",
+    "key_points": [
+      "Common functions: CURRENT_DATE/NOW, EXTRACT, DATE_ADD/INTERVAL, DATEDIFF",
+      "Syntax differs between DBMSs"
+    ],
+    "id": "Q_DB3_049"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "ER model",
+    "concept": "Crow's Foot notation",
+    "difficulty": "Easy",
+    "question": "In Crow's Foot notation for ER diagrams, what do the symbols at the ends of a relationship line represent?",
+    "reference_answer": "Crow's Foot expresses cardinality and optionality at each end of a relationship: a bar (|) means 'one', the crow's foot (three prongs) means 'many', and a circle (O) means 'zero/optional'. Combined: || is exactly one (mandatory), O| is zero or one, |< is one or many, O< is zero or many. E.g., Customer ||——O< Order: each order belongs to exactly one customer, and each customer has zero or more orders.",
+    "key_points": [
+      "Bar means one, crow's foot means many, circle means optional",
+      "Combined, they express both cardinality and optionality at each end"
+    ],
+    "id": "Q_DB3_050"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Functional dependencies",
+    "concept": "Attribute closure algorithm",
+    "difficulty": "Medium",
+    "question": "Given R(A, B, C, D, E) and F = {A → B, BC → D, D → E, E → A}. Compute {A, C}+ and determine whether {A, C} is a key of R.",
+    "reference_answer": "Algorithm: start with X+ = {A, C}, repeatedly apply every dependency whose left side is contained in X+ to add its right side, until nothing changes. A → B: add B, X+ = {A, B, C}. BC → D: add D, X+ = {A, B, C, D}. D → E: add E, X+ = {A, B, C, D, E}. Since {A, C}+ contains all attributes, {A, C} is a superkey. Checking minimality: {A}+ = {A, B} and {C}+ = {C} are both insufficient, so {A, C} is a candidate key.",
+    "key_points": [
+      "Repeatedly apply dependencies whose left side ⊆ X+ until stable: {A,C}+ = {A,B,C,D,E}",
+      "The closure contains all attributes and no proper subset suffices, so {A,C} is a candidate key"
+    ],
+    "id": "Q_DB3_051"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Functional dependencies",
+    "concept": "Minimal cover",
+    "difficulty": "Medium",
+    "question": "What is a minimal (canonical) cover of a set of functional dependencies? State the three steps to find it.",
+    "reference_answer": "A minimal cover is a set of functional dependencies equivalent to F (implying exactly the same dependencies) but without redundancy. Steps: (1) Split right sides so each dependency has a single attribute on the right (A → BC becomes A → B, A → C). (2) Remove extraneous left-side attributes: for XA → B, if B is in X+ (computed with the current F) replace it with X → B. (3) Remove redundant dependencies: drop X → A if A is still in X+ computed with the remaining dependencies. The minimal cover is the input to the 3NF synthesis algorithm.",
+    "key_points": [
+      "A minimal cover is equivalent to F without redundancy",
+      "Three steps: split right sides, remove extraneous left attributes, remove redundant dependencies"
+    ],
+    "id": "Q_DB3_052"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Normalization",
+    "concept": "Testing a two-table decomposition for losslessness",
+    "difficulty": "Medium",
+    "question": "Given R(studentId, studentName, classId, className) with F = {studentId → studentName, studentId → classId, classId → className}. Is the decomposition into R1(studentId, studentName, classId) and R2(classId, className) lossless? Explain using the test criterion.",
+    "reference_answer": "Criterion for a decomposition into two relations: it is lossless-join if and only if the common attributes R1 ∩ R2 form a superkey of R1 or of R2 (i.e., (R1 ∩ R2) → R1 or (R1 ∩ R2) → R2 is in F+). Here R1 ∩ R2 = {classId}, and classId → className, so {classId}+ ⊇ R2 = {classId, className}, i.e., classId is a key of R2. Hence the decomposition is lossless. Also, every dependency lies entirely within R1 or R2, so the decomposition also preserves dependencies.",
+    "key_points": [
+      "A two-table decomposition is lossless if the intersection is a superkey of one of the tables",
+      "classId is a key of R2, so the decomposition is lossless (and dependency-preserving)"
+    ],
+    "id": "Q_DB3_053"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Normalization",
+    "concept": "Trade-off between BCNF and 3NF",
+    "difficulty": "Medium",
+    "question": "Why do practitioners sometimes stop at 3NF instead of always decomposing to BCNF? Illustrate with R(student, course, lecturer) where F = {(student, course) → lecturer, lecturer → course}.",
+    "reference_answer": "A 3NF decomposition that is both lossless AND dependency-preserving always exists (synthesis algorithm), but a BCNF decomposition only guarantees losslessness and may lose dependencies. In the example, lecturer → course violates BCNF (lecturer is not a superkey), but R is in 3NF because course is a key attribute. Decomposing to BCNF into (lecturer, course) and (student, lecturer) loses the dependency (student, course) → lecturer: you cannot check within one table that a student has only one lecturer per course; a join is needed to detect violations. So 3NF is chosen to keep the constraint, accepting a little redundancy.",
+    "key_points": [
+      "3NF is always achievable with dependency preservation; BCNF may lose dependencies",
+      "The BCNF decomposition loses (student, course) → lecturer, so 3NF is sometimes preferred"
+    ],
+    "id": "Q_DB3_054"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Precedence graph",
+    "difficulty": "Medium",
+    "question": "Describe how to use a precedence graph to test whether a schedule is conflict-serializable.",
+    "reference_answer": "Each transaction is a node. Two operations conflict if they belong to different transactions, access the same data item and at least one is a write (R-W, W-R, W-W). For each conflicting pair where Ti's operation appears before Tj's in the schedule, add an edge Ti → Tj. The schedule is conflict-serializable if and only if the graph has NO cycle; a topological sort of the graph then gives an equivalent serial order. Example: R1(A) W2(A) W1(A) gives edges T1 → T2 and T2 → T1, a cycle, so it is not serializable.",
+    "key_points": [
+      "Nodes are transactions; edge Ti → Tj when Ti's conflicting operation precedes Tj's",
+      "No cycle ⇔ conflict-serializable; a topological sort gives the equivalent serial order"
+    ],
+    "id": "Q_DB3_055"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Strict Two-Phase Locking",
+    "difficulty": "Medium",
+    "question": "How does strict 2PL differ from basic 2PL, and why do most DBMSs use strict 2PL?",
+    "reference_answer": "Basic 2PL only requires a growing phase (only acquiring locks) followed by a shrinking phase (only releasing locks) — it guarantees serializability but allows releasing write locks BEFORE commit. Other transactions can then read uncommitted data; if the first transaction aborts, the readers must abort too (cascading abort), and schedules may be unrecoverable. Strict 2PL holds all WRITE (exclusive) locks until commit/abort, eliminating cascading aborts and guaranteeing recoverable schedules; Rigorous 2PL holds read locks until the end as well. That is why strict/rigorous 2PL is widely used.",
+    "key_points": [
+      "Basic 2PL allows releasing write locks before commit, causing cascading aborts",
+      "Strict 2PL holds write locks until the transaction ends, ensuring recoverability and avoiding cascading aborts"
+    ],
+    "id": "Q_DB3_056"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Lock granularity and intention locks",
+    "difficulty": "Medium",
+    "question": "Why does a DBMS need intention locks (IS, IX) when supporting locks at multiple granularities (table, page, row)?",
+    "reference_answer": "With multi-granularity locking, one transaction may lock a whole table (e.g., during ALTER or a full scan) while another locks individual rows. To lock an entire table X, the system must know whether anyone holds locks on rows in it — checking every row is far too expensive. Intention locks solve this: before locking a row S/X, a transaction must place IS/IX on the table (and page) containing it. A request for an X lock on the table then only needs to check compatibility with locks on the table itself: X conflicts with IS/IX so it waits. Compatibility: IS is compatible with IS, IX, S; IX with IS, IX; S with IS, S.",
+    "key_points": [
+      "Intention locks at higher levels signal locks held at lower levels",
+      "They allow detecting table-level conflicts without scanning every row"
+    ],
+    "id": "Q_DB3_057"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Deadlock",
+    "concept": "Deadlock prevention: Wait-Die and Wound-Wait",
+    "difficulty": "Medium",
+    "question": "Compare the two timestamp-based deadlock prevention schemes: Wait-Die and Wound-Wait.",
+    "reference_answer": "Each transaction has a start timestamp (smaller = older). Wait-Die (non-preemptive): if an older transaction requests a lock held by a younger one, it WAITS; if a younger transaction requests a lock held by an older one, it ABORTS itself ('dies') and restarts with its original timestamp. Wound-Wait (preemptive): an older transaction requesting a lock held by a younger one 'wounds' it — forcing the younger to abort; a younger transaction requesting a lock of an older one waits. Both only allow waiting in one age direction, so no wait cycle can form; keeping the original timestamp on restart prevents starvation because a transaction eventually becomes the oldest. Wound-Wait usually causes fewer aborts.",
+    "key_points": [
+      "Wait-Die: old waits for young, young meeting old aborts itself",
+      "Wound-Wait: old forces young to abort, young waits for old; one-directional waiting prevents cycles, retained timestamps prevent starvation"
+    ],
+    "id": "Q_DB3_058"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Timestamp ordering protocol",
+    "difficulty": "Medium",
+    "question": "How does the Basic Timestamp Ordering concurrency control protocol work?",
+    "reference_answer": "Each transaction T has a timestamp TS(T); each data item X stores R-TS(X) (largest timestamp that read it) and W-TS(X) (largest that wrote it). When T reads X: if TS(T) < W-TS(X) (a 'younger' transaction already wrote X) then T is aborted; otherwise the read proceeds and R-TS(X) is updated. When T writes X: if TS(T) < R-TS(X) or TS(T) < W-TS(X) then abort; otherwise write and update W-TS(X). The protocol guarantees schedules equivalent to timestamp order, uses no locks so there is no deadlock, but may cause many aborts under high contention. Thomas's write rule allows skipping obsolete writes instead of aborting.",
+    "key_points": [
+      "Each item keeps R-TS and W-TS; operations arriving 'late' relative to younger transactions are aborted",
+      "Lock-free, no deadlock but possibly many aborts; Thomas's write rule skips obsolete writes"
+    ],
+    "id": "Q_DB3_059"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data recovery",
+    "concept": "Undo logging and Redo logging",
+    "difficulty": "Medium",
+    "question": "Compare the principles of Undo logging and Redo logging for crash recovery.",
+    "reference_answer": "Undo logging records OLD values; rules: a log record must reach disk before the data change is written to disk, and all modified data pages must be written to disk BEFORE the COMMIT record is written. Recovery: undo uncommitted transactions. Redo logging records NEW values; rules: modified data pages must NOT be written to disk before the log and the COMMIT record reach disk. Recovery: redo committed transactions. Undo forces data writes at commit (slow), Redo forces keeping pages in the buffer until commit (memory-hungry). Undo/Redo logging (as in ARIES) records both values, allowing the most flexibility (steal/no-force policies).",
+    "key_points": [
+      "Undo: log old values, data must reach disk before COMMIT, recover by undoing",
+      "Redo: log new values, data reaches disk only after COMMIT, recover by redoing; Undo/Redo allows steal/no-force"
+    ],
+    "id": "Q_DB3_060"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data recovery",
+    "concept": "Shadow Paging vs Write-Ahead Logging",
+    "difficulty": "Medium",
+    "question": "What is shadow paging and why do most modern DBMSs choose WAL instead?",
+    "reference_answer": "Shadow paging never overwrites old pages: when a transaction modifies a page, the new version is written elsewhere and a new page table is updated; on commit, the root pointer is atomically switched to the new page table, and on abort the new table is discarded. Advantage: simple recovery, no undo/redo needed. Disadvantages: data becomes fragmented (related pages are no longer contiguous, breaking clustering), page-table copying overhead, difficulty supporting concurrent transactions modifying the same page, and commits must write every modified page. WAL only needs a small sequential log write at commit, keeps data in place and supports concurrency well, so it is more efficient (although the copy-on-write idea is still used in some systems such as LMDB and file systems).",
+    "key_points": [
+      "Shadow paging writes new pages elsewhere and commits by switching the root pointer",
+      "Drawbacks: fragmentation, poor concurrency, costly commits; WAL's sequential logging is more efficient"
+    ],
+    "id": "Q_DB3_061"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Intermediate SQL",
+    "concept": "Running totals with window frames",
+    "difficulty": "Medium",
+    "question": "Write a query computing the daily cumulative revenue within each month, and explain the role of ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW.",
+    "reference_answer": "SELECT day, revenue, SUM(revenue) OVER (PARTITION BY DATE_TRUNC('month', day) ORDER BY day ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS runningTotal FROM DailyRevenue; PARTITION BY creates a separate window per month (the total restarts at the beginning of each month), ORDER BY defines the order, and the ROWS BETWEEN ... frame specifies summing from the first row of the partition to the current row. Note: with ORDER BY but no explicit frame, the default is RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW, which adds rows with equal ORDER BY values together at once — use ROWS to compute strictly row by row.",
+    "key_points": [
+      "SUM() OVER (PARTITION BY ... ORDER BY ... ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) gives a running total",
+      "The default frame is RANGE, grouping rows with equal ORDER BY values; use ROWS for row-by-row totals"
+    ],
+    "id": "Q_DB3_062"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Grouping data",
+    "concept": "ROLLUP, CUBE and GROUPING SETS",
+    "difficulty": "Medium",
+    "question": "Distinguish GROUP BY ROLLUP(region, store), GROUP BY CUBE(region, store) and GROUPING SETS when building revenue reports.",
+    "reference_answer": "ROLLUP(region, store) produces hierarchical subtotals: (region, store), (region) — total per region, and () — grand total; suited for hierarchical data. CUBE(region, store) produces all combinations: (region, store), (region), (store), () — adding totals per store regardless of region. GROUPING SETS lets you list exactly the combinations you want, e.g., GROUPING SETS ((region), (month), ()). Subtotal rows have NULL in the aggregated columns; use GROUPING(col) to distinguish NULLs produced by aggregation from real NULLs in the data.",
+    "key_points": [
+      "ROLLUP: hierarchical subtotals; CUBE: all combinations; GROUPING SETS: arbitrary chosen combinations",
+      "Subtotal rows have NULLs in aggregated columns; use GROUPING() to tell them apart from real NULLs"
+    ],
+    "id": "Q_DB3_063"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Grouping data",
+    "concept": "Conditional aggregation (pivot with CASE)",
+    "difficulty": "Medium",
+    "question": "Write a query turning Orders(customerId, year, amount) into a report with one row per customer and one column per year 2022, 2023, 2024 containing total amounts.",
+    "reference_answer": "Use conditional aggregation: SELECT customerId, SUM(CASE WHEN year = 2022 THEN amount ELSE 0 END) AS y2022, SUM(CASE WHEN year = 2023 THEN amount ELSE 0 END) AS y2023, SUM(CASE WHEN year = 2024 THEN amount ELSE 0 END) AS y2024 FROM Orders GROUP BY customerId; Each CASE selects values only for the corresponding year, and SUM aggregates per customer. Some systems offer FILTER syntax (SUM(amount) FILTER (WHERE year = 2022)) or PIVOT. Limitation: the column list must be known in advance; dynamic columns require dynamic SQL.",
+    "key_points": [
+      "Pivot with SUM(CASE WHEN ... THEN ... ELSE 0 END) plus GROUP BY",
+      "FILTER or PIVOT can be used; dynamic columns need dynamic SQL"
+    ],
+    "id": "Q_DB3_064"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Intermediate SQL",
+    "concept": "Finding and deleting duplicate records",
+    "difficulty": "Medium",
+    "question": "The Customer table has many duplicate rows with the same email. Write how to delete duplicates, keeping only the row with the smallest id for each email.",
+    "reference_answer": "Use a window function to number rows within each email group: WITH c AS (SELECT id, ROW_NUMBER() OVER (PARTITION BY email ORDER BY id) AS rn FROM Customer) DELETE FROM Customer WHERE id IN (SELECT id FROM c WHERE rn > 1); Or the classic way: DELETE FROM Customer k WHERE EXISTS (SELECT 1 FROM Customer k2 WHERE k2.email = k.email AND k2.id < k.id); Before deleting, run a SELECT to check, handle child tables referencing the rows to be deleted (repoint foreign keys to the kept row), and afterwards add a UNIQUE(email) constraint to prevent recurrence — normalizing case and whitespace before comparing.",
+    "key_points": [
+      "Use ROW_NUMBER() OVER (PARTITION BY email ORDER BY id) and delete rn > 1, or EXISTS with a smaller id",
+      "Check first, handle referencing child rows, then add UNIQUE to prevent recurrence"
+    ],
+    "id": "Q_DB3_065"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Row-level and statement-level triggers",
+    "difficulty": "Medium",
+    "question": "Distinguish FOR EACH ROW and FOR EACH STATEMENT triggers. For an UPDATE affecting 10,000 rows, how many times does each run and what is each suited for?",
+    "reference_answer": "A row-level trigger (FOR EACH ROW) runs once for EACH affected row — 10,000 times — and can access the old/new row values (OLD/NEW); suited for per-row normalization, complex per-row constraint checks and detailed per-row auditing. A statement-level trigger (FOR EACH STATEMENT) runs exactly ONCE for the whole statement, even if no rows are affected; suited for logging 'who ran what statement', refreshing a summary table once, or overall checks (with transition tables in PostgreSQL). Row-level triggers on bulk operations can significantly slow things down.",
+    "key_points": [
+      "Row-level runs per row with OLD/NEW; statement-level runs once per statement",
+      "Row-level suits per-row checks/auditing but is costly for bulk updates"
+    ],
+    "id": "Q_DB3_066"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Pros and cons of Stored Procedures",
+    "difficulty": "Medium",
+    "question": "Analyze the pros and cons of putting data processing logic in stored procedures versus in application code.",
+    "reference_answer": "Pros: processing close to the data reduces network round trips (one call instead of dozens of queries); EXECUTE can be granted without direct table access; logic is shared across applications in different languages; execution plans are reused. Cons: procedural languages (PL/SQL, T-SQL) are less expressive, hard to unit test, hard to version and deploy alongside the application; tight coupling to one DBMS (vendor lock-in); computational load shifts onto the database, which is harder to scale horizontally than the application tier. They are usually reasonable for bulk data processing, while complex business logic belongs in the application.",
+    "key_points": [
+      "Pros: fewer round trips, fine-grained permissions, shared logic, plan reuse",
+      "Cons: hard to test/version, vendor lock-in, load on a hard-to-scale database"
+    ],
+    "id": "Q_DB3_067"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database security",
+    "concept": "How prepared statements prevent SQL injection",
+    "difficulty": "Medium",
+    "question": "Explain at the mechanism level why prepared statements (parameterization) prevent SQL injection, while manual 'escaping' of strings is less reliable.",
+    "reference_answer": "With a prepared statement, the SQL structure (statement template) is sent and parsed FIRST, and parameter values are transmitted separately as DATA, never parsed as SQL code — even if a user enters ' OR '1'='1, it is just a string compared with the column. Manual escaping depends on developers remembering to escape correctly everywhere, in the right context (strings, numbers, column names, LIKE), with the right character encoding; forgetting a single place or hitting an encoding edge case is enough to be exploited. Note: parameters can only replace values, not table/column names or ORDER BY keywords — those must be validated against a whitelist.",
+    "key_points": [
+      "Prepared statements separate statement structure from data; parameters are never interpreted as SQL",
+      "Manual escaping is error-prone; dynamic table/column names must be whitelisted"
+    ],
+    "id": "Q_DB3_068"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Sizing a connection pool",
+    "difficulty": "Medium",
+    "question": "A team increased the connection pool size from 20 to 500 hoping to raise throughput, but the system became slower. Explain this phenomenon.",
+    "reference_answer": "A database server has a finite number of CPU cores and disk bandwidth; the number of queries that can truly run in parallel efficiently is roughly a few times the core count. With 500 active connections: the CPU context-switches constantly between processes/threads, contention on internal locks and latches rises sharply, memory is divided among many sessions (each connection consumes RAM for work_mem/sort buffers), and the buffer cache is churned. As a result each query slows down and total throughput drops. The pool should be small and sized by measurement (a reference formula: cores × 2 + number of disks), letting excess requests wait in the pool's queue instead of piling onto the database; also, the sum of pools across all application instances must not exceed the database's limit.",
+    "key_points": [
+      "Too many connections cause context switching, lock contention and memory pressure on the database",
+      "Keep the pool small and measured; excess requests wait in the pool; account for all instances' pools"
+    ],
+    "id": "Q_DB3_069"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Lazy loading vs eager loading in ORMs",
+    "difficulty": "Medium",
+    "question": "Compare lazy loading and eager loading in an ORM when loading a list of Orders with their OrderLines.",
+    "reference_answer": "Lazy loading loads only the Orders; the OrderLines list is queried only when code first accesses it. Pro: no unnecessary data loaded. Cons: iterating 100 orders and accessing each order's lines generates 1 + 100 queries (the N+1 problem), and errors occur when accessed outside the session. Eager loading loads OrderLines upfront (JOIN FETCH or a second IN query): fewer queries but possibly loads extra data, and joining multiple collections causes a Cartesian product explosion. A good approach: default to lazy, and eager-load deliberately per use case (fetch joins, entity graphs, batch fetching).",
+    "key_points": [
+      "Lazy: loads on demand, saves data but easily causes N+1",
+      "Eager: loads upfront, fewer queries but may over-fetch or explode Cartesian products; choose per use case"
+    ],
+    "id": "Q_DB3_070"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "SQL DDL",
+    "concept": "Zero-downtime migration: the expand-contract pattern",
+    "difficulty": "Medium",
+    "question": "You need to rename column fullName to displayName in the Customer table, which is used continuously by the application with rolling deployments (multiple application versions running at once). Describe the expand-contract process.",
+    "reference_answer": "You cannot rename directly because the old application version still reads fullName. Process: (1) Expand: add the new column displayName (nullable). (2) Deploy the application writing to both columns while still reading the old one. (3) Backfill: copy old data into the new column in small batches. (4) Deploy the application reading from the new column (still writing both to allow rollback). (5) Once all versions use the new column, stop writing the old one. (6) Contract: drop fullName. Each step is backward compatible with the previous version, so the application can be rolled back at any time.",
+    "key_points": [
+      "Do not rename directly because older versions still use the old column",
+      "Expand (add column, dual write, backfill) → switch reads → contract (drop old column); each step backward compatible"
+    ],
+    "id": "Q_DB3_071"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Indexes",
+    "concept": "Partial indexes",
+    "difficulty": "Medium",
+    "question": "What is a partial index (an index with a WHERE condition)? Give an example of a suitable scenario.",
+    "reference_answer": "A partial index indexes only the subset of rows satisfying a condition, e.g., CREATE INDEX idx_pending_orders ON Orders(createdAt) WHERE status = 'PENDING'; It fits when queries frequently target only a small portion of the data (pending orders are 1% of a 50-million-row table): the index is much smaller, faster and cheaper to maintain on writes. It is also used for conditional uniqueness, such as UNIQUE(email) WHERE deleted = false. Queries must have a condition matching (or implying) the index condition to use it.",
+    "key_points": [
+      "A partial index covers only rows satisfying a condition",
+      "Small, fast, cheap on writes; used for queries on subsets or conditional uniqueness"
+    ],
+    "id": "Q_DB3_072"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Indexes",
+    "concept": "Expression (functional) indexes",
+    "difficulty": "Medium",
+    "question": "The query WHERE LOWER(email) = 'an@x.com' cannot use an index on the email column. Explain and propose a solution.",
+    "reference_answer": "A B-tree index on email stores the original sorted email values; a condition on LOWER(email) compares transformed values that do not match the index order, so the optimizer cannot use it (it must scan the whole table computing LOWER for each row). Solution: create an expression index CREATE INDEX idx_email_lower ON Users(LOWER(email)); — queries using exactly that expression will use the index. Combining it with UNIQUE also prevents case-insensitive duplicate emails. Alternatives: store a pre-normalized email, or use a case-insensitive type/collation (citext).",
+    "key_points": [
+      "Applying a function to a column prevents using an index on the raw column",
+      "Create an index on LOWER(email), or store normalized data/use a case-insensitive collation"
+    ],
+    "id": "Q_DB3_073"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Query optimization",
+    "concept": "Sort-Merge Join",
+    "difficulty": "Medium",
+    "question": "Describe the Sort-Merge Join algorithm and when the optimizer prefers it over Hash Join.",
+    "reference_answer": "Sort-Merge Join sorts both tables on the join column (if not already ordered), then scans both sorted lists in parallel like merging two sequences in merge sort, pairing rows with the same key. The cost is mainly the O(n log n) sorting plus one linear merge pass. The optimizer prefers it when: inputs are already ordered (from a B-tree index or a previous step), the result needs ORDER BY on the join column, the join condition is an inequality/range (hash join only supports equality), or data is too large for memory so a hash table would spill to disk.",
+    "key_points": [
+      "Sort both inputs on the join key, then merge linearly",
+      "Preferred when inputs are pre-sorted, ordered output is needed, the join is non-equi, or memory is limited"
+    ],
+    "id": "Q_DB3_074"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Storage and file organization",
+    "concept": "External merge sort in a DBMS",
+    "difficulty": "Medium",
+    "question": "When an ORDER BY must sort a 100GB table with only 1GB of buffer memory, how does a DBMS use external merge sort? What does the number of passes depend on?",
+    "reference_answer": "Phase 1 (run generation): read successive 1GB chunks into memory, sort each in memory and write it to disk as a sorted 'run' — about 100 runs. Phase 2 (merging): use B-1 buffer pages for input and 1 for output to merge many runs at once (k-way merge with a heap), producing larger runs, repeating until one run remains. Number of passes = 1 + ⌈log_(B-1)(number of runs)⌉, each pass reading and writing the whole data once. With enough buffer, usually only 2 passes are needed. Hence increasing sort memory (work_mem/sort_buffer) can eliminate an entire I/O pass, and an index providing the order avoids sorting altogether.",
+    "key_points": [
+      "Run generation sorts memory-sized chunks; the merge phase combines runs with k-way merge",
+      "Passes ≈ 1 + log_(B-1)(runs); more sort memory or an ordering index reduces cost"
+    ],
+    "id": "Q_DB3_075"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Query optimization",
+    "concept": "Selectivity estimation and histograms",
+    "difficulty": "Medium",
+    "question": "How does the optimizer estimate the number of rows satisfying WHERE price BETWEEN 100 AND 200? What role do histograms play?",
+    "reference_answer": "The optimizer relies on collected statistics (ANALYZE): row counts, number of distinct values, most common values (MCV) and histograms describing value distributions. If it only knew min/max and assumed a uniform distribution, selectivity ≈ (200 - 100)/(max - min) — badly wrong when data is skewed. A histogram (usually equi-depth, equal rows per bucket) shows how many buckets the range [100, 200] spans, giving an estimate close to reality. Row estimates drive the choice between index scan and full scan, join order and join algorithms, so wrong statistics lead to bad plans.",
+    "key_points": [
+      "The optimizer estimates from statistics: row count, distinct values, MCVs, histograms",
+      "Histograms capture skew for accurate row estimates — which drive index choice and join order"
+    ],
+    "id": "Q_DB3_076"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Storage and file organization",
+    "concept": "Column-stores for analytical queries",
+    "difficulty": "Medium",
+    "question": "The query SELECT region, SUM(revenue) FROM Sales GROUP BY region runs on a table of 1 billion rows and 80 columns. Explain why a column-store can be tens of times faster than a row-store.",
+    "reference_answer": "A row-store must read all pages containing all 80 columns of every row even though only 2 are needed — reading about 40 times more data than necessary. A column-store reads only the region and revenue columns. Moreover, same-column data has the same type and similar values so it compresses very well (dictionary encoding for region, run-length encoding when sorted), cutting I/O several times more; and vectorized execution (processing column batches, exploiting SIMD and CPU caches) is faster than row-at-a-time processing. Trade-off: column-stores are slow when reading/writing whole individual rows or doing scattered updates.",
+    "key_points": [
+      "A column-store reads only the needed columns instead of whole rows",
+      "Effective per-column compression and vectorized execution; in exchange slow for row-level reads/writes"
+    ],
+    "id": "Q_DB3_077"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Storage and file organization",
+    "concept": "LSM-Tree vs B-Tree",
+    "difficulty": "Medium",
+    "question": "Compare the LSM-Tree (used in Cassandra, RocksDB) and the B-Tree in terms of write and read performance.",
+    "reference_answer": "A B-Tree updates data IN PLACE: each write must locate the right leaf page and rewrite it (random writes); reads are fast and predictable because each key lives in exactly one place. An LSM-Tree writes into memory (memtable) and a sequential log; when full, it is flushed to disk as immutable sorted files (SSTables); files are periodically merged (compaction) in the background. Pro: sequential writes give very high write throughput. Cons: reads may need to check several files (mitigated by Bloom filters), compaction consumes background I/O and CPU (write amplification), and read latency is less predictable. LSM suits heavy write workloads (logs, IoT, time series), B-Tree suits balanced OLTP read/write workloads.",
+    "key_points": [
+      "B-Tree updates in place: fast predictable reads, random writes",
+      "LSM writes sequentially for high throughput, reads may span files, compaction costs"
+    ],
+    "id": "Q_DB3_078"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "Star schema vs snowflake schema",
+    "difficulty": "Medium",
+    "question": "Compare the star schema and the snowflake schema.",
+    "reference_answer": "Star schema: each dimension table is a single denormalized table, e.g., DimProduct also contains categoryName, groupName, brandName. Snowflake schema normalizes dimensions into multiple hierarchical tables: DimProduct → DimCategory → DimGroup. Star: simpler queries, fewer JOINs, usually faster, easier for report authors, but redundant data in dimensions. Snowflake: saves storage and keeps hierarchical attributes consistent when they change, but requires more JOINs. Since dimensions are usually small compared to facts, the star schema is preferred in most data warehouses.",
+    "key_points": [
+      "Star: denormalized dimensions, fewer JOINs, simpler queries",
+      "Snowflake: normalized multi-level dimensions, less redundancy but more JOINs; star is usually preferred"
+    ],
+    "id": "Q_DB3_079"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "The grain of a fact table",
+    "difficulty": "Medium",
+    "question": "Why is 'declaring the grain' (what each row of a fact table represents) the most important first step when designing a fact table?",
+    "reference_answer": "The grain determines the meaning of each row (e.g., 'one product line on one invoice' or 'total revenue of one store per day'), which in turn determines which dimensions can be attached and which measures are valid. The more atomic the grain, the more flexible: it can be aggregated to any level and answer unforeseen questions; a pre-aggregated grain is compact but cannot be drilled down (you cannot know which products were bought together). Mixing several grains in one fact table (both detail rows and summary rows) causes double counting when summing. So the grain must be agreed upon before choosing dimensions and measures.",
+    "key_points": [
+      "The grain defines each row's meaning and determines valid dimensions and measures",
+      "Atomic grain is more flexible; mixing grains in one table causes double counting"
+    ],
+    "id": "Q_DB3_080"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "Incremental loading and Change Data Capture",
+    "difficulty": "Medium",
+    "question": "Compare full load and incremental load in ETL. How does Change Data Capture (CDC) support incremental loading?",
+    "reference_answer": "Full load deletes and reloads all data each time: simple, always correct, but slow and heavy on source systems for large data. Incremental load only loads changes since the last run: fast and lighter, but requires correctly identifying changes. The simple approach uses an updated_at column, but it easily misses DELETED rows and updates that do not touch that column. CDC reads the source database's transaction log (binlog, WAL) directly to capture every INSERT/UPDATE/DELETE in order, without modifying applications or scanning tables — tools like Debezium emit changes as event streams.",
+    "key_points": [
+      "Full load is simple but costly; incremental is fast but must identify changes correctly",
+      "CDC reads the transaction log to capture all changes including DELETEs, in order, without app changes"
+    ],
+    "id": "Q_DB3_081"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Synchronous vs asynchronous replication",
+    "difficulty": "Medium",
+    "question": "Compare synchronous and asynchronous replication in terms of durability and performance.",
+    "reference_answer": "Synchronous: the primary reports a commit as successful only after at least one replica confirms receiving (and durably writing) the change. Pro: a sudden primary failure loses no committed transactions. Cons: every commit pays extra network latency, and if a replica is slow/unresponsive, writes are blocked. Asynchronous: the primary commits immediately and changes are sent to replicas afterwards. Pros: low write latency, primary independent of replicas. Cons: replicas lag; if the primary fails, transactions not yet replicated are lost on failover. Hybrids: semi-synchronous (wait for one of N replicas) or synchronous within a region and asynchronous to remote regions.",
+    "key_points": [
+      "Synchronous: no loss of committed data but higher latency and dependence on replicas",
+      "Asynchronous: fast but replica lag and possible loss on failover; semi-synchronous options exist"
+    ],
+    "id": "Q_DB3_082"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Replica lag and read-your-writes consistency",
+    "difficulty": "Medium",
+    "question": "A user updates their avatar (written to the primary), the page reloads reading from a replica and still shows the old avatar. Explain and list ways to ensure 'read-your-writes'.",
+    "reference_answer": "With asynchronous replication, a replica may lag the primary by hundreds of milliseconds to several seconds; reading from it right after a write may not yet show the change. Ways to ensure read-your-writes: (1) read from the primary for data the user just modified (e.g., their own profile) or for a short period after a write; (2) remember the log position (LSN/GTID) of the session's last write and only read from replicas that have applied up to that position, otherwise wait or fall back to the primary; (3) pin a user session to a fixed replica to at least ensure monotonic reads (never seeing data 'go back in time').",
+    "key_points": [
+      "Asynchronous replicas lag, so reading right after writing may show stale data",
+      "Solutions: read from the primary for just-modified data, track the session's LSN, pin sessions to replicas"
+    ],
+    "id": "Q_DB3_083"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Quorum reads and writes (N, R, W)",
+    "difficulty": "Medium",
+    "question": "In a storage system replicating data N times (like Cassandra, DynamoDB), explain the condition R + W > N and the meaning of choosing different R, W values.",
+    "reference_answer": "Each key is stored on N replicas; a write succeeds when W replicas acknowledge, a read succeeds after responses from R replicas. If R + W > N, the set of replicas read and the set written always overlap in at least one replica, so a read is guaranteed to reach at least one replica with the latest value (chosen by timestamp/version). E.g., with N = 3: W = 2, R = 2 is balanced; W = 3, R = 1 gives fast reads but writes fail if one node is down; W = 1, R = 3 is the opposite. R + W ≤ N (e.g., R = W = 1) gives low latency and high availability but may read stale data. Even with R + W > N there are edge cases (partially failed writes, sloppy quorums), so it is not entirely equivalent to strong consistency.",
+    "key_points": [
+      "R + W > N guarantees read and write sets overlap, so reads see the latest version",
+      "Tune R, W to trade latency, availability and consistency; edge cases remain"
+    ],
+    "id": "Q_DB3_084"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "NoSQL and comparisons",
+    "concept": "Graph databases and multi-hop queries",
+    "difficulty": "Medium",
+    "question": "The query 'find friends of friends of friends (3 hops) of a user' on a social network of 100 million people. Compare doing it in SQL with self-joins versus in a graph database.",
+    "reference_answer": "In SQL, each hop is a self-join on a Friendship table (billions of rows): three hops are three joins, each probing an index, with intermediate results growing exponentially; the cost depends on the size of the whole table and index (O(log n) per lookup). A graph database uses 'index-free adjacency': each node stores direct pointers to its adjacent edges, so a hop costs proportionally to the number of neighbors, independent of the total graph size; the query is expressed naturally (MATCH (a)-[:FRIEND*3]->(c)). However, for aggregate queries over the whole dataset, or super-connected nodes (celebrities with millions of friends), graph databases also struggle; and the operational cost of an additional system must be considered.",
+    "key_points": [
+      "SQL needs multiple self-joins; each hop's cost depends on table and index size",
+      "Graphs traverse by adjacency pointers, cost proportional to neighbors; still struggle with global aggregation and supernodes"
+    ],
+    "id": "Q_DB3_085"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "NoSQL and comparisons",
+    "concept": "The cache-aside pattern with Redis",
+    "difficulty": "Medium",
+    "question": "Describe the cache-aside pattern when using Redis as a cache for the Product table, and strategies for invalidating the cache when data changes.",
+    "reference_answer": "Cache-aside (lazy loading): on read, the application looks in Redis first; on a hit it returns the value; on a miss it reads from the database, writes into Redis with a time-to-live (TTL) and returns it. When updating a product: write to the database, then DELETE the corresponding cache key (instead of overwriting with the new value) so the next read reloads the latest data. The TTL acts as a safety net, ensuring stale data does not persist forever if deletion fails. Other patterns: write-through (write through the cache to the database at the same time), write-behind (write the cache first, flush to the database later — fast but risks data loss).",
+    "key_points": [
+      "Cache-aside: read the cache, on a miss read the DB and populate the cache with a TTL",
+      "On update: write the DB then delete the cache key; TTL as a safety net; write-through and write-behind alternatives"
+    ],
+    "id": "Q_DB3_086"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "NoSQL and comparisons",
+    "concept": "Global secondary indexes in NoSQL",
+    "difficulty": "Medium",
+    "question": "In DynamoDB, the Orders table has partition key customerId. You need to query 'all orders with status SHIPPING'. Explain the problem and the role of a Global Secondary Index (GSI).",
+    "reference_answer": "Key-value/wide-column systems distribute data by partition key; queries are efficient only when the partition key is known (orders of one customer). Querying by status forces scanning the whole table across all partitions (Scan) — very expensive. A GSI is a copy of the data organized under a different partition key (e.g., status, sort key createdAt), maintained automatically by the system when the base table changes, enabling efficient queries on the new key. Trade-offs: extra storage and write cost (each base-table write also writes the index), GSIs are usually only eventually consistent, and low-cardinality keys like status easily create hot partitions — often requiring a random suffix (write sharding).",
+    "key_points": [
+      "NoSQL queries are efficient by partition key; other attributes require a full scan",
+      "A GSI is a copy keyed differently: extra write/storage cost, eventually consistent, beware hot partitions"
+    ],
+    "id": "Q_DB3_087"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Race conditions in the SELECT-then-INSERT pattern",
+    "difficulty": "Medium",
+    "question": "An application checks SELECT COUNT(*) FROM Users WHERE email = ? and only INSERTs if none exists. Why can duplicate emails still appear, and what is the correct solution?",
+    "reference_answer": "Two concurrent requests both run SELECT, both see count = 0 (under READ COMMITTED, and even under REPEATABLE READ/snapshot since the new row does not yet exist to be locked), then both INSERT — the gap between check and act (check-then-act) allows duplicates. The correct solution is to let the database guarantee it: create a UNIQUE(email) constraint, then INSERT directly and handle the unique-violation error (or use INSERT ... ON CONFLICT DO NOTHING/UPDATE). The unique constraint is enforced atomically inside the database through the index, leaving no gap. SERIALIZABLE would also prevent it but requires retry logic.",
+    "key_points": [
+      "Check-then-act leaves a gap between SELECT and INSERT; two transactions can both insert",
+      "Use a UNIQUE constraint + INSERT with error handling/ON CONFLICT so the database guarantees atomicity"
+    ],
+    "id": "Q_DB3_088"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "SQL DDL",
+    "concept": "Gaps in sequence values",
+    "difficulty": "Medium",
+    "question": "Why can auto-increment/sequence values skip (1, 2, 5, 6...) and why should you not try to 'fix' this?",
+    "reference_answer": "For concurrent performance, sequences hand out values NON-transactionally: a value once taken is not returned when the transaction rolls back (otherwise every other transaction would have to wait to know whether the value will be used — a bottleneck). In addition, many systems pre-allocate a block of values in a cache to reduce I/O, and a server restart discards the remainder; INSERTs failing on constraint violations also consume values. You should not force contiguous numbers (e.g., using MAX(id)+1) because it causes locking and race conditions. If the business requires contiguous numbers (legally mandated invoice numbers), use a separate locked mechanism, decoupled from the primary key.",
+    "key_points": [
+      "Sequences do not return values on rollback, use caches, and failed inserts consume values",
+      "Do not force contiguity with MAX+1; business numbering needs its own locked mechanism"
+    ],
+    "id": "Q_DB3_089"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database security",
+    "concept": "WITH GRANT OPTION and cascading revocation",
+    "difficulty": "Medium",
+    "question": "User A grants SELECT on the EmployeeSalary table to B WITH GRANT OPTION, and B grants it on to C. Then A revokes B's privilege. What happens to C's privilege?",
+    "reference_answer": "WITH GRANT OPTION allows the grantee to grant the privilege on to others, forming a chain of grants. When A revokes B's privilege: with REVOKE ... CASCADE, the privilege B granted to C (and anyone C granted to) is also revoked, unless C also received it from another independent source. With RESTRICT (the default in many systems), the revoke is refused because dependent privileges exist. This is why WITH GRANT OPTION should be limited for sensitive data: it distributes control and makes it hard to audit who has access.",
+    "key_points": [
+      "WITH GRANT OPTION allows re-granting, creating dependency chains",
+      "REVOKE CASCADE revokes down the chain (unless another source exists), RESTRICT refuses; limit it for sensitive data"
+    ],
+    "id": "Q_DB3_090"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "NoSQL and comparisons",
+    "concept": "JSONB vs normalized columns",
+    "difficulty": "Medium",
+    "question": "When should product attributes be stored in a JSONB column, and when should they be split into normalized columns/tables?",
+    "reference_answer": "JSONB fits when attributes are diverse and vary by product type (phones have RAM, shirts have size and material), have no strict business rules, are mostly displayed or simply filtered, or are semi-structured external data (webhook payloads). Split into normalized columns/tables when: the attribute exists on every row, needs constraints (NOT NULL, types, foreign keys, CHECK), is frequently JOINed or aggregated, needs accurate statistics for the optimizer, or is business-critical (price, stock). A common hybrid: standard columns for core attributes, JSONB for the extensible part.",
+    "key_points": [
+      "JSONB for diverse, flexible, loosely constrained attributes",
+      "Normalized columns for core attributes needing constraints, joins, aggregation, statistics; hybrids are common"
+    ],
+    "id": "Q_DB3_091"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "SQL DDL",
+    "concept": "Storing time in UTC",
+    "difficulty": "Medium",
+    "question": "Why is it recommended to store event instants in UTC (or a time-zone-aware type) and only convert to local time for display? Give one exception.",
+    "reference_answer": "Storing local time without a time zone is ambiguous when users/servers span multiple time zones, and daylight saving time (DST) makes some local times occur twice or not at all — comparisons, sorting and duration calculations can be wrong. UTC is an absolute, continuous timeline, so storing UTC keeps all arithmetic correct; displaying in the user's time zone is done at the presentation layer. Exception: FUTURE times tied to local human intent (a 9 a.m. appointment in Ho Chi Minh City next year) should be stored as local time plus a time zone name (Asia/Ho_Chi_Minh), because time zone rules may change before then.",
+    "key_points": [
+      "Local time without a zone is ambiguous and breaks with DST and multiple zones; UTC is absolute",
+      "Exception: future local-time events should store local time + the time zone name"
+    ],
+    "id": "Q_DB3_092"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Relational algebra",
+    "concept": "Tuple Relational Calculus",
+    "difficulty": "Medium",
+    "question": "How does Tuple Relational Calculus differ from relational algebra? Express the query 'students with a score above 8' in tuple relational calculus.",
+    "reference_answer": "Relational algebra is PROCEDURAL: it describes a sequence of operations (selection, projection, join...) to compute the result. Tuple relational calculus is DECLARATIVE, based on predicate logic: it only describes what conditions the result must satisfy, not how to compute it. Example: { t | t ∈ Student ∧ t.score > 8 }. A query with a quantifier: students enrolled in at least one course: { t | t ∈ Student ∧ ∃ e ∈ Enrollment (e.studentId = t.studentId) }. Codd's theorem proves relational algebra and safe relational calculus are equivalent in expressive power; SQL is influenced by relational calculus (declarative), and the optimizer translates it into algebraic form for execution.",
+    "key_points": [
+      "Relational algebra is procedural, relational calculus is declarative and logic-based",
+      "Example { t | t ∈ Student ∧ t.score > 8 }; both (safe forms) are equally expressive"
+    ],
+    "id": "Q_DB3_093"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Intermediate SQL",
+    "concept": "LATERAL joins (CROSS APPLY)",
+    "difficulty": "Medium",
+    "question": "Write a query getting the 3 most recent orders of EACH customer using a LATERAL join, and explain what LATERAL allows that an ordinary subquery in FROM does not.",
+    "reference_answer": "SELECT c.customerId, o.* FROM Customer c CROSS JOIN LATERAL (SELECT * FROM Orders od WHERE od.customerId = c.customerId ORDER BY od.orderDate DESC LIMIT 3) o; (SQL Server uses CROSS APPLY with TOP 3). An ordinary subquery in FROM is evaluated independently and cannot reference columns of tables before it. LATERAL lets the subquery reference each row of the left table — like a loop 'for each customer, run this subquery'. With an index on (customerId, orderDate DESC), each run reads only 3 rows, more efficient than numbering ROW_NUMBER over the whole orders table when the number of customers is small. Use LEFT JOIN LATERAL ... ON true to keep customers with no orders.",
+    "key_points": [
+      "LATERAL lets a FROM subquery reference columns of the left table, like a per-row loop",
+      "Suits top-N-per-group with a suitable index; LEFT JOIN LATERAL keeps rows with no matches"
+    ],
+    "id": "Q_DB3_094"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Advisory locks",
+    "difficulty": "Medium",
+    "question": "What is an advisory lock (e.g., pg_advisory_lock in PostgreSQL) and when is it used?",
+    "reference_answer": "An advisory lock is a lock whose meaning is defined by the APPLICATION, tied to an arbitrary number/key rather than to a row or table; the database only guarantees mutual exclusion, while honoring the lock is a convention among application processes. Uses: ensuring only one instance runs a scheduled (cron) job at a time across a cluster of servers, serializing processing per business key (all operations on one customer's wallet), running migrations safely. Pro: uses the existing database as a simple distributed lock service. Caveats: session-level locks must be released explicitly (careful with connection pools), and it does not protect data from code that does not take the lock.",
+    "key_points": [
+      "An advisory lock is application-defined, not tied to rows/tables",
+      "Used for single-instance jobs and per-key serialization; must be released properly and respected by all parties"
+    ],
+    "id": "Q_DB3_095"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Normalization",
+    "concept": "Join dependencies and Fifth Normal Form (5NF)",
+    "difficulty": "Medium",
+    "question": "What is a join dependency, and what problem does Fifth Normal Form (5NF) solve that 4NF does not?",
+    "reference_answer": "A join dependency states that relation R always equals the join of its projections R1, R2, ..., Rn; a multivalued dependency is the special case n = 2. 5NF requires every non-trivial join dependency to be implied by the keys. Example Supply(supplier, product, project) with the rule 'if a supplier supplies product P, P is used in project D, and the supplier participates in project D, then the supplier supplies P to D': the relation cannot be losslessly decomposed into 2 tables but can be into 3 two-column tables. Kept as a single three-column table, several tuples must be inserted together to maintain the rule. In practice 5NF is rare and mainly matters for many-ary relationships with such cyclic constraints.",
+    "key_points": [
+      "A join dependency: a relation equals the join of several projections; MVD is the case n = 2",
+      "5NF handles cases only losslessly decomposable into 3 or more tables; rare in practice"
+    ],
+    "id": "Q_DB3_096"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Indexes",
+    "concept": "Vertical and horizontal partitioning",
+    "difficulty": "Medium",
+    "question": "Compare vertical partitioning and horizontal partitioning, with application examples.",
+    "reference_answer": "Horizontal partitioning splits a table's ROWS into parts by a criterion (time ranges, regions, hash of a key), each part having the same columns — e.g., a Log table partitioned by month so a monthly query scans only one partition and old data is removed by dropping a whole partition. Vertical partitioning splits COLUMNS into several tables sharing the primary key — e.g., moving description (long text) and image (BLOB) columns of Product into a ProductDetail table, so the main table is lean, fits more rows per page and scans/caches better for frequent queries needing only a few columns. Trade-off of vertical partitioning: a JOIN is needed to get all information.",
+    "key_points": [
+      "Horizontal: split rows by criterion, same structure; suits time/region data",
+      "Vertical: split columns into tables sharing the key; separates large/rarely used columns at the cost of JOINs"
+    ],
+    "id": "Q_DB3_097"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "Reporting on a read replica vs a data warehouse",
+    "difficulty": "Medium",
+    "question": "A company runs heavy analytical reports directly on a read replica of its operational database. Analyze the pros and cons compared to building a separate data warehouse.",
+    "reference_answer": "Read replica: quick to set up, near-real-time data, no direct load on the primary. Cons: the schema normalized for OLTP forces report queries to JOIN many tables, slowly; row-store and OLTP indexes are not optimized for aggregate scans; long queries on the replica may conflict with applying changes (PostgreSQL must cancel the query or let the replica lag), and the replica is a failover candidate so its performance still matters; it only has current data of one system, no history and no integration with other sources. Data warehouse: star schema, column-store, history, multi-source integration, cleaned data quality, but requires building ETL and data has latency. Companies often start with a replica and move to a warehouse as analytical needs grow.",
+    "key_points": [
+      "Replica: quick and near-real-time, but OLTP schema is slow for analytics and may conflict with replication",
+      "Warehouse: optimized for analytics, history and integration, at the cost of ETL effort and latency"
+    ],
+    "id": "Q_DB3_098"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database security",
+    "concept": "Database auditing",
+    "difficulty": "Medium",
+    "question": "What information should database auditing record, and why should you not rely only on log tables written by the application itself?",
+    "reference_answer": "Audit records should include: who (database account and end-user identity), what (operation type, statement, affected objects, before/after values for sensitive data), when (exact time), where from (IP address, application), and the outcome (success/failure, permission denied). Relying only on application logs is insufficient because accesses bypassing the application (administrators running SQL directly, reporting tools, stolen accounts) are not recorded; and anyone with privileges to modify the log table can erase traces. Database-level auditing is needed (pgAudit, SQL Server Audit), shipping logs to a separate append-only (WORM) system and separating database administration privileges from log management.",
+    "key_points": [
+      "Record who, what, when, where from, outcome; before/after values for sensitive data",
+      "Application logs miss direct access and can be erased; use database-level auditing stored separately append-only"
+    ],
+    "id": "Q_DB3_099"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Query optimization",
+    "concept": "Sargable predicates",
+    "difficulty": "Medium",
+    "question": "Why is the condition WHERE YEAR(orderDate) = 2024 often slow even with an index on orderDate? Rewrite it efficiently and explain the concept of 'sargable'.",
+    "reference_answer": "A 'sargable' (Search ARGument ABLE) condition is one the DBMS can use an index for range searching — the column must stand 'bare' on one side of the comparison. YEAR(orderDate) = 2024 applies a function to the column, so the B-tree index on orderDate cannot be used to seek; the whole table is scanned computing YEAR for each row. Rewrite: WHERE orderDate >= '2024-01-01' AND orderDate < '2025-01-01' — a range condition on the column itself, usable with an index range scan. Likewise avoid price * 1.1 > 100 (write price > 100/1.1), customerName LIKE '%an' (leading wildcard), or comparing mismatched data types.",
+    "key_points": [
+      "Sargable: the column stands bare in the condition so the index can be used for ranges",
+      "Rewrite YEAR(date) = 2024 as the range [2024-01-01, 2025-01-01); avoid functions/arithmetic on columns and leading-% LIKE"
+    ],
+    "id": "Q_DB3_100"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Intermediate SQL",
+    "concept": "Unstable pagination due to non-unique ORDER BY",
+    "difficulty": "Hard",
+    "question": "A product listing API paginates with ORDER BY price LIMIT 20 OFFSET ?. Users report some products appearing on both page 1 and page 2, while some products never appear. Analyze the cause.",
+    "reference_answer": "When many products share the same price, ORDER BY price does not determine the order among them; SQL guarantees no stable order between executions. Each page query may use a different plan (parallel scans, different sort algorithms, top-N heapsort, different buffer contents), so rows with equal prices may be ordered differently each time — the row at position 20 this time may be at 21 next time, causing duplicates or omissions. Fix: add a unique column as a tiebreaker (ORDER BY price, id) so the order is total and deterministic; better still, use keyset pagination (WHERE (price, id) > (:lastPrice, :lastId)) also based on a unique key. Additionally, rows inserted/deleted between calls also shift OFFSET.",
+    "key_points": [
+      "ORDER BY on a non-unique column does not guarantee a stable order between executions",
+      "Add a unique tiebreaker column for a total order; prefer keyset pagination"
+    ],
+    "id": "Q_DB3_101"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Serializable Snapshot Isolation and serialization failures",
+    "difficulty": "Hard",
+    "question": "After switching a PostgreSQL system to SERIALIZABLE to prevent write skew, the application starts getting 'could not serialize access due to read/write dependencies' errors even though no two transactions truly conflict in business terms. Analyze the cause and the accompanying design requirement.",
+    "reference_answer": "PostgreSQL implements SERIALIZABLE with SSI (Serializable Snapshot Isolation): it tracks read-write dependencies (rw-antidependencies) between concurrent transactions and aborts one when it detects a 'dangerous' structure that could lead to a cycle. Tracking is coarse-grained (predicate locks may be promoted from rows to pages or the whole relation when numerous; a full table scan locks the entire relation), so there are FALSE POSITIVES: transactions that would actually have been serializable get aborted. Therefore using SERIALIZABLE requires the application to RETRY the whole transaction on serialization failures (SQLSTATE 40001), and transactions must be short and idempotent with respect to external side effects. To lower the abort rate: have proper indexes to avoid full table scans, declare read-only transactions READ ONLY, and keep transactions short.",
+    "key_points": [
+      "SSI tracks read-write dependencies coarsely, so it has false positives aborting non-conflicting transactions",
+      "Mandatory whole-transaction retry; reduce aborts with indexes, READ ONLY, short transactions"
+    ],
+    "id": "Q_DB3_102"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Deadlock",
+    "concept": "Deadlocks from gap/next-key locks during concurrent inserts",
+    "difficulty": "Hard",
+    "question": "In MySQL InnoDB (REPEATABLE READ), two transactions both run SELECT ... FROM Booking WHERE roomId = 5 AND day = '2024-12-24' FOR UPDATE (finding no row), then INSERT the row if absent. The system deadlocks frequently. Explain the mechanism.",
+    "reference_answer": "When SELECT ... FOR UPDATE finds no row, InnoDB still places a GAP LOCK on the index gap where that row would be, to prevent phantoms. Gap locks held by different transactions are COMPATIBLE with each other, so both transactions acquire gap locks on the same gap. Then each transaction's INSERT needs an 'insert intention lock' on that gap — conflicting with the gap lock held by the other transaction. Both wait for each other → deadlock, which InnoDB detects and rolls one back. Fixes: use a UNIQUE(roomId, day) constraint and INSERT directly (handling the duplicate error) or INSERT ... ON DUPLICATE KEY; or use READ COMMITTED (fewer gap locks); or lock a fixed 'parent' row (the room) first; and always have deadlock retry logic.",
+    "key_points": [
+      "SELECT FOR UPDATE finding no row still takes a gap lock; gap locks are mutually compatible",
+      "INSERT needs an insert intention lock that conflicts with the other's gap lock, deadlocking; use UNIQUE + direct insert or lower isolation"
+    ],
+    "id": "Q_DB3_103"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Lock escalation",
+    "difficulty": "Hard",
+    "question": "A job updating 50,000 rows of the Orders table in one transaction on SQL Server freezes the entire sales application even though other rows are unrelated. Analyze the cause ('lock escalation') and how to handle it.",
+    "reference_answer": "Each row lock consumes memory in the lock manager; when one transaction holds too many locks on an object (SQL Server: about 5,000), the system automatically ESCALATES them to a single table-level (or partition-level) lock to save resources. A table-level X lock blocks every other transaction from reading (under locking reads) or writing ANY row of the table until the job commits — the whole application freezes. Handling: split the job into many small batch transactions (a few thousand rows each) committing frequently; run off-peak; disable/tune escalation for the table (trading memory); use row versioning (RCSI) so readers are not blocked by write locks.",
+    "key_points": [
+      "Too many row locks make the DBMS escalate to a table lock",
+      "A table lock blocks all other transactions; use small batches, off-peak runs, escalation tuning, row versioning"
+    ],
+    "id": "Q_DB3_104"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Constraints",
+    "concept": "Unindexed foreign keys in child tables",
+    "difficulty": "Hard",
+    "question": "Deleting a row from Customer (the parent table) takes several seconds, and during that time writes to Orders (the child table with foreign key customerId but NO index on customerId) are blocked. Explain the cause.",
+    "reference_answer": "When deleting (or updating the key of) a parent row, the database must check the child table for referencing rows (to enforce RESTRICT/CASCADE/SET NULL). Without an index on the foreign key column customerId, this check must SCAN THE ENTIRE Orders table (tens of millions of rows) for each deleted parent row — deleting 1,000 customers means 1,000 scans. In addition, some systems (Oracle) take a table-level lock on the child during the operation when the foreign key is unindexed, blocking concurrent writes. Fix: create an index on the foreign key column in the child table — most databases do not create it automatically (unlike primary keys). The index also speeds up parent-child JOINs.",
+    "key_points": [
+      "Deleting a parent row requires checking the child table; without an FK index, the whole child table is scanned",
+      "Some systems also lock the child table; always index foreign key columns since databases usually do not"
+    ],
+    "id": "Q_DB3_105"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data recovery",
+    "concept": "The three ARIES recovery phases and Compensation Log Records (CLR)",
+    "difficulty": "Hard",
+    "question": "What phases make up the ARIES recovery algorithm? Why does ARIES write Compensation Log Records (CLRs) during the Undo phase?",
+    "reference_answer": "Three phases: (1) Analysis — read the log from the last checkpoint to determine the transactions active at the crash (to be undone) and the dirty pages possibly not yet written to disk, finding where redo should start. (2) Redo — 'repeating history': redo ALL changes (including those of uncommitted transactions) from the starting point, using the page LSN to skip changes already on disk, bringing the database to its exact state at the crash. (3) Undo — roll back uncommitted transactions in reverse order. Each undo action writes a CLR with an 'undoNextLSN' pointer to the next record to undo. If the system crashes again DURING Undo, the next recovery redoes the CLRs and continues from undoNextLSN without undoing anything twice — making recovery idempotent with bounded work even under repeated crashes.",
+    "key_points": [
+      "Analysis finds active transactions and dirty pages; Redo repeats history; Undo rolls back uncommitted transactions",
+      "CLRs record undo actions with undoNextLSN so a crash during recovery does not cause repeated undo"
+    ],
+    "id": "Q_DB3_106"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data recovery",
+    "concept": "Torn pages and full page writes",
+    "difficulty": "Hard",
+    "question": "A database page is 8KB but the storage device only guarantees atomic writes of 512B or 4KB. Analyze the 'torn page' risk on power loss and how PostgreSQL (full_page_writes) or InnoDB (doublewrite buffer) handle it.",
+    "reference_answer": "If power fails while writing an 8KB page, the page on disk may contain half new and half old content — a 'torn' page with an invalid structure. Ordinary WAL records only deltas (e.g., 'insert tuple X at slot Y'), and applying a delta to a corrupted page cannot recover it correctly. PostgreSQL full_page_writes: the first time a page is modified after each checkpoint, the ENTIRE page image is written to the WAL; during recovery, this full image replaces the torn page and subsequent deltas are applied. InnoDB doublewrite buffer: before writing a page to its real location, it is written to a sequential doublewrite area and fsynced; if the real page is torn, it is restored from the doublewrite copy. Both trade extra write I/O; they can only be disabled when the file system/device guarantees page-atomic writes (e.g., ZFS).",
+    "key_points": [
+      "Power loss while writing a page larger than the device's atomic unit leaves a half-old, half-new page",
+      "Full page writes (whole page images in WAL) or a doublewrite buffer enable recovery, at the cost of extra write I/O"
+    ],
+    "id": "Q_DB3_107"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data recovery",
+    "concept": "fsync and disk write caches",
+    "difficulty": "Hard",
+    "question": "A database reports COMMIT successful, but after a sudden power loss a few committed transactions disappear. The configuration has no obvious error. Analyze the layers that can 'lie' about durability.",
+    "reference_answer": "Durability relies on the log being written to durable storage before the commit is acknowledged, via fsync/fdatasync. Layers that can break this guarantee: (1) relaxed database settings (synchronous_commit=off, innodb_flush_log_at_trx_commit=2) accepting the loss of the last few transactions for speed; (2) the write cache of the disk/RAID controller reporting 'written' while data is only in the device's RAM — without battery/capacitor backup, power loss means data loss; (3) virtualization/network storage layers ignoring flush commands; (4) incorrect fsync error handling: on Linux, if fsync reports an error and is called again, dirty pages may already be marked clean and the later call 'succeeds' even though data was never written (the 'fsyncgate' incident that led PostgreSQL to panic on fsync errors). Measures: verify durability settings, use devices with power-loss protection, test by actually pulling the power, and keep synchronous replication/backups.",
+    "key_points": [
+      "Durability depends on fsync actually reaching durable storage",
+      "Broken by relaxed settings, unprotected write caches, virtualization ignoring flushes, and wrong fsync error handling"
+    ],
+    "id": "Q_DB3_108"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Split-brain during failover",
+    "difficulty": "Hard",
+    "question": "A primary-replica cluster uses automatic heartbeat-based failover. After a temporary network incident, both nodes believe they are the primary and both accept writes. Analyze the consequences and prevention mechanisms.",
+    "reference_answer": "This is split-brain: a network partition makes the replica miss heartbeats and promote itself, while the old primary is still alive serving some clients. Both nodes accept different writes and data diverges (the same id issued for two different records, a balance deducted in two places); when the network heals there is no safe automatic merge — one side's writes must be discarded or reconciled manually. Prevention: (1) base failover decisions on majority consensus (quorum) with an odd number of nodes or a witness node — the minority side must not promote itself; (2) fencing/STONITH: fully isolate the old primary (power off, block network, revoke the virtual IP) before promoting the new one; (3) monotonically increasing fencing tokens/epochs so the storage layer rejects writes from the old primary; (4) the primary demotes itself when it loses contact with the majority.",
+    "key_points": [
+      "A network partition makes two nodes both primary; data diverges and cannot be merged automatically",
+      "Prevent with quorum/witness, fencing (STONITH), fencing tokens, and self-demotion on losing the majority"
+    ],
+    "id": "Q_DB3_109"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Logical replication and schema changes",
+    "difficulty": "Hard",
+    "question": "A system uses logical replication (PostgreSQL publication/subscription) to sync data to an analytics database. After an ALTER TABLE adding a column at the source, replication stops completely and WAL at the source grows until the disk fills. Analyze the cause.",
+    "reference_answer": "Logical replication ships row-level (decoded) changes, not DDL; schema changes at the source are NOT applied automatically at the destination. When rows with the new column arrive but the destination table lacks the column, the subscriber errors and stops applying. Meanwhile, the replication slot at the source retains all WAL not yet confirmed by the subscriber so no change is lost, so WAL accumulates without bound until the disk is full — potentially crashing the operational database. Correct procedure: apply DDL at the destination first (add the column), then at the source; monitor replication slot lag and retained size, set a limit (max_slot_wal_keep_size) with alerts, and drop abandoned slots.",
+    "key_points": [
+      "Logical replication does not ship DDL; a new source column makes the subscriber fail and stop",
+      "The replication slot retains unconfirmed WAL, filling the source disk; apply DDL at the destination first and monitor/limit slots"
+    ],
+    "id": "Q_DB3_110"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Last-Write-Wins and clock skew",
+    "difficulty": "Hard",
+    "question": "A multi-region NoSQL system resolves write conflicts with Last-Write-Wins (LWW) based on the timestamp of the server receiving the write. Analyze why this can silently lose data.",
+    "reference_answer": "LWW keeps the record with the largest timestamp and discards the others. (1) Two genuinely concurrent updates (user A adds a product to the cart in region 1, user B on another device adds a different product in region 2) — one is completely discarded even though both are valid, because LWW has no notion of merging. (2) Server clocks drift (NTP only guarantees a few milliseconds of skew, sometimes jumps backwards): a write that happened LATER in real time but on a server with a slow clock is considered older and discarded — the new write is lost. No error is reported. Solutions: use concurrency detection (vector clocks/version vectors) to keep conflicting versions and merge them semantically, use CRDTs (e.g., an OR-Set for carts), or route writes through a leader/consensus for data requiring correctness.",
+    "key_points": [
+      "LWW discards valid concurrent updates without merging",
+      "Clock skew makes newer writes look older and get silently lost; use version vectors, CRDTs or a leader/consensus"
+    ],
+    "id": "Q_DB3_111"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Vector clocks and sibling versions",
+    "difficulty": "Hard",
+    "question": "Explain how vector clocks help detect concurrent writes in leaderless storage systems (like Dynamo/Riak), and the resulting responsibilities for the application.",
+    "reference_answer": "Each data version carries a vector clock: a map from node (or client) to a counter of updates. Comparing two versions: if A's vector ≤ B's in every component, A is an ancestor of B and B can safely overwrite it; if neither is ≤ the other, the two writes are CONCURRENT (unaware of each other) — the system keeps both as 'siblings' instead of picking arbitrarily. On read, the application receives multiple versions and must merge them according to business semantics (union of carts), then write back with the merged vector. Responsibilities/risks: merge logic is complex (an item deleted in a cart union may 'come back to life' without tombstones), the number of siblings can grow if clients do not send back the context, and vectors can grow large and need pruning.",
+    "key_points": [
+      "Vector clocks compare component-wise to distinguish causal order from concurrent writes",
+      "Concurrent writes are kept as siblings for the application to merge; beware resurrected deletions and growing vectors"
+    ],
+    "id": "Q_DB3_112"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Transactions",
+    "concept": "Sagas and the pitfalls of compensating transactions",
+    "difficulty": "Hard",
+    "question": "A tour booking process spans three services: flight booking, hotel booking and payment, coordinated by a Saga (each step has a compensating action). Analyze the problems that a Saga does not solve the way an ACID transaction does.",
+    "reference_answer": "(1) Lack of isolation: each step commits locally immediately, so intermediate states (ticket held but not yet paid) are visible to other transactions — causing business-level dirty reads (a customer sees 'booked' and then it is cancelled) and lost updates between concurrent sagas. Semantic countermeasures are needed: 'pending' states (semantic locks), ordering steps so the step most likely to fail runs first. (2) Compensation cannot always undo: a confirmation email already sent, a ticket cancellation with a fee — compensation is a reverse business action, not a rollback. (3) The compensating action itself may fail and must be retried indefinitely, so it must be idempotent. (4) Messages may be duplicated or arrive out of order, e.g., a cancel arriving before the booking. (5) Tracing and debugging are hard. Hence Sagas trade isolation for availability and scalability.",
+    "key_points": [
+      "Sagas lack isolation: intermediate states are visible, requiring semantic locks and step ordering",
+      "Compensation is not rollback, may fail or be irreversible, must be idempotent and tolerate duplicated/out-of-order messages"
+    ],
+    "id": "Q_DB3_113"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Transactions",
+    "concept": "Dual writes and the Transactional Outbox",
+    "difficulty": "Hard",
+    "question": "The Order service INSERTs an order into the database and then publishes an 'OrderCreated' event to Kafka. Analyze why this is a 'dual write' problem and how the Transactional Outbox pattern fixes it.",
+    "reference_answer": "The database and Kafka are independent systems without a shared transaction. If the database commit succeeds and the publish fails (network error, process crash), the order exists but other services never learn about it; if publishing first and the commit then fails, there is an event about an order that does not exist. Retrying does not fully solve it because the process can die between the two steps. Transactional Outbox: in the SAME database transaction, insert the order and also insert an event record into an outbox table — guaranteeing atomicity. A separate relay process (polling or CDC reading the log) reads the outbox and publishes to Kafka, marking records as sent. The relay may send duplicates (at-least-once), so consumers must be idempotent (storing processed event ids); per-entity ordering must be preserved (partitioning by order id).",
+    "key_points": [
+      "Writing to the database and a message broker is not atomic; a crash in between loses or fabricates events",
+      "Outbox writes the event in the same DB transaction, a relay publishes later; at-least-once so consumers must be idempotent and preserve per-entity order"
+    ],
+    "id": "Q_DB3_114"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "NoSQL and comparisons",
+    "concept": "Cache stampede (thundering herd)",
+    "difficulty": "Hard",
+    "question": "An e-commerce homepage caches the 'featured products' list in Redis with a 60-second TTL. Right when the key expires at peak time, the database receives thousands of identical heavy queries at once and is overloaded. Analyze and propose solutions.",
+    "reference_answer": "With cache-aside, when a hot key expires, every request arriving during the cache rebuild window (a heavy query taking seconds) sees a miss and hits the database to compute the same result — a cache stampede. The load spike slows the query further, extending the miss window, potentially causing cascading failure. Solutions: (1) a rebuild lock — only one request (holding a SETNX/mutex) recomputes, others wait briefly or serve stale data; (2) stale-while-revalidate: store a soft expiry, near expiry serve stale data and refresh in the background; (3) probabilistic early expiration so requests randomly refresh before expiry; (4) add random jitter to TTLs so many keys do not expire together; (5) for extremely hot data, refresh proactively with a background job instead of letting it expire.",
+    "key_points": [
+      "When a hot key expires, many requests miss simultaneously and query the database",
+      "Solutions: rebuild lock, stale-while-revalidate, probabilistic early expiry, TTL jitter, proactive refresh"
+    ],
+    "id": "Q_DB3_115"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "NoSQL and comparisons",
+    "concept": "A race condition leaving stale data in the cache",
+    "difficulty": "Hard",
+    "question": "A system uses cache-aside: on update, write to the database then delete the cache key. Even so, the cache sometimes keeps a product's old price until the TTL (24 hours) expires. Describe an interleaving that causes this and how to mitigate it.",
+    "reference_answer": "Sequence: (1) Read request R sees a cache miss, reads the old price 100 from the database (not yet written to the cache). (2) Write request W updates the database to 120, then deletes the cache key (the cache is still empty, so the delete has no effect). (3) R writes the old value 100 into the cache. Result: the cache holds 100 while the database has 120, until the TTL expires. Also, if the cache delete fails (Redis temporarily down), stale data persists. Mitigations: shorter TTLs for important data; a delayed second delete a few hundred milliseconds later; conditional cache writes by version (only write if newer than the current version, e.g., via a Lua script or Memcache-style lease tokens); or use CDC from the database log to invalidate the cache in commit order with retries.",
+    "key_points": [
+      "Read stale value, write new + delete cache, then the reader writes the stale value into the cache — stale until TTL expires",
+      "Mitigate with shorter TTLs, delayed double delete, versioned/leased cache writes, CDC-based invalidation"
+    ],
+    "id": "Q_DB3_116"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "LazyInitializationException and Open Session in View",
+    "difficulty": "Hard",
+    "question": "In a Spring/Hibernate application, a controller returns an Order entity for JSON serialization and gets a LazyInitializationException on the orderLines list. A colleague proposes enabling Open Session in View (OSIV) to 'fix' it. Analyze the error and the risks of this solution.",
+    "reference_answer": "The error occurs because orderLines is mapped lazily; when the view/serializer accesses it, the persistence context (Hibernate session) has already closed after the service method ended, so more data cannot be loaded. OSIV keeps the session (and usually a database connection) open for the entire request lifecycle, including view rendering. Risks: (1) database connections are held much longer (during serialization, calls to other services), exhausting the connection pool under load; (2) lazy queries silently occur in the view layer, hiding N+1 queries; (3) queries run outside an explicit transaction, possibly inconsistent; (4) serializers traversing relationships may drag in the whole object graph. Better: disable OSIV, determine the data each use case needs and load it in the service (fetch joins, entity graphs, projections), and return DTOs instead of entities.",
+    "key_points": [
+      "Accessing a lazy collection after the session closes causes LazyInitializationException",
+      "OSIV holds the session/connection for the whole request: pool exhaustion, hidden N+1, queries outside transactions; load deliberately and return DTOs"
+    ],
+    "id": "Q_DB3_117"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Connection leaks and connection pool deadlock",
+    "difficulty": "Hard",
+    "question": "An application has a pool of 10 connections. Each request takes a connection to open a transaction, then internally calls a utility that takes ANOTHER connection from the pool to write a log. Under high load, the whole application hangs forever even though the database is idle. Analyze.",
+    "reference_answer": "With 10 concurrent requests, each already holds 1 connection (the pool is exhausted) and waits for a second connection for logging — nobody returns a connection because they are waiting, nobody can get a new one: a resource deadlock at the application level (pool deadlock) that the database knows nothing about. The bug only appears when concurrent requests ≥ pool size, so light testing does not reveal it. Related: connection leaks (taking without returning, e.g., forgetting to close in exception branches) also gradually exhaust the pool. Fix: do not acquire nested connections in one thread — reuse the current connection/transaction or log asynchronously; if an independent transaction is truly needed, use a separate pool; always use try-with-resources; configure acquisition timeouts and enable leak detection (leakDetectionThreshold).",
+    "key_points": [
+      "Each thread holding one connection while waiting for a second when the pool is exhausted causes pool deadlock",
+      "Avoid nested acquisition, use separate pools if needed, always close connections, set timeouts and leak detection"
+    ],
+    "id": "Q_DB3_118"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Transactions",
+    "concept": "Statement timeout, lock timeout and idle-in-transaction sessions",
+    "difficulty": "Hard",
+    "question": "Analyze the role of three limits — statement_timeout, lock_timeout and idle_in_transaction_session_timeout (PostgreSQL) — in protecting a system, and the pitfall of setting timeouts only on the application side.",
+    "reference_answer": "statement_timeout cancels statements running too long (a report query accidentally scanning a whole table). lock_timeout cancels a statement waiting too long for a lock — especially important for DDL: an ALTER TABLE waiting for a lock blocks every query queued behind it. idle_in_transaction_session_timeout closes sessions that opened a transaction and then do nothing (an application forgetting to commit, waiting on an external API), since such sessions hold locks and prevent VACUUM from cleaning dead rows. Pitfall of application-only timeouts: the application gives up and returns an error to the user, but the statement keeps running on the database (consuming resources, holding locks) unless a cancel is sent; when the application retries, queries pile up and overload the database. Set timeouts on both sides, with the database side shorter than or equal to the application side.",
+    "key_points": [
+      "statement_timeout stops long queries; lock_timeout stops lock waits (esp. DDL); idle-in-transaction closes stalled sessions holding locks",
+      "Application-only timeouts do not stop statements on the database, and retries pile up load; set them on both sides"
+    ],
+    "id": "Q_DB3_119"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "SQL DDL",
+    "concept": "Lock queues when running ALTER TABLE on a hot table",
+    "difficulty": "Hard",
+    "question": "Running ALTER TABLE Orders ADD COLUMN note TEXT (an operation that normally takes milliseconds) in production freezes every API reading/writing Orders for over a minute. Explain the mechanism and how to do it safely.",
+    "reference_answer": "ALTER TABLE needs an ACCESS EXCLUSIVE lock on the table, conflicting with every other lock including those of SELECTs. If a long transaction (a 60-second report) holds a read lock on Orders, ALTER must wait. The dangerous part: the lock queue is FIFO — every new query (even a simple SELECT) arriving after the ALTER must queue BEHIND it because its request conflicts with the ALTER's pending lock. So an 'instant' operation ends up blocking the whole table for as long as the long transaction keeps running. Safe approach: set a short lock_timeout (a few seconds) for the migration session and retry several times; check for and avoid long transactions before running; for table-rewriting changes (changing column types, adding NOT NULL columns with computed defaults on older versions) use the expand-contract strategy or online schema change tools.",
+    "key_points": [
+      "ALTER needs an exclusive lock and must wait for long transactions holding read locks",
+      "The FIFO lock queue makes every query behind ALTER block too; use a short lock_timeout + retry, avoid long transactions, online schema change"
+    ],
+    "id": "Q_DB3_120"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Query optimization",
+    "concept": "Misestimation due to correlated columns",
+    "difficulty": "Hard",
+    "question": "The query WHERE city = 'Hanoi' AND district = 'Cau Giay' returns 50,000 rows, but the optimizer estimates only 50 and chooses a nested loop join, making the query very slow. Analyze the cause.",
+    "reference_answer": "By default the optimizer assumes conditions are statistically INDEPENDENT: the combined selectivity is the product of the individual selectivities. If city = 'Hanoi' selects 10% and district = 'Cau Giay' selects 1%, the estimate is 0.1%. But the two columns are fully correlated (Cau Giay is always in Hanoi), so the real selectivity is 1% — a 10× error, which multiplies through each subsequent join. Underestimation makes the optimizer choose nested loops (good for few rows) instead of hash joins and order tables wrongly. Fixes: create extended multi-column statistics (CREATE STATISTICS ... (dependencies) ON city, district in PostgreSQL, or statistics on composite indexes in other systems), normalize the schema to remove redundant columns, or as a last resort use hints/rewrite the query.",
+    "key_points": [
+      "The optimizer assumes independent conditions and multiplies selectivities; correlated columns cause severe underestimates",
+      "Wrong estimates lead to nested loops and wrong join order; use multi-column statistics or adjust schema/queries"
+    ],
+    "id": "Q_DB3_121"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Query optimization",
+    "concept": "Stale statistics after bulk loading",
+    "difficulty": "Hard",
+    "question": "A nightly ETL job deletes and reloads 20 million rows into a staging table, then immediately runs a large JOIN on it. The query sometimes runs 5 minutes, sometimes 5 hours. Analyze.",
+    "reference_answer": "The optimizer relies on table statistics (row counts, distributions); statistics are only updated by a manual ANALYZE or when autovacuum/auto-stats triggers after a change threshold, which happens asynchronously. Right after loading, statistics may still reflect the old state (e.g., an empty table, 0 rows), so the optimizer chooses a plan for a small table (nested loops, scans without indexes) — disastrous with 20 million rows. Runtime varies depending on whether auto-analyze happens to run before the query. Fix: run an explicit ANALYZE on the table right after loading and before the query; be especially careful with temporary tables since autovacuum does not process them; log execution plans (auto_explain) to detect plan variance.",
+    "key_points": [
+      "Statistics are not updated in time after bulk loads, so the optimizer plans for a small table",
+      "Runtime varies with whether auto-analyze ran in time; run ANALYZE explicitly after loading"
+    ],
+    "id": "Q_DB3_122"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "MVCC table bloat, VACUUM and XID wraparound",
+    "difficulty": "Hard",
+    "question": "A PostgreSQL table has only 1 million 'live' rows but takes 80GB, and queries keep getting slower. Meanwhile, a reporting session has had a transaction open for 3 days. Analyze the connection and a more serious risk that may arise.",
+    "reference_answer": "With MVCC, UPDATE/DELETE do not remove old rows immediately but create new versions; old rows become 'dead tuples' that VACUUM can only clean once no transaction can still see them. A transaction open for 3 days pins the visibility horizon (xmin horizon) in the past, so no dead tuples created since can be cleaned — the table bloats, indexes bloat too, scans slow down and I/O increases. The more serious risk: PostgreSQL uses 32-bit transaction IDs; VACUUM must 'freeze' old rows to prevent transaction ID wraparound. If freezing is blocked long enough, the system warns and then forces itself to stop accepting writes to protect data. Fix: monitor and limit long transactions (idle_in_transaction_session_timeout), tune autovacuum for heavily updated tables, use pg_repack to reclaim space, and monitor XID age.",
+    "key_points": [
+      "MVCC dead tuples are cleaned only when no transaction can see them; long transactions block VACUUM causing bloat",
+      "XID wraparound risk forces the database to stop writes; limit long transactions, tune autovacuum, monitor XID age"
+    ],
+    "id": "Q_DB3_123"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Storage and file organization",
+    "concept": "Write stalls and amplification in LSM-Trees",
+    "difficulty": "Hard",
+    "question": "A RocksDB/Cassandra cluster under continuous heavy writes suddenly shows periods where write latency spikes to seconds (write stalls). Analyze the relation to compaction and the types of amplification.",
+    "reference_answer": "LSM writes fast because it only writes sequentially to memtables/SSTables, but pushes cost to background compaction: merging SSTables to remove old versions and keep the number of files to read reasonable. When the write rate exceeds compaction capacity (disk bandwidth/CPU limits), the number of L0 files or pending memtables exceeds thresholds; to avoid unbounded read slowdowns and running out of disk, the engine deliberately slows or stops writes — a write stall. Three amplifications trade off: write amplification (each byte rewritten many times across levels), read amplification (one read checks many files), space amplification (unmerged old versions take space). Leveled compaction lowers read/space amp but raises write amp; size-tiered does the opposite. Handling: choose the compaction strategy for the workload, provision disk bandwidth for compaction, rate-limit incoming writes, and monitor L0 file counts and pending compaction bytes.",
+    "key_points": [
+      "When compaction cannot keep up with writes, the engine slows/stops writes (write stall)",
+      "Trade-offs among write, read and space amplification; choose compaction strategy by workload and provision resources"
+    ],
+    "id": "Q_DB3_124"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "NoSQL and comparisons",
+    "concept": "Tombstones in Cassandra and slow queries",
+    "difficulty": "Hard",
+    "question": "A Cassandra table is used as a job queue: workers read the newest rows of a partition and delete them after processing. After a few weeks, reads get slower and sometimes fail with TombstoneOverwhelmingException. Analyze.",
+    "reference_answer": "In a distributed LSM, DELETE does not remove data immediately but writes a 'tombstone' — needed so the deletion propagates to replicas and older SSTables. Tombstones are only purged after gc_grace_seconds (default 10 days, giving replicas time to repair) and after compaction. A queue pattern of continuous deletions creates millions of tombstones in the same partition; every read of 'the newest rows' must scan through all those tombstones before finding live data — progressively slower, memory-hungry, and beyond a safety threshold the query is aborted. This is the 'queue on Cassandra' anti-pattern. Solutions: use a dedicated queue system (Kafka, RabbitMQ); if unavoidable, partition by time windows (buckets) to drop whole old partitions instead of deleting rows, use TTLs with TimeWindowCompactionStrategy, and lower gc_grace_seconds carefully.",
+    "key_points": [
+      "DELETE writes tombstones kept until gc_grace and compaction; reads must scan through them",
+      "A queue on Cassandra is an anti-pattern; use a dedicated message queue or time-bucketed partitions + TTL"
+    ],
+    "id": "Q_DB3_125"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Storage and file organization",
+    "concept": "Point updates in column-stores and delta stores",
+    "difficulty": "Hard",
+    "question": "After converting the Orders table to columnar storage to speed up reports, per-order UPDATEs (changing status) become very slow. Explain and describe how real systems handle it.",
+    "reference_answer": "In a column-store, one row is scattered into pieces across many columns, and each column is compressed into large blocks (tens of thousands to millions of values). Updating one value requires decompressing, modifying and recompressing that column's block, and locating the row in every column — very expensive compared to a row-store modifying one page. Real systems use a hybrid architecture: new writes go to a row-oriented 'delta store' (an open row group) and old rows are marked deleted with a delete bitmap; queries merge the compressed columns with the delta; a background process periodically merges deltas into compressed column blocks (tuple mover). Consequently column-stores still suit batch loading with few updates; for frequently updated operations keep OLTP in a row-store and sync to a column-store/HTAP for analytics.",
+    "key_points": [
+      "Updating one value in a column-store requires decompressing/recompressing blocks and touching many columns",
+      "Real systems use row-based delta stores + delete bitmaps with background merges; separate OLTP (row) from analytics (column)"
+    ],
+    "id": "Q_DB3_126"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Hot partitions from a poor partition key",
+    "difficulty": "Hard",
+    "question": "An IoTEvent table in DynamoDB/Cassandra uses the date (yyyy-mm-dd) as partition key for easy per-day queries. The system is constantly throttled even though the total provisioned throughput has plenty of headroom. Analyze.",
+    "reference_answer": "Data and throughput are split by partition key; each physical partition has its own throughput limit. With the date as key, all events of the current day from millions of devices go into the SAME partition — a hot partition overloaded and throttled, while old days' partitions see almost no load; the total provisioned throughput is meaningless because it is not evenly used. Fix: choose a key with high cardinality matching access patterns (deviceId, or deviceId + date); if per-day queries are needed, add a shard suffix (date#0..date#N, chosen randomly or by device hash on write) and query the N partitions in parallel on read (write sharding), or use secondary indexes/stream data into an analytics system for time-based queries.",
+    "key_points": [
+      "A date partition key funnels all current writes into one throttled hot partition",
+      "Choose high-cardinality keys matching access patterns; use write sharding (suffixes) when grouping by date"
+    ],
+    "id": "Q_DB3_127"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Tenant-based sharding and whale tenants",
+    "difficulty": "Hard",
+    "question": "A SaaS shards data by companyId (each company entirely on one shard) so all of a company's queries and transactions happen on one node. After signing a large corporation, the shard containing it is overloaded. Analyze the trade-offs and remedies.",
+    "reference_answer": "Tenant sharding has big advantages: a tenant's queries/JOINs/transactions never cross nodes, and data isolation is good. But it assumes each tenant is small enough to fit one node; tenant sizes are usually highly skewed (power law), so a 'whale' tenant can exceed one shard's capacity and also harm other tenants on the same shard (noisy neighbor). Remedies: (1) isolate large tenants on dedicated, more powerful shards/clusters; (2) shard within the large tenant by a secondary key (companyId + branchId/userId), accepting that some of its queries become distributed; (3) design a tenant → shard mapping table (directory-based sharding) to move tenants without changing the hash function; (4) per-tenant resource limits. Lesson: choosing a shard key must consider real distributions and the ability to rebalance.",
+    "key_points": [
+      "Tenant sharding keeps queries/transactions local but assumes tenants are small",
+      "Whale tenants cause overload and noisy neighbors; isolate them, sub-shard within the tenant, use a tenant → shard directory"
+    ],
+    "id": "Q_DB3_128"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Snowflake-style distributed IDs and clocks moving backwards",
+    "difficulty": "Hard",
+    "question": "A system generates 64-bit Twitter Snowflake-style IDs (millisecond timestamp + machine id + counter). After NTP sets one machine's clock back 2 seconds, the system logs duplicate primary key errors. Analyze and propose prevention.",
+    "reference_answer": "Snowflake IDs are unique only if, on each machine, the (timestamp, counter) pair never repeats. When the clock moves back 2 seconds, the machine regenerates timestamps already used in the previous 2 seconds; the counter is usually reset each millisecond, so it can produce exactly the IDs already issued — duplicates. IDs also lose their time-ordering that many systems rely on. Prevention: store the last issued timestamp; if the current clock is smaller, wait until it passes (for small skews) or refuse to generate IDs and alert (for large skews); configure NTP to 'slew' (adjust gradually) rather than 'step'; ensure machine ids are unique (assigned by a coordination service, not set manually). Alternatives: UUID v7 with sufficient randomness, or allocating ID blocks from a central sequence.",
+    "key_points": [
+      "A backward clock makes the machine reuse timestamps and regenerate issued IDs",
+      "Store the last timestamp, wait or refuse when the clock goes back, NTP slew, unique machine ids; or UUID v7/ID blocks"
+    ],
+    "id": "Q_DB3_129"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "SQL DDL",
+    "concept": "Scheduling bugs due to daylight saving time (DST)",
+    "difficulty": "Hard",
+    "question": "An international system stores daily medication reminders at 08:00 by storing the UTC instant of the first reminder and adding 24 hours each day. European users report that from late March, reminders arrive at 09:00. Analyze and propose a correct design.",
+    "reference_answer": "When switching to summer time, the local clock jumps forward 1 hour; '08:00 local' now corresponds to a UTC instant 1 hour earlier than before. Adding exactly 24 absolute hours on the UTC timeline keeps the UTC time fixed, which displays as 09:00 local. Also note: some days are 23 or 25 local hours long, and some local times do not exist (02:30 on the spring-forward day) or occur twice. Correct design: for recurring events tied to human intent, store the rule in local time (08:00 daily) plus an IANA time zone name (Europe/Berlin), and compute the UTC instant of each occurrence when needed using an up-to-date time zone library; define explicit handling of non-existent/duplicated local times. Instants of events that already happened should be stored in UTC.",
+    "key_points": [
+      "Adding 24 hours in UTC does not preserve local time across DST transitions",
+      "Store recurring local-time rules + IANA zone and compute UTC per occurrence; handle non-existent/duplicate times"
+    ],
+    "id": "Q_DB3_130"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Constraints",
+    "concept": "Unicode normalization defeating UNIQUE constraints",
+    "difficulty": "Hard",
+    "question": "The Users table has UNIQUE(username), yet two accounts named 'Thủy' that look identical exist, and an attacker exploits this for impersonation. Analyze the Unicode-related cause and prevention.",
+    "reference_answer": "In Unicode, the same displayed character can have multiple representations: precomposed form ('ủ' as one code point — NFC) and decomposed form ('u' + combining horn + combining hook — NFD). The two strings look identical but differ in bytes, so a UNIQUE constraint (comparing bytes or using a non-normalizing collation) treats them as different. There are also homoglyphs from other scripts (Cyrillic 'а' vs Latin 'a'), invisible characters (zero-width), and case differences. Prevention: normalize strings to one form (NFC, or NFKC for identifiers) before storing and comparing — in the application and/or via a CHECK constraint (normalize(col) = col) or a unique index on the normalized + lowercased expression; restrict the character set for usernames; apply 'confusable' checks (Unicode TR39) for public identifiers.",
+    "key_points": [
+      "The same visible character has multiple byte representations (NFC/NFD), homoglyphs, invisible characters — UNIQUE sees them as different",
+      "Normalize to NFC/NFKC + lowercase before storing, unique on the normalized expression, restrict character sets, check confusables"
+    ],
+    "id": "Q_DB3_131"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Nested and recursive triggers",
+    "difficulty": "Hard",
+    "question": "The Stock table has an AFTER UPDATE trigger updating a StockSummary table; StockSummary in turn has a trigger updating Stock back to 'synchronize'. After a small change, updating one row takes minutes or fails with a nesting depth error. Analyze the risks of cascading triggers.",
+    "reference_answer": "A trigger firing another trigger forms a chain; a cycle (A → B → A) leads to recursion that only stops at the system's depth limit (SQL Server 32 levels, PostgreSQL may overflow the stack) or when some stop condition happens to hold — causing errors or costly repeated operations. Even without cycles, cascading triggers create 'hidden logic': a simple UPDATE triggers dozens of operations invisible in application code, performance becomes unpredictable (especially row-level triggers on bulk updates), debugging is hard, the execution order of several triggers on the same event may be undefined, and lock holding times grow, leading to deadlocks. Fixes: avoid cyclic dependencies (summaries flow one way only), use stop conditions (WHEN, pg_trigger_depth()), and consider replacing them with centralized application logic, views/materialized views or aggregation jobs.",
+    "key_points": [
+      "Triggers calling triggers can recurse to the depth limit or repeat costly work",
+      "Hidden logic makes performance unpredictable and debugging hard, and increases lock time; avoid cycles, add stop conditions, consider alternatives"
+    ],
+    "id": "Q_DB3_132"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Indexes",
+    "concept": "Mislabeling a function as IMMUTABLE for an index",
+    "difficulty": "Hard",
+    "question": "A developer creates a function localDate(ts timestamptz) returning ts converted to a date in the session's time zone, declaring it IMMUTABLE so an index can be built on the expression localDate(eventTime). Analyze the consequences.",
+    "reference_answer": "PostgreSQL only allows IMMUTABLE functions in indexes because index values are computed once at write time and assumed to always match a recomputation. This function actually depends on the session's TimeZone setting (it should be STABLE): the same ts in a session with a different time zone gives a different date. Consequences: the index stores values computed in the time zone of the writing session; queries from sessions in other time zones using the index return WRONG results (missing or extra rows) without any error; results even differ depending on whether a query uses the index or a table scan, and a REINDEX can 'change' which data is found. This is logical index corruption. Correct approach: fix the time zone as a constant parameter inside the function (ts AT TIME ZONE 'Asia/Ho_Chi_Minh') to make it truly IMMUTABLE, or store a precomputed date column.",
+    "key_points": [
+      "Indexes assume IMMUTABLE functions always return the same result; a session-dependent function violates this",
+      "Queries return silently wrong results that differ between index and table scans; fix parameters or store a computed column"
+    ],
+    "id": "Q_DB3_133"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database programming",
+    "concept": "Row-by-row cursor processing (RBAR) vs set-based processing",
+    "difficulty": "Hard",
+    "question": "A stored procedure updates prices for 2 million products using a cursor, each loop iteration SELECTing a discount rate and UPDATEing one row; it takes 3 hours. Analyze why it is slow and how to rewrite it.",
+    "reference_answer": "The RBAR (Row By Agonizing Row) approach pays a fixed cost for EACH row: context switching between the procedural language and the SQL engine, parsing/executing a separate statement, a separate index lookup, logging and locking per statement — multiplied by 2 million. The optimizer also cannot choose a good overall strategy (hash join, sequential scan). Rewrite set-based: a single UPDATE Product p SET price = p.price * (1 - d.rate) FROM Discount d WHERE d.categoryId = p.categoryId; — the database chooses a hash join and processes in bulk, typically hundreds of times faster. For very large volumes, split into a few batches (by id ranges) to limit transaction size, log volume and lock duration. Cursors should only be used when per-row logic truly cannot be expressed in set-based SQL.",
+    "key_points": [
+      "RBAR pays per-row fixed costs (context switch, execution, logging, locking) and blocks global optimization",
+      "Rewrite as a single set-based UPDATE ... FROM, batching when too large; use cursors only when unavoidable"
+    ],
+    "id": "Q_DB3_134"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Relational model",
+    "concept": "The Entity-Attribute-Value (EAV) model",
+    "difficulty": "Hard",
+    "question": "To be 'flexible', a system stores all product attributes in a table Attribute(productId, attributeName, value VARCHAR). Analyze the problems of this EAV model as the system grows.",
+    "reference_answer": "(1) Loss of types and constraints: every value is a string, so there can be no per-attribute NOT NULL, CHECK or foreign keys; dirty data ('100', '100.0', 'one hundred') gets mixed. (2) Complex, slow queries: retrieving a product with 10 attributes requires a pivot or 10 self-joins; filtering 'price < 500 and color = red' needs many joins/subqueries, and numeric comparisons on a string column cannot use indexes effectively. (3) The optimizer has no per-attribute statistics, so estimates are poor. (4) The table balloons with rows and large indexes. (5) Business constraints move into the application, and a mistyped attribute name creates a 'new' attribute. Alternatives: standard columns for core attributes, per-category subtables, or a JSONB column with schema validation for the truly dynamic part.",
+    "key_points": [
+      "EAV loses types and constraints, dirty data, arbitrary attribute names",
+      "Queries need many joins/pivots, are slow and hard to estimate; use standard columns + subtables/validated JSONB"
+    ],
+    "id": "Q_DB3_135"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Aggregate functions",
+    "concept": "Non-deterministic floating-point SUM under parallel execution",
+    "difficulty": "Hard",
+    "question": "A report computing SUM(doubleValue) over 100 million rows gives results differing in the 6th decimal place between runs, making automated reconciliation report mismatches. The data does not change. Explain.",
+    "reference_answer": "Floating-point (FLOAT/DOUBLE) addition is not associative: (a + b) + c can differ from a + (b + c) due to rounding at each step. When the database executes in parallel (parallel query), data is split among workers that each compute a partial sum and then combine; the split and combination order depend on scheduling and the execution plan, so the summation order changes between runs — results differ in the last digits. Adding numbers of very different magnitudes also loses the small values. Fix: use NUMERIC/DECIMAL (exact, associative addition) for data requiring reconciliation such as money; if floats are unavoidable, compare with a tolerance, round results to meaningful precision, or force sequential execution with a deterministic order (trading performance).",
+    "key_points": [
+      "Floating-point addition is not associative; summation order changes under parallel execution, altering results",
+      "Use DECIMAL for exact data; with floats compare with tolerance or round"
+    ],
+    "id": "Q_DB3_136"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database security",
+    "concept": "The right to erasure (GDPR) and backups",
+    "difficulty": "Hard",
+    "question": "A customer requests deletion of all their personal data under GDPR. The team DELETEd the rows in the main database. Analyze where the data may still exist and design strategies to meet this requirement.",
+    "reference_answer": "Personal data may still be in: backups (backups, snapshots), archived transaction logs/WAL kept for point-in-time recovery, replicas and analytics warehouses, caches, search indexes (Elasticsearch), immutable message queues/event stores, export files, application logs and audit logs. Deleting from immutable backups is often infeasible. Strategies: (1) crypto-shredding — encrypt each user's personal data with a per-user key stored separately; deleting the key renders the data unreadable everywhere (including backups); (2) isolate identifying data in a separate store, with other systems keeping only pseudonymous ids (pseudonymization); (3) map personal data flows and propagate deletion (a 'user deleted' event to every system); (4) time-limited backup retention policies and a procedure to re-delete after restoring from an old backup.",
+    "key_points": [
+      "Data remains in backups, archived WAL, replicas, warehouses, caches, search indexes, event stores, logs",
+      "Strategies: crypto-shredding, isolating and pseudonymizing identifying data, propagating deletion events, backup retention limits"
+    ],
+    "id": "Q_DB3_137"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database security",
+    "concept": "Privilege escalation via SECURITY DEFINER functions",
+    "difficulty": "Hard",
+    "question": "An administrator creates a function changePassword(name, newPassword) with SECURITY DEFINER (running with the creator's privileges — a superuser) so ordinary users can change passwords. Analyze the privilege escalation risks.",
+    "reference_answer": "A SECURITY DEFINER function runs with its owner's privileges, so any flaw inside becomes a superuser-level flaw. (1) search_path: if the function references tables/functions/operators without schema qualification, an attacker can create same-named objects in a schema they control that appears earlier in the search_path, making the function execute their code with superuser privileges. (2) Dynamic SQL concatenating parameters (EXECUTE 'ALTER USER ' || name ...) opens SQL injection. (3) Missing business authorization checks: the function does not verify that name is the caller (session_user), so anyone can change anyone's password, including the admin's. (4) EXECUTE is granted to PUBLIC by default. Measures: set a fixed safe search_path in the function definition, fully qualify schemas, use format() with %I/%L or parameters, verify the caller's identity, REVOKE EXECUTE FROM PUBLIC and grant only to needed roles, and make the function owner a minimal-privilege role rather than a superuser.",
+    "key_points": [
+      "SECURITY DEFINER runs with the owner's privileges: bugs inside become superuser-level holes",
+      "Risks: search_path, SQL injection, missing caller checks, EXECUTE to PUBLIC; fix search_path, check permissions, minimal-privilege owner"
+    ],
+    "id": "Q_DB3_138"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Database security",
+    "concept": "Column-level encryption and queryability",
+    "difficulty": "Hard",
+    "question": "To protect national ID and phone numbers, a team encrypts these columns at the application level. Analyze the trade-offs between randomized and deterministic encryption regarding queryability and security.",
+    "reference_answer": "Randomized encryption (AES-GCM with a random IV): the same value produces a different ciphertext each time — strong security, but the database cannot search by equality, cannot JOIN, enforce UNIQUE or index the column; finding 'the customer with phone number X' requires decrypting everything. Deterministic encryption: the same value always gives the same ciphertext, so equality search, UNIQUE, JOINs and indexes work — but it leaks information: an attacker sees which rows share values, can perform frequency analysis, and with small domains (gender, province codes) can infer values. Neither supports range queries or LIKE (that requires order-preserving encryption, which leaks even more). A common model: store randomized ciphertext plus a 'blind index' column (a keyed HMAC of the normalized value) for equality search; manage keys in a separate KMS with a rotation procedure.",
+    "key_points": [
+      "Randomized encryption is safer but loses search, indexing, UNIQUE and JOINs",
+      "Deterministic encryption allows equality search but leaks frequency/duplicates; use a blind index (HMAC) + KMS"
+    ],
+    "id": "Q_DB3_139"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data recovery",
+    "concept": "Event Sourcing: replay, event schema evolution and snapshots",
+    "difficulty": "Hard",
+    "question": "An e-wallet system uses Event Sourcing: the balance is computed by replaying all Deposit, Withdraw, Transfer events. After two years, performance and evolution problems arise. Analyze the main challenges.",
+    "reference_answer": "(1) Replay performance: accounts with hundreds of thousands of events must replay them all on every load — periodic snapshots are needed (store the state at event N, replay only what follows), but snapshots must be rebuilt when the state computation logic changes. (2) Event schema evolution: events are immutable and live forever, so every old structure version must remain readable — versioning and 'upcasters' converting old events to the new form on read are needed; history cannot be fixed with UPDATE. (3) Business logic changes: replaying old events with new code may produce results different from the past (e.g., a new fee rule) — events must record decided outcomes, not just intentions. (4) Querying: the event store cannot be queried by attributes directly, requiring projections/read models updated asynchronously (CQRS) with lag and rebuild capability. (5) Personal data in immutable events complicates erasure requests. Event sourcing excels at auditing and reconstructing history but adds significant complexity.",
+    "key_points": [
+      "Full replay is slow, requiring snapshots; immutable event schemas need versioning and upcasters",
+      "Logic changes alter replay results, queries need projections (CQRS), personal data is hard to erase"
+    ],
+    "id": "Q_DB3_140"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "Ordering and duplication guarantees in CDC",
+    "difficulty": "Hard",
+    "question": "A CDC pipeline (Debezium → Kafka → data warehouse) sometimes makes order status in the warehouse 'go backwards' (from delivered back to shipping), and some orders are counted twice. Analyze the causes and how to design consumers.",
+    "reference_answer": "(1) Ordering: CDC reads the log in exact commit order, but if the Kafka topic is not partitioned by the order's primary key, changes to the same order may land in different partitions and be processed in parallel out of order; parallel consumers or retries can also reorder. (2) Duplicates: CDC and Kafka usually guarantee at-least-once — when the connector restarts from a previously saved offset, some events are re-sent; consumers using INSERT/accumulation count twice. Consumer design: partition by primary key to preserve per-entity order; write to the target with idempotent upserts; only apply a change if its log position (LSN/binlog position) or version is newer than the value stored for that entity (skipping old/duplicate events); handle delete events (tombstones) and the initial snapshot interleaved with the change stream specifically.",
+    "key_points": [
+      "Non-key partitioning and parallel processing reorder changes to the same entity",
+      "At-least-once delivery duplicates events; consumers need idempotent upserts and LSN/version comparisons"
+    ],
+    "id": "Q_DB3_141"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "Global uniqueness constraints on a sharded database",
+    "difficulty": "Hard",
+    "question": "The Users table is sharded by userId across 16 nodes. Requirement: email must be unique across the whole system. Why is a regular UNIQUE(email) constraint insufficient, and what designs exist?",
+    "reference_answer": "Each shard only enforces UNIQUE on its local data; two users with the same email whose userIds hash to different shards go undetected. Checking all shards before inserting has a race condition (two requests both check and then both insert) and is very expensive. Designs: (1) a lookup table email → userId sharded BY EMAIL; registration must write to both places — requiring a distributed transaction or a two-step process with compensation (reserve the email first, create the user later, clean up orphan records); (2) use a distributed database supporting global unique indexes (Spanner, CockroachDB) — essentially also an index sharded by email with distributed transactions, trading latency; (3) a central reservation service for identifiers; (4) if feasible, choose the shard key so the constraint becomes local.",
+    "key_points": [
+      "UNIQUE only applies within each shard; checking all shards before inserting is racy",
+      "Solutions: an email-sharded lookup table with distributed transactions/reservation, databases with global unique indexes, a reservation service"
+    ],
+    "id": "Q_DB3_142"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "Late-arriving facts and dimensions",
+    "difficulty": "Hard",
+    "question": "In a data warehouse, a sale from day 10 is loaded on day 15 because a POS system was offline, and the details of a customer who just registered at the counter arrive after that customer's own transaction. Analyze the problems and how to handle them.",
+    "reference_answer": "(1) Late-arriving facts: the day-10 report has already run and been sent and is no longer correct; with slowly changing dimensions (SCD type 2), the transaction must be linked to the dimension version effective ON DAY 10 (e.g., the membership tier at that time), not the current version — requiring lookup by effective date ranges. Aggregates/partitions for past days must be recomputed (distinguishing event date from load date, designing pipelines that can recompute a lateness window). (2) Late-arriving dimensions: when loading a fact whose customer is not yet in the dimension table, dropping the fact loses revenue, and assigning an 'Unknown' key loses the link. Standard approach: create a 'placeholder' dimension record (inferred member) with only the natural key, attach the fact to it, and when complete details arrive, update the placeholder (without creating a new SCD version for that first update).",
+    "key_points": [
+      "Late facts must link to the dimension version effective on the event date and trigger recomputation of aggregates",
+      "Late dimensions are handled with placeholder records (inferred members), updated when complete data arrives"
+    ],
+    "id": "Q_DB3_143"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Data warehousing",
+    "concept": "The chasm trap when joining two fact tables",
+    "difficulty": "Hard",
+    "question": "A report needs sales revenue and refund amounts by product. The query JOINs DimProduct with both FactSales and FactRefunds and then SUMs both columns; revenue comes out inflated several times. Analyze and rewrite correctly.",
+    "reference_answer": "Both fact tables have a many-to-one relationship with the same dimension but are not directly related to each other. JOINing both through the product dimension, for each product with m sales rows and k refund rows, produces m × k rows (a local Cartesian product) — each sales row repeated k times and each refund row m times, so the SUMs are multiplied. This is the 'chasm trap'. The bug is hard to spot because the query runs fine, and for products with only one refund row the result happens to be correct. Correct approach (drill-across): aggregate EACH fact table by product first in separate subqueries/CTEs, then JOIN the aggregated results (one row per product) with each other and the dimension, using FULL OUTER JOIN/COALESCE to keep products present on only one side.",
+    "key_points": [
+      "Joining two fact tables through a shared dimension produces m × k rows, multiplying SUMs",
+      "Aggregate each fact table separately first, then join the results (drill-across), keeping one-sided rows with FULL OUTER JOIN"
+    ],
+    "id": "Q_DB3_144"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Transactions",
+    "concept": "Mass-deleting data on a live system",
+    "difficulty": "Hard",
+    "question": "You need to delete 300 million log rows older than one year from the Log table (1 billion rows total) in production. Running DELETE FROM Log WHERE day < ... once causes many incidents. Analyze the incidents and propose an approach.",
+    "reference_answer": "A giant DELETE is a single transaction: (1) it holds locks on hundreds of millions of rows for a long time (possibly escalating), blocking other operations; (2) it generates an enormous amount of log/WAL, potentially filling the log disk, and if cancelled midway the rollback takes comparable time; (3) replicas must apply the same volume, so replication lag spikes; (4) with MVCC it creates hundreds of millions of dead rows needing VACUUM, and the table still occupies space; (5) the long transaction hinders system-wide cleanup. Approach: ideally design time-based partitioning so old data is removed with DROP/DETACH PARTITION (almost instant, no dead rows). Without partitioning: delete in small batches (e.g., 10,000 rows by indexed primary key ranges), commit each batch, pause between batches, monitor replica lag and log generation; or, if most data is being deleted, create a new table with the rows to keep and swap.",
+    "key_points": [
+      "A giant single-transaction DELETE causes long locks, huge logs, slow rollback, replica lag, dead rows",
+      "Prefer time partitioning with DROP PARTITION; otherwise delete in monitored small batches or copy-and-swap"
+    ],
+    "id": "Q_DB3_145"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Indexes",
+    "concept": "Online index creation and invalid indexes",
+    "difficulty": "Hard",
+    "question": "To avoid locking the table, a team uses CREATE INDEX CONCURRENTLY (PostgreSQL) on a 500GB table. The process is cancelled midway due to an error, and days later they notice writes are slower even though queries do not use the new index. Analyze.",
+    "reference_answer": "CREATE INDEX CONCURRENTLY does not take a write-blocking lock; instead it scans the table in multiple passes and waits for running transactions to finish; it cannot run inside a transaction block and, if it fails (unique violation, deadlock, cancellation), it does NOT clean up: the index remains in an INVALID state. An INVALID index is not used by queries but IS STILL updated on every INSERT/UPDATE — paying write cost without any benefit, and if it is a unique index it can cause confusing errors. In addition, concurrent builds wait for long transactions so they can run very long. Handling: check pg_index.indisvalid after creation, DROP INDEX CONCURRENTLY the broken index and recreate it; monitor progress (pg_stat_progress_create_index); avoid long transactions during the build.",
+    "key_points": [
+      "A failed concurrent index build leaves an INVALID index that is not removed automatically",
+      "INVALID indexes do not serve queries but still cost writes; check indisvalid, drop and recreate"
+    ],
+    "id": "Q_DB3_146"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Concurrency control",
+    "concept": "Job queues in the database with SKIP LOCKED",
+    "difficulty": "Hard",
+    "question": "Several workers take jobs from a Job table (status = 'PENDING'). The initial SELECT ... LIMIT 1 then UPDATE approach let two workers grab the same job; switching to SELECT ... FOR UPDATE made workers queue behind each other. Analyze and describe the FOR UPDATE SKIP LOCKED solution with caveats.",
+    "reference_answer": "SELECT then UPDATE is not atomic, so it races. FOR UPDATE locks the row, but every worker targets the same 'first' row and must wait for the previous worker to commit — serializing everything and losing parallelism. FOR UPDATE SKIP LOCKED lets each worker skip rows locked by other workers and immediately take the next unlocked row: SELECT id FROM Job WHERE status = 'PENDING' ORDER BY id LIMIT 1 FOR UPDATE SKIP LOCKED; then update the status in the same transaction. Caveats: (1) holding the transaction for the whole job processing (minutes) keeps locks and connections for long — usually better to mark 'PROCESSING' with a lease deadline and commit immediately, process outside the transaction, and have a job reclaiming expired leases; (2) a worker dying midway means the job must be retaken, so processing must be idempotent; (3) an appropriate index is needed (a partial index on status = 'PENDING'); (4) constant updates create many dead rows needing good VACUUM; (5) SKIP LOCKED gives an inconsistent view, not for ordinary business queries.",
+    "key_points": [
+      "SKIP LOCKED lets workers skip locked rows and take jobs in parallel without duplicates",
+      "Prefer leases + early commit over long transactions, idempotent processing, proper indexes and VACUUM"
+    ],
+    "id": "Q_DB3_147"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Distributed databases",
+    "concept": "ID order is not commit order",
+    "difficulty": "Hard",
+    "question": "A periodic sync job fetches new data with WHERE id > :lastMaxId (ids from a sequence). Occasionally some orders are never synced. Explain why and propose the correct approach.",
+    "reference_answer": "Sequence values are assigned at INSERT time, but transactions may commit much later. Example: transaction A takes id 100 but is still processing; transaction B takes id 101 and commits immediately. The job runs, sees only 101 (100 is uncommitted and invisible), records lastMaxId = 101. Then A commits with id 100 — the next run looks for id > 101 and misses order 100 forever. Creation-time columns have the same issue (assigned at start, committed later). Correct approaches: use CDC reading the log in commit order; or only sync up to a 'safe watermark' below all still-active transactions (PostgreSQL: pg_snapshot_xmin), rewind by a safety margin and accept reprocessing (idempotent upserts); or use an outbox table with a processed flag instead of relying on id order.",
+    "key_points": [
+      "Ids are assigned at INSERT but commits can be later, so a smaller id may appear after a larger one",
+      "Use CDC in commit order, a safe watermark based on active transactions with idempotent reprocessing, or an outbox with flags"
+    ],
+    "id": "Q_DB3_148"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Constraints",
+    "concept": "NULLs in multi-column UNIQUE constraints",
+    "difficulty": "Hard",
+    "question": "The Config(companyId, branchId NULL, key, value) table has UNIQUE(companyId, branchId, key), where branchId = NULL means a company-level setting. Many duplicate company-level settings still appear. Explain and propose fixes.",
+    "reference_answer": "Per the SQL standard, NULL is not equal to NULL (the comparison yields UNKNOWN), so most systems (PostgreSQL, MySQL, and Oracle in some cases) treat two tuples ('C1', NULL, 'tax') as DIFFERENT for UNIQUE purposes — unlimited duplicate company-level settings can be inserted. (SQL Server, conversely, allows only one NULL, behaving differently when migrating.) Fixes: (1) do not give NULL a business meaning — use a special value such as branch code 'ALL' or 0; (2) create two partial unique indexes: UNIQUE(companyId, key) WHERE branchId IS NULL and UNIQUE(companyId, branchId, key) WHERE branchId IS NOT NULL; (3) PostgreSQL 15+ supports UNIQUE NULLS NOT DISTINCT; (4) an index on a COALESCE(branchId, ...) expression.",
+    "key_points": [
+      "UNIQUE treats NULLs as distinct, allowing duplicates when a column is NULL; behavior differs between systems",
+      "Fix with a special value instead of NULL, partial unique indexes, NULLS NOT DISTINCT or a COALESCE index"
+    ],
+    "id": "Q_DB3_149"
+  },
+  {
+    "language": "en",
+    "subject": "Database Systems",
+    "competency": "3_Database Systems",
+    "topic": "Aggregate functions",
+    "concept": "Allocating money and rounding discrepancies",
+    "difficulty": "Hard",
+    "question": "An invoice of 100,000 VND must be split equally among 3 departments and each share stored in Allocation(DECIMAL(18,0)). The sum of the rounded shares is 99,999 or 100,001 depending on the approach. Analyze and propose a correct allocation algorithm.",
+    "reference_answer": "Even with DECIMAL, dividing 100,000/3 = 33,333.33... and rounding each share to whole units independently makes the sum of shares (3 × 33,333 = 99,999) differ from the original total — off by 1; rounding up overshoots. Across millions of invoices, accumulated discrepancies break reconciliation reports. Correct algorithm (largest remainder): compute the floored integer part for each party, compute the remainder = total - Σ integer parts, then add one smallest unit to the parties with the largest fractional parts (or by a fixed business rule, e.g., the first party) until the remainder is exhausted. Result: 33,334, 33,333, 33,333, summing exactly to 100,000. The rule must be deterministic so recomputation gives the same result; add a constraint/reconciliation check that total allocated = original total.",
+    "key_points": [
+      "Rounding each share independently makes the shares' sum differ from the total, accumulating discrepancies",
+      "Use largest remainder allocation: floor then distribute the remainder deterministically; verify the reconciled total"
+    ],
+    "id": "Q_DB3_150"
+  }
+]

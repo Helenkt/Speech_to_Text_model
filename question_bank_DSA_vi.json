@@ -1,0 +1,2252 @@
+[
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Ký hiệu Big-Omega và Big-Theta",
+    "difficulty": "Easy",
+    "question": "Ngoài Big-O, ký hiệu Big-Omega (Ω) và Big-Theta (Θ) biểu diễn điều gì?",
+    "reference_answer": "Big-O cho CẬN TRÊN: f(n) = O(g(n)) nghĩa là f tăng không nhanh hơn g (sai khác hằng số) khi n đủ lớn. Big-Omega cho CẬN DƯỚI: f(n) = Ω(g(n)) nghĩa là f tăng ít nhất nhanh như g. Big-Theta cho CẬN CHẶT: f(n) = Θ(g(n)) khi f vừa là O(g) vừa là Ω(g), tức f tăng đúng cùng tốc độ với g. Ví dụ Merge Sort là Θ(n log n); tìm kiếm tuyến tính là O(n) và Ω(1) nếu xét mọi trường hợp.",
+    "key_points": [
+      "Big-O: cận trên; Big-Omega: cận dưới; Big-Theta: cận chặt (cả trên và dưới)",
+      "Θ(g) nghĩa là tăng đúng cùng bậc với g"
+    ],
+    "id": "Q_DSA_151"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Trực giác về độ phức tạp O(log n)",
+    "difficulty": "Easy",
+    "question": "Một thuật toán có độ phức tạp O(log n) thường có đặc điểm gì trong cách xử lý dữ liệu?",
+    "reference_answer": "Thuật toán O(log n) thường thu hẹp kích thước bài toán theo một TỶ LỆ cố định sau mỗi bước (ví dụ chia đôi), nên số bước bằng số lần chia n cho 2 tới khi còn 1, tức khoảng log₂ n. Ví dụ: tìm kiếm nhị phân, thao tác trên cây cân bằng, lũy thừa nhanh. Với n = 1 tỷ, log₂ n chỉ khoảng 30 bước — tăng gấp đôi dữ liệu chỉ thêm một bước.",
+    "key_points": [
+      "O(log n) xuất hiện khi mỗi bước thu nhỏ bài toán theo tỷ lệ cố định (thường chia đôi)",
+      "Tăng gấp đôi dữ liệu chỉ thêm một bước; n = 1 tỷ cần khoảng 30 bước"
+    ],
+    "id": "Q_DSA_152"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Hàng đợi (Queue)",
+    "concept": "Hàng đợi hai đầu (Deque)",
+    "difficulty": "Easy",
+    "question": "Hàng đợi hai đầu (Deque - Double-ended queue) khác Stack và Queue như thế nào?",
+    "reference_answer": "Deque cho phép thêm và xóa phần tử ở CẢ HAI đầu (đầu và cuối) với độ phức tạp O(1). Vì vậy nó tổng quát hóa cả Stack (chỉ dùng một đầu) và Queue (thêm một đầu, lấy đầu kia). Deque được dùng trong kỹ thuật cửa sổ trượt tìm giá trị lớn nhất, thuật toán 0-1 BFS, lịch sử thao tác có giới hạn.",
+    "key_points": [
+      "Deque cho phép thêm/xóa ở cả hai đầu với O(1)",
+      "Tổng quát hóa cả Stack và Queue"
+    ],
+    "id": "Q_DSA_153"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Hàng đợi (Queue)",
+    "concept": "Hàng đợi vòng (Circular Queue)",
+    "difficulty": "Easy",
+    "question": "Vì sao khi cài đặt Queue bằng mảng, người ta thường dùng hàng đợi vòng (circular queue)?",
+    "reference_answer": "Nếu cài đặt Queue bằng mảng thông thường, mỗi lần lấy phần tử ở đầu, chỉ số đầu tăng dần và các ô phía trước bị bỏ trống, không tái sử dụng được (hoặc phải dịch toàn bộ mảng tốn O(n)). Hàng đợi vòng coi mảng như một vòng tròn: chỉ số đầu và cuối tăng theo modulo kích thước mảng ((i + 1) % n), nên các ô đã giải phóng được dùng lại và mọi thao tác enqueue/dequeue đều O(1).",
+    "key_points": [
+      "Mảng thường lãng phí ô phía đầu hoặc phải dịch phần tử O(n)",
+      "Circular queue dùng chỉ số modulo để tái sử dụng ô, thao tác O(1)"
+    ],
+    "id": "Q_DSA_154"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Danh sách liên kết (Linked List)",
+    "concept": "Danh sách liên kết vòng",
+    "difficulty": "Easy",
+    "question": "Danh sách liên kết vòng (circular linked list) khác danh sách liên kết thường ở điểm nào và có ứng dụng gì?",
+    "reference_answer": "Trong danh sách liên kết vòng, nút cuối cùng trỏ ngược về nút đầu tiên thay vì trỏ tới null, tạo thành một vòng khép kín. Nó phù hợp cho các bài toán xoay vòng: lập lịch Round-Robin của hệ điều hành (lần lượt cấp CPU cho từng tiến trình), danh sách người chơi theo lượt, bài toán Josephus. Khi duyệt cần điều kiện dừng là quay lại nút xuất phát để tránh vòng lặp vô hạn.",
+    "key_points": [
+      "Nút cuối trỏ về nút đầu, tạo vòng khép kín",
+      "Ứng dụng xoay vòng: Round-Robin, lượt chơi; cần điều kiện dừng khi duyệt"
+    ],
+    "id": "Q_DSA_155"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Ngăn xếp (Stack)",
+    "concept": "Cài đặt Stack bằng mảng và bằng danh sách liên kết",
+    "difficulty": "Easy",
+    "question": "So sánh hai cách cài đặt Stack: bằng mảng (động) và bằng danh sách liên kết.",
+    "reference_answer": "Bằng mảng động: push/pop ở cuối mảng O(1) (phân bổ), dữ liệu liền kề nên thân thiện với bộ nhớ đệm CPU, ít tốn bộ nhớ phụ; nhưng thỉnh thoảng phải mở rộng mảng (sao chép O(n)). Bằng danh sách liên kết: push/pop ở đầu danh sách luôn O(1) thực sự, không cần mở rộng, nhưng mỗi phần tử tốn thêm bộ nhớ cho con trỏ và các nút nằm rải rác trong bộ nhớ. Trong thực tế, cài đặt bằng mảng thường nhanh hơn.",
+    "key_points": [
+      "Mảng: O(1) phân bổ, liền kề bộ nhớ, đôi khi phải mở rộng",
+      "Danh sách liên kết: O(1) thực sự nhưng tốn bộ nhớ con trỏ và kém thân thiện cache"
+    ],
+    "id": "Q_DSA_156"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Tính chất của Binary Heap",
+    "difficulty": "Easy",
+    "question": "Một Min-Heap nhị phân phải thỏa mãn những tính chất nào?",
+    "reference_answer": "Min-Heap nhị phân phải thỏa hai tính chất: (1) Tính chất hình dạng — là cây nhị phân hoàn chỉnh (complete): mọi mức đều đầy trừ mức cuối, và mức cuối được lấp từ trái sang phải. (2) Tính chất thứ tự heap — giá trị mỗi nút nhỏ hơn hoặc bằng giá trị các nút con của nó, do đó phần tử nhỏ nhất luôn ở gốc. Lưu ý heap không yêu cầu thứ tự giữa anh em (khác với BST).",
+    "key_points": [
+      "Hình dạng: cây nhị phân hoàn chỉnh",
+      "Thứ tự: cha ≤ con (min-heap), phần tử nhỏ nhất ở gốc; không ràng buộc giữa anh em"
+    ],
+    "id": "Q_DSA_157"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Thao tác vun đống lên và xuống (Sift-up/Sift-down)",
+    "difficulty": "Easy",
+    "question": "Khi thêm một phần tử vào heap và khi lấy phần tử gốc ra, heap được khôi phục tính chất bằng thao tác nào?",
+    "reference_answer": "Khi thêm: đặt phần tử mới vào vị trí trống cuối cùng (giữ hình dạng hoàn chỉnh), rồi 'sift-up' — so sánh với cha và hoán đổi nếu vi phạm thứ tự, lặp lại cho đến khi đúng hoặc tới gốc. Khi lấy gốc: đưa phần tử cuối cùng lên gốc, rồi 'sift-down' — so sánh với con nhỏ hơn (min-heap) và hoán đổi nếu vi phạm, lặp tới khi đúng. Cả hai thao tác đi theo một đường từ gốc tới lá nên có độ phức tạp O(log n).",
+    "key_points": [
+      "Thêm: đặt cuối rồi sift-up; lấy gốc: đưa phần tử cuối lên rồi sift-down",
+      "Mỗi thao tác đi theo chiều cao cây, O(log n)"
+    ],
+    "id": "Q_DSA_158"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Tính chất của hàm băm tốt",
+    "difficulty": "Easy",
+    "question": "Một hàm băm tốt dùng cho Hash Table cần có những tính chất nào?",
+    "reference_answer": "(1) Tất định: cùng một khóa luôn cho cùng một giá trị băm. (2) Phân bố đều: các khóa được rải đều trên các bucket, giảm đụng độ. (3) Tính nhanh: tính toán với chi phí thấp. (4) Nhạy với thay đổi: khóa khác nhau một chút (như 'abc' và 'acb') nên cho giá trị băm khác nhau, tận dụng mọi phần của khóa. Hàm băm cho bảng băm không cần tính chất mật mã như hàm băm bảo mật.",
+    "key_points": [
+      "Tất định, phân bố đều, tính nhanh",
+      "Tận dụng mọi phần của khóa để khóa gần giống nhau cho giá trị khác nhau"
+    ],
+    "id": "Q_DSA_159"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Kiểu dữ liệu trừu tượng Set và Map",
+    "difficulty": "Easy",
+    "question": "Phân biệt kiểu dữ liệu trừu tượng Set (tập hợp) và Map (ánh xạ).",
+    "reference_answer": "Set lưu một tập các phần tử KHÔNG TRÙNG LẶP, thao tác chính: thêm, xóa, kiểm tra một phần tử có thuộc tập hay không. Map (Dictionary) lưu các cặp khóa-giá trị với khóa không trùng lặp, thao tác chính: gán giá trị cho khóa, tra giá trị theo khóa, xóa theo khóa. Cả hai đều có thể cài đặt bằng bảng băm (HashSet/HashMap, trung bình O(1)) hoặc cây cân bằng (TreeSet/TreeMap, O(log n), giữ thứ tự khóa).",
+    "key_points": [
+      "Set: tập phần tử không trùng; Map: cặp khóa-giá trị với khóa không trùng",
+      "Cài đặt bằng bảng băm (O(1) trung bình) hoặc cây cân bằng (O(log n), có thứ tự)"
+    ],
+    "id": "Q_DSA_160"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Kiểu dữ liệu trừu tượng (ADT) và cấu trúc dữ liệu",
+    "difficulty": "Easy",
+    "question": "Phân biệt kiểu dữ liệu trừu tượng (Abstract Data Type - ADT) với cấu trúc dữ liệu (data structure).",
+    "reference_answer": "ADT mô tả một kiểu dữ liệu qua TẬP THAO TÁC và hành vi của chúng, không nói tới cách cài đặt — ví dụ Stack được định nghĩa bởi push, pop, top theo nguyên lý LIFO. Cấu trúc dữ liệu là CÁCH CÀI ĐẶT cụ thể để hiện thực ADT trong bộ nhớ — ví dụ Stack có thể cài bằng mảng động hoặc danh sách liên kết. Một ADT có thể có nhiều cấu trúc dữ liệu cài đặt với hiệu năng khác nhau.",
+    "key_points": [
+      "ADT: định nghĩa bằng tập thao tác và hành vi, không quan tâm cài đặt",
+      "Cấu trúc dữ liệu: cách hiện thực ADT trong bộ nhớ; một ADT có nhiều cách cài đặt"
+    ],
+    "id": "Q_DSA_161"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Chiến lược Chia để trị (Divide and Conquer)",
+    "difficulty": "Easy",
+    "question": "Chiến lược Chia để trị gồm ba bước nào? Kể tên vài thuật toán áp dụng chiến lược này.",
+    "reference_answer": "Ba bước: (1) Chia (Divide) — tách bài toán thành các bài toán con nhỏ hơn cùng dạng; (2) Trị (Conquer) — giải đệ quy các bài toán con, bài toán đủ nhỏ thì giải trực tiếp; (3) Kết hợp (Combine) — gộp lời giải các bài toán con thành lời giải bài toán ban đầu. Ví dụ: Merge Sort, Quick Sort, tìm kiếm nhị phân, nhân số lớn Karatsuba, tìm cặp điểm gần nhất.",
+    "key_points": [
+      "Ba bước: chia, trị (giải đệ quy), kết hợp",
+      "Ví dụ: Merge Sort, Quick Sort, Binary Search, Karatsuba"
+    ],
+    "id": "Q_DSA_162"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Kỹ thuật quay lui (Backtracking)",
+    "difficulty": "Easy",
+    "question": "Kỹ thuật quay lui (backtracking) là gì?",
+    "reference_answer": "Quay lui là kỹ thuật xây dựng lời giải từng bước một (ví dụ chọn giá trị cho từng vị trí); tại mỗi bước thử lần lượt các lựa chọn khả dĩ, nếu lựa chọn dẫn tới trạng thái vi phạm ràng buộc hoặc không thể thành lời giải thì 'quay lui' — hủy lựa chọn đó và thử lựa chọn khác. Thường cài đặt bằng đệ quy. Ứng dụng: bài toán N quân hậu, Sudoku, sinh hoán vị/tổ hợp, tìm đường trong mê cung.",
+    "key_points": [
+      "Xây dựng lời giải từng bước, thử các lựa chọn và hủy khi đi vào ngõ cụt",
+      "Thường dùng đệ quy; ứng dụng: N-Queens, Sudoku, sinh tổ hợp"
+    ],
+    "id": "Q_DSA_163"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Phương pháp vét cạn (Brute Force)",
+    "difficulty": "Easy",
+    "question": "Phương pháp vét cạn (brute force) là gì? Khi nào nó vẫn là lựa chọn hợp lý?",
+    "reference_answer": "Vét cạn là thử TẤT CẢ các khả năng có thể để tìm lời giải, ví dụ kiểm tra mọi cặp phần tử để tìm hai số có tổng bằng k (O(n²)). Ưu điểm: đơn giản, dễ cài đặt, chắc chắn đúng. Nhược điểm: thường có độ phức tạp cao (đa thức bậc cao hoặc hàm mũ). Nó vẫn hợp lý khi dữ liệu nhỏ, khi cần một lời giải tham chiếu để kiểm thử thuật toán tối ưu hơn, hoặc khi chưa biết thuật toán nào tốt hơn.",
+    "key_points": [
+      "Vét cạn thử mọi khả năng, đơn giản và chắc chắn đúng nhưng chậm",
+      "Hợp lý khi dữ liệu nhỏ hoặc làm lời giải tham chiếu để kiểm thử"
+    ],
+    "id": "Q_DSA_164"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Duyệt cây theo thứ tự trước và sau (Pre-order, Post-order)",
+    "difficulty": "Easy",
+    "question": "Mô tả thứ tự duyệt Pre-order và Post-order trên cây nhị phân, cho một ứng dụng của mỗi loại.",
+    "reference_answer": "Pre-order: thăm nút hiện tại TRƯỚC, rồi duyệt cây con trái, rồi cây con phải (Gốc-Trái-Phải). Ứng dụng: sao chép cây, tuần tự hóa cấu trúc cây (lưu gốc trước để dựng lại), in cấu trúc thư mục. Post-order: duyệt cây con trái, cây con phải, rồi mới thăm nút hiện tại (Trái-Phải-Gốc). Ứng dụng: giải phóng/xóa cây (xóa con trước cha), tính kích thước thư mục (cần tổng của các con), tính giá trị cây biểu thức.",
+    "key_points": [
+      "Pre-order: Gốc-Trái-Phải, dùng để sao chép/tuần tự hóa cây",
+      "Post-order: Trái-Phải-Gốc, dùng để xóa cây, tính toán cần kết quả của con trước"
+    ],
+    "id": "Q_DSA_165"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Độ sâu và chiều cao của một nút",
+    "difficulty": "Easy",
+    "question": "Phân biệt độ sâu (depth) và chiều cao (height) của một nút trong cây.",
+    "reference_answer": "Độ sâu của một nút là số cạnh trên đường đi từ GỐC xuống nút đó (gốc có độ sâu 0). Chiều cao của một nút là số cạnh trên đường đi DÀI NHẤT từ nút đó xuống một lá (lá có chiều cao 0). Chiều cao của cây là chiều cao của gốc, cũng bằng độ sâu lớn nhất trong cây. Độ sâu đo 'từ trên xuống', chiều cao đo 'từ dưới lên'.",
+    "key_points": [
+      "Độ sâu: số cạnh từ gốc xuống nút",
+      "Chiều cao: số cạnh đường dài nhất từ nút xuống lá; chiều cao cây = chiều cao gốc"
+    ],
+    "id": "Q_DSA_166"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Cây tổng quát và biểu diễn con trái - anh phải",
+    "difficulty": "Easy",
+    "question": "Làm thế nào để biểu diễn một cây tổng quát (mỗi nút có số con không giới hạn) bằng cấu trúc nút chỉ có hai con trỏ?",
+    "reference_answer": "Dùng biểu diễn 'con trái - anh phải' (left-child, right-sibling): mỗi nút có một con trỏ tới CON ĐẦU TIÊN của nó và một con trỏ tới ANH EM KẾ TIẾP (nút cùng cha đứng ngay sau). Để duyệt các con của một nút, đi tới con đầu tiên rồi lần theo chuỗi con trỏ anh em. Cách này giúp mọi nút có kích thước cố định bất kể số con, và thực chất biến cây tổng quát thành một cây nhị phân.",
+    "key_points": [
+      "Mỗi nút giữ con trỏ tới con đầu tiên và anh em kế tiếp",
+      "Nút có kích thước cố định, cây tổng quát được biểu diễn như cây nhị phân"
+    ],
+    "id": "Q_DSA_167"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Đồ thị có trọng số",
+    "difficulty": "Easy",
+    "question": "Đồ thị có trọng số (weighted graph) là gì? Cho ví dụ thực tế.",
+    "reference_answer": "Đồ thị có trọng số là đồ thị mà mỗi cạnh được gán một giá trị số (trọng số) biểu thị chi phí, khoảng cách, thời gian hoặc dung lượng của kết nối đó. Ví dụ: bản đồ giao thông với các thành phố là đỉnh, đường đi là cạnh và trọng số là số km; mạng máy tính với trọng số là độ trễ. Các bài toán đường đi ngắn nhất, cây khung nhỏ nhất đều làm việc trên đồ thị có trọng số.",
+    "key_points": [
+      "Mỗi cạnh mang một trọng số như khoảng cách, chi phí, thời gian",
+      "Là nền tảng cho bài toán đường đi ngắn nhất, cây khung nhỏ nhất"
+    ],
+    "id": "Q_DSA_168"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Đồ thị có hướng không chu trình (DAG)",
+    "difficulty": "Easy",
+    "question": "Đồ thị có hướng không chu trình (DAG) là gì? Nêu một ví dụ ứng dụng.",
+    "reference_answer": "DAG (Directed Acyclic Graph) là đồ thị có hướng không chứa chu trình nào — không thể xuất phát từ một đỉnh, đi theo hướng các cạnh và quay lại chính nó. DAG biểu diễn tự nhiên quan hệ phụ thuộc hoặc thứ tự: các môn học tiên quyết, các tác vụ trong dự án (tác vụ B chỉ bắt đầu sau A), quá trình build phần mềm, lịch sử commit trong Git. Trên DAG luôn có thể sắp xếp topo.",
+    "key_points": [
+      "DAG là đồ thị có hướng không có chu trình",
+      "Biểu diễn quan hệ phụ thuộc: môn tiên quyết, tác vụ dự án, build; luôn sắp xếp topo được"
+    ],
+    "id": "Q_DSA_169"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Bậc của đỉnh",
+    "difficulty": "Easy",
+    "question": "Bậc (degree) của một đỉnh là gì? Trong đồ thị có hướng, bậc vào và bậc ra khác nhau thế nào?",
+    "reference_answer": "Trong đồ thị vô hướng, bậc của một đỉnh là số cạnh nối với nó. Tổng bậc mọi đỉnh bằng hai lần số cạnh (mỗi cạnh được đếm ở hai đầu). Trong đồ thị có hướng, bậc vào (in-degree) là số cạnh đi VÀO đỉnh, bậc ra (out-degree) là số cạnh đi RA từ đỉnh. Ví dụ trên mạng xã hội theo dõi một chiều, bậc vào là số người theo dõi bạn, bậc ra là số người bạn theo dõi.",
+    "key_points": [
+      "Bậc là số cạnh nối với đỉnh; tổng bậc = 2 × số cạnh trong đồ thị vô hướng",
+      "Đồ thị có hướng: bậc vào là cạnh đi vào, bậc ra là cạnh đi ra"
+    ],
+    "id": "Q_DSA_170"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Đường đi, đường đi đơn và chu trình",
+    "difficulty": "Easy",
+    "question": "Phân biệt các khái niệm đường đi (path), đường đi đơn (simple path) và chu trình (cycle) trong đồ thị.",
+    "reference_answer": "Đường đi là một dãy các đỉnh trong đó hai đỉnh liên tiếp được nối bởi một cạnh. Đường đi đơn là đường đi không lặp lại đỉnh nào. Chu trình là đường đi có đỉnh đầu trùng đỉnh cuối (và có ít nhất một cạnh, trong đồ thị vô hướng thường yêu cầu ít nhất 3 đỉnh phân biệt và không lặp cạnh). Độ dài đường đi là số cạnh (hoặc tổng trọng số nếu đồ thị có trọng số).",
+    "key_points": [
+      "Đường đi: dãy đỉnh nối nhau bằng cạnh; đường đi đơn: không lặp đỉnh",
+      "Chu trình: đường đi quay về đỉnh xuất phát"
+    ],
+    "id": "Q_DSA_171"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Đồ thị liên thông",
+    "difficulty": "Easy",
+    "question": "Thế nào là một đồ thị vô hướng liên thông (connected)?",
+    "reference_answer": "Đồ thị vô hướng liên thông khi giữa MỌI cặp đỉnh đều tồn tại ít nhất một đường đi. Nếu không liên thông, đồ thị gồm nhiều thành phần liên thông — mỗi thành phần là một nhóm đỉnh tối đa liên thông với nhau. Có thể kiểm tra liên thông bằng một lần BFS/DFS từ một đỉnh bất kỳ: đồ thị liên thông khi và chỉ khi lần duyệt thăm được tất cả các đỉnh.",
+    "key_points": [
+      "Liên thông: mọi cặp đỉnh đều có đường đi",
+      "Kiểm tra bằng một lần BFS/DFS xem có thăm hết đỉnh không"
+    ],
+    "id": "Q_DSA_172"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Cây là đồ thị đặc biệt",
+    "difficulty": "Easy",
+    "question": "Vì sao một cây có n đỉnh luôn có đúng n - 1 cạnh?",
+    "reference_answer": "Cây là đồ thị vô hướng liên thông và không có chu trình. Có thể chứng minh bằng quy nạp: cây 1 đỉnh có 0 cạnh; mọi cây có ít nhất 2 đỉnh đều có một lá (đỉnh bậc 1), bỏ lá đó cùng cạnh nối với nó ta được cây n - 1 đỉnh, theo giả thiết quy nạp có n - 2 cạnh, nên cây ban đầu có n - 1 cạnh. Hệ quả: thêm bất kỳ cạnh nào vào cây sẽ tạo chu trình, bỏ bất kỳ cạnh nào sẽ làm mất liên thông.",
+    "key_points": [
+      "Cây: liên thông, không chu trình, luôn có n - 1 cạnh",
+      "Thêm một cạnh tạo chu trình, bỏ một cạnh làm mất liên thông"
+    ],
+    "id": "Q_DSA_173"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Đồ thị thưa và đồ thị dày",
+    "difficulty": "Easy",
+    "question": "Phân biệt đồ thị thưa (sparse) và đồ thị dày (dense). Điều này ảnh hưởng thế nào tới việc chọn cách biểu diễn?",
+    "reference_answer": "Đồ thị có V đỉnh có thể có tối đa khoảng V² cạnh. Đồ thị thưa có số cạnh E nhỏ hơn nhiều so với V² (thường E xấp xỉ V, như mạng đường bộ, mạng xã hội — mỗi người chỉ quen vài trăm người trong hàng tỷ). Đồ thị dày có E gần V². Đồ thị thưa nên biểu diễn bằng danh sách kề (bộ nhớ O(V + E)); đồ thị dày có thể dùng ma trận kề (O(V²)) để kiểm tra cạnh nhanh O(1).",
+    "key_points": [
+      "Thưa: E nhỏ hơn nhiều V²; dày: E gần V²",
+      "Thưa dùng danh sách kề, dày có thể dùng ma trận kề"
+    ],
+    "id": "Q_DSA_174"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Sắp xếp (Sorting)",
+    "concept": "Thuật toán Shell Sort",
+    "difficulty": "Easy",
+    "question": "Shell Sort cải tiến Insertion Sort theo ý tưởng nào?",
+    "reference_answer": "Insertion Sort chậm khi phần tử nằm xa vị trí đúng vì mỗi lần chỉ dịch được một bước. Shell Sort thực hiện Insertion Sort trên các dãy con gồm các phần tử cách nhau một khoảng (gap) lớn, giúp phần tử di chuyển xa nhanh chóng; sau đó giảm dần khoảng cách cho tới 1 (lần cuối chính là Insertion Sort thông thường trên mảng đã gần được sắp xếp). Độ phức tạp phụ thuộc dãy khoảng cách, thường tốt hơn nhiều so với O(n²).",
+    "key_points": [
+      "Sắp xếp chèn trên các phần tử cách nhau gap lớn, rồi giảm dần gap về 1",
+      "Giúp phần tử di chuyển xa nhanh; hiệu năng phụ thuộc dãy gap"
+    ],
+    "id": "Q_DSA_175"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Sắp xếp (Sorting)",
+    "concept": "Thuật toán Bucket Sort",
+    "difficulty": "Easy",
+    "question": "Mô tả ý tưởng Bucket Sort và điều kiện để nó hiệu quả.",
+    "reference_answer": "Bucket Sort chia miền giá trị thành k 'thùng' (bucket) bằng nhau, phân phối mỗi phần tử vào thùng tương ứng với giá trị của nó, sắp xếp riêng từng thùng (thường bằng Insertion Sort), rồi nối các thùng theo thứ tự. Thuật toán hiệu quả (gần O(n) trung bình) khi dữ liệu phân bố tương đối ĐỀU trên miền giá trị đã biết, ví dụ số thực trong [0, 1). Nếu dữ liệu dồn vào ít thùng, hiệu năng suy biến về thuật toán dùng để sắp xếp trong thùng.",
+    "key_points": [
+      "Phân phối phần tử vào các thùng theo giá trị, sắp xếp từng thùng rồi nối lại",
+      "Hiệu quả khi dữ liệu phân bố đều trên miền đã biết"
+    ],
+    "id": "Q_DSA_176"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Mảng (Array)",
+    "concept": "Đảo ngược mảng tại chỗ",
+    "difficulty": "Easy",
+    "question": "Mô tả cách đảo ngược một mảng tại chỗ (in-place) và độ phức tạp của nó.",
+    "reference_answer": "Dùng hai chỉ số: trai bắt đầu từ 0, phai bắt đầu từ n - 1. Trong khi trai < phai: hoán đổi a[trai] và a[phai], rồi tăng trai, giảm phai. Mỗi cặp phần tử đối xứng được hoán đổi đúng một lần. Độ phức tạp thời gian O(n) (n/2 lần hoán đổi), bộ nhớ phụ O(1) vì chỉ dùng thêm vài biến.",
+    "key_points": [
+      "Hai chỉ số từ hai đầu tiến vào giữa, hoán đổi từng cặp",
+      "Thời gian O(n), bộ nhớ phụ O(1)"
+    ],
+    "id": "Q_DSA_177"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Mảng (Array)",
+    "concept": "Mảng tổng tiền tố (Prefix Sum)",
+    "difficulty": "Easy",
+    "question": "Mảng tổng tiền tố (prefix sum) là gì và giúp trả lời nhanh loại truy vấn nào?",
+    "reference_answer": "Mảng tổng tiền tố P được tính một lần với P[0] = 0 và P[i] = P[i-1] + a[i-1], tức P[i] là tổng i phần tử đầu tiên. Sau bước tiền xử lý O(n), tổng của bất kỳ đoạn con a[l..r] được tính trong O(1) bằng P[r+1] - P[l]. Rất hữu ích khi có nhiều truy vấn tổng đoạn trên mảng KHÔNG thay đổi. Có thể mở rộng cho mảng hai chiều để tính tổng hình chữ nhật con.",
+    "key_points": [
+      "P[i] là tổng i phần tử đầu, tiền xử lý O(n)",
+      "Tổng đoạn [l, r] = P[r+1] - P[l] trong O(1); phù hợp mảng không đổi"
+    ],
+    "id": "Q_DSA_178"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Tìm kiếm (Searching)",
+    "concept": "Tìm kiếm nội suy (Interpolation Search)",
+    "difficulty": "Easy",
+    "question": "Tìm kiếm nội suy (interpolation search) khác tìm kiếm nhị phân ở cách chọn vị trí so sánh như thế nào?",
+    "reference_answer": "Tìm kiếm nhị phân luôn so sánh với phần tử ở GIỮA đoạn. Tìm kiếm nội suy ước lượng vị trí khóa dựa trên giá trị của nó, giống cách ta mở từ điển gần cuối khi tìm chữ 'X': pos = lo + (khoa - a[lo]) × (hi - lo) / (a[hi] - a[lo]). Với mảng đã sắp xếp có giá trị phân bố đều, độ phức tạp trung bình chỉ O(log log n); nhưng nếu phân bố lệch, trường hợp xấu nhất suy biến thành O(n).",
+    "key_points": [
+      "Ước lượng vị trí theo giá trị khóa thay vì chọn điểm giữa",
+      "Trung bình O(log log n) với dữ liệu phân bố đều, xấu nhất O(n)"
+    ],
+    "id": "Q_DSA_179"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Tìm kiếm (Searching)",
+    "concept": "Tìm kiếm theo bước nhảy (Jump Search)",
+    "difficulty": "Easy",
+    "question": "Jump Search tìm kiếm trên mảng đã sắp xếp như thế nào và có độ phức tạp bao nhiêu?",
+    "reference_answer": "Jump Search nhảy qua mảng theo từng khối kích thước m (thường m = √n), kiểm tra phần tử cuối mỗi khối cho đến khi gặp khối có phần tử cuối ≥ khóa cần tìm; sau đó tìm tuyến tính trong khối đó. Tổng số bước là khoảng n/m + m, nhỏ nhất khi m = √n, nên độ phức tạp O(√n) — chậm hơn tìm nhị phân nhưng chỉ cần bước đi tiến (hữu ích khi quay lui tốn kém, như trên băng từ hoặc danh sách liên kết có bước nhảy).",
+    "key_points": [
+      "Nhảy theo khối √n rồi tìm tuyến tính trong khối",
+      "Độ phức tạp O(√n); hữu ích khi di chuyển lùi tốn kém"
+    ],
+    "id": "Q_DSA_180"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Ngăn xếp lời gọi và tràn ngăn xếp",
+    "difficulty": "Easy",
+    "question": "Ngăn xếp lời gọi (call stack) đóng vai trò gì khi thực thi hàm đệ quy, và lỗi tràn ngăn xếp (stack overflow) xảy ra khi nào?",
+    "reference_answer": "Mỗi lần gọi hàm, chương trình đẩy một 'khung' (stack frame) chứa tham số, biến cục bộ và địa chỉ trả về lên call stack; khi hàm kết thúc, khung được lấy ra. Với đệ quy, mỗi tầng gọi chiếm một khung, nên độ sâu đệ quy n tốn O(n) bộ nhớ ngăn xếp. Call stack có kích thước giới hạn (thường vài MB); khi đệ quy quá sâu (thiếu trường hợp cơ sở, hoặc đầu vào quá lớn như duyệt danh sách liên kết 1 triệu phần tử bằng đệ quy), ngăn xếp bị đầy và gây lỗi stack overflow.",
+    "key_points": [
+      "Mỗi lời gọi đệ quy tạo một stack frame, độ sâu n tốn O(n) bộ nhớ",
+      "Stack overflow xảy ra khi đệ quy quá sâu hoặc thiếu trường hợp cơ sở"
+    ],
+    "id": "Q_DSA_181"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Kỹ thuật ghi nhớ (Memoization)",
+    "difficulty": "Easy",
+    "question": "Memoization là gì và khi nào nó giúp tăng tốc thuật toán đệ quy?",
+    "reference_answer": "Memoization là kỹ thuật lưu lại kết quả của các lời gọi hàm theo tham số đầu vào (thường trong bảng băm hoặc mảng); khi hàm được gọi lại với cùng tham số, trả ngay kết quả đã lưu thay vì tính lại. Nó chỉ giúp tăng tốc khi thuật toán đệ quy có các BÀI TOÁN CON CHỒNG LẤP (cùng một bài toán con được giải nhiều lần) và hàm là thuần túy (cùng đầu vào luôn cho cùng kết quả, không có tác dụng phụ).",
+    "key_points": [
+      "Memoization lưu kết quả theo tham số để không tính lại",
+      "Hiệu quả khi có bài toán con chồng lấp và hàm thuần túy"
+    ],
+    "id": "Q_DSA_182"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Tham lam (Greedy Algorithm)",
+    "concept": "Mã hóa Huffman",
+    "difficulty": "Easy",
+    "question": "Mã hóa Huffman dùng để làm gì và dựa trên chiến lược tham lam nào?",
+    "reference_answer": "Mã hóa Huffman dùng để nén dữ liệu không mất mát bằng cách gán mã nhị phân độ dài thay đổi cho các ký tự: ký tự xuất hiện nhiều có mã ngắn, ký tự hiếm có mã dài; các mã là mã tiền tố (không mã nào là tiền tố của mã khác) nên giải mã không nhầm lẫn. Chiến lược tham lam: lặp lại việc chọn hai nút có tần suất NHỎ NHẤT (dùng hàng đợi ưu tiên), gộp thành một nút cha có tần suất bằng tổng, cho đến khi còn một cây; mã của ký tự là đường đi từ gốc tới lá (trái 0, phải 1).",
+    "key_points": [
+      "Huffman nén không mất mát bằng mã tiền tố độ dài thay đổi theo tần suất",
+      "Tham lam: liên tục gộp hai nút tần suất nhỏ nhất bằng hàng đợi ưu tiên"
+    ],
+    "id": "Q_DSA_183"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Chuỗi (String)",
+    "concept": "Kiểm tra chuỗi đối xứng bằng hai con trỏ",
+    "difficulty": "Easy",
+    "question": "Mô tả cách kiểm tra một chuỗi có phải là chuỗi đối xứng (palindrome) hay không với bộ nhớ phụ O(1).",
+    "reference_answer": "Dùng hai con trỏ: i ở đầu chuỗi, j ở cuối chuỗi. Trong khi i < j: nếu s[i] khác s[j] thì kết luận không phải palindrome; ngược lại tăng i và giảm j. Nếu vòng lặp kết thúc mà không gặp cặp khác nhau thì chuỗi là palindrome. Độ phức tạp O(n) thời gian và O(1) bộ nhớ phụ. Nếu đề bài yêu cầu bỏ qua dấu câu và hoa thường thì cần bỏ qua ký tự không phải chữ/số và so sánh sau khi chuyển về chữ thường.",
+    "key_points": [
+      "Hai con trỏ từ hai đầu tiến vào giữa, so sánh từng cặp ký tự",
+      "O(n) thời gian, O(1) bộ nhớ; chuẩn hóa nếu cần bỏ qua dấu câu và hoa thường"
+    ],
+    "id": "Q_DSA_184"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Chuỗi (String)",
+    "concept": "Kiểm tra hai chuỗi là đảo chữ (Anagram)",
+    "difficulty": "Easy",
+    "question": "Làm thế nào để kiểm tra hai chuỗi có phải là đảo chữ (anagram) của nhau — gồm cùng các ký tự với cùng số lần xuất hiện — trong thời gian O(n)?",
+    "reference_answer": "Cách 1 (đếm tần suất): nếu độ dài khác nhau thì không phải anagram; dùng một mảng đếm (với bảng chữ cái nhỏ) hoặc bảng băm, tăng số đếm cho mỗi ký tự của chuỗi thứ nhất và giảm cho mỗi ký tự của chuỗi thứ hai; cuối cùng mọi số đếm phải bằng 0. Độ phức tạp O(n). Cách 2: sắp xếp cả hai chuỗi rồi so sánh, đơn giản nhưng tốn O(n log n).",
+    "key_points": [
+      "Đếm tần suất ký tự bằng mảng/bảng băm, tăng với chuỗi này giảm với chuỗi kia",
+      "Đếm tần suất O(n); sắp xếp rồi so sánh O(n log n)"
+    ],
+    "id": "Q_DSA_185"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Thao tác bit: kiểm tra lũy thừa của 2",
+    "difficulty": "Easy",
+    "question": "Vì sao biểu thức n > 0 && (n & (n - 1)) == 0 kiểm tra được n có phải là lũy thừa của 2 hay không?",
+    "reference_answer": "Lũy thừa của 2 trong hệ nhị phân có đúng MỘT bit 1 (ví dụ 8 = 1000). Khi trừ đi 1, bit 1 đó trở thành 0 và mọi bit phía sau thành 1 (7 = 0111). Phép AND của hai số này bằng 0. Với số không phải lũy thừa của 2 (có từ hai bit 1 trở lên), phép trừ 1 chỉ thay đổi các bit từ bit 1 thấp nhất trở xuống, bit 1 cao hơn vẫn giữ nguyên nên AND khác 0. Điều kiện n > 0 loại trừ trường hợp 0. Thao tác O(1).",
+    "key_points": [
+      "Lũy thừa của 2 có đúng một bit 1; n - 1 lật bit đó và các bit thấp hơn",
+      "n & (n - 1) xóa bit 1 thấp nhất; bằng 0 khi chỉ có một bit 1"
+    ],
+    "id": "Q_DSA_186"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Mảng (Array)",
+    "concept": "Tìm phần tử xuất hiện một lần bằng XOR",
+    "difficulty": "Easy",
+    "question": "Cho một mảng trong đó mọi phần tử xuất hiện đúng hai lần, trừ một phần tử xuất hiện một lần. Làm thế nào tìm phần tử đó trong O(n) thời gian và O(1) bộ nhớ?",
+    "reference_answer": "XOR toàn bộ các phần tử trong mảng. Phép XOR có tính giao hoán, kết hợp, x ^ x = 0 và x ^ 0 = x. Vì vậy các cặp phần tử giống nhau triệt tiêu nhau thành 0, kết quả cuối cùng chính là phần tử xuất hiện một lần. Chỉ cần một biến tích lũy nên bộ nhớ O(1), một lượt duyệt nên thời gian O(n).",
+    "key_points": [
+      "XOR mọi phần tử: cặp giống nhau triệt tiêu thành 0",
+      "Kết quả là phần tử đơn lẻ; O(n) thời gian, O(1) bộ nhớ"
+    ],
+    "id": "Q_DSA_187"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Thuật toán Euclid tìm ước chung lớn nhất",
+    "difficulty": "Easy",
+    "question": "Thuật toán Euclid tìm ước chung lớn nhất (GCD) của hai số dựa trên tính chất nào? Độ phức tạp của nó là bao nhiêu?",
+    "reference_answer": "Thuật toán dựa trên tính chất gcd(a, b) = gcd(b, a mod b) với b ≠ 0, và gcd(a, 0) = a. Lặp (hoặc đệ quy) cho tới khi số thứ hai bằng 0. Ví dụ gcd(48, 18) = gcd(18, 12) = gcd(12, 6) = gcd(6, 0) = 6. Độ phức tạp O(log(min(a, b))) vì cứ sau hai bước, số lớn hơn giảm ít nhất một nửa.",
+    "key_points": [
+      "gcd(a, b) = gcd(b, a mod b), dừng khi số thứ hai bằng 0",
+      "Độ phức tạp O(log min(a, b))"
+    ],
+    "id": "Q_DSA_188"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Sàng Eratosthenes",
+    "difficulty": "Easy",
+    "question": "Mô tả thuật toán sàng Eratosthenes tìm mọi số nguyên tố không vượt quá n.",
+    "reference_answer": "Tạo mảng đánh dấu từ 2 đến n, ban đầu coi tất cả là nguyên tố. Lần lượt với mỗi số p từ 2 trở đi mà còn được đánh dấu là nguyên tố, gạch bỏ (đánh dấu là hợp số) mọi bội của p bắt đầu từ p² (các bội nhỏ hơn đã bị gạch bởi các số nguyên tố nhỏ hơn). Chỉ cần xét p tới √n. Các số còn lại không bị gạch là nguyên tố. Độ phức tạp O(n log log n), bộ nhớ O(n).",
+    "key_points": [
+      "Gạch bỏ các bội của mỗi số nguyên tố p bắt đầu từ p², xét p tới √n",
+      "Độ phức tạp O(n log log n), bộ nhớ O(n)"
+    ],
+    "id": "Q_DSA_189"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Lũy thừa nhanh (Binary Exponentiation)",
+    "difficulty": "Easy",
+    "question": "Làm thế nào tính a^n trong O(log n) phép nhân thay vì n phép nhân?",
+    "reference_answer": "Dùng lũy thừa nhanh dựa trên biểu diễn nhị phân của n: nếu n chẵn thì a^n = (a^(n/2))², nếu n lẻ thì a^n = a × a^(n-1). Cài đặt lặp: kết quả = 1; trong khi n > 0: nếu bit thấp nhất của n là 1 thì nhân kết quả với a; bình phương a; dịch n sang phải một bit. Mỗi bước giảm n một nửa nên chỉ cần O(log n) phép nhân. Thường kết hợp lấy modulo ở mỗi bước để tránh tràn số khi tính a^n mod m.",
+    "key_points": [
+      "Dựa vào biểu diễn nhị phân của số mũ: bình phương và nhân khi bit bằng 1",
+      "O(log n) phép nhân; kết hợp modulo để tránh tràn số"
+    ],
+    "id": "Q_DSA_190"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Số học modulo và tràn số",
+    "difficulty": "Easy",
+    "question": "Khi đề bài yêu cầu in kết quả 'modulo 10^9 + 7', vì sao cần lấy modulo ở mỗi bước tính toán thay vì chỉ ở cuối?",
+    "reference_answer": "Kết quả trung gian (số cách đếm, giai thừa, lũy thừa) có thể vượt rất xa giới hạn của kiểu số nguyên 64-bit, gây tràn số và cho kết quả sai. Nhờ tính chất (a + b) mod m = ((a mod m) + (b mod m)) mod m và (a × b) mod m = ((a mod m) × (b mod m)) mod m, ta có thể lấy modulo sau mỗi phép cộng/nhân để giữ giá trị trung gian luôn nhỏ hơn m mà kết quả cuối cùng không đổi. Với m ≈ 10^9, tích hai số nhỏ hơn m vẫn vừa trong 64-bit.",
+    "key_points": [
+      "Giá trị trung gian lớn sẽ tràn kiểu số nguyên",
+      "Tính chất modulo của phép cộng/nhân cho phép lấy modulo từng bước mà kết quả không đổi"
+    ],
+    "id": "Q_DSA_191"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Sắp xếp (Sorting)",
+    "concept": "Sắp xếp theo nhiều tiêu chí",
+    "difficulty": "Easy",
+    "question": "Làm thế nào sắp xếp danh sách sinh viên theo điểm giảm dần, nếu cùng điểm thì theo tên tăng dần?",
+    "reference_answer": "Dùng hàm so sánh theo thứ tự từ điển (lexicographic) trên bộ tiêu chí: so sánh điểm trước (đảo chiều để giảm dần); chỉ khi điểm bằng nhau mới so sánh tên. Ví dụ Python: sorted(ds, key=lambda s: (-s.diem, s.ten)); Java: Comparator.comparing(SinhVien::getDiem).reversed().thenComparing(SinhVien::getTen). Cách khác là sắp xếp nhiều lần bằng thuật toán ỔN ĐỊNH theo thứ tự ngược: trước theo tên, sau theo điểm.",
+    "key_points": [
+      "So sánh theo bộ tiêu chí theo thứ tự ưu tiên (lexicographic)",
+      "Hoặc sắp xếp ổn định nhiều lần từ tiêu chí phụ tới tiêu chí chính"
+    ],
+    "id": "Q_DSA_192"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Tìm kiếm (Searching)",
+    "concept": "Biến thể lower bound và upper bound",
+    "difficulty": "Easy",
+    "question": "Trong mảng đã sắp xếp có phần tử trùng lặp, lower bound và upper bound của giá trị x là gì? Ứng dụng đếm số lần xuất hiện của x.",
+    "reference_answer": "Lower bound là vị trí ĐẦU TIÊN có phần tử ≥ x; upper bound là vị trí đầu tiên có phần tử > x. Cả hai đều tìm được bằng biến thể của tìm kiếm nhị phân trong O(log n). Số lần xuất hiện của x bằng upper_bound(x) - lower_bound(x). Ví dụ mảng [1, 2, 2, 2, 5], với x = 2: lower bound = 1, upper bound = 4, số lần xuất hiện = 3.",
+    "key_points": [
+      "Lower bound: vị trí đầu tiên ≥ x; upper bound: vị trí đầu tiên > x",
+      "Số lần xuất hiện = upper - lower, tính trong O(log n)"
+    ],
+    "id": "Q_DSA_193"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Tìm kiếm (Searching)",
+    "concept": "Điều kiện vòng lặp trong tìm kiếm nhị phân",
+    "difficulty": "Easy",
+    "question": "Trong cài đặt tìm kiếm nhị phân dùng lo = 0, hi = n - 1, vì sao điều kiện lặp là while (lo <= hi) chứ không phải lo < hi, và cập nhật là lo = mid + 1, hi = mid - 1?",
+    "reference_answer": "Với cách đặt hi = n - 1, đoạn tìm kiếm là đoạn ĐÓNG [lo, hi], nên khi lo = hi đoạn vẫn còn một phần tử cần kiểm tra — nếu dùng lo < hi sẽ bỏ sót phần tử đó. Vì a[mid] đã được so sánh và không phải đáp án, đoạn tiếp theo loại bỏ hẳn mid: lo = mid + 1 hoặc hi = mid - 1; nếu viết lo = mid có thể gây lặp vô hạn khi lo và hi kề nhau. Quy tắc chung: chọn một bất biến (đoạn đóng hay nửa mở [lo, hi)) và giữ nhất quán cả điều kiện dừng lẫn cách cập nhật.",
+    "key_points": [
+      "Đoạn đóng [lo, hi] còn một phần tử khi lo = hi nên phải dùng lo <= hi",
+      "Loại mid khỏi đoạn bằng mid ± 1 để tránh lặp vô hạn; giữ nhất quán bất biến"
+    ],
+    "id": "Q_DSA_194"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Phát hiện phần tử trùng lặp bằng Hash Set",
+    "difficulty": "Easy",
+    "question": "Làm thế nào kiểm tra một mảng có phần tử trùng lặp hay không trong O(n) thời gian trung bình?",
+    "reference_answer": "Duyệt mảng và dùng một Hash Set lưu các phần tử đã gặp: với mỗi phần tử, nếu nó đã có trong set thì kết luận có trùng lặp; ngược lại thêm vào set. Mỗi thao tác kiểm tra/thêm trung bình O(1), tổng O(n) thời gian và O(n) bộ nhớ. So với cách sắp xếp rồi so sánh các phần tử kề nhau (O(n log n) thời gian, có thể O(1) bộ nhớ phụ), Hash Set nhanh hơn nhưng tốn bộ nhớ hơn.",
+    "key_points": [
+      "Duyệt mảng, kiểm tra và thêm phần tử vào Hash Set",
+      "O(n) thời gian, O(n) bộ nhớ; đánh đổi với cách sắp xếp O(n log n)"
+    ],
+    "id": "Q_DSA_195"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Danh sách liên kết (Linked List)",
+    "concept": "Tìm nút giữa bằng con trỏ nhanh-chậm",
+    "difficulty": "Easy",
+    "question": "Làm thế nào tìm nút ở giữa của một danh sách liên kết đơn chỉ với MỘT lượt duyệt?",
+    "reference_answer": "Dùng hai con trỏ cùng xuất phát từ đầu danh sách: con trỏ chậm đi 1 bước mỗi lần, con trỏ nhanh đi 2 bước mỗi lần. Khi con trỏ nhanh tới cuối danh sách (hoặc null), con trỏ chậm đã đi được một nửa quãng đường nên đang đứng ở nút giữa. Độ phức tạp O(n) thời gian, O(1) bộ nhớ, không cần biết trước độ dài danh sách.",
+    "key_points": [
+      "Con trỏ chậm đi 1 bước, nhanh đi 2 bước",
+      "Khi nhanh tới cuối, chậm ở giữa; một lượt duyệt, O(1) bộ nhớ"
+    ],
+    "id": "Q_DSA_196"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Danh sách liên kết (Linked List)",
+    "concept": "Phát hiện chu trình trong danh sách liên kết (Floyd)",
+    "difficulty": "Easy",
+    "question": "Thuật toán Floyd (rùa và thỏ) phát hiện danh sách liên kết có chu trình như thế nào?",
+    "reference_answer": "Dùng hai con trỏ: rùa đi 1 bước, thỏ đi 2 bước mỗi lần. Nếu danh sách không có chu trình, thỏ sẽ gặp null và dừng. Nếu có chu trình, cả hai cuối cùng đều đi vào vòng; trong vòng, khoảng cách giữa thỏ và rùa giảm đi 1 sau mỗi bước, nên chắc chắn thỏ sẽ đuổi kịp và gặp rùa. Thuật toán O(n) thời gian, O(1) bộ nhớ (thay vì dùng Hash Set lưu các nút đã thăm tốn O(n)).",
+    "key_points": [
+      "Rùa đi 1 bước, thỏ đi 2 bước; không có chu trình thì thỏ gặp null",
+      "Có chu trình thì hai con trỏ chắc chắn gặp nhau; O(n) thời gian, O(1) bộ nhớ"
+    ],
+    "id": "Q_DSA_197"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Danh sách liên kết (Linked List)",
+    "concept": "Đảo ngược danh sách liên kết đơn",
+    "difficulty": "Easy",
+    "question": "Mô tả thuật toán lặp đảo ngược một danh sách liên kết đơn.",
+    "reference_answer": "Dùng ba con trỏ: truoc = null, hienTai = head. Trong khi hienTai khác null: lưu tiep = hienTai.next; đảo hướng liên kết hienTai.next = truoc; tiến lên truoc = hienTai, hienTai = tiep. Khi kết thúc, truoc là đầu mới của danh sách. Việc lưu tiep trước khi đảo là bắt buộc, nếu không sẽ mất phần còn lại của danh sách. Độ phức tạp O(n) thời gian, O(1) bộ nhớ.",
+    "key_points": [
+      "Dùng truoc, hienTai, tiep; lưu tiep trước khi đảo hienTai.next",
+      "Kết thúc thì truoc là head mới; O(n) thời gian, O(1) bộ nhớ"
+    ],
+    "id": "Q_DSA_198"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Danh sách liên kết (Linked List)",
+    "concept": "Nút giả (Sentinel/Dummy node)",
+    "difficulty": "Easy",
+    "question": "Vì sao khi cài đặt các thao tác trên danh sách liên kết (như xóa phần tử, trộn hai danh sách) người ta hay dùng một nút giả (dummy node) đứng trước head?",
+    "reference_answer": "Nhiều thao tác phải xử lý riêng trường hợp đặc biệt khi thay đổi chính nút đầu (xóa head, danh sách rỗng, chèn vào đầu). Đặt một nút giả trước head làm cho MỌI nút thật đều có một nút đứng trước, nên có thể dùng chung một đoạn code cho mọi vị trí, loại bỏ các nhánh if đặc biệt và giảm lỗi. Kết quả trả về là dummy.next. Chi phí chỉ là thêm một nút.",
+    "key_points": [
+      "Nút giả đứng trước head giúp mọi nút thật đều có nút đứng trước",
+      "Loại bỏ xử lý đặc biệt cho head/danh sách rỗng; trả về dummy.next"
+    ],
+    "id": "Q_DSA_199"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Cấu trúc dữ liệu tuyến tính và phi tuyến tính",
+    "difficulty": "Easy",
+    "question": "Phân biệt cấu trúc dữ liệu tuyến tính và phi tuyến tính, cho ví dụ mỗi loại.",
+    "reference_answer": "Cấu trúc dữ liệu tuyến tính sắp xếp các phần tử theo một trình tự, mỗi phần tử (trừ đầu và cuối) có đúng một phần tử đứng trước và một phần tử đứng sau, nên có thể duyệt hết trong một lượt tuần tự: mảng, danh sách liên kết, ngăn xếp, hàng đợi. Cấu trúc phi tuyến tính tổ chức phần tử theo quan hệ phân cấp hoặc mạng lưới, một phần tử có thể liên kết với nhiều phần tử khác: cây, heap, đồ thị. Cấu trúc phi tuyến tính cần các chiến lược duyệt riêng như DFS, BFS, duyệt cây theo các thứ tự.",
+    "key_points": [
+      "Tuyến tính: phần tử xếp theo trình tự, mỗi phần tử có một trước một sau (mảng, danh sách, stack, queue)",
+      "Phi tuyến tính: quan hệ phân cấp hoặc mạng lưới (cây, heap, đồ thị), cần chiến lược duyệt riêng"
+    ],
+    "id": "Q_DSA_200"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Hàng đợi (Queue)",
+    "concept": "Cài đặt Queue bằng hai Stack",
+    "difficulty": "Medium",
+    "question": "Mô tả cách cài đặt Queue bằng hai Stack và chứng minh mỗi thao tác có chi phí phân bổ O(1).",
+    "reference_answer": "Dùng stack vào (S_in) và stack ra (S_out). Enqueue: push vào S_in. Dequeue: nếu S_out rỗng thì lần lượt pop mọi phần tử từ S_in và push sang S_out (đảo ngược thứ tự, phần tử vào trước giờ nằm trên đỉnh S_out), rồi pop từ S_out. Một lần dequeue có thể tốn O(n) khi phải chuyển, nhưng mỗi phần tử trong suốt vòng đời chỉ được push vào S_in một lần, chuyển sang S_out một lần và pop khỏi S_out một lần — tối đa khoảng 4 thao tác cơ bản. Do đó tổng chi phí cho m thao tác là O(m), tức phân bổ O(1) mỗi thao tác.",
+    "key_points": [
+      "Enqueue vào S_in; dequeue lấy từ S_out, chỉ chuyển toàn bộ S_in sang khi S_out rỗng",
+      "Mỗi phần tử được di chuyển hằng số lần nên chi phí phân bổ O(1)"
+    ],
+    "id": "Q_DSA_201"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Ngăn xếp (Stack)",
+    "concept": "Min-Stack lấy phần tử nhỏ nhất trong O(1)",
+    "difficulty": "Medium",
+    "question": "Thiết kế một Stack hỗ trợ push, pop, top và getMin đều trong O(1).",
+    "reference_answer": "Dùng thêm một stack phụ (minStack) song song: khi push x, đẩy x vào stack chính và đẩy min(x, đỉnh minStack) vào minStack (hoặc chỉ đẩy khi x ≤ đỉnh minStack để tiết kiệm). Khi pop, lấy ra ở cả hai stack (hoặc chỉ pop minStack khi phần tử bị lấy bằng đỉnh minStack). getMin trả về đỉnh minStack. Ý tưởng then chốt: tại mỗi trạng thái của stack, giá trị nhỏ nhất của các phần tử bên dưới là cố định cho tới khi chúng bị pop, nên có thể ghi nhớ sẵn cùng lúc push.",
+    "key_points": [
+      "Dùng stack phụ lưu giá trị nhỏ nhất tương ứng với từng mức của stack chính",
+      "Push/pop đồng bộ hai stack, getMin đọc đỉnh stack phụ — mọi thao tác O(1)"
+    ],
+    "id": "Q_DSA_202"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Ngăn xếp (Stack)",
+    "concept": "Ngăn xếp đơn điệu (Monotonic Stack)",
+    "difficulty": "Medium",
+    "question": "Dùng ngăn xếp đơn điệu để tìm 'phần tử lớn hơn kế tiếp' (next greater element) cho mỗi phần tử của mảng trong O(n) như thế nào?",
+    "reference_answer": "Duyệt mảng từ trái sang phải, duy trì một stack chứa chỉ số các phần tử CHƯA tìm được phần tử lớn hơn kế tiếp, với giá trị giảm dần từ đáy lên đỉnh. Với phần tử hiện tại a[i]: trong khi stack không rỗng và a[đỉnh] < a[i], thì a[i] chính là phần tử lớn hơn kế tiếp của đỉnh — ghi kết quả và pop. Sau đó push i. Các chỉ số còn lại trong stack cuối cùng không có phần tử lớn hơn (gán -1). Mỗi chỉ số được push và pop tối đa một lần nên tổng O(n), thay vì O(n²) với hai vòng lặp lồng nhau.",
+    "key_points": [
+      "Stack giữ các chỉ số chưa có đáp án với giá trị giảm dần",
+      "Phần tử mới pop mọi phần tử nhỏ hơn và là đáp án cho chúng; mỗi chỉ số push/pop một lần nên O(n)"
+    ],
+    "id": "Q_DSA_203"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Hàng đợi (Queue)",
+    "concept": "Giá trị lớn nhất trong cửa sổ trượt bằng Deque",
+    "difficulty": "Medium",
+    "question": "Cho mảng n phần tử và cửa sổ độ dài k, tìm giá trị lớn nhất trong mỗi cửa sổ trong O(n) bằng deque.",
+    "reference_answer": "Duy trì deque chứa CHỈ SỐ của các phần tử có khả năng là max của cửa sổ hiện tại hoặc tương lai, với giá trị giảm dần từ đầu tới cuối deque. Với mỗi i: (1) loại bỏ ở đầu deque các chỉ số đã ra khỏi cửa sổ (≤ i - k); (2) loại bỏ ở cuối deque các chỉ số có giá trị ≤ a[i] — chúng không bao giờ là max nữa vì a[i] lớn hơn và tồn tại lâu hơn; (3) thêm i vào cuối; (4) khi i ≥ k - 1, max của cửa sổ là a[đầu deque]. Mỗi chỉ số vào và ra deque tối đa một lần nên tổng O(n), so với O(n·k) khi tìm max lại cho từng cửa sổ.",
+    "key_points": [
+      "Deque giữ chỉ số theo giá trị giảm dần, loại chỉ số hết hạn ở đầu và phần tử nhỏ hơn ở cuối",
+      "Đầu deque luôn là max của cửa sổ; mỗi chỉ số vào/ra một lần nên O(n)"
+    ],
+    "id": "Q_DSA_204"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Xây dựng Heap trong O(n)",
+    "difficulty": "Medium",
+    "question": "Vì sao xây dựng heap từ một mảng n phần tử bằng thuật toán 'heapify từ dưới lên' (bottom-up) chỉ tốn O(n), trong khi chèn lần lượt n phần tử tốn O(n log n)?",
+    "reference_answer": "Bottom-up: gọi sift-down cho các nút từ nút trong cuối cùng (chỉ số n/2 - 1) ngược về gốc. Chi phí sift-down của một nút tỷ lệ với CHIỀU CAO của nó (khoảng cách xuống lá), không phải độ sâu. Trong cây hoàn chỉnh, khoảng n/2 nút là lá (chi phí 0), n/4 nút có chiều cao 1, n/8 nút có chiều cao 2... Tổng chi phí ≈ n × Σ h/2^(h+1), chuỗi này hội tụ về hằng số, nên tổng O(n). Ngược lại, chèn lần lượt dùng sift-up, chi phí tỷ lệ với ĐỘ SÂU; phần lớn nút nằm ở các mức sâu (khoảng log n), nên tổng có thể tới O(n log n).",
+    "key_points": [
+      "Bottom-up dùng sift-down, chi phí theo chiều cao nút; đa số nút có chiều cao nhỏ",
+      "Tổng Σ n·h/2^(h+1) = O(n); chèn lần lượt dùng sift-up theo độ sâu nên O(n log n)"
+    ],
+    "id": "Q_DSA_205"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Hàng đợi (Queue)",
+    "concept": "Tìm k phần tử lớn nhất bằng Heap kích thước k",
+    "difficulty": "Medium",
+    "question": "Cho một luồng dữ liệu rất lớn (không chứa hết trong bộ nhớ), làm thế nào tìm k phần tử lớn nhất? Phân tích độ phức tạp.",
+    "reference_answer": "Duy trì một MIN-heap kích thước tối đa k. Với mỗi phần tử x trong luồng: nếu heap chưa đủ k phần tử thì thêm vào; nếu đủ và x lớn hơn gốc heap (phần tử nhỏ nhất trong k phần tử lớn nhất hiện tại) thì thay gốc bằng x và sift-down. Cuối cùng heap chứa k phần tử lớn nhất. Độ phức tạp O(n log k) thời gian và O(k) bộ nhớ — tốt hơn nhiều so với sắp xếp toàn bộ O(n log n) và O(n) bộ nhớ khi k nhỏ. Điểm dễ nhầm: tìm k phần tử LỚN nhất dùng MIN-heap, vì cần loại nhanh phần tử nhỏ nhất trong nhóm.",
+    "key_points": [
+      "Duy trì min-heap k phần tử, thay gốc khi gặp phần tử lớn hơn",
+      "O(n log k) thời gian, O(k) bộ nhớ; phù hợp luồng dữ liệu lớn"
+    ],
+    "id": "Q_DSA_206"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Hàng đợi (Queue)",
+    "concept": "Trung vị của luồng dữ liệu bằng hai Heap",
+    "difficulty": "Medium",
+    "question": "Thiết kế cấu trúc hỗ trợ thêm số và truy vấn trung vị (median) hiện tại một cách hiệu quả.",
+    "reference_answer": "Dùng hai heap: MAX-heap 'thấp' chứa nửa nhỏ của dữ liệu và MIN-heap 'cao' chứa nửa lớn, với bất biến: mọi phần tử của 'thấp' ≤ mọi phần tử của 'cao', và kích thước chênh nhau không quá 1. Thêm x: đưa vào 'thấp' nếu x ≤ đỉnh 'thấp', ngược lại vào 'cao'; sau đó cân bằng lại bằng cách chuyển đỉnh của heap lớn hơn sang heap kia nếu chênh lệch > 1. Trung vị là đỉnh của heap lớn hơn (số phần tử lẻ) hoặc trung bình hai đỉnh (số phần tử chẵn). Thêm O(log n), truy vấn O(1).",
+    "key_points": [
+      "Max-heap giữ nửa nhỏ, min-heap giữ nửa lớn, kích thước chênh không quá 1",
+      "Thêm O(log n), trung vị đọc từ đỉnh heap trong O(1)"
+    ],
+    "id": "Q_DSA_207"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Thiết kế bộ đệm LRU",
+    "difficulty": "Medium",
+    "question": "Thiết kế bộ đệm LRU (Least Recently Used) với dung lượng cố định, hỗ trợ get và put đều trong O(1).",
+    "reference_answer": "Kết hợp hai cấu trúc: (1) Bảng băm ánh xạ khóa → nút trong danh sách, để tìm phần tử O(1); (2) danh sách liên kết ĐÔI giữ thứ tự sử dụng: đầu là mới dùng nhất, cuối là lâu nhất chưa dùng. get(k): tra bảng băm, nếu có thì tách nút ra và đưa lên đầu danh sách (O(1) nhờ có con trỏ prev/next), trả giá trị. put(k, v): nếu đã có thì cập nhật và đưa lên đầu; nếu chưa có và bộ đệm đầy thì xóa nút ở cuối (đồng thời xóa khóa trong bảng băm), rồi thêm nút mới vào đầu. Danh sách đôi là cần thiết để xóa một nút bất kỳ trong O(1). Java có sẵn LinkedHashMap với accessOrder = true.",
+    "key_points": [
+      "Bảng băm để tra O(1) + danh sách liên kết đôi để giữ thứ tự sử dụng",
+      "get/put đưa nút lên đầu, đầy thì loại nút cuối; danh sách đôi cho phép xóa nút bất kỳ O(1)"
+    ],
+    "id": "Q_DSA_208"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Tìm kiếm (Searching)",
+    "concept": "Tìm kiếm nhị phân trên không gian đáp án",
+    "difficulty": "Medium",
+    "question": "Có n đống chuối và h giờ; mỗi giờ khỉ ăn tối đa v quả từ một đống (đống ít hơn v thì ăn hết đống đó và nghỉ phần còn lại của giờ). Tìm tốc độ v nhỏ nhất để ăn hết trong h giờ. Giải thích vì sao có thể dùng tìm kiếm nhị phân.",
+    "reference_answer": "Thay vì tìm trên mảng, tìm nhị phân trên KHÔNG GIAN ĐÁP ÁN v ∈ [1, max(đống)]. Điều kiện then chốt là tính ĐƠN ĐIỆU: nếu tốc độ v ăn kịp thì mọi tốc độ lớn hơn cũng ăn kịp; số giờ cần thiết với tốc độ v là Σ ⌈đống_i / v⌉, tính trong O(n). Tìm v nhỏ nhất thỏa điều kiện: nếu v ăn kịp thì thu hẹp về nửa trái (giữ v), ngược lại sang nửa phải. Độ phức tạp O(n log M) với M là đống lớn nhất. Kỹ thuật này áp dụng cho nhiều bài toán 'tìm giá trị nhỏ nhất/lớn nhất thỏa điều kiện' miễn là hàm kiểm tra đơn điệu.",
+    "key_points": [
+      "Tìm nhị phân trên miền giá trị đáp án thay vì trên mảng",
+      "Yêu cầu hàm kiểm tra đơn điệu; độ phức tạp O(n log M)"
+    ],
+    "id": "Q_DSA_209"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Tìm kiếm (Searching)",
+    "concept": "Tìm kiếm trên mảng đã sắp xếp bị xoay",
+    "difficulty": "Medium",
+    "question": "Mảng đã sắp xếp tăng dần bị xoay tại một vị trí chưa biết (ví dụ [4, 5, 6, 7, 0, 1, 2]), các phần tử phân biệt. Làm thế nào tìm một giá trị trong O(log n)?",
+    "reference_answer": "Biến thể tìm kiếm nhị phân: tại mỗi bước với mid, ít nhất MỘT trong hai nửa [lo, mid] hoặc [mid, hi] chắc chắn đã được sắp xếp. Nếu a[lo] ≤ a[mid] thì nửa trái đã sắp xếp: nếu a[lo] ≤ x < a[mid] thì tìm ở nửa trái, ngược lại ở nửa phải. Nếu không thì nửa phải đã sắp xếp: nếu a[mid] < x ≤ a[hi] thì tìm ở nửa phải, ngược lại ở nửa trái. Mỗi bước loại một nửa nên O(log n). Khi có phần tử trùng lặp (a[lo] = a[mid] = a[hi]) không xác định được nửa nào sắp xếp, trường hợp xấu nhất suy biến về O(n).",
+    "key_points": [
+      "Tại mỗi bước, một trong hai nửa chắc chắn đã sắp xếp, kiểm tra x có nằm trong nửa đó không",
+      "O(log n) với phần tử phân biệt; có trùng lặp thì xấu nhất O(n)"
+    ],
+    "id": "Q_DSA_210"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Hàng đợi (Queue)",
+    "concept": "Trộn k danh sách đã sắp xếp",
+    "difficulty": "Medium",
+    "question": "Trộn k danh sách đã sắp xếp (tổng N phần tử) thành một danh sách sắp xếp. So sánh cách trộn lần lượt từng cặp với cách dùng min-heap.",
+    "reference_answer": "Trộn lần lượt (danh sách 1 với 2, kết quả với 3, ...): danh sách kết quả dài dần, tổng chi phí O(N·k) trong trường hợp các danh sách có độ dài tương đương. Dùng min-heap: đưa phần tử đầu của mỗi danh sách vào heap kích thước k; lặp lại việc lấy phần tử nhỏ nhất ra, đưa vào kết quả, và thêm phần tử kế tiếp từ cùng danh sách đó vào heap. Mỗi phần tử vào/ra heap một lần với chi phí O(log k), tổng O(N log k). Cách khác cũng đạt O(N log k) là trộn theo cặp kiểu chia để trị (giống Merge Sort trên các danh sách). Đây là cơ sở của k-way merge trong sắp xếp ngoài.",
+    "key_points": [
+      "Trộn lần lượt tốn O(N·k)",
+      "Min-heap k phần tử hoặc trộn chia để trị đạt O(N log k); là nền tảng của k-way merge"
+    ],
+    "id": "Q_DSA_211"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Sắp xếp (Sorting)",
+    "concept": "Đếm số cặp nghịch thế bằng Merge Sort",
+    "difficulty": "Medium",
+    "question": "Số cặp nghịch thế của mảng là số cặp (i, j) với i < j và a[i] > a[j]. Làm thế nào đếm trong O(n log n) thay vì O(n²)?",
+    "reference_answer": "Lồng việc đếm vào Merge Sort. Số cặp nghịch thế = số cặp trong nửa trái + số cặp trong nửa phải + số cặp 'chéo' (một phần tử ở mỗi nửa). Hai nửa được đếm đệ quy và sau đó đã được sắp xếp. Trong bước trộn, khi lấy một phần tử từ nửa PHẢI (vì nó nhỏ hơn phần tử hiện tại a[i] của nửa trái), thì nó nhỏ hơn mọi phần tử còn lại của nửa trái (từ i tới cuối nửa trái, do đã sắp xếp), nên cộng thêm (số phần tử còn lại ở nửa trái) cặp nghịch thế. Chi phí đếm hòa vào bước trộn O(n), tổng O(n log n). Số cặp nghịch thế đo mức độ 'chưa sắp xếp', bằng số lần hoán đổi của Bubble Sort.",
+    "key_points": [
+      "Tổng = nghịch thế trong từng nửa + nghịch thế chéo, đếm trong bước trộn của Merge Sort",
+      "Khi lấy phần tử từ nửa phải, cộng số phần tử còn lại ở nửa trái; tổng O(n log n)"
+    ],
+    "id": "Q_DSA_212"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Định lý thợ (Master Theorem)",
+    "difficulty": "Medium",
+    "question": "Phát biểu định lý thợ (Master Theorem) cho truy hồi T(n) = a·T(n/b) + f(n) và áp dụng cho Merge Sort và tìm kiếm nhị phân.",
+    "reference_answer": "So sánh f(n) với n^(log_b a) (chi phí của các lá trong cây đệ quy): (1) Nếu f(n) = O(n^(log_b a - ε)) — chi phí tập trung ở lá — thì T(n) = Θ(n^(log_b a)). (2) Nếu f(n) = Θ(n^(log_b a)) — chi phí mỗi mức bằng nhau — thì T(n) = Θ(n^(log_b a) · log n). (3) Nếu f(n) = Ω(n^(log_b a + ε)) và thỏa điều kiện chính quy — chi phí tập trung ở gốc — thì T(n) = Θ(f(n)). Merge Sort: a = 2, b = 2, f(n) = n = n^(log_2 2) → trường hợp 2, Θ(n log n). Tìm kiếm nhị phân: a = 1, b = 2, f(n) = 1 = n^0 → trường hợp 2, Θ(log n).",
+    "key_points": [
+      "So sánh f(n) với n^(log_b a): lá chiếm ưu thế, cân bằng, hoặc gốc chiếm ưu thế",
+      "Merge Sort Θ(n log n), Binary Search Θ(log n) đều thuộc trường hợp 2"
+    ],
+    "id": "Q_DSA_213"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Nhân số lớn Karatsuba",
+    "difficulty": "Medium",
+    "question": "Thuật toán Karatsuba nhân hai số n chữ số nhanh hơn phương pháp nhân tay O(n²) bằng cách nào?",
+    "reference_answer": "Tách mỗi số thành hai nửa: x = a·10^m + b, y = c·10^m + d. Tích xy = ac·10^(2m) + (ad + bc)·10^m + bd, cách thông thường cần 4 phép nhân nửa kích thước, dẫn tới T(n) = 4T(n/2) + O(n) = O(n²) — không cải thiện. Karatsuba nhận xét ad + bc = (a + b)(c + d) - ac - bd, nên chỉ cần 3 phép nhân: ac, bd và (a + b)(c + d). Truy hồi T(n) = 3T(n/2) + O(n) cho O(n^(log_2 3)) ≈ O(n^1.585). Với số rất lớn (mật mã, tính toán số học chính xác cao) cải thiện đáng kể; với số nhỏ, chi phí phụ khiến nhân tay nhanh hơn nên thực tế dùng ngưỡng chuyển đổi.",
+    "key_points": [
+      "Dùng (a + b)(c + d) - ac - bd để giảm từ 4 xuống 3 phép nhân con",
+      "T(n) = 3T(n/2) + O(n) = O(n^1.585); dùng ngưỡng chuyển về nhân thường với số nhỏ"
+    ],
+    "id": "Q_DSA_214"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Tìm cặp điểm gần nhất bằng chia để trị",
+    "difficulty": "Medium",
+    "question": "Mô tả ý tưởng thuật toán chia để trị tìm cặp điểm gần nhất trong n điểm trên mặt phẳng với độ phức tạp O(n log n).",
+    "reference_answer": "Sắp xếp điểm theo x, chia đôi bằng một đường thẳng đứng, đệ quy tìm khoảng cách nhỏ nhất d_trái và d_phải ở hai nửa, đặt d = min. Cặp gần nhất 'chéo' (mỗi điểm một nửa) chỉ có thể nằm trong dải rộng 2d quanh đường chia. Sắp xếp các điểm trong dải theo y; mỗi điểm chỉ cần so sánh với một số hằng điểm kế tiếp (tối đa khoảng 7) vì trong hình chữ nhật d × 2d chỉ chứa được hằng số điểm có khoảng cách đôi một ≥ d. Bước kết hợp O(n) (nếu duy trì sẵn danh sách sắp theo y) nên T(n) = 2T(n/2) + O(n) = O(n log n), so với O(n²) khi xét mọi cặp.",
+    "key_points": [
+      "Chia theo x, giải hai nửa, chỉ xét dải rộng 2d quanh đường chia",
+      "Mỗi điểm trong dải chỉ so với hằng số điểm kế tiếp theo y; tổng O(n log n)"
+    ],
+    "id": "Q_DSA_215"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Quay lui và cắt nhánh trong bài toán N quân hậu",
+    "difficulty": "Medium",
+    "question": "Trong bài toán đặt N quân hậu, làm thế nào kiểm tra xung đột trong O(1) khi đặt mỗi quân, và cắt nhánh giúp giảm không gian tìm kiếm thế nào?",
+    "reference_answer": "Đặt mỗi hàng đúng một quân hậu, lần lượt từ hàng 0. Dùng ba mảng boolean đánh dấu: cột đã có hậu, đường chéo chính (đặc trưng bởi hàng - cột, dịch thêm n - 1 để không âm) và đường chéo phụ (hàng + cột). Đặt hậu ở (r, c) hợp lệ khi cả ba ô đánh dấu đều trống — kiểm tra O(1); khi quay lui thì bỏ đánh dấu. Cắt nhánh: ngay khi một vị trí xung đột, toàn bộ cây con phía dưới bị bỏ qua, nên số trạng thái thực sự duyệt nhỏ hơn rất nhiều so với vét cạn n^n cách đặt hay n! hoán vị. Có thể tối ưu thêm bằng bitmask và tận dụng đối xứng.",
+    "key_points": [
+      "Mỗi hàng một quân; mảng đánh dấu cột, chéo (r - c) và chéo (r + c) cho kiểm tra O(1)",
+      "Cắt nhánh khi xung đột loại bỏ cả cây con, giảm mạnh so với vét cạn"
+    ],
+    "id": "Q_DSA_216"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Sinh mọi tập con bằng bitmask",
+    "difficulty": "Medium",
+    "question": "Làm thế nào sinh tất cả 2^n tập con của một tập n phần tử bằng kỹ thuật bitmask? Khi nào cách này không còn phù hợp?",
+    "reference_answer": "Mỗi số nguyên mask từ 0 tới 2^n - 1 biểu diễn một tập con: bit thứ i bằng 1 nghĩa là phần tử i thuộc tập con. Lặp mask từ 0 tới 2^n - 1, với mỗi mask duyệt n bit để lấy các phần tử. Tổng chi phí O(n·2^n). Ưu điểm: đơn giản, không đệ quy, dễ dùng làm trạng thái cho Bitmask DP. Hạn chế: số tập con tăng theo hàm mũ nên chỉ khả thi với n nhỏ (khoảng n ≤ 20 - 25), và bị giới hạn bởi số bit của kiểu số nguyên; với n lớn hơn cần tìm cấu trúc bài toán (DP, meet-in-the-middle, cắt nhánh).",
+    "key_points": [
+      "Mỗi mask 0..2^n - 1 ứng với một tập con, bit i cho biết phần tử i có thuộc tập con",
+      "Chi phí O(n·2^n), chỉ khả thi với n nhỏ"
+    ],
+    "id": "Q_DSA_217"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Thuật toán sinh hoán vị kế tiếp",
+    "difficulty": "Medium",
+    "question": "Mô tả thuật toán tìm hoán vị kế tiếp theo thứ tự từ điển (next permutation) của một dãy, ví dụ [1, 3, 5, 4, 2].",
+    "reference_answer": "(1) Từ phải sang trái, tìm vị trí i đầu tiên có a[i] < a[i+1] (với ví dụ: i chỉ vào 3, vì đoạn [5, 4, 2] giảm dần). Nếu không có, dãy đang là hoán vị lớn nhất. (2) Từ phải sang trái, tìm j đầu tiên có a[j] > a[i] (phần tử 4). (3) Hoán đổi a[i] và a[j] → [1, 4, 5, 3, 2]. (4) Đảo ngược đoạn sau vị trí i (vốn đang giảm dần) để thành tăng dần → [1, 4, 2, 3, 5]. Độ phức tạp O(n) mỗi lần, bộ nhớ O(1), xử lý đúng cả phần tử trùng lặp. Lặp lại từ dãy đã sắp xếp tăng dần sẽ sinh mọi hoán vị theo thứ tự từ điển.",
+    "key_points": [
+      "Tìm i cuối cùng có a[i] < a[i+1], tìm j cuối cùng có a[j] > a[i], hoán đổi",
+      "Đảo ngược đoạn sau i; O(n) mỗi lần, xử lý được phần tử trùng"
+    ],
+    "id": "Q_DSA_218"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Sắp xếp topo bằng thuật toán Kahn",
+    "difficulty": "Medium",
+    "question": "Mô tả thuật toán Kahn (dựa trên bậc vào) để sắp xếp topo, và cách nó đồng thời phát hiện đồ thị có chu trình.",
+    "reference_answer": "Tính bậc vào của mọi đỉnh; đưa mọi đỉnh có bậc vào 0 (không phụ thuộc ai) vào hàng đợi. Lặp: lấy một đỉnh u ra, thêm vào kết quả; với mỗi cạnh u → v, giảm bậc vào của v, nếu về 0 thì đưa v vào hàng đợi. Độ phức tạp O(V + E). Nếu kết thúc mà số đỉnh trong kết quả nhỏ hơn V, thì các đỉnh còn lại đều có bậc vào > 0 vĩnh viễn — chúng nằm trên (hoặc phụ thuộc vào) một chu trình, nên đồ thị không phải DAG. Thay hàng đợi bằng min-heap sẽ cho thứ tự topo nhỏ nhất theo từ điển.",
+    "key_points": [
+      "Liên tục lấy đỉnh bậc vào 0, giảm bậc vào các đỉnh kề; O(V + E)",
+      "Kết quả ít hơn V đỉnh nghĩa là có chu trình; dùng min-heap để có thứ tự từ điển nhỏ nhất"
+    ],
+    "id": "Q_DSA_219"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Truy vết đường đi ngắn nhất trong Dijkstra",
+    "difficulty": "Medium",
+    "question": "Thuật toán Dijkstra cơ bản chỉ cho khoảng cách ngắn nhất. Làm thế nào để in ra chính đường đi ngắn nhất từ nguồn s tới đích t?",
+    "reference_answer": "Duy trì thêm mảng truoc[] (predecessor): mỗi khi cạnh u → v làm giảm khoảng cách (dist[u] + w < dist[v]), ngoài việc cập nhật dist[v], gán truoc[v] = u. Sau khi thuật toán kết thúc, đi ngược từ t theo truoc[] cho tới s rồi đảo ngược dãy thu được để có đường đi từ s tới t. Nếu dist[t] vẫn là vô cực thì không có đường đi. Các con trỏ truoc[] của mọi đỉnh tạo thành 'cây đường đi ngắn nhất' gốc s. Chi phí thêm O(V) bộ nhớ và O(độ dài đường) để truy vết.",
+    "key_points": [
+      "Lưu truoc[v] = u mỗi khi cạnh u → v cải thiện dist[v]",
+      "Đi ngược từ t theo truoc[] rồi đảo ngược; các con trỏ tạo cây đường đi ngắn nhất"
+    ],
+    "id": "Q_DSA_220"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "0-1 BFS",
+    "difficulty": "Medium",
+    "question": "Với đồ thị có trọng số cạnh chỉ là 0 hoặc 1, làm thế nào tìm đường đi ngắn nhất trong O(V + E) thay vì O((V + E) log V) của Dijkstra?",
+    "reference_answer": "Dùng 0-1 BFS với hàng đợi hai đầu (deque): khi xét cạnh u → v có trọng số w và dist[u] + w < dist[v], cập nhật dist[v]; nếu w = 0 thì đẩy v vào ĐẦU deque (cùng mức khoảng cách với u), nếu w = 1 thì đẩy vào CUỐI deque. Cách làm này giữ deque luôn chứa các đỉnh với khoảng cách không giảm và chênh nhau tối đa 1, nên đóng vai trò như hàng đợi ưu tiên mà không cần heap. Mỗi đỉnh có thể được đẩy vài lần nhưng tổng chi phí O(V + E). Ứng dụng: lưới mà đi thẳng mất 0, rẽ mất 1; bài toán số lần đổi hướng/phá tường ít nhất.",
+    "key_points": [
+      "Cạnh trọng số 0 đẩy vào đầu deque, trọng số 1 đẩy vào cuối",
+      "Deque đóng vai trò hàng đợi ưu tiên, tổng O(V + E)"
+    ],
+    "id": "Q_DSA_221"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "BFS đa nguồn (Multi-source BFS)",
+    "difficulty": "Medium",
+    "question": "Trong một lưới có nhiều bệnh viện, cần tính khoảng cách từ mỗi ô tới bệnh viện GẦN NHẤT. Vì sao chạy BFS riêng từ mỗi bệnh viện là không hiệu quả và BFS đa nguồn giải quyết thế nào?",
+    "reference_answer": "Chạy BFS riêng cho mỗi trong k bệnh viện tốn O(k·N) với N là số ô. BFS đa nguồn đưa TẤT CẢ bệnh viện vào hàng đợi ban đầu với khoảng cách 0, rồi chạy BFS bình thường một lần. Điều này tương đương với việc thêm một 'siêu nguồn' ảo nối tới mọi bệnh viện bằng cạnh trọng số 0. Vì BFS mở rộng theo từng lớp khoảng cách, ô nào được thăm lần đầu thì khoảng cách đó chính là tới bệnh viện gần nhất. Tổng chi phí O(N). Ứng dụng: lan truyền (cam thối lan), khoảng cách tới vật cản gần nhất.",
+    "key_points": [
+      "Đưa mọi nguồn vào hàng đợi ban đầu với khoảng cách 0, chạy BFS một lần",
+      "Tương đương thêm siêu nguồn ảo; O(N) thay vì O(k·N)"
+    ],
+    "id": "Q_DSA_222"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Đếm số đảo trên lưới (Flood Fill)",
+    "difficulty": "Medium",
+    "question": "Cho lưới m × n gồm đất (1) và nước (0), đếm số hòn đảo (các ô đất kề nhau theo 4 hướng). Mô tả thuật toán và lưu ý khi cài đặt.",
+    "reference_answer": "Coi lưới là đồ thị ẩn: mỗi ô là đỉnh, nối với 4 ô kề. Duyệt mọi ô; khi gặp ô đất chưa thăm thì tăng bộ đếm đảo và chạy DFS/BFS (flood fill) từ ô đó để đánh dấu đã thăm toàn bộ ô đất liên thông. Số lần bắt đầu flood fill chính là số thành phần liên thông = số đảo. Độ phức tạp O(m·n). Lưu ý: kiểm tra biên trước khi truy cập ô kề; đánh dấu đã thăm ngay khi đưa vào hàng đợi/stack; với lưới lớn (ví dụ 2000 × 2000) DFS đệ quy có thể tràn stack, nên dùng BFS hoặc DFS với stack tường minh; có thể đánh dấu trực tiếp trên lưới nếu được phép sửa đầu vào.",
+    "key_points": [
+      "Mỗi lần gặp ô đất chưa thăm thì tăng bộ đếm và flood fill đánh dấu cả đảo",
+      "O(m·n); kiểm tra biên, đánh dấu khi đưa vào, tránh đệ quy sâu với lưới lớn"
+    ],
+    "id": "Q_DSA_223"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Đường đi ngắn nhất trên DAG theo thứ tự topo",
+    "difficulty": "Medium",
+    "question": "Vì sao trên đồ thị có hướng không chu trình (DAG), có thể tìm đường đi ngắn nhất từ một nguồn trong O(V + E), kể cả khi có trọng số âm?",
+    "reference_answer": "Sắp xếp topo các đỉnh, rồi duyệt theo thứ tự đó và 'nới lỏng' (relax) mọi cạnh đi ra của mỗi đỉnh. Vì trong thứ tự topo mọi cạnh đi từ trước ra sau, khi xử lý đỉnh u thì mọi đường đi tới u đều đã được xét (mọi đỉnh trước u đã được xử lý xong), nên dist[u] đã là giá trị cuối cùng. Mỗi cạnh được nới lỏng đúng một lần nên O(V + E). Không cần điều kiện trọng số không âm như Dijkstra vì không có chu trình. Đổi dấu trọng số (hoặc đổi min thành max) sẽ tìm được đường đi DÀI nhất trên DAG — bài toán NP-khó trên đồ thị tổng quát nhưng dễ trên DAG, dùng trong lập lịch dự án (đường găng - critical path).",
+    "key_points": [
+      "Duyệt theo thứ tự topo và nới lỏng cạnh, mỗi cạnh một lần, O(V + E)",
+      "Không cần trọng số không âm; đổi thành max để tìm đường dài nhất (critical path)"
+    ],
+    "id": "Q_DSA_224"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Đường đi rẻ nhất với tối đa K cạnh",
+    "difficulty": "Medium",
+    "question": "Tìm chuyến bay rẻ nhất từ thành phố A tới B với không quá K lần quá cảnh. Vì sao Dijkstra thông thường không giải đúng, và cách dùng Bellman-Ford giới hạn số vòng?",
+    "reference_answer": "Dijkstra tối ưu chi phí mà bỏ qua số cạnh; một đỉnh khi đã được 'chốt' với chi phí nhỏ nhất có thể dùng quá nhiều chặng, trong khi một đường đắt hơn nhưng ít chặng hơn mới thỏa ràng buộc — Dijkstra loại bỏ đường đó. Bellman-Ford giới hạn: sau vòng lặp thứ i, dist[v] là chi phí nhỏ nhất dùng tối đa i cạnh. Chạy đúng K + 1 vòng (K quá cảnh = K + 1 chuyến bay), và ở mỗi vòng phải nới lỏng dựa trên BẢN SAO dist của vòng trước — nếu cập nhật tại chỗ, một vòng có thể nới lỏng nhiều cạnh nối tiếp và vượt quá giới hạn số cạnh. Độ phức tạp O(K·E). Cách khác: Dijkstra/BFS trên trạng thái (đỉnh, số cạnh đã dùng).",
+    "key_points": [
+      "Dijkstra bỏ qua ràng buộc số cạnh nên có thể loại đường hợp lệ",
+      "Bellman-Ford K + 1 vòng, mỗi vòng dùng bản sao dist của vòng trước; O(K·E)"
+    ],
+    "id": "Q_DSA_225"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Bài toán Two Sum với bảng băm",
+    "difficulty": "Medium",
+    "question": "Cho mảng chưa sắp xếp và giá trị đích T, tìm hai chỉ số có tổng bằng T trong O(n). So sánh với cách dùng hai con trỏ.",
+    "reference_answer": "Duyệt mảng một lượt với một bảng băm ánh xạ giá trị → chỉ số của các phần tử đã gặp. Với mỗi a[i], kiểm tra T - a[i] có trong bảng không; nếu có thì trả về cặp chỉ số, nếu không thì thêm a[i] vào bảng. Kiểm tra trước khi thêm giúp tránh ghép phần tử với chính nó. Độ phức tạp O(n) thời gian trung bình, O(n) bộ nhớ. Cách hai con trỏ đòi hỏi mảng đã sắp xếp: nếu phải sắp xếp trước thì tốn O(n log n) và mất chỉ số gốc (phải lưu kèm), nhưng bộ nhớ phụ O(1) nếu mảng đã sắp xếp sẵn.",
+    "key_points": [
+      "Một lượt duyệt, tra T - a[i] trong bảng băm các phần tử đã gặp rồi mới thêm a[i]",
+      "O(n) thời gian và bộ nhớ; hai con trỏ cần mảng sắp xếp, O(1) bộ nhớ"
+    ],
+    "id": "Q_DSA_226"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Thuật toán Kadane tìm đoạn con có tổng lớn nhất",
+    "difficulty": "Medium",
+    "question": "Mô tả thuật toán Kadane tìm tổng lớn nhất của một đoạn con liên tục trong O(n), và giải thích dưới góc nhìn quy hoạch động.",
+    "reference_answer": "Gọi best_end[i] là tổng lớn nhất của đoạn con KẾT THÚC tại i. Đoạn đó hoặc chỉ gồm a[i], hoặc là đoạn tốt nhất kết thúc tại i - 1 nối thêm a[i]: best_end[i] = max(a[i], best_end[i-1] + a[i]). Ý nghĩa: nếu tổng tích lũy trước đó âm thì bỏ đi và bắt đầu lại từ a[i]. Đáp án là max mọi best_end[i]. Vì mỗi bước chỉ cần giá trị trước đó, dùng hai biến nên bộ nhớ O(1), thời gian O(n). Lưu ý trường hợp mọi phần tử đều âm: khởi tạo bằng a[0] (không phải 0) để trả về phần tử lớn nhất thay vì đoạn rỗng.",
+    "key_points": [
+      "best_end[i] = max(a[i], best_end[i-1] + a[i]); đáp án là max mọi best_end",
+      "O(n) thời gian, O(1) bộ nhớ; khởi tạo bằng a[0] để xử lý mảng toàn số âm"
+    ],
+    "id": "Q_DSA_227"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Bài toán chọn phần tử không kề nhau (House Robber)",
+    "difficulty": "Medium",
+    "question": "Cho dãy tiền trong các ngôi nhà xếp thành hàng, không được lấy ở hai nhà kề nhau, tìm tổng lớn nhất. Viết công thức DP và mở rộng khi các nhà xếp thành vòng tròn.",
+    "reference_answer": "dp[i] = tổng lớn nhất xét i nhà đầu tiên. Với nhà thứ i có hai lựa chọn: không lấy (dp[i-1]) hoặc lấy (dp[i-2] + a[i]), nên dp[i] = max(dp[i-1], dp[i-2] + a[i]), với dp[0] = 0, dp[1] = a[1]. Chỉ cần hai biến, O(n) thời gian, O(1) bộ nhớ. Khi các nhà xếp vòng tròn, nhà đầu và nhà cuối trở thành kề nhau, nên không thể lấy cả hai: giải hai bài toán tuyến tính — bỏ nhà cuối (xét nhà 1..n-1) và bỏ nhà đầu (xét nhà 2..n) — lấy kết quả lớn hơn.",
+    "key_points": [
+      "dp[i] = max(dp[i-1], dp[i-2] + a[i]), O(n) thời gian, O(1) bộ nhớ",
+      "Bản vòng tròn: giải hai lần bỏ nhà đầu hoặc bỏ nhà cuối rồi lấy max"
+    ],
+    "id": "Q_DSA_228"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Tham lam (Greedy Algorithm)",
+    "concept": "Bài toán nhảy xa (Jump Game) bằng tham lam",
+    "difficulty": "Medium",
+    "question": "Cho mảng a, a[i] là độ dài bước nhảy tối đa từ vị trí i. Kiểm tra có tới được vị trí cuối từ vị trí 0 hay không trong O(n), và giải thích vì sao tham lam đúng.",
+    "reference_answer": "Duy trì xaNhat = vị trí xa nhất có thể tới được. Duyệt i từ 0: nếu i > xaNhat thì vị trí i không tới được nên dừng, trả về false; ngược lại cập nhật xaNhat = max(xaNhat, i + a[i]); nếu xaNhat ≥ n - 1 thì trả về true. Tính đúng: tập các vị trí tới được luôn là một đoạn liên tục [0, xaNhat] — nếu tới được vị trí j thì tới được mọi vị trí trước j (vì có thể nhảy ngắn hơn), nên chỉ cần theo dõi biên phải. Không cần thử mọi cách nhảy như DP/vét cạn (O(n²) hoặc hơn).",
+    "key_points": [
+      "Duy trì vị trí xa nhất có thể tới, dừng khi i vượt quá nó",
+      "Đúng vì tập vị trí tới được là đoạn liên tục; O(n) thay vì DP O(n²)"
+    ],
+    "id": "Q_DSA_229"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Sắp xếp (Sorting)",
+    "concept": "Gộp các khoảng chồng lấp (Merge Intervals)",
+    "difficulty": "Medium",
+    "question": "Cho danh sách các khoảng [bắt đầu, kết thúc], gộp mọi khoảng chồng lấp nhau. Mô tả thuật toán và độ phức tạp.",
+    "reference_answer": "Sắp xếp các khoảng theo điểm bắt đầu. Duyệt lần lượt, duy trì khoảng đang gộp hiện tại: nếu khoảng kế tiếp có điểm bắt đầu ≤ điểm kết thúc của khoảng hiện tại thì chúng chồng lấp, cập nhật kết thúc = max(hai điểm kết thúc) — phải dùng max vì khoảng sau có thể nằm trọn trong khoảng trước; nếu không chồng lấp thì đưa khoảng hiện tại vào kết quả và bắt đầu khoảng mới. Sau khi sắp xếp, chỉ cần so sánh với khoảng cuối cùng trong kết quả vì mọi khoảng trước đó đều kết thúc sớm hơn. Độ phức tạp O(n log n) do sắp xếp, phần gộp O(n).",
+    "key_points": [
+      "Sắp xếp theo điểm bắt đầu, gộp khi bắt đầu ≤ kết thúc hiện tại",
+      "Kết thúc mới = max hai điểm kết thúc; tổng O(n log n)"
+    ],
+    "id": "Q_DSA_230"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Hàng đợi (Queue)",
+    "concept": "Số phòng họp tối thiểu",
+    "difficulty": "Medium",
+    "question": "Cho danh sách cuộc họp với thời gian bắt đầu và kết thúc, tìm số phòng họp tối thiểu cần dùng. Trình bày hai cách giải.",
+    "reference_answer": "Cách 1 (min-heap): sắp xếp cuộc họp theo giờ bắt đầu; dùng min-heap lưu giờ kết thúc của các phòng đang dùng. Với mỗi cuộc họp, nếu phòng kết thúc sớm nhất (đỉnh heap) đã trống trước giờ bắt đầu thì tái sử dụng (pop), sau đó push giờ kết thúc mới. Kích thước lớn nhất của heap là đáp án. Cách 2 (quét sự kiện - sweep line): tách thành các sự kiện (thời điểm, +1 khi bắt đầu, -1 khi kết thúc), sắp xếp theo thời gian (sự kiện kết thúc xếp trước bắt đầu nếu cùng thời điểm, vì phòng được giải phóng kịp), quét và theo dõi số cuộc họp đồng thời lớn nhất. Cả hai O(n log n). Đáp án chính là số khoảng chồng lấp tối đa tại một thời điểm.",
+    "key_points": [
+      "Min-heap giờ kết thúc: tái sử dụng phòng sớm trống nhất, kích thước heap lớn nhất là đáp án",
+      "Sweep line: +1/-1 theo sự kiện, xử lý kết thúc trước bắt đầu khi trùng giờ; cả hai O(n log n)"
+    ],
+    "id": "Q_DSA_231"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Mảng (Array)",
+    "concept": "Mảng hiệu (Difference Array) cho cập nhật đoạn",
+    "difficulty": "Medium",
+    "question": "Cần thực hiện m thao tác 'cộng v vào mọi phần tử từ l tới r' trên mảng n phần tử, sau đó in mảng kết quả. Làm thế nào đạt O(n + m) thay vì O(n·m)?",
+    "reference_answer": "Dùng mảng hiệu d với d[i] = a[i] - a[i-1]. Thao tác cộng v vào đoạn [l, r] chỉ làm thay đổi hai vị trí của mảng hiệu: d[l] += v và d[r+1] -= v — O(1) mỗi thao tác. Sau m thao tác, khôi phục mảng bằng cách tính tổng tiền tố của d: a[i] = a[i-1] + d[i], mất O(n). Tổng O(n + m). Đây là phép toán ngược của mảng tổng tiền tố. Hạn chế: chỉ phù hợp khi mọi cập nhật xảy ra trước rồi mới truy vấn; nếu cập nhật và truy vấn xen kẽ thì cần Fenwick tree hoặc segment tree.",
+    "key_points": [
+      "Cộng đoạn [l, r] bằng d[l] += v, d[r+1] -= v trong O(1)",
+      "Khôi phục bằng tổng tiền tố O(n); chỉ hợp khi cập nhật xong mới truy vấn"
+    ],
+    "id": "Q_DSA_232"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Bài toán cái túi không giới hạn (Unbounded Knapsack)",
+    "difficulty": "Medium",
+    "question": "Bài toán cái túi không giới hạn (mỗi loại vật được lấy bao nhiêu lần cũng được) khác 0/1 Knapsack ở công thức truy hồi như thế nào?",
+    "reference_answer": "0/1 Knapsack: dp[i][w] = max(dp[i-1][w], dp[i-1][w - w_i] + v_i) — nếu lấy vật i thì chuyển về bài toán CÁC VẬT TRƯỚC i (vì mỗi vật chỉ dùng một lần). Unbounded: dp[i][w] = max(dp[i-1][w], dp[i][w - w_i] + v_i) — nếu lấy vật i thì vẫn ở hàng i, cho phép lấy tiếp vật i. Với mảng một chiều dp[w] = giá trị lớn nhất với sức chứa w, công thức gọn là dp[w] = max qua mọi vật i có w_i ≤ w của dp[w - w_i] + v_i. Độ phức tạp O(n·W) (giả đa thức). Ứng dụng: cắt thanh, đổi tiền với số lượng đồng xu không giới hạn.",
+    "key_points": [
+      "Unbounded khi lấy vật i vẫn ở hàng i (dp[i][w - w_i]), còn 0/1 chuyển về hàng i - 1",
+      "Dạng một chiều dp[w] = max(dp[w - w_i] + v_i); O(n·W)"
+    ],
+    "id": "Q_DSA_233"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Chia mảng thành hai tập có tổng bằng nhau",
+    "difficulty": "Medium",
+    "question": "Kiểm tra một mảng số nguyên dương có thể chia thành hai tập con có tổng bằng nhau hay không. Đưa về bài toán nào và độ phức tạp?",
+    "reference_answer": "Nếu tổng S lẻ thì không thể. Nếu S chẵn, bài toán tương đương: có tồn tại tập con có tổng đúng bằng S/2 không (Subset Sum) — một dạng 0/1 Knapsack. Dùng mảng boolean can[t] = có thể tạo tổng t; khởi tạo can[0] = true; với mỗi phần tử x, duyệt t từ S/2 GIẢM dần về x và gán can[t] = can[t] or can[t - x] (duyệt giảm dần để mỗi phần tử chỉ được dùng một lần). Đáp án là can[S/2]. Độ phức tạp O(n·S) thời gian, O(S) bộ nhớ — giả đa thức, hiệu quả khi tổng không quá lớn. Có thể tăng tốc bằng bitset: bits |= bits << x.",
+    "key_points": [
+      "Đưa về Subset Sum với đích S/2 (S lẻ thì không thể)",
+      "DP boolean duyệt t giảm dần cho mỗi phần tử, O(n·S); có thể tối ưu bằng bitset"
+    ],
+    "id": "Q_DSA_234"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Dãy con đối xứng dài nhất (Longest Palindromic Subsequence)",
+    "difficulty": "Medium",
+    "question": "Tìm độ dài dãy con (không cần liên tục) đối xứng dài nhất của chuỗi s. Viết công thức DP và nêu mối liên hệ với LCS.",
+    "reference_answer": "Gọi dp[i][j] là độ dài dãy con đối xứng dài nhất trong đoạn s[i..j]. Nếu s[i] = s[j] thì dp[i][j] = dp[i+1][j-1] + 2 (hai ký tự hai đầu bao quanh một dãy đối xứng bên trong); nếu khác thì dp[i][j] = max(dp[i+1][j], dp[i][j-1]). Cơ sở dp[i][i] = 1. Tính theo độ dài đoạn tăng dần (hoặc i giảm dần, j tăng dần). Độ phức tạp O(n²) thời gian và bộ nhớ (có thể giảm bộ nhớ xuống O(n)). Liên hệ: đáp án bằng LCS(s, đảo ngược của s). Khác với bài toán chuỗi con đối xứng LIÊN TỤC dài nhất vốn có lời giải O(n) (Manacher).",
+    "key_points": [
+      "dp[i][j] = dp[i+1][j-1] + 2 nếu s[i] = s[j], ngược lại max(dp[i+1][j], dp[i][j-1])",
+      "O(n²); bằng LCS của s và chuỗi đảo ngược"
+    ],
+    "id": "Q_DSA_235"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Bài toán tách từ (Word Break)",
+    "difficulty": "Medium",
+    "question": "Cho chuỗi s và từ điển, kiểm tra s có thể tách thành dãy các từ trong từ điển hay không. Viết công thức DP và phân tích độ phức tạp.",
+    "reference_answer": "Gọi ok[i] = true nếu tiền tố s[0..i) tách được. ok[0] = true. ok[i] = true nếu tồn tại j < i sao cho ok[j] = true và s[j..i) thuộc từ điển. Đáp án ok[n]. Nếu lưu từ điển trong Hash Set, có O(n²) cặp (j, i), mỗi lần tạo/băm chuỗi con tốn O(độ dài), tổng khoảng O(n³) trong trường hợp xấu; tối ưu bằng cách chỉ xét j sao cho i - j không vượt quá độ dài từ dài nhất L, còn O(n·L²), hoặc dùng Trie để duyệt từ vị trí j và tìm mọi từ khớp trong một lượt. Đệ quy thuần túy không ghi nhớ có thể bùng nổ hàm mũ với chuỗi như 'aaaa...ab'.",
+    "key_points": [
+      "ok[i] = tồn tại j với ok[j] và s[j..i) thuộc từ điển",
+      "Giới hạn độ dài từ hoặc dùng Trie để tối ưu; đệ quy không ghi nhớ có thể hàm mũ"
+    ],
+    "id": "Q_DSA_236"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Đếm số cách đổi tiền: tổ hợp và hoán vị",
+    "difficulty": "Medium",
+    "question": "Đếm số cách tạo số tiền S từ các mệnh giá (không giới hạn số lượng). Vì sao thứ tự hai vòng lặp (duyệt mệnh giá ngoài hay số tiền ngoài) cho ra hai đáp án khác nhau?",
+    "reference_answer": "Dùng ways[0] = 1. Cách A — vòng ngoài duyệt MỆNH GIÁ, vòng trong duyệt số tiền t tăng dần: ways[t] += ways[t - c]. Mỗi mệnh giá được 'đưa vào' theo một thứ tự cố định, nên mỗi tập (multiset) đồng xu được đếm đúng một lần — đếm TỔ HỢP (1+2 và 2+1 là một cách). Cách B — vòng ngoài duyệt SỐ TIỀN, vòng trong duyệt mệnh giá: ways[t] = Σ ways[t - c] — ở mỗi số tiền, đồng xu cuối cùng có thể là bất kỳ mệnh giá nào, nên các thứ tự khác nhau được đếm riêng — đếm HOÁN VỊ/dãy có thứ tự (1+2 khác 2+1), như bài toán leo cầu thang. Cả hai O(n·S). Cần xác định đề bài hỏi loại nào; nếu kết quả lớn cần lấy modulo.",
+    "key_points": [
+      "Mệnh giá ở vòng ngoài: đếm tổ hợp (không phân biệt thứ tự)",
+      "Số tiền ở vòng ngoài: đếm dãy có thứ tự; cả hai O(n·S)"
+    ],
+    "id": "Q_DSA_237"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Số Catalan và số cây BST khác nhau",
+    "difficulty": "Medium",
+    "question": "Có bao nhiêu cây nhị phân tìm kiếm có cấu trúc khác nhau chứa các khóa 1..n? Xây dựng công thức truy hồi.",
+    "reference_answer": "Gọi G(n) là số BST khác nhau với n khóa. Chọn khóa i làm gốc: cây con trái chứa i - 1 khóa nhỏ hơn, cây con phải chứa n - i khóa lớn hơn, hai cây con độc lập nên số cách là G(i-1) × G(n-i). Tổng qua mọi lựa chọn gốc: G(n) = Σ_{i=1..n} G(i-1)·G(n-i), với G(0) = G(1) = 1. Đây chính là dãy số Catalan: 1, 1, 2, 5, 14, 42..., có công thức đóng C(n) = (2n)! / ((n+1)!·n!), tăng xấp xỉ 4^n / n^1.5. Tính bằng DP mất O(n²). Số Catalan cũng đếm số cách đặt ngoặc hợp lệ, số đường đi lưới không vượt đường chéo, số cách chia đa giác thành tam giác.",
+    "key_points": [
+      "Chọn gốc i: G(n) = Σ G(i-1)·G(n-i), G(0) = 1",
+      "Đây là số Catalan (2n)!/((n+1)!·n!); cũng đếm dãy ngoặc hợp lệ, cách chia đa giác"
+    ],
+    "id": "Q_DSA_238"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Kiểm tra cây có phải BST và lỗi thường gặp",
+    "difficulty": "Medium",
+    "question": "Một lời giải kiểm tra BST chỉ so sánh mỗi nút với con trái và con phải trực tiếp (trai < nut < phai). Vì sao lời giải này sai? Nêu cách đúng.",
+    "reference_answer": "Tính chất BST là toàn cục: MỌI nút trong cây con trái phải nhỏ hơn nút gốc, không chỉ con trực tiếp. Phản ví dụ: gốc 10, con trái 5, con phải của 5 là 15 — mỗi cặp cha-con đều 'đúng' nhưng 15 nằm trong cây con trái của 10 nên vi phạm. Cách đúng 1: đệ quy truyền khoảng hợp lệ (min, max) cho mỗi nút; đi sang trái thì cập nhật max = giá trị nút, sang phải cập nhật min = giá trị nút; nút vi phạm khoảng thì không phải BST. Cách đúng 2: duyệt in-order và kiểm tra dãy giá trị tăng nghiêm ngặt (chỉ cần nhớ giá trị trước đó). Cả hai O(n). Lưu ý dùng giới hạn đủ lớn (hoặc null) cho min/max ban đầu để không lỗi với giá trị biên của kiểu số nguyên.",
+    "key_points": [
+      "Chỉ so sánh cha-con trực tiếp bỏ sót vi phạm ở cháu chắt",
+      "Truyền khoảng (min, max) khi đệ quy hoặc kiểm tra in-order tăng nghiêm ngặt; O(n)"
+    ],
+    "id": "Q_DSA_239"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Tổ tiên chung gần nhất (LCA) trên BST",
+    "difficulty": "Medium",
+    "question": "Làm thế nào tìm tổ tiên chung gần nhất (Lowest Common Ancestor) của hai nút p, q trên một cây nhị phân tìm kiếm trong O(h)?",
+    "reference_answer": "Tận dụng thứ tự của BST: xuất phát từ gốc; nếu cả p và q đều nhỏ hơn nút hiện tại thì LCA nằm ở cây con trái, đi sang trái; nếu cả hai lớn hơn thì đi sang phải; ngược lại (p và q nằm ở hai phía, hoặc một trong hai chính là nút hiện tại) thì nút hiện tại là LCA — đây là điểm 'tách nhánh' đầu tiên của hai đường đi từ gốc. Độ phức tạp O(h) với h là chiều cao cây, O(log n) nếu cây cân bằng, bộ nhớ O(1) nếu cài đặt lặp. Với cây nhị phân tổng quát (không có thứ tự) cần duyệt đệ quy toàn cây O(n).",
+    "key_points": [
+      "Đi từ gốc: cả hai nhỏ hơn thì sang trái, cả hai lớn hơn thì sang phải",
+      "Điểm tách nhánh đầu tiên là LCA; O(h), cây tổng quát cần O(n)"
+    ],
+    "id": "Q_DSA_240"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Đường kính của cây",
+    "difficulty": "Medium",
+    "question": "Đường kính của cây nhị phân là độ dài đường đi dài nhất giữa hai nút bất kỳ. Làm thế nào tính trong O(n)?",
+    "reference_answer": "Đường đi dài nhất đi qua một nút 'cao nhất' u nào đó, và có độ dài bằng chiều cao cây con trái của u + chiều cao cây con phải của u (tính theo số cạnh, cộng thêm các cạnh nối tới u). Duyệt post-order: hàm đệ quy trả về chiều cao của nút; tại mỗi nút, tính tổng chiều cao hai nhánh để cập nhật biến đáp án toàn cục, rồi trả về 1 + max(hai chiều cao) cho cha. Mỗi nút xử lý một lần nên O(n). Sai lầm phổ biến: nghĩ đường kính luôn đi qua gốc. Với cây tổng quát (đồ thị cây), có cách khác: BFS từ đỉnh bất kỳ tìm đỉnh xa nhất a, rồi BFS từ a tìm đỉnh xa nhất b; khoảng cách a-b là đường kính.",
+    "key_points": [
+      "Tại mỗi nút, đường qua nút = chiều cao trái + chiều cao phải; cập nhật đáp án trong post-order",
+      "O(n); đường kính không nhất thiết qua gốc; cây tổng quát dùng hai lần BFS"
+    ],
+    "id": "Q_DSA_241"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Tuần tự hóa và khôi phục cây nhị phân",
+    "difficulty": "Medium",
+    "question": "Làm thế nào tuần tự hóa (serialize) một cây nhị phân thành chuỗi và khôi phục lại chính xác? Vì sao chỉ một dãy duyệt in-order là không đủ?",
+    "reference_answer": "Chỉ một dãy duyệt (in-order hoặc pre-order) không xác định duy nhất cây: nhiều cây khác cấu trúc cho cùng dãy in-order (ví dụ cây lệch trái và lệch phải với cùng khóa). Cách phổ biến: duyệt pre-order và ghi cả các con NULL bằng ký hiệu đặc biệt, ví dụ '1,2,#,#,3,4,#,#,#'. Khi khôi phục, đọc tuần tự: gặp '#' trả về null, ngược lại tạo nút rồi đệ quy dựng cây con trái và phải. Cả hai chiều O(n). Cách khác: lưu hai dãy pre-order + in-order (khi khóa phân biệt), hoặc duyệt theo mức (BFS) kèm null. Riêng với BST, chỉ cần dãy pre-order vì thứ tự khóa đã xác định cấu trúc.",
+    "key_points": [
+      "Một dãy duyệt không có null không xác định duy nhất cây",
+      "Pre-order kèm ký hiệu null rồi đọc tuần tự để dựng lại, O(n); BST chỉ cần pre-order"
+    ],
+    "id": "Q_DSA_242"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Kiểm tra cây cân bằng chiều cao trong O(n)",
+    "difficulty": "Medium",
+    "question": "Một cây nhị phân cân bằng chiều cao nếu tại mọi nút, chiều cao hai cây con chênh nhau không quá 1. Vì sao cách tính chiều cao riêng cho mỗi nút rồi so sánh tốn O(n²) với cây lệch, và cách tối ưu là gì?",
+    "reference_answer": "Cách ngây thơ: tại mỗi nút gọi hàm chieuCao(trai) và chieuCao(phai), mỗi hàm duyệt toàn bộ cây con; với cây lệch (như danh sách), tổng chi phí là n + (n-1) + ... = O(n²). Cách tối ưu: duyệt post-order một lần, hàm trả về chiều cao của nút, hoặc giá trị đặc biệt -1 nếu cây con đã mất cân bằng. Tại mỗi nút: lấy chiều cao trái và phải (nếu một bên là -1 thì trả -1 ngay — dừng sớm), nếu chênh lệch > 1 thì trả -1, ngược lại trả 1 + max. Mỗi nút thăm một lần nên O(n). Đây là mẫu chung: gộp việc tính thông tin và kiểm tra trong cùng một lần duyệt từ dưới lên.",
+    "key_points": [
+      "Tính chiều cao riêng cho mỗi nút lặp lại công việc, O(n²) với cây lệch",
+      "Post-order trả chiều cao hoặc -1 khi mất cân bằng, dừng sớm; O(n)"
+    ],
+    "id": "Q_DSA_243"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Cây tăng cường lưu kích thước cây con (Order Statistic Tree)",
+    "difficulty": "Medium",
+    "question": "Làm thế nào bổ sung thông tin vào cây BST cân bằng để tìm phần tử nhỏ thứ k và tính thứ hạng của một giá trị trong O(log n)?",
+    "reference_answer": "Lưu thêm tại mỗi nút trường size = số nút trong cây con gốc tại nút đó (size = size(trai) + size(phai) + 1). Tìm phần tử thứ k: tại nút x với t = size(trai): nếu k = t + 1 thì x là đáp án; nếu k ≤ t thì tìm thứ k trong cây con trái; ngược lại tìm thứ k - t - 1 trong cây con phải. Tính thứ hạng của giá trị v: đi từ gốc xuống, mỗi lần rẽ phải thì cộng size(trai) + 1 của nút vừa vượt qua. Cả hai O(h) = O(log n) trên cây cân bằng. Điều kiện: phải cập nhật size đúng khi chèn, xóa và cả trong các phép xoay cân bằng (chỉ ảnh hưởng hằng số nút).",
+    "key_points": [
+      "Mỗi nút lưu size của cây con, cập nhật khi chèn/xóa/xoay",
+      "Tìm thứ k và tính thứ hạng bằng cách đi xuống dựa vào size cây con trái, O(log n)"
+    ],
+    "id": "Q_DSA_244"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Xóa phần tử trong Open Addressing và tombstone",
+    "difficulty": "Medium",
+    "question": "Trong bảng băm dùng Open Addressing (linear probing), vì sao không thể xóa một phần tử bằng cách đơn giản đặt ô đó thành rỗng? Giải pháp 'tombstone' có nhược điểm gì?",
+    "reference_answer": "Tìm kiếm với linear probing dừng khi gặp ô RỖNG, vì ô rỗng nghĩa là khóa chưa từng được đặt xa hơn. Nếu xóa phần tử A bằng cách để rỗng ô của nó, khóa B từng bị đụng độ và được đặt ở ô sau A sẽ không còn tìm thấy — chuỗi dò bị cắt đứt. Tombstone: đánh dấu ô là 'đã xóa' — tìm kiếm coi như có phần tử và tiếp tục dò, còn chèn có thể tái sử dụng ô đó. Nhược điểm: tombstone tích tụ làm chuỗi dò dài ra, tìm kiếm (nhất là tìm khóa không tồn tại) chậm dần dù số phần tử thực ít; cần định kỳ rehash để dọn tombstone, và khi tính hệ số tải phải tính cả tombstone. Cách thay thế: backward-shift deletion (dịch các phần tử phía sau về lấp chỗ trống) với linear probing.",
+    "key_points": [
+      "Đặt rỗng làm đứt chuỗi dò, các khóa đặt sau ô đó không tìm thấy",
+      "Tombstone giữ chuỗi dò nhưng tích tụ làm chậm; cần rehash định kỳ hoặc dùng backward-shift deletion"
+    ],
+    "id": "Q_DSA_245"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Count-Min Sketch đếm tần suất xấp xỉ",
+    "difficulty": "Medium",
+    "question": "Count-Min Sketch giúp ước lượng tần suất xuất hiện của các phần tử trong luồng dữ liệu rất lớn như thế nào? Sai số của nó có tính chất gì?",
+    "reference_answer": "Count-Min Sketch là ma trận d × w bộ đếm với d hàm băm độc lập. Khi phần tử x xuất hiện, với mỗi hàng i tăng bộ đếm tại cột h_i(x). Ước lượng tần suất của x là MIN các bộ đếm h_i(x) qua d hàng. Vì các phần tử khác có thể đụng độ vào cùng bộ đếm, mỗi bộ đếm chỉ có thể lớn hơn hoặc bằng tần suất thật, nên ước lượng không bao giờ thấp hơn thực tế (chỉ ước lượng thừa); lấy min qua nhiều hàng giảm sai số. Với w = ⌈e/ε⌉ và d = ⌈ln(1/δ)⌉, sai số vượt quá ε·N (N là tổng số phần tử) với xác suất không quá δ. Bộ nhớ chỉ phụ thuộc ε, δ chứ không phụ thuộc số phần tử phân biệt — phù hợp đếm truy cập URL, phát hiện heavy hitter trong mạng.",
+    "key_points": [
+      "Ma trận d × w bộ đếm với d hàm băm; tăng một ô mỗi hàng, ước lượng bằng min",
+      "Chỉ ước lượng thừa, sai số ≤ εN với xác suất 1 - δ; bộ nhớ không phụ thuộc số phần tử phân biệt"
+    ],
+    "id": "Q_DSA_246"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Mảng (Array)",
+    "concept": "Lấy mẫu hồ chứa (Reservoir Sampling)",
+    "difficulty": "Medium",
+    "question": "Làm thế nào chọn ngẫu nhiên đều k phần tử từ một luồng dữ liệu có độ dài chưa biết trước, chỉ duyệt một lần và dùng O(k) bộ nhớ?",
+    "reference_answer": "Thuật toán Reservoir Sampling: đưa k phần tử đầu vào 'hồ chứa'. Với phần tử thứ i (i > k, đếm từ 1), sinh số ngẫu nhiên j đều trong [1, i]; nếu j ≤ k thì thay phần tử thứ j trong hồ bằng phần tử thứ i, ngược lại bỏ qua. Chứng minh (quy nạp): phần tử thứ i được chọn vào hồ với xác suất k/i; sau đó ở mỗi bước m > i nó bị thay thế với xác suất (k/m)·(1/k) = 1/m, tức sống sót với xác suất (m-1)/m; tích các xác suất sống sót tới n là i/n, nhân với k/i cho k/n — mọi phần tử có cùng xác suất k/n. Một lượt duyệt, O(k) bộ nhớ.",
+    "key_points": [
+      "Giữ k phần tử đầu; phần tử thứ i thay vào vị trí ngẫu nhiên với xác suất k/i",
+      "Mọi phần tử có xác suất được chọn k/n; một lượt, O(k) bộ nhớ"
+    ],
+    "id": "Q_DSA_247"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Mảng (Array)",
+    "concept": "Thuật toán xáo trộn Fisher-Yates",
+    "difficulty": "Medium",
+    "question": "Mô tả thuật toán Fisher-Yates để xáo trộn mảng đều ngẫu nhiên, và vì sao cách 'với mỗi i, hoán đổi a[i] với a[random(0, n-1)]' lại không cho phân bố đều?",
+    "reference_answer": "Fisher-Yates: duyệt i từ n - 1 xuống 1, chọn j ngẫu nhiên đều trong [0, i] (bao gồm i), hoán đổi a[i] và a[j]. Mỗi bước 'chốt' một phần tử ngẫu nhiên vào vị trí i từ các phần tử còn lại, tổng số kết quả có thể là n·(n-1)·...·1 = n!, mỗi hoán vị đúng một cách — phân bố đều, O(n). Cách sai chọn j trong toàn bộ [0, n-1] ở mọi bước tạo ra n^n chuỗi lựa chọn có xác suất bằng nhau; vì n^n thường không chia hết cho n! (ví dụ n = 3: 27 không chia hết cho 6), một số hoán vị xuất hiện nhiều hơn số khác — phân bố lệch. Lỗi này từng xảy ra trong thực tế (xáo bài trực tuyến). Cũng cần bộ sinh số ngẫu nhiên tốt và không dùng modulo gây lệch.",
+    "key_points": [
+      "Duyệt i giảm dần, hoán đổi a[i] với a[j], j đều trong [0, i]; n! kết quả đồng xác suất",
+      "Chọn j trong [0, n-1] tạo n^n khả năng không chia hết cho n! nên phân bố lệch"
+    ],
+    "id": "Q_DSA_248"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Thuật toán ngẫu nhiên Las Vegas và Monte Carlo",
+    "difficulty": "Medium",
+    "question": "Phân biệt thuật toán ngẫu nhiên kiểu Las Vegas và kiểu Monte Carlo, cho ví dụ mỗi loại.",
+    "reference_answer": "Las Vegas: luôn cho kết quả ĐÚNG, nhưng THỜI GIAN chạy là ngẫu nhiên (được phân tích theo kỳ vọng). Ví dụ: Quick Sort chọn pivot ngẫu nhiên — luôn sắp xếp đúng, thời gian kỳ vọng O(n log n). Monte Carlo: thời gian chạy bị chặn xác định, nhưng KẾT QUẢ có thể sai với một xác suất nhỏ có thể kiểm soát. Ví dụ: kiểm tra số nguyên tố Miller-Rabin (có thể kết luận nhầm hợp số là nguyên tố với xác suất ≤ 4^(-k) sau k lần thử), Bloom filter (dương tính giả). Lặp lại thuật toán Monte Carlo nhiều lần độc lập giúp giảm xác suất sai theo cấp số mũ.",
+    "key_points": [
+      "Las Vegas: luôn đúng, thời gian ngẫu nhiên (ví dụ Quick Sort ngẫu nhiên)",
+      "Monte Carlo: thời gian cố định, có thể sai với xác suất nhỏ (Miller-Rabin); lặp lại để giảm sai số"
+    ],
+    "id": "Q_DSA_249"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Lớp P, NP và NP-đầy đủ",
+    "difficulty": "Medium",
+    "question": "Phân biệt các lớp bài toán P, NP và NP-đầy đủ (NP-complete). Phép quy dẫn (reduction) đóng vai trò gì?",
+    "reference_answer": "P là lớp bài toán quyết định GIẢI được trong thời gian đa thức. NP là lớp bài toán mà một lời giải đề xuất có thể được KIỂM TRA trong thời gian đa thức (ví dụ với Sudoku, kiểm tra một bảng đã điền là dễ). P ⊆ NP; câu hỏi P = NP hay không vẫn chưa có lời giải. NP-đầy đủ là các bài toán thuộc NP và 'khó nhất' trong NP: mọi bài toán NP đều quy dẫn được về nó trong thời gian đa thức (SAT, 3-SAT, tô màu đồ thị 3 màu, chu trình Hamilton, TSP dạng quyết định). Phép quy dẫn A ≤p B biến mọi thể hiện của A thành thể hiện của B trong thời gian đa thức; nếu giải B nhanh thì giải được A nhanh. Để chứng minh bài toán mới X là NP-khó, quy dẫn một bài toán NP-đầy đủ đã biết VỀ X (không phải ngược lại).",
+    "key_points": [
+      "P: giải được đa thức; NP: kiểm tra lời giải được đa thức; NP-đầy đủ: thuộc NP và mọi bài toán NP quy dẫn về được",
+      "Chứng minh X NP-khó bằng cách quy dẫn bài toán NP-đầy đủ đã biết về X"
+    ],
+    "id": "Q_DSA_250"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Tìm kiếm (Searching)",
+    "concept": "Tràn số khi tính điểm giữa trong tìm kiếm nhị phân",
+    "difficulty": "Hard",
+    "question": "Cài đặt tìm kiếm nhị phân với int mid = (lo + hi) / 2; đã tồn tại gần 10 năm trong thư viện chuẩn Java trước khi bị phát hiện lỗi. Phân tích lỗi và các cách sửa.",
+    "reference_answer": "Khi mảng rất lớn (trên khoảng 2^30 phần tử) và lo, hi đều lớn, tổng lo + hi có thể vượt quá giới hạn int (2^31 - 1) và bị tràn thành số âm; mid âm dẫn tới ArrayIndexOutOfBoundsException hoặc hành vi sai. Lỗi không xuất hiện với dữ liệu kiểm thử thông thường nên tồn tại rất lâu. Sửa: mid = lo + (hi - lo) / 2 (hi - lo không tràn vì cả hai không âm và hi ≥ lo), hoặc mid = (lo + hi) >>> 1 (dịch phải không dấu trong Java, coi tổng tràn như số không dấu 32-bit, vẫn đúng). Bài học: phép toán trung gian trên chỉ số/kích thước cần xét tràn số, nhất là khi dữ liệu lớn dần theo thời gian; tương tự với mergesort, tính trung bình hai số.",
+    "key_points": [
+      "lo + hi có thể tràn int với mảng rất lớn, mid âm gây lỗi",
+      "Dùng lo + (hi - lo) / 2 hoặc dịch phải không dấu; luôn xét tràn số ở phép toán trung gian"
+    ],
+    "id": "Q_DSA_251"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Sắp xếp (Sorting)",
+    "concept": "Độ sâu đệ quy của Quick Sort",
+    "difficulty": "Hard",
+    "question": "Ngay cả khi chọn pivot ngẫu nhiên, Quick Sort đệ quy vẫn có thể gây tràn ngăn xếp trong trường hợp xấu. Phân tích và nêu kỹ thuật giới hạn độ sâu ngăn xếp ở O(log n).",
+    "reference_answer": "Với phân hoạch lệch nặng (xác suất nhỏ nhưng có thể xảy ra, hoặc chắc chắn xảy ra với pivot cố định trên dữ liệu đã sắp xếp/toàn phần tử bằng nhau khi dùng phân hoạch hai chiều), mỗi lần đệ quy chỉ giảm kích thước đi 1, độ sâu đệ quy thành O(n) — với n = 10 triệu sẽ tràn stack. Kỹ thuật: sau khi phân hoạch, ĐỆ QUY vào phần NHỎ hơn và xử lý phần lớn hơn bằng VÒNG LẶP (khử đệ quy đuôi). Vì phần nhỏ hơn có kích thước tối đa n/2, mỗi tầng đệ quy giảm kích thước ít nhất một nửa, nên độ sâu ngăn xếp chỉ O(log n) bất kể phân hoạch lệch thế nào (thời gian xấu nhất vẫn O(n²)). Kết hợp với phân hoạch ba chiều cho phần tử trùng và Introsort (chuyển sang Heap Sort khi quá sâu) để đảm bảo cả thời gian.",
+    "key_points": [
+      "Phân hoạch lệch khiến độ sâu đệ quy O(n), có thể tràn stack",
+      "Đệ quy vào phần nhỏ hơn, lặp với phần lớn hơn để giới hạn stack O(log n); kết hợp phân hoạch ba chiều/Introsort"
+    ],
+    "id": "Q_DSA_252"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Dùng số thực làm khóa bảng băm: -0.0 và NaN",
+    "difficulty": "Hard",
+    "question": "Phân tích các vấn đề khi dùng số thực (double) làm khóa trong bảng băm, đặc biệt với các giá trị 0.0, -0.0 và NaN trong Java.",
+    "reference_answer": "Với kiểu nguyên thủy, 0.0 == -0.0 là true nhưng NaN == NaN là false. Trong khi đó Double.equals() và hashCode() dựa trên biểu diễn bit: new Double(0.0).equals(-0.0) là false (hai bit khác nhau, hashCode khác nhau) còn Double.NaN.equals(Double.NaN) là true. Hệ quả: map.put(0.0, x) rồi map.get(-0.0) trả về null dù 'bằng nhau' theo toán học; một tập dùng so sánh == (như tự cài đặt bảng băm cho double nguyên thủy) có thể chèn vô số NaN vì NaN không bao giờ bằng chính nó, và không bao giờ tìm lại được. Thêm vào đó, sai số làm tròn khiến hai kết quả tính toán 'bằng nhau' có bit khác nhau. Giải pháp: tránh số thực làm khóa; nếu bắt buộc, chuẩn hóa (đổi -0.0 thành 0.0, loại NaN), hoặc lượng tử hóa về số nguyên (nhân 10^k rồi làm tròn).",
+    "key_points": [
+      "== coi 0.0 bằng -0.0 và NaN khác NaN, còn equals/hashCode dựa trên bit thì ngược lại",
+      "Gây không tìm thấy khóa hoặc chèn NaN vô hạn; tránh dùng số thực làm khóa hoặc chuẩn hóa/lượng tử hóa"
+    ],
+    "id": "Q_DSA_253"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "DFS đệ quy trên đồ thị lớn và chuyển sang ngăn xếp tường minh",
+    "difficulty": "Hard",
+    "question": "DFS đệ quy chạy tốt trên dữ liệu kiểm thử nhưng sập (RecursionError/StackOverflowError) trên đồ thị đường đi 1 triệu đỉnh. Phân tích và những điểm cần chú ý khi chuyển sang DFS dùng ngăn xếp tường minh.",
+    "reference_answer": "Độ sâu đệ quy của DFS bằng độ dài đường đi dài nhất được khám phá, có thể lên tới V (đồ thị dạng chuỗi), vượt giới hạn ngăn xếp (Python mặc định 1000, JVM vài chục nghìn khung). Chuyển sang ngăn xếp tường minh trên heap tránh được giới hạn, nhưng cần chú ý: (1) thứ tự thăm thay đổi — đẩy láng giềng theo thứ tự xuôi thì lấy ra ngược, cần đẩy ngược nếu muốn cùng thứ tự với bản đệ quy; (2) thời điểm đánh dấu: nếu đánh dấu khi đẩy, kết quả không còn đúng là thứ tự DFS chuẩn (một số thuật toán như tìm cạnh ngược, Tarjan phụ thuộc thứ tự này); (3) các thuật toán cần xử lý 'khi rời đỉnh' (post-order: sắp xếp topo, tính low-link) cần lưu trạng thái trong khung, ví dụ đẩy cặp (đỉnh, chỉ số láng giềng kế tiếp) hoặc đẩy đỉnh hai lần với cờ 'đang vào/đang ra'. Tăng giới hạn đệ quy chỉ là giải pháp tạm và có thể làm sập tiến trình thật sự.",
+    "key_points": [
+      "Độ sâu đệ quy DFS có thể bằng V, vượt giới hạn ngăn xếp",
+      "Ngăn xếp tường minh cần giữ đúng thứ tự thăm, thời điểm đánh dấu và trạng thái post-order (đỉnh, chỉ số láng giềng)"
+    ],
+    "id": "Q_DSA_254"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Dijkstra với heap không có decrease-key",
+    "difficulty": "Hard",
+    "question": "Đa số thư viện heap (như heapq của Python, PriorityQueue của Java) không hỗ trợ decrease-key. Phân tích cách cài đặt Dijkstra 'lazy deletion' và lỗi phổ biến khi quên kiểm tra mục lỗi thời.",
+    "reference_answer": "Thay vì giảm khóa, mỗi khi dist[v] được cải thiện ta đẩy THÊM một cặp (dist mới, v) vào heap; cặp cũ vẫn nằm trong heap với khoảng cách lớn hơn (mục lỗi thời). Khi lấy (d, u) ra, phải kiểm tra nếu d > dist[u] (hoặc u đã được chốt) thì bỏ qua. Heap có thể chứa tới O(E) mục nên độ phức tạp O(E log E) = O(E log V), bộ nhớ O(E). Nếu quên bước kiểm tra, mỗi mục lỗi thời sẽ khiến u được xử lý lại và nới lỏng lại mọi cạnh của u — với đồ thị dày hoặc nhiều lần cải thiện, chi phí có thể bùng nổ (O(E·deg)), và trong biến thể có trọng số âm (sai mục đích sử dụng) có thể cho kết quả sai. Đây là lỗi phổ biến làm Dijkstra 'đúng nhưng chậm' khó phát hiện bằng test nhỏ.",
+    "key_points": [
+      "Đẩy thêm mục mới thay vì decrease-key; heap tới O(E) mục, O(E log V)",
+      "Bắt buộc bỏ qua mục có d > dist[u]; quên kiểm tra làm xử lý lặp và chi phí bùng nổ"
+    ],
+    "id": "Q_DSA_255"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Cộng hằng số vào trọng số âm không bảo toàn đường đi ngắn nhất",
+    "difficulty": "Hard",
+    "question": "Để dùng Dijkstra trên đồ thị có cạnh âm (không có chu trình âm), một sinh viên cộng thêm hằng số C = |trọng số nhỏ nhất| vào MỌI cạnh cho thành không âm. Vì sao cách này sai, và kỹ thuật đúng (như trong thuật toán Johnson) khác ở điểm nào?",
+    "reference_answer": "Cộng C vào mọi cạnh làm chi phí một đường đi k cạnh tăng thêm k·C, nên đường đi NHIỀU cạnh bị phạt nặng hơn đường đi ít cạnh — thứ tự giữa các đường đi thay đổi. Ví dụ: đường A→B trực tiếp trọng số 1 và đường A→C→B với trọng số 2 + (-2) = 0; cộng C = 2 thì đường trực tiếp thành 3, đường hai cạnh thành 4 + 0 = 4, Dijkstra chọn đường trực tiếp — sai. Kỹ thuật đúng là 'đánh lại trọng số bằng thế' (reweighting with potentials): w'(u, v) = w(u, v) + h(u) - h(v), với h là khoảng cách từ một đỉnh ảo tính bằng Bellman-Ford. Khi đó mọi đường đi từ s tới t bị thay đổi CÙNG một lượng h(s) - h(t) (các số hạng giữa triệt tiêu theo kiểu tổng lồng), nên thứ tự các đường đi được bảo toàn, và bất đẳng thức tam giác đảm bảo w' ≥ 0.",
+    "key_points": [
+      "Cộng hằng số phạt đường nhiều cạnh nặng hơn, làm thay đổi đường đi ngắn nhất",
+      "Reweighting w + h(u) - h(v) làm mọi đường s→t đổi cùng một lượng nên bảo toàn thứ tự và cho trọng số không âm"
+    ],
+    "id": "Q_DSA_256"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Sai số dấu phẩy động trong thuật toán hình học",
+    "difficulty": "Hard",
+    "question": "Thuật toán bao lồi dùng phép thử hướng (cross product) với tọa độ double đôi khi cho kết quả sai hoặc chạy vòng vô hạn với các điểm gần thẳng hàng. Phân tích nguyên nhân và các cách xử lý.",
+    "reference_answer": "Phép thử hướng tính dấu của (b - a) × (c - a) để biết c nằm bên trái, phải hay trên đường ab. Khi ba điểm gần thẳng hàng, giá trị thực rất gần 0 và sai số làm tròn có thể đổi dấu kết quả; tệ hơn, các phép thử khác nhau trên cùng bộ điểm có thể cho kết luận MÂU THUẪN (a-b-c quay trái nhưng b-c-a quay phải), phá vỡ bất biến mà thuật toán dựa vào, dẫn tới bao lồi sai, điểm bị loại nhầm hoặc vòng lặp không dừng. Cách xử lý: (1) dùng tọa độ nguyên và số học chính xác (int64/BigInteger, tích chéo nguyên không sai số) — cách tốt nhất khi được; (2) so sánh với ngưỡng epsilon phù hợp với độ lớn dữ liệu (nhưng epsilon không có tính bắc cầu, chỉ giảm chứ không loại bỏ mâu thuẫn); (3) dùng các predicate thích nghi chính xác (adaptive exact predicates của Shewchuk) tính nhanh bằng số thực và chỉ chuyển sang chính xác khi kết quả gần 0.",
+    "key_points": [
+      "Gần thẳng hàng, sai số làm tròn đổi dấu phép thử hướng và gây kết luận mâu thuẫn",
+      "Dùng tọa độ nguyên/số học chính xác, epsilon có hiểu biết, hoặc predicate thích nghi chính xác"
+    ],
+    "id": "Q_DSA_257"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Co mảng động và hiện tượng thrashing",
+    "difficulty": "Hard",
+    "question": "Một mảng động tăng gấp đôi khi đầy và giảm một nửa khi số phần tử còn một nửa dung lượng. Chỉ ra chuỗi thao tác khiến chi phí phân bổ thành O(n) mỗi thao tác, và chiến lược co giãn đúng.",
+    "reference_answer": "Giả sử mảng vừa đầy với n phần tử (dung lượng n). Thêm một phần tử làm mở rộng lên 2n (sao chép n); xóa một phần tử làm còn n phần tử, đúng một nửa dung lượng, nên co về n (sao chép n); thêm lại thì lại mở rộng. Chuỗi thêm-xóa-thêm-xóa tại ngưỡng này khiến MỖI thao tác tốn O(n) — thrashing. Nguyên nhân: ngưỡng tăng và ngưỡng giảm trùng nhau, không có 'khoảng đệm'. Chiến lược đúng: tăng gấp đôi khi đầy, nhưng chỉ co một nửa khi số phần tử giảm xuống còn 1/4 dung lượng. Sau mỗi lần thay đổi kích thước, mảng ở trạng thái đầy một nửa, cần ít nhất Θ(n) thao tác nữa mới chạm ngưỡng tiếp theo — phân tích bằng phương pháp thế năng (potential method) cho thấy chi phí phân bổ O(1) cho cả thêm và xóa.",
+    "key_points": [
+      "Ngưỡng tăng (đầy) và giảm (một nửa) trùng nhau khiến thêm/xóa luân phiên mỗi lần tốn O(n)",
+      "Co khi còn 1/4 dung lượng tạo khoảng đệm, chứng minh bằng phương pháp thế năng cho O(1) phân bổ"
+    ],
+    "id": "Q_DSA_258"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Bucket chuyển thành cây trong HashMap của Java",
+    "difficulty": "Hard",
+    "question": "Từ Java 8, khi một bucket của HashMap có quá nhiều phần tử, nó được chuyển từ danh sách liên kết sang cây đỏ-đen (treeification). Phân tích lý do, điều kiện và giới hạn của cơ chế này.",
+    "reference_answer": "Lý do: chống suy biến khi nhiều khóa đụng độ vào cùng bucket (do hashCode kém hoặc tấn công hash flooding), làm tra cứu từ O(1) thành O(n). Điều kiện: bucket có từ 8 phần tử trở lên VÀ bảng có dung lượng ít nhất 64 (nếu bảng nhỏ hơn thì ưu tiên mở rộng bảng); khi số phần tử giảm xuống 6 thì chuyển lại danh sách (khoảng trễ để tránh dao động). Khi đó tra cứu trong bucket là O(log k). Giới hạn: cây sắp xếp theo hashCode trước; nếu các khóa có CÙNG hashCode, cây chỉ hiệu quả khi khóa cài đặt Comparable (để so sánh), ngược lại phải phân xử bằng tie-breaking (System.identityHashCode) và việc tìm kiếm có thể phải duyệt cả hai nhánh, gần như O(k). Nút cây tốn bộ nhớ gấp khoảng hai lần nút danh sách. Vì vậy chất lượng hashCode vẫn là yếu tố chính.",
+    "key_points": [
+      "Treeify để chống suy biến O(n) khi đụng độ nhiều; ngưỡng 8 phần tử và bảng ≥ 64, quay lại khi ≤ 6",
+      "Hiệu quả với khóa cùng hashCode chỉ khi khóa Comparable; tốn bộ nhớ hơn; hashCode tốt vẫn là chính"
+    ],
+    "id": "Q_DSA_259"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Bùng nổ không gian trạng thái khi ghi nhớ",
+    "difficulty": "Hard",
+    "question": "Một lời giải đệ quy có ghi nhớ dùng khóa memo là (chỉ số i, danh sách các phần tử đã chọn) và chạy hết bộ nhớ dù n chỉ là 40. Phân tích nguyên nhân và nguyên tắc thiết kế trạng thái DP.",
+    "reference_answer": "Memoization chỉ hiệu quả khi số TRẠNG THÁI PHÂN BIỆT nhỏ và các trạng thái lặp lại nhiều. Dùng cả danh sách phần tử đã chọn làm khóa khiến gần như mọi lời gọi có khóa khác nhau: số trạng thái có thể là 2^40 — không có sự chồng lấp nào để tận dụng, bộ nhớ memo phình to còn tệ hơn đệ quy thuần, chưa kể chi phí băm một danh sách dài ở mỗi lời gọi. Nguyên tắc: trạng thái chỉ nên chứa THÔNG TIN TỐI THIỂU ảnh hưởng tới các quyết định tương lai. Ví dụ với Subset Sum, chỉ cần (i, tổng hiện tại) chứ không cần biết đã chọn những phần tử nào — số trạng thái giảm còn n·S. Nếu tương lai thật sự phụ thuộc tập đã chọn (TSP), dùng bitmask với n nhỏ. Ngoài ra khóa memo phải bất biến và băm được (tuple thay vì list).",
+    "key_points": [
+      "Khóa memo chứa quá nhiều thông tin làm mọi trạng thái khác nhau, không có chồng lấp, bộ nhớ bùng nổ",
+      "Trạng thái chỉ chứa thông tin tối thiểu ảnh hưởng tương lai (i, tổng hiện tại); khóa phải bất biến"
+    ],
+    "id": "Q_DSA_260"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Lỗi duyệt tăng dần trong 0/1 Knapsack một chiều",
+    "difficulty": "Hard",
+    "question": "Một lập trình viên tối ưu bộ nhớ 0/1 Knapsack xuống mảng một chiều: for mỗi vật (w_i, v_i): for c từ w_i tới W: dp[c] = max(dp[c], dp[c - w_i] + v_i). Kết quả lớn hơn đáp án đúng. Giải thích.",
+    "reference_answer": "Với mảng một chiều, khi tính dp[c] ta muốn dp[c - w_i] là giá trị của HÀNG TRƯỚC (chưa dùng vật i). Duyệt c TĂNG dần thì dp[c - w_i] đã được cập nhật trong vòng lặp hiện tại — tức đã có thể chứa vật i — nên dp[c] có thể dùng vật i thêm lần nữa: thuật toán vô tình giải bài toán cái túi KHÔNG GIỚI HẠN, cho đáp án lớn hơn. Sửa: duyệt c GIẢM dần từ W về w_i, khi đó dp[c - w_i] (chỉ số nhỏ hơn) chưa bị cập nhật trong vòng hiện tại, vẫn là giá trị hàng trước. Lỗi này tinh vi vì code chạy, không có ngoại lệ, và trên nhiều bộ test nhỏ đáp án tình cờ trùng. Cách phòng: hiểu rõ phụ thuộc giữa các ô trước khi nén chiều, và đối chiếu với phiên bản hai chiều.",
+    "key_points": [
+      "Duyệt tăng dần khiến dp[c - w_i] đã chứa vật i, thành bài toán không giới hạn",
+      "Duyệt c giảm dần để đọc giá trị hàng trước; đối chiếu với bản hai chiều khi nén bộ nhớ"
+    ],
+    "id": "Q_DSA_261"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Tham lam (Greedy Algorithm)",
+    "concept": "Chứng minh tính đúng của tham lam bằng lập luận trao đổi",
+    "difficulty": "Hard",
+    "question": "Lập luận trao đổi (exchange argument) dùng để chứng minh một thuật toán tham lam là tối ưu như thế nào? Minh họa với bài toán chọn tối đa số hoạt động không chồng lấp (chọn hoạt động kết thúc sớm nhất).",
+    "reference_answer": "Lập luận trao đổi: lấy một lời giải tối ưu bất kỳ O; chỉ ra rằng có thể THAY dần các lựa chọn của O bằng lựa chọn của thuật toán tham lam G mà không làm lời giải tệ đi, cho tới khi O trở thành G — do đó G cũng tối ưu. Minh họa: gọi g là hoạt động kết thúc sớm nhất (lựa chọn tham lam), o là hoạt động kết thúc sớm nhất trong O. Vì g kết thúc không muộn hơn o, thay o bằng g trong O vẫn không chồng lấp với các hoạt động còn lại của O (chúng đều bắt đầu sau khi o kết thúc, nên sau khi g kết thúc) và số hoạt động không đổi. Vậy tồn tại lời giải tối ưu chứa g; áp dụng quy nạp cho bài toán con còn lại (các hoạt động bắt đầu sau g). Ngược lại, tiêu chí trực giác khác (chọn hoạt động ngắn nhất, bắt đầu sớm nhất) không qua được lập luận này và có phản ví dụ.",
+    "key_points": [
+      "Biến đổi dần lời giải tối ưu thành lời giải tham lam mà không làm tệ đi",
+      "Hoạt động kết thúc sớm nhất có thể thay cho hoạt động đầu của lời giải tối ưu; các tiêu chí khác có phản ví dụ"
+    ],
+    "id": "Q_DSA_262"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Lập lịch khoảng có trọng số (Weighted Interval Scheduling)",
+    "difficulty": "Hard",
+    "question": "Khi mỗi hoạt động có thêm lợi nhuận và mục tiêu là tối đa tổng lợi nhuận (không chồng lấp), vì sao chiến lược 'kết thúc sớm nhất' thất bại và lời giải DP O(n log n) như thế nào?",
+    "reference_answer": "Tham lam theo thời điểm kết thúc tối đa SỐ LƯỢNG hoạt động, không xét lợi nhuận: ví dụ hai hoạt động ngắn lợi nhuận 1 mỗi cái chồng lấp với một hoạt động dài lợi nhuận 100 — tham lam chọn hai cái ngắn (tổng 2). Không có tiêu chí tham lam đơn giản nào đúng. DP: sắp xếp theo thời điểm kết thúc; với hoạt động j, gọi p(j) là chỉ số hoạt động cuối cùng kết thúc không muộn hơn thời điểm bắt đầu của j (tìm bằng tìm kiếm nhị phân). OPT(j) = max(OPT(j-1), loiNhuan_j + OPT(p(j))) — hoặc bỏ j, hoặc chọn j cộng với lời giải tốt nhất tương thích. Tổng O(n log n). Truy vết ngược để biết hoạt động nào được chọn.",
+    "key_points": [
+      "Tham lam theo kết thúc sớm tối đa số lượng chứ không tối đa lợi nhuận, có phản ví dụ",
+      "Sắp theo kết thúc, OPT(j) = max(OPT(j-1), w_j + OPT(p(j))) với p(j) tìm nhị phân; O(n log n)"
+    ],
+    "id": "Q_DSA_263"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Ghép cặp ổn định (Gale-Shapley)",
+    "difficulty": "Hard",
+    "question": "Trình bày thuật toán Gale-Shapley cho bài toán ghép cặp ổn định (stable matching) giữa n sinh viên và n trường, và phân tích tính chất 'ai đề xuất thì người đó có lợi'.",
+    "reference_answer": "Một ghép cặp không ổn định nếu tồn tại sinh viên s và trường t chưa ghép với nhau nhưng cả hai đều thích nhau hơn đối tác hiện tại. Thuật toán: khi còn sinh viên tự do, sinh viên đó đề xuất với trường cao nhất trong danh sách mà mình chưa đề xuất; trường nếu đang trống thì tạm nhận, nếu đang giữ một sinh viên khác thì giữ người mình thích hơn và trả người kia về trạng thái tự do. Mỗi sinh viên đề xuất mỗi trường tối đa một lần nên kết thúc sau tối đa n² lần đề xuất, O(n²). Kết quả luôn ổn định (nếu s thích t hơn, s đã từng đề xuất t và bị t từ chối vì một người t thích hơn). Tính chất: bên ĐỀ XUẤT nhận được đối tác tốt nhất có thể trong mọi ghép cặp ổn định, còn bên NHẬN đề xuất nhận đối tác tệ nhất có thể — thiết kế ai là bên đề xuất có ý nghĩa chính sách (hệ thống xét tuyển nên để thí sinh đề xuất). Bên đề xuất cũng không có động cơ khai gian danh sách ưu tiên.",
+    "key_points": [
+      "Bên đề xuất lần lượt đề xuất theo thứ tự ưu tiên, bên nhận giữ người tốt nhất; O(n²), luôn ổn định",
+      "Bên đề xuất nhận kết quả tốt nhất trong mọi ghép cặp ổn định, bên nhận tệ nhất; ảnh hưởng thiết kế chính sách"
+    ],
+    "id": "Q_DSA_264"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Edmonds-Karp và vai trò của BFS trong luồng cực đại",
+    "difficulty": "Hard",
+    "question": "Ford-Fulkerson chọn đường tăng luồng tùy ý có thể chạy rất chậm (hoặc không dừng với dung lượng vô tỉ). Edmonds-Karp khắc phục bằng cách nào và đạt độ phức tạp bao nhiêu?",
+    "reference_answer": "Ford-Fulkerson với đường tăng tùy ý (ví dụ DFS) có số lần lặp phụ thuộc vào GIÁ TRỊ luồng cực đại: ví dụ kinh điển với dung lượng 10^9 và một cạnh dung lượng 1 ở giữa có thể mất 2·10^9 lần tăng luồng mỗi lần 1 đơn vị; với dung lượng vô tỉ thì thậm chí có thể không dừng và hội tụ về giá trị sai. Edmonds-Karp luôn chọn đường tăng NGẮN NHẤT theo số cạnh bằng BFS trên đồ thị thặng dư. Có thể chứng minh khoảng cách (số cạnh) từ nguồn tới mỗi đỉnh trong đồ thị thặng dư không giảm, và mỗi cạnh trở thành cạnh 'tắc nghẽn' tối đa O(V) lần, nên số lần tăng luồng là O(V·E), tổng O(V·E²) — độc lập với giá trị dung lượng. Các thuật toán nhanh hơn như Dinic (O(V²·E), rất nhanh trên đồ thị đơn vị) dùng đồ thị phân tầng và luồng chặn.",
+    "key_points": [
+      "Đường tăng tùy ý làm số lần lặp phụ thuộc giá trị dung lượng, có thể không dừng với số vô tỉ",
+      "BFS chọn đường ngắn nhất, khoảng cách không giảm, O(V·E) lần tăng, tổng O(V·E²); Dinic nhanh hơn"
+    ],
+    "id": "Q_DSA_265"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Tính duy nhất của thứ tự topo",
+    "difficulty": "Hard",
+    "question": "Làm thế nào kiểm tra một DAG có DUY NHẤT một thứ tự topo hay không, và ý nghĩa thực tế của câu hỏi này?",
+    "reference_answer": "Thứ tự topo duy nhất khi và chỉ khi DAG có một đường đi Hamilton (đi qua mọi đỉnh) — tức mọi cặp đỉnh liên tiếp trong thứ tự topo đều được nối trực tiếp bởi một cạnh. Kiểm tra bằng thuật toán Kahn: nếu tại bất kỳ bước nào hàng đợi chứa từ hai đỉnh bậc vào 0 trở lên, thì có hai lựa chọn hợp lệ, thứ tự không duy nhất. Hoặc tính một thứ tự topo rồi kiểm tra mọi cặp liên tiếp (v_i, v_{i+1}) có cạnh nối không. Cả hai O(V + E). Ý nghĩa: trong hệ thống build/lập lịch, nhiều thứ tự hợp lệ nghĩa là có thể chạy song song các tác vụ độc lập; trong bài toán suy luận thứ tự (khôi phục bảng chữ cái từ từ điển người ngoài hành tinh, xếp hạng từ kết quả so sánh), thứ tự không duy nhất nghĩa là dữ liệu chưa đủ để kết luận.",
+    "key_points": [
+      "Thứ tự topo duy nhất ⇔ DAG có đường Hamilton; trong Kahn hàng đợi không bao giờ có ≥ 2 đỉnh",
+      "Nhiều thứ tự nghĩa là có thể chạy song song hoặc dữ liệu chưa đủ để kết luận thứ tự"
+    ],
+    "id": "Q_DSA_266"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Cạm bẫy khi chuyển DFS sang ngăn xếp: đánh dấu lúc đẩy hay lúc lấy",
+    "difficulty": "Hard",
+    "question": "Một bản DFS dùng stack đánh dấu 'đã thăm' ngay khi ĐẨY đỉnh vào stack (giống BFS). Phân tích vì sao thứ tự thu được không còn là thứ tự DFS đúng nghĩa, và hậu quả với thuật toán phát hiện chu trình trên đồ thị có hướng.",
+    "reference_answer": "Đánh dấu khi đẩy: khi xử lý u, mọi láng giềng chưa thăm của u bị đánh dấu ngay lập tức. Nếu sau đó, trong lúc đi sâu theo một láng giềng v, ta gặp lại láng giềng w (của u) bằng một đường khác, w đã bị đánh dấu nên bị bỏ qua — trong DFS chuẩn, w lẽ ra được thăm qua đường v → ... → w và là con của nhánh đó. Kết quả: cây DFS sai, thứ tự vào/ra (pre/post) sai. Hậu quả: thuật toán phát hiện chu trình dùng ba màu (trắng/xám/đen, cạnh tới đỉnh xám là cạnh ngược) và sắp xếp topo theo thứ tự post-order đều dựa trên cấu trúc cây DFS đúng, nên có thể báo sai chu trình hoặc cho thứ tự topo sai. Cách đúng: đánh dấu khi LẤY ra (chấp nhận một đỉnh có thể bị đẩy nhiều lần, bỏ qua nếu đã thăm), hoặc mô phỏng chính xác đệ quy bằng cặp (đỉnh, iterator láng giềng).",
+    "key_points": [
+      "Đánh dấu khi đẩy làm láng giềng bị 'chiếm chỗ' sớm, cây DFS và thứ tự pre/post sai",
+      "Phát hiện chu trình ba màu và topo theo post-order cho kết quả sai; đánh dấu khi lấy ra hoặc mô phỏng đệ quy bằng (đỉnh, iterator)"
+    ],
+    "id": "Q_DSA_267"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "BFS đánh dấu khi lấy ra khỏi hàng đợi",
+    "difficulty": "Hard",
+    "question": "Một bản BFS chỉ đánh dấu đỉnh 'đã thăm' khi LẤY ra khỏi hàng đợi (thay vì khi đưa vào). Kết quả khoảng cách vẫn đúng nhưng chương trình hết bộ nhớ trên lưới 2000 × 2000. Phân tích.",
+    "reference_answer": "Nếu chỉ đánh dấu khi lấy ra, một đỉnh chưa được lấy ra có thể bị NHIỀU đỉnh khác đưa vào hàng đợi (mỗi láng giềng đã xử lý đưa nó vào một lần). Trên lưới, mỗi ô có tới 4 láng giềng, nên số bản sao trong hàng đợi có thể gấp nhiều lần số ô; trên đồ thị dày, hàng đợi có thể chứa O(E) mục thay vì O(V). Khoảng cách vẫn đúng vì lần lấy ra đầu tiên của mỗi đỉnh vẫn theo thứ tự BFS, nhưng bộ nhớ và thời gian tăng mạnh, có thể vượt giới hạn. Cách đúng cho BFS không trọng số: đánh dấu (và gán khoảng cách) ngay khi ĐƯA VÀO hàng đợi, đảm bảo mỗi đỉnh vào hàng đợi đúng một lần, O(V + E). Lưu ý điều này khác với Dijkstra, nơi đỉnh chỉ được 'chốt' khi lấy ra vì khoảng cách có thể còn được cải thiện.",
+    "key_points": [
+      "Đánh dấu khi lấy ra khiến một đỉnh bị đưa vào hàng đợi nhiều lần, hàng đợi tới O(E)",
+      "BFS không trọng số nên đánh dấu khi đưa vào; khác với Dijkstra chốt khi lấy ra"
+    ],
+    "id": "Q_DSA_268"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Tổ tiên chung gần nhất bằng Binary Lifting",
+    "difficulty": "Hard",
+    "question": "Với cây n nút và q truy vấn LCA (tổ tiên chung gần nhất) trên cây tổng quát, mô tả kỹ thuật binary lifting và độ phức tạp.",
+    "reference_answer": "Tiền xử lý: tính độ sâu mỗi nút bằng DFS/BFS và bảng up[k][v] = tổ tiên thứ 2^k của v: up[0][v] = cha của v, up[k][v] = up[k-1][up[k-1][v]]. Bảng có kích thước n × log n, tính trong O(n log n). Truy vấn LCA(u, v): (1) đưa nút sâu hơn lên cùng độ sâu với nút kia bằng cách nhảy theo các bit của chênh lệch độ sâu; (2) nếu trùng nhau thì đó là LCA; (3) ngược lại, với k từ lớn tới nhỏ, nếu up[k][u] ≠ up[k][v] thì nhảy cả hai lên; cuối cùng LCA là cha của u. Mỗi truy vấn O(log n). Khoảng cách giữa hai nút = depth(u) + depth(v) - 2·depth(LCA). Kỹ thuật cũng trả lời 'tổ tiên thứ k' và có thể gộp thêm giá trị (max cạnh trên đường đi). Phương án khác: Euler tour + sparse table cho truy vấn O(1).",
+    "key_points": [
+      "Bảng up[k][v] = tổ tiên thứ 2^k, tiền xử lý O(n log n)",
+      "Đưa về cùng độ sâu rồi nhảy từ bước lớn tới nhỏ khi tổ tiên khác nhau; truy vấn O(log n)"
+    ],
+    "id": "Q_DSA_269"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Segment Tree với lazy propagation",
+    "difficulty": "Hard",
+    "question": "Segment tree cơ bản hỗ trợ cập nhật một điểm và truy vấn đoạn trong O(log n). Khi cần 'cộng v vào mọi phần tử trong đoạn [l, r]' xen kẽ với truy vấn tổng đoạn, kỹ thuật lazy propagation hoạt động thế nào và cần lưu ý gì?",
+    "reference_answer": "Cập nhật từng phần tử trong đoạn tốn O(n log n). Lazy propagation: khi đoạn của một nút nằm TRỌN trong [l, r], cập nhật giá trị tổng của nút (tong += v × độ dài đoạn) và ghi một 'thẻ trì hoãn' lazy += v thay vì đi xuống các con. Chỉ khi một thao tác sau cần đi xuống các con của nút đó, thẻ mới được đẩy xuống (push down): áp dụng cho hai con và xóa thẻ ở nút cha. Mỗi thao tác chạm O(log n) nút nên cả cập nhật đoạn và truy vấn đều O(log n). Lưu ý: phải push down trước khi đi xuống ở CẢ cập nhật lẫn truy vấn; khi có nhiều loại cập nhật (gán và cộng), thứ tự áp dụng và cách hợp thành thẻ phải được định nghĩa cẩn thận (gán ghi đè cộng trước đó); kích thước mảng cây nên là 4n; và phép tổng hợp phải tương thích với cập nhật (với max, cộng v vào cả đoạn thì max += v).",
+    "key_points": [
+      "Nút nằm trọn trong đoạn cập nhật thì cập nhật tại chỗ và ghi thẻ lazy, chỉ đẩy xuống khi cần",
+      "Cập nhật/truy vấn đoạn O(log n); phải push down ở mọi thao tác, định nghĩa cẩn thận việc hợp thành thẻ"
+    ],
+    "id": "Q_DSA_270"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Mảng (Array)",
+    "concept": "Sparse Table cho truy vấn min đoạn trong O(1)",
+    "difficulty": "Hard",
+    "question": "Sparse table trả lời truy vấn min trên đoạn của mảng TĨNH trong O(1) như thế nào? Vì sao kỹ thuật này không áp dụng trực tiếp cho truy vấn tổng?",
+    "reference_answer": "Tiền xử lý st[k][i] = min của đoạn bắt đầu tại i có độ dài 2^k, với st[k][i] = min(st[k-1][i], st[k-1][i + 2^(k-1)]); bảng O(n log n). Truy vấn [l, r]: đặt k = ⌊log₂(r - l + 1)⌋, đáp án = min(st[k][l], st[k][r - 2^k + 1]) — hai đoạn độ dài 2^k phủ kín [l, r] và có thể CHỒNG LẤP nhau. Điều này đúng vì phép min là lũy đẳng (idempotent): min(x, x) = x, phần tử bị tính hai lần không ảnh hưởng. Với tổng thì phần chồng lấp bị cộng hai lần nên không dùng được cách O(1) này (phải tách đoạn thành các khối 2^k không chồng lấp, O(log n), hoặc dùng mảng tổng tiền tố vốn đã O(1)). Hạn chế: chỉ cho mảng tĩnh; cập nhật một phần tử phải xây lại.",
+    "key_points": [
+      "st[k][i] là min đoạn độ dài 2^k; truy vấn bằng hai đoạn chồng lấp phủ [l, r]",
+      "Đúng nhờ min lũy đẳng; tổng không lũy đẳng nên không dùng được; chỉ cho mảng tĩnh"
+    ],
+    "id": "Q_DSA_271"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Mảng (Array)",
+    "concept": "Chia căn và thuật toán Mo",
+    "difficulty": "Hard",
+    "question": "Thuật toán Mo trả lời q truy vấn ngoại tuyến 'số phần tử phân biệt trong đoạn [l, r]' trong O((n + q)√n) như thế nào? Điều kiện để áp dụng là gì?",
+    "reference_answer": "Ý tưởng: duy trì một cửa sổ [L, R] cùng cấu trúc đếm (mảng tần suất và số phần tử phân biệt); mở rộng hoặc thu hẹp cửa sổ một vị trí tốn O(1). Sắp xếp các truy vấn để tổng số bước di chuyển L, R nhỏ: chia chỉ số thành các khối kích thước √n, sắp xếp truy vấn theo khối của l, trong cùng khối theo r tăng dần (biến thể: đảo chiều r ở khối lẻ). Khi đó R di chuyển O(n) mỗi khối, tổng O(n√n); L di chuyển O(√n) mỗi truy vấn, tổng O(q√n). Xử lý tuần tự và ghi đáp án theo chỉ số gốc. Điều kiện: truy vấn biết trước (ngoại tuyến), không có cập nhật (hoặc dùng biến thể Mo có cập nhật phức tạp hơn), và thao tác thêm/bớt một phần tử khỏi cửa sổ phải rẻ. Phù hợp khi không có cấu trúc dữ liệu trực tuyến hiệu quả cho truy vấn.",
+    "key_points": [
+      "Duy trì cửa sổ di chuyển từng bước, sắp truy vấn theo khối √n của l rồi theo r",
+      "Tổng O((n + q)√n); cần truy vấn ngoại tuyến, không cập nhật, thêm/bớt phần tử O(1)"
+    ],
+    "id": "Q_DSA_272"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Cấu trúc dữ liệu bền vững (Persistent) bằng sao chép đường đi",
+    "difficulty": "Hard",
+    "question": "Cấu trúc dữ liệu bền vững (persistent) cho phép truy cập mọi phiên bản cũ sau mỗi cập nhật. Kỹ thuật sao chép đường đi (path copying) trên cây cân bằng hoạt động thế nào và tốn bao nhiêu bộ nhớ?",
+    "reference_answer": "Không sửa nút tại chỗ; khi cập nhật một khóa, chỉ tạo bản SAO các nút trên đường đi từ gốc tới nút bị thay đổi (O(log n) nút), các nút mới trỏ tới những cây con không đổi của phiên bản cũ. Gốc mới đại diện phiên bản mới, gốc cũ vẫn nguyên vẹn đại diện phiên bản cũ — các phiên bản CHIA SẺ phần lớn cấu trúc. Mỗi cập nhật tốn O(log n) thời gian và O(log n) bộ nhớ thêm, thay vì O(n) nếu sao chép toàn bộ. Ứng dụng: lịch sử undo/version, truy vấn trên các phiên bản (persistent segment tree tìm phần tử nhỏ thứ k trong đoạn), cấu trúc dữ liệu bất biến trong lập trình hàm (Clojure, Scala, Immutable.js), MVCC trong CSDL, cho phép nhiều luồng đọc an toàn không cần khóa. Đánh đổi: cấp phát nhiều nút nhỏ, phụ thuộc GC, hằng số thời gian lớn hơn cấu trúc khả biến.",
+    "key_points": [
+      "Chỉ sao chép O(log n) nút trên đường cập nhật, chia sẻ các cây con không đổi",
+      "Mỗi phiên bản O(log n) bộ nhớ thêm; dùng cho lịch sử phiên bản, cấu trúc bất biến, MVCC; đổi lại hằng số và áp lực GC"
+    ],
+    "id": "Q_DSA_273"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Danh sách liên kết (Linked List)",
+    "concept": "Tính cục bộ bộ nhớ đệm: mảng so với danh sách liên kết",
+    "difficulty": "Hard",
+    "question": "Duyệt tổng 10 triệu số trong ArrayList<Integer>/mảng int[] và trong LinkedList đều là O(n), nhưng thực tế có thể chênh lệch hàng chục lần. Phân tích nguyên nhân ở mức phần cứng và hệ quả cho việc chọn cấu trúc dữ liệu.",
+    "reference_answer": "CPU đọc bộ nhớ theo dòng cache (thường 64 byte) và có bộ dự đoán nạp trước (prefetcher). Mảng int[] lưu các giá trị liền kề: mỗi dòng cache chứa 16 số, truy cập tuần tự được prefetch hiệu quả, gần như luôn trúng cache. Danh sách liên kết lưu mỗi nút ở một vị trí tùy ý trên heap; mỗi bước phải đọc con trỏ next rồi mới biết địa chỉ tiếp theo (pointer chasing), không thể prefetch, thường trượt cache và phải chờ RAM (hàng trăm chu kỳ). Thêm vào đó, mỗi nút tốn thêm bộ nhớ cho con trỏ và header đối tượng. Ngay cả ArrayList<Integer> cũng chậm hơn int[] vì chứa tham chiếu tới các đối tượng Integer rải rác. Hệ quả: Big-O bỏ qua hằng số phụ thuộc phần cứng; với hầu hết khối lượng thực tế, mảng động vượt trội danh sách liên kết, kể cả khi chèn/xóa ở giữa với n vừa phải; danh sách liên kết chỉ có lợi khi có sẵn tham chiếu tới nút cần thao tác (như trong LRU cache).",
+    "key_points": [
+      "Mảng liền kề tận dụng dòng cache và prefetch; danh sách liên kết phải dò con trỏ, trượt cache liên tục",
+      "Big-O giống nhau nhưng hằng số khác hàng chục lần; ưu tiên mảng trừ khi có sẵn tham chiếu nút"
+    ],
+    "id": "Q_DSA_274"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Thuật toán Strassen và giới hạn thực tế",
+    "difficulty": "Hard",
+    "question": "Thuật toán Strassen nhân ma trận trong O(n^2.807) thay vì O(n³). Vì sao các thư viện số học thực tế (BLAS) hầu như không dùng Strassen làm mặc định?",
+    "reference_answer": "Strassen chia mỗi ma trận thành 4 khối và chỉ dùng 7 phép nhân khối (thay vì 8) cùng 18 phép cộng/trừ khối, cho T(n) = 7T(n/2) + O(n²) = O(n^log₂7). Tuy nhiên: (1) hằng số lớn do nhiều phép cộng và ma trận tạm, chỉ có lợi khi n rất lớn (vài trăm tới vài nghìn tùy phần cứng), nên chỉ dùng ở các tầng trên và chuyển sang nhân thường khi khối nhỏ; (2) kém ổn định số học — sai số làm tròn với số thực lớn hơn thuật toán chuẩn, không chấp nhận được ở nhiều ứng dụng khoa học; (3) tốn thêm bộ nhớ cho các ma trận trung gian; (4) nhân ma trận chuẩn được tối ưu cực kỳ tốt cho phần cứng (chia khối theo cache, SIMD, đa luồng, GPU), đạt gần hiệu năng đỉnh, trong khi cấu trúc truy cập của Strassen khó tối ưu tương tự; (5) yêu cầu kích thước phù hợp (đệm thêm khi n không là lũy thừa của 2). Các thuật toán có số mũ thấp hơn nữa (Coppersmith-Winograd và hậu duệ) chỉ mang tính lý thuyết vì hằng số khổng lồ.",
+    "key_points": [
+      "Strassen dùng 7 thay vì 8 phép nhân khối, O(n^2.807)",
+      "Hằng số lớn, kém ổn định số học, tốn bộ nhớ, khó tối ưu cho phần cứng nên thư viện ít dùng mặc định"
+    ],
+    "id": "Q_DSA_275"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Sắp xếp (Sorting)",
+    "concept": "Vì sao Java dùng thuật toán khác nhau để sắp xếp kiểu nguyên thủy và đối tượng",
+    "difficulty": "Hard",
+    "question": "Arrays.sort() trong Java dùng Dual-Pivot Quicksort cho mảng kiểu nguyên thủy (int[]) nhưng dùng TimSort (biến thể Merge Sort) cho mảng đối tượng. Phân tích lý do thiết kế này.",
+    "reference_answer": "Với đối tượng, tính ỔN ĐỊNH là quan trọng: sắp xếp theo một tiêu chí không được làm xáo trộn thứ tự tương đối của các đối tượng 'bằng nhau' (ví dụ đã sắp theo tên, giờ sắp theo lớp, sinh viên cùng lớp vẫn giữ thứ tự tên) — Quick Sort không ổn định, TimSort ổn định. Ngoài ra, so sánh đối tượng qua compareTo/Comparator tốn kém (gọi phương thức ảo, dò con trỏ), nên thuật toán ít phép so sánh như TimSort (khai thác các đoạn đã sắp sẵn, O(n) với dữ liệu gần sắp xếp) có lợi; bộ nhớ phụ O(n) chỉ chứa tham chiếu. Với kiểu nguyên thủy, hai giá trị bằng nhau không phân biệt được nên ổn định vô nghĩa; so sánh rất rẻ, còn cục bộ bộ nhớ và sắp xếp tại chỗ (không tốn O(n) bộ nhớ phụ) mới quan trọng — Dual-Pivot Quicksort nhanh hơn trong thực tế. Đổi lại Quicksort có trường hợp xấu O(n²) hiếm gặp, được giảm thiểu bằng chiến lược chọn pivot và chuyển sang thuật toán khác.",
+    "key_points": [
+      "Đối tượng cần sắp xếp ổn định và so sánh đắt, nên dùng TimSort ít phép so sánh",
+      "Kiểu nguyên thủy không cần ổn định, so sánh rẻ, ưu tiên tại chỗ và cục bộ cache nên dùng Dual-Pivot Quicksort"
+    ],
+    "id": "Q_DSA_276"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Nghịch lý ngày sinh và xác suất trùng mã băm",
+    "difficulty": "Hard",
+    "question": "Một hệ thống sinh mã định danh ngẫu nhiên 32-bit cho mỗi đơn hàng và giả định 'không gian 4 tỷ giá trị là đủ lớn, khó trùng'. Sau khoảng 100.000 đơn hàng đã xuất hiện trùng mã. Giải thích bằng nghịch lý ngày sinh và đề xuất kích thước phù hợp.",
+    "reference_answer": "Nghịch lý ngày sinh: với N giá trị có thể, xác suất có ít nhất một cặp trùng trong k mẫu ngẫu nhiên xấp xỉ 1 - e^(-k²/(2N)), đạt khoảng 50% khi k ≈ 1,18·√N. Với N = 2^32 ≈ 4,3 tỷ, √N ≈ 65.536, nên chỉ khoảng 77.000 mã đã có 50% khả năng trùng — không phải hàng tỷ như trực giác. Số CẶP tăng theo k², đó là lý do trùng lặp xuất hiện sớm. Đề xuất: muốn xác suất trùng nhỏ hơn p với k mã cần N ≫ k²/(2p); ví dụ 1 tỷ mã với p = 10^-9 cần khoảng 2^90 trở lên, nên dùng 122 bit ngẫu nhiên của UUID v4 hoặc 128 bit. Đồng thời vẫn nên có ràng buộc duy nhất ở CSDL và xử lý trùng (sinh lại). Cùng nguyên lý giải thích vì sao hàm băm mật mã cần đầu ra ≥ 256 bit để chống tấn công tìm va chạm.",
+    "key_points": [
+      "Xác suất trùng ≈ 1 - e^(-k²/2N); với N = 2^32 chỉ khoảng 77.000 mã đã có 50% khả năng trùng",
+      "Cần N ≫ k²/(2p), dùng 122-128 bit ngẫu nhiên và vẫn giữ ràng buộc duy nhất + sinh lại khi trùng"
+    ],
+    "id": "Q_DSA_277"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Số âm khi lấy modulo trong phép trừ",
+    "difficulty": "Hard",
+    "question": "Một lời giải DP đếm số cách modulo M = 10^9 + 7 dùng công thức dp[i] = (dp[i-1] * 2 - dp[last[i]]) % M và cho đáp án âm hoặc sai ở một số test. Phân tích lỗi.",
+    "reference_answer": "Sau khi lấy modulo, dp[i-1]·2 % M và dp[last[i]] đều nằm trong [0, M), nhưng giá trị đã rút gọn của số bị trừ có thể NHỎ hơn số trừ dù giá trị thật lớn hơn; hiệu trở thành âm. Trong C++/Java/C#, toán tử % với số âm trả về kết quả âm (ví dụ -3 % 7 = -3), nên dp chứa số âm và các bước sau lan truyền sai (Python trả về số không âm nên không gặp lỗi này — một nguồn khác biệt khi chuyển code giữa ngôn ngữ). Sửa: ((a - b) % M + M) % M, hoặc cộng M trước khi lấy modulo: (a - b + M) % M khi a, b đều trong [0, M). Ngoài ra, phép nhân hai số gần M cần kiểu 64-bit để không tràn trước khi lấy modulo, và phép chia modulo phải dùng nghịch đảo modulo (M nguyên tố, Fermat) chứ không chia thường.",
+    "key_points": [
+      "Hiệu hai giá trị đã rút gọn modulo có thể âm; % trong C++/Java giữ dấu âm",
+      "Dùng ((a - b) % M + M) % M; nhân cần 64-bit, chia dùng nghịch đảo modulo"
+    ],
+    "id": "Q_DSA_278"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Biểu diễn đồ thị dạng CSR cho đồ thị cực lớn",
+    "difficulty": "Hard",
+    "question": "Với đồ thị 100 triệu đỉnh, 2 tỷ cạnh, danh sách kề dạng List<List<Integer>> tiêu tốn bộ nhớ khổng lồ. Mô tả biểu diễn Compressed Sparse Row (CSR) và đánh đổi của nó.",
+    "reference_answer": "List<List<Integer>> tốn chi phí rất lớn ngoài dữ liệu thật: mỗi danh sách là một đối tượng có header, mảng nội bộ dư dung lượng, và mỗi Integer là một đối tượng riêng (16 byte + 8 byte tham chiếu thay vì 4 byte) — có thể gấp 5-10 lần kích thước cần thiết, đồng thời rải rác bộ nhớ làm duyệt chậm. CSR dùng hai mảng nguyên thủy: mảng ke[] dài E chứa đỉnh đích của mọi cạnh, sắp xếp theo đỉnh nguồn; và mảng batDau[] dài V + 1 với các láng giềng của u nằm ở ke[batDau[u] .. batDau[u+1]). Bộ nhớ khoảng 4E + 4V byte (hoặc 8 byte cho chỉ số lớn), duyệt láng giềng là quét tuần tự liền kề — thân thiện cache, dễ ánh xạ bộ nhớ (mmap) và song song hóa. Đánh đổi: cấu trúc tĩnh, thêm/xóa cạnh rất tốn kém (phải dựng lại), cần xây dựng qua bước đếm bậc và sắp xếp; phù hợp đồ thị phân tích, ít thay đổi.",
+    "key_points": [
+      "List lồng nhau tốn header, boxing và dư dung lượng, gấp nhiều lần dữ liệu thật",
+      "CSR dùng hai mảng (ke, batDau), gọn và liền kề, thân thiện cache; đánh đổi là khó cập nhật"
+    ],
+    "id": "Q_DSA_279"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Đồ thị ẩn và bùng nổ không gian trạng thái",
+    "difficulty": "Hard",
+    "question": "Bài toán Word Ladder: biến từ 'cat' thành 'dog' bằng cách đổi một chữ cái mỗi bước, mỗi từ trung gian phải có trong từ điển 100.000 từ. Phân tích vì sao xây dựng tường minh toàn bộ đồ thị (nối mọi cặp từ khác nhau một chữ) là không hiệu quả và cách xử lý tốt hơn.",
+    "reference_answer": "Xây tường minh cần so sánh mọi cặp từ: O(N²·L) với N = 100.000 là khoảng 10^10 phép so sánh, và đồ thị có thể có rất nhiều cạnh. Thay vào đó coi đồ thị là ẨN (implicit): chỉ sinh láng giềng khi BFS cần. Cách 1: với từ hiện tại, thử thay mỗi vị trí bằng 26 chữ cái và tra Hash Set từ điển — O(26·L) mỗi từ. Cách 2: tiền xử lý 'mẫu đại diện' như 'c*t', 'ca*' ánh xạ tới danh sách từ khớp, láng giềng là các từ cùng mẫu. BFS từ từ đầu (hoặc BFS hai chiều từ cả hai đầu để giảm số trạng thái từ b^d xuống khoảng 2·b^(d/2)) và đánh dấu từ đã thăm. Bài học chung: với bài toán trạng thái (câu đố, trò chơi), không gian trạng thái thường quá lớn để liệt kê, phải sinh láng giềng theo yêu cầu, cắt bớt trạng thái không hợp lệ và chọn chiến lược tìm kiếm phù hợp.",
+    "key_points": [
+      "Xây tường minh đồ thị cần O(N²·L) so sánh",
+      "Sinh láng giềng theo yêu cầu (thay ký tự hoặc mẫu đại diện), BFS/BFS hai chiều trên đồ thị ẩn"
+    ],
+    "id": "Q_DSA_280"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Nhầm lẫn giữa cây khung nhỏ nhất và cây đường đi ngắn nhất",
+    "difficulty": "Hard",
+    "question": "Một kỹ sư dùng cây khung nhỏ nhất (MST) của mạng cáp để định tuyến gói tin từ trung tâm dữ liệu tới mọi chi nhánh với kỳ vọng độ trễ nhỏ nhất. Phân tích sai lầm, và nêu thêm các điều kiện liên quan tới tính duy nhất và trọng số âm của MST.",
+    "reference_answer": "MST tối thiểu hóa TỔNG trọng số các cạnh được chọn (tổng chi phí xây dựng cáp), còn cây đường đi ngắn nhất (SPT, kết quả của Dijkstra từ trung tâm) tối thiểu hóa khoảng cách từ GỐC tới từng đỉnh. Đường đi trên MST từ gốc tới một chi nhánh có thể dài hơn nhiều so với đường ngắn nhất: ví dụ chu trình 4 đỉnh với ba cạnh trọng số 1 và một cạnh trọng số 2.5 — MST bỏ cạnh 2.5, nên đỉnh ở đầu kia phải đi vòng qua ba cạnh (tổng 3) thay vì 2.5. Hai bài toán có mục tiêu khác nhau. Thêm: MST là duy nhất nếu mọi trọng số cạnh phân biệt (khi có trọng số trùng có thể có nhiều MST cùng tổng); MST vẫn tính đúng với trọng số âm (Kruskal/Prim chỉ phụ thuộc thứ tự so sánh trọng số), khác với Dijkstra; và cộng hằng số vào mọi cạnh không làm thay đổi MST (vì mọi cây khung có đúng V - 1 cạnh) — trái ngược với đường đi ngắn nhất.",
+    "key_points": [
+      "MST tối thiểu tổng trọng số cây; SPT tối thiểu khoảng cách từ gốc — mục tiêu khác nhau",
+      "MST duy nhất khi trọng số phân biệt, đúng với trọng số âm, bất biến khi cộng hằng số vào mọi cạnh"
+    ],
+    "id": "Q_DSA_281"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Thuật toán Borůvka và song song hóa MST",
+    "difficulty": "Hard",
+    "question": "Thuật toán Borůvka tìm cây khung nhỏ nhất như thế nào, và vì sao nó phù hợp với môi trường song song/phân tán hơn Prim và Kruskal?",
+    "reference_answer": "Ban đầu mỗi đỉnh là một thành phần. Mỗi vòng: với MỌI thành phần, tìm cạnh có trọng số nhỏ nhất nối nó ra ngoài thành phần; thêm tất cả các cạnh đó vào MST (cạnh nhẹ nhất ra khỏi một tập luôn thuộc MST theo tính chất lát cắt), rồi gộp các thành phần. Mỗi vòng số thành phần giảm ít nhất một nửa, nên có O(log V) vòng, mỗi vòng O(E): tổng O(E log V). Để tránh tạo chu trình khi trọng số trùng nhau, cần quy tắc phá hòa nhất quán (so sánh thêm chỉ số cạnh). Song song hóa: việc tìm cạnh nhẹ nhất của các thành phần trong một vòng là ĐỘC LẬP nhau, có thể chia cho nhiều bộ xử lý/máy; Prim tăng trưởng một cây tuần tự, Kruskal xử lý cạnh theo thứ tự sắp xếp toàn cục — vốn khó song song. Borůvka là nền tảng của nhiều thuật toán MST song song, phân tán và các thuật toán MST thời gian tuyến tính kỳ vọng.",
+    "key_points": [
+      "Mỗi vòng mọi thành phần chọn cạnh nhẹ nhất ra ngoài, gộp lại; O(log V) vòng, O(E log V)",
+      "Các thành phần xử lý độc lập nên dễ song song/phân tán; cần phá hòa nhất quán khi trọng số trùng"
+    ],
+    "id": "Q_DSA_282"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Phát hiện cơ hội kinh doanh chênh lệch tỷ giá bằng chu trình âm",
+    "difficulty": "Hard",
+    "question": "Cho tỷ giá giữa n loại tiền tệ, cần phát hiện chuỗi đổi tiền bắt đầu và kết thúc cùng một loại mà sinh lời (tích tỷ giá > 1). Biến đổi bài toán thành tìm chu trình âm như thế nào, và cách truy ra chính chu trình đó?",
+    "reference_answer": "Sinh lời khi r1·r2·...·rk > 1. Lấy logarit: Σ log r_i > 0, tương đương Σ (-log r_i) < 0. Đặt trọng số cạnh w(u, v) = -log(tỷ giá u → v), bài toán trở thành tìm chu trình có tổng trọng số âm. Chạy Bellman-Ford (từ một đỉnh ảo nối tới mọi đỉnh với trọng số 0 để phủ mọi thành phần) V - 1 vòng; nếu ở vòng thứ V vẫn còn cạnh nới lỏng được thì tồn tại chu trình âm. Truy ra chu trình: lấy đỉnh x vừa được nới lỏng ở vòng V, đi ngược theo mảng truoc[] đúng V bước để chắc chắn nằm TRONG chu trình (x có thể chỉ nằm trên đường dẫn tới chu trình), rồi tiếp tục đi theo truoc[] cho tới khi quay lại đỉnh đó. Lưu ý thực tế: sai số dấu phẩy động của log có thể tạo chu trình âm giả, cần ngưỡng epsilon; phí giao dịch và độ trễ khiến cơ hội thực tế hiếm.",
+    "key_points": [
+      "Trọng số -log(tỷ giá) biến tích > 1 thành chu trình có tổng âm; Bellman-Ford vòng thứ V phát hiện",
+      "Đi ngược truoc[] V bước để vào chu trình rồi lần theo; cẩn thận sai số dấu phẩy động"
+    ],
+    "id": "Q_DSA_283"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Trie nén (Radix Tree) để giảm bộ nhớ",
+    "difficulty": "Hard",
+    "question": "Trie cơ bản với mảng 26 con trỏ mỗi nút tiêu tốn rất nhiều bộ nhớ khi lưu 1 triệu URL dài. Phân tích nguyên nhân và các biến thể giảm bộ nhớ.",
+    "reference_answer": "Mỗi nút cấp sẵn mảng con trỏ cho toàn bộ bảng chữ cái (26 với chữ thường, 256 với byte, hàng nghìn với Unicode) dù đa số ô trống; và các chuỗi dài có nhiều đoạn 'một con duy nhất' (tiền tố riêng của từng URL) tạo ra hàng chục triệu nút chỉ có một con. Bộ nhớ có thể gấp hàng chục lần tổng độ dài chuỗi. Biến thể: (1) lưu con bằng bảng băm hoặc danh sách sắp xếp thay vì mảng cố định — đổi một chút tốc độ lấy bộ nhớ; (2) Radix tree/Patricia trie: gộp các chuỗi nút một-con thành một cạnh mang cả chuỗi con, số nút giảm xuống tối đa khoảng 2 lần số khóa; (3) Ternary search tree: mỗi nút một ký tự với ba con trỏ (nhỏ hơn, bằng, lớn hơn); (4) các cấu trúc nén tĩnh (succinct trie, FST như trong Lucene) cho dữ liệu chỉ đọc. Radix tree được dùng trong bảng định tuyến IP, router HTTP, chỉ mục bộ nhớ của Redis.",
+    "key_points": [
+      "Mảng con cố định lãng phí ô trống; chuỗi dài tạo vô số nút một con",
+      "Dùng con dạng băm/danh sách, radix tree gộp nút một con, ternary search tree, hoặc trie nén tĩnh"
+    ],
+    "id": "Q_DSA_284"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Chuỗi (String)",
+    "concept": "Mảng hậu tố và mảng LCP",
+    "difficulty": "Hard",
+    "question": "Mảng hậu tố (suffix array) kết hợp mảng LCP giải quyết những bài toán chuỗi nào? Nêu độ phức tạp xây dựng và một ứng dụng cụ thể.",
+    "reference_answer": "Mảng hậu tố là danh sách các vị trí bắt đầu của mọi hậu tố của chuỗi, sắp xếp theo thứ tự từ điển. Mảng LCP lưu độ dài tiền tố chung dài nhất giữa hai hậu tố kề nhau trong thứ tự đó. Xây dựng: thuật toán nhân đôi tiền tố O(n log n) (hoặc O(n log² n) đơn giản hơn), các thuật toán SA-IS/DC3 đạt O(n); LCP tính bằng thuật toán Kasai O(n). Ứng dụng: tìm một mẫu độ dài m trong văn bản bằng tìm kiếm nhị phân trên mảng hậu tố O(m log n); chuỗi con lặp lại dài nhất = max LCP; đếm số chuỗi con phân biệt = n(n+1)/2 - Σ LCP; chuỗi con chung dài nhất của hai chuỗi (nối với ký tự phân cách). Dùng trong tìm kiếm toàn văn, tin sinh học (căn chỉnh DNA), nén dữ liệu (Burrows-Wheeler). So với cây hậu tố, mảng hậu tố tốn ít bộ nhớ hơn nhiều.",
+    "key_points": [
+      "Suffix array: các hậu tố sắp xếp; LCP: tiền tố chung giữa hậu tố kề nhau",
+      "Xây O(n log n) hoặc O(n), LCP O(n); dùng tìm mẫu, chuỗi lặp dài nhất, đếm chuỗi con phân biệt"
+    ],
+    "id": "Q_DSA_285"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Chuỗi (String)",
+    "concept": "Thuật toán Aho-Corasick tìm nhiều mẫu cùng lúc",
+    "difficulty": "Hard",
+    "question": "Cần tìm sự xuất hiện của 10.000 từ khóa bị cấm trong một luồng văn bản lớn. Vì sao chạy KMP riêng cho từng từ khóa là không hiệu quả, và Aho-Corasick giải quyết thế nào?",
+    "reference_answer": "Chạy KMP cho k mẫu tốn O(k·n + Σm) — với k = 10.000, văn bản bị quét 10.000 lần. Aho-Corasick xây một Trie từ mọi mẫu, rồi bổ sung 'liên kết thất bại' (failure link) cho mỗi nút: trỏ tới nút biểu diễn hậu tố dài nhất của chuỗi hiện tại mà cũng là tiền tố của một mẫu nào đó (tổng quát hóa hàm thất bại của KMP), tính bằng BFS. Khi quét văn bản MỘT lần, tại mỗi ký tự đi theo cạnh trie nếu có, nếu không thì theo failure link; tại mỗi nút báo cáo các mẫu kết thúc ở đó (kể cả qua 'output link' tới các mẫu là hậu tố). Độ phức tạp O(n + Σm + z) với z là số lần xuất hiện. Ứng dụng: lọc từ khóa, phát hiện chữ ký mã độc trong IDS (Snort), grep nhiều mẫu. Lưu ý khi z rất lớn (mẫu lồng nhau như 'a', 'aa', 'aaa') thì đầu ra chi phối chi phí.",
+    "key_points": [
+      "KMP cho từng mẫu quét văn bản k lần, O(k·n)",
+      "Trie + failure link quét văn bản một lần, O(n + Σm + z); dùng lọc từ khóa, IDS"
+    ],
+    "id": "Q_DSA_286"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Thuật toán Hirschberg: khôi phục lời giải với bộ nhớ tuyến tính",
+    "difficulty": "Hard",
+    "question": "Khoảng cách chỉnh sửa (edit distance) giữa hai chuỗi 100.000 ký tự: tính GIÁ TRỊ chỉ cần O(n) bộ nhớ với hai hàng DP, nhưng muốn KHÔI PHỤC dãy thao tác thì bảng đầy đủ cần 10^10 ô. Thuật toán Hirschberg giải quyết như thế nào?",
+    "reference_answer": "Hirschberg kết hợp chia để trị với DP hai hàng. Chia chuỗi A tại điểm giữa mid. Tính hàng DP cuối cho A[0..mid) với toàn bộ B (đi xuôi) và cho A[mid..n) đảo ngược với B đảo ngược (đi ngược), mỗi lượt chỉ cần O(|B|) bộ nhớ. Điểm chia tối ưu k của B là vị trí làm tổng chi phí xuôi[k] + ngược[k] nhỏ nhất — đường căn chỉnh tối ưu chắc chắn đi qua ô (mid, k). Sau đó đệ quy độc lập cho hai bài toán con (A[0..mid), B[0..k)) và (A[mid..n), B[k..m)), ghép các dãy thao tác. Thời gian vẫn O(n·m) (chỉ khoảng gấp đôi, vì các bài toán con ở mỗi tầng có tổng diện tích giảm một nửa), nhưng bộ nhớ chỉ O(n + m). Kỹ thuật này dùng trong căn chỉnh trình tự sinh học, công cụ diff.",
+    "key_points": [
+      "Chia A tại giữa, DP xuôi và ngược hai hàng để tìm điểm chia k của B mà đường tối ưu đi qua",
+      "Đệ quy hai nửa: thời gian vẫn O(n·m) (gấp khoảng 2), bộ nhớ O(n + m)"
+    ],
+    "id": "Q_DSA_287"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Dãy con tăng dài nhất trong O(n log n)",
+    "difficulty": "Hard",
+    "question": "Mô tả thuật toán tìm độ dài dãy con tăng dài nhất (LIS) trong O(n log n) và giải thích vì sao mảng phụ không phải là chính dãy con LIS. Làm thế nào để khôi phục dãy?",
+    "reference_answer": "Duy trì mảng tails, với tails[k] là phần tử KẾT THÚC NHỎ NHẤT có thể của một dãy con tăng độ dài k + 1 trong phần đã xét. tails luôn tăng nghiêm ngặt. Với mỗi x: tìm nhị phân vị trí đầu tiên trong tails có giá trị ≥ x (lower bound, cho dãy tăng nghiêm ngặt); nếu không có thì nối x vào cuối (kéo dài LIS), ngược lại thay tails[pos] = x (một dãy cùng độ dài nhưng kết thúc nhỏ hơn, có tiềm năng kéo dài tốt hơn). Đáp án là độ dài tails. O(n log n). tails KHÔNG phải là LIS thực sự: các phần tử của nó có thể đến từ các dãy khác nhau và không theo đúng thứ tự xuất hiện (ví dụ [3, 4, 1] cho tails = [1, 4]). Khôi phục: lưu thêm với mỗi phần tử chỉ số phần tử đứng trước nó (chỉ số đang ở tails[pos-1] lúc chèn) và chỉ số của tails[k], rồi truy ngược từ phần tử cuối. Dùng upper bound nếu cho phép dãy không giảm.",
+    "key_points": [
+      "tails[k] là phần tử kết thúc nhỏ nhất của dãy tăng độ dài k + 1; cập nhật bằng tìm nhị phân, O(n log n)",
+      "tails không phải LIS thật; khôi phục bằng lưu chỉ số phần tử trước và truy ngược"
+    ],
+    "id": "Q_DSA_288"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Quy hoạch động theo chữ số (Digit DP)",
+    "difficulty": "Hard",
+    "question": "Đếm số nguyên trong [1, 10^18] có tổng các chữ số chia hết cho 7. Vì sao không thể duyệt, và Digit DP xây dựng trạng thái như thế nào?",
+    "reference_answer": "Duyệt 10^18 số là bất khả. Digit DP xây dựng số từng chữ số từ trái sang phải, với trạng thái (vị trí pos, tổng chữ số hiện tại modulo 7, cờ tight). Cờ tight cho biết tiền tố đã xây dựng có đang bằng đúng tiền tố của giới hạn trên N hay không: nếu tight, chữ số tiếp theo chỉ được chọn từ 0 tới chữ số tương ứng của N; nếu không, được chọn 0-9 tự do. Đếm cho f(N) = số lượng trong [0, N], đáp án f(R) - f(L - 1). Số trạng thái chỉ khoảng 19 × 7 × 2, mỗi trạng thái thử 10 chữ số. Lưu ý: chỉ ghi nhớ các trạng thái không tight (trạng thái tight chỉ xuất hiện một lần trên mỗi vị trí); xử lý số 0 và chữ số 0 dẫn đầu nếu điều kiện phụ thuộc vào chúng (ví dụ đếm số có chữ số phân biệt thì cần thêm cờ 'đã bắt đầu').",
+    "key_points": [
+      "Xây số từng chữ số với trạng thái (vị trí, thông tin cần nhớ, cờ tight)",
+      "Tính f(N) rồi lấy hiệu; số trạng thái nhỏ; cẩn thận chữ số 0 dẫn đầu và chỉ memo trạng thái không tight"
+    ],
+    "id": "Q_DSA_289"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Quy hoạch động (Dynamic Programming)",
+    "concept": "Định lý Sprague-Grundy cho trò chơi tổ hợp",
+    "difficulty": "Hard",
+    "question": "Hai người chơi lần lượt trên nhiều đống sỏi độc lập, mỗi lượt chọn một đống và lấy 1, 3 hoặc 4 viên; ai không đi được thì thua. Làm thế nào xác định thế thắng/thua mà không cần duyệt toàn bộ cây trò chơi của tất cả các đống cùng lúc?",
+    "reference_answer": "Với trò chơi công bằng (impartial) — hai người có cùng tập nước đi — mỗi trạng thái có một giá trị Grundy: g(x) = mex{ g(y) : y là trạng thái đi tới được từ x }, trong đó mex là số tự nhiên nhỏ nhất không có trong tập; trạng thái kết thúc có g = 0. Trạng thái thua (với người sắp đi) khi và chỉ khi g = 0. Định lý Sprague-Grundy: tổng của các trò chơi độc lập có giá trị Grundy bằng XOR các giá trị Grundy thành phần. Vì vậy chỉ cần tính g(n) cho một đống bằng DP (g(n) = mex{g(n-1), g(n-3), g(n-4)}), rồi XOR các g của các đống; người đi trước thắng khi và chỉ khi XOR khác 0. Với trò Nim thông thường (lấy bao nhiêu cũng được), g(n) = n. Giá trị Grundy thường có chu kỳ, cho phép xử lý đống rất lớn.",
+    "key_points": [
+      "Giá trị Grundy g(x) = mex các g của trạng thái kế tiếp; g = 0 là thế thua",
+      "Tổng trò chơi độc lập có g bằng XOR các thành phần; người đi trước thắng khi XOR ≠ 0"
+    ],
+    "id": "Q_DSA_290"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đệ quy (Recursion)",
+    "concept": "Kỹ thuật gặp nhau ở giữa (Meet in the Middle)",
+    "difficulty": "Hard",
+    "question": "Cho n = 40 số nguyên, đếm số tập con có tổng đúng bằng T (giá trị có thể rất lớn nên không dùng được DP theo tổng). Vì sao 2^40 là quá lớn, và kỹ thuật meet in the middle giảm xuống bao nhiêu?",
+    "reference_answer": "Vét cạn 2^40 ≈ 1,1 nghìn tỷ tập con là quá chậm; DP theo tổng không khả thi vì giá trị lớn (tới 10^15). Meet in the middle: chia mảng thành hai nửa 20 phần tử; liệt kê mọi tổng tập con của mỗi nửa — mỗi nửa 2^20 ≈ 1 triệu tổng. Một tập con của cả mảng là hợp của một tập con nửa trái và một tập con nửa phải, nên cần đếm số cặp (a, b) với a + b = T. Sắp xếp danh sách nửa phải, với mỗi a ở nửa trái tìm nhị phân (hoặc dùng bảng băm đếm tần suất) số lượng T - a. Độ phức tạp O(2^(n/2)·n) thay vì O(2^n), bộ nhớ O(2^(n/2)). Kỹ thuật áp dụng khi bài toán tách được thành hai nửa độc lập rồi ghép kết quả: 4-SUM, tấn công mật mã 'double DES', tìm kiếm hai chiều.",
+    "key_points": [
+      "Chia hai nửa, liệt kê 2^(n/2) tổng mỗi nửa, ghép bằng sắp xếp + tìm nhị phân hoặc bảng băm",
+      "Thời gian O(2^(n/2)·n) thay vì O(2^n), đổi lại bộ nhớ O(2^(n/2))"
+    ],
+    "id": "Q_DSA_291"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Nhánh và cận (Branch and Bound)",
+    "difficulty": "Hard",
+    "question": "Kỹ thuật nhánh và cận (branch and bound) khác quay lui thuần túy ở điểm nào? Minh họa với 0/1 Knapsack khi sức chứa quá lớn để dùng DP.",
+    "reference_answer": "Quay lui chỉ cắt nhánh khi vi phạm ràng buộc (vượt sức chứa). Nhánh và cận còn cắt nhánh dựa trên CẬN TỐI ƯU: với mỗi nút (lựa chọn một phần), tính một cận trên lạc quan của giá trị tốt nhất có thể đạt được trong cây con; nếu cận này không vượt qua lời giải tốt nhất đã tìm được thì bỏ cả cây con. Với Knapsack: sắp vật theo tỷ lệ giá trị/trọng lượng giảm dần; cận trên của một nút = giá trị hiện tại + giá trị của bài toán cái túi PHÂN SỐ (fractional, giải tham lam) cho các vật còn lại với sức chứa còn lại — vì nới lỏng ràng buộc nên luôn ≥ đáp án thật. Duyệt ưu tiên nút có cận cao (best-first) để sớm tìm lời giải tốt, giúp cắt được nhiều hơn. Trường hợp xấu nhất vẫn hàm mũ, nhưng thực tế thường cắt bỏ phần lớn cây. Chất lượng cận (càng chặt càng tốt) và thứ tự duyệt quyết định hiệu quả; đây cũng là nền tảng của các bộ giải quy hoạch nguyên.",
+    "key_points": [
+      "Ngoài cắt theo ràng buộc, cắt cây con khi cận tối ưu không vượt lời giải tốt nhất hiện có",
+      "Knapsack: cận bằng cái túi phân số, duyệt best-first; xấu nhất vẫn hàm mũ, hiệu quả phụ thuộc độ chặt của cận"
+    ],
+    "id": "Q_DSA_292"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Độ phức tạp thuật toán",
+    "concept": "Thuật toán xấp xỉ cho bài toán phủ đỉnh",
+    "difficulty": "Hard",
+    "question": "Bài toán phủ đỉnh nhỏ nhất (vertex cover) là NP-khó. Trình bày thuật toán 2-xấp xỉ dựa trên ghép cặp cực đại và chứng minh hệ số xấp xỉ. Vì sao chiến lược tham lam 'chọn đỉnh bậc cao nhất' không có đảm bảo tương tự?",
+    "reference_answer": "Thuật toán: khi còn cạnh chưa được phủ, chọn một cạnh (u, v) bất kỳ, thêm CẢ u và v vào tập phủ, xóa mọi cạnh kề u hoặc v. Các cạnh được chọn tạo thành một ghép cặp M (không có hai cạnh chung đỉnh). Tập phủ thu được có kích thước 2|M|. Mọi tập phủ (kể cả tối ưu OPT) phải chứa ít nhất một đầu mút của mỗi cạnh trong M, và vì các cạnh trong M rời nhau nên OPT ≥ |M|. Do đó kết quả ≤ 2|M| ≤ 2·OPT — chạy O(V + E). Tham lam chọn đỉnh bậc cao nhất trông hợp lý nhưng có thể cho kết quả tệ hơn tối ưu tới hệ số Θ(log n) trên các đồ thị được xây dựng đặc biệt (đồ thị hai phía nhiều tầng), nên không có đảm bảo hằng số. Bài học: thuật toán xấp xỉ có giá trị khi CHỨNG MINH được hệ số; người ta cũng đã chứng minh (dưới giả thuyết Unique Games) không thể xấp xỉ tốt hơn 2 - ε trong thời gian đa thức.",
+    "key_points": [
+      "Chọn cả hai đầu mút của các cạnh trong một ghép cặp cực đại; OPT ≥ |M| nên kết quả ≤ 2·OPT",
+      "Tham lam bậc cao nhất có thể tệ tới Θ(log n); giá trị của xấp xỉ nằm ở hệ số được chứng minh"
+    ],
+    "id": "Q_DSA_293"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Sắp xếp (Sorting)",
+    "concept": "Quick Sort ngẫu nhiên bị tấn công khi nguồn ngẫu nhiên dự đoán được",
+    "difficulty": "Hard",
+    "question": "Một dịch vụ web sắp xếp dữ liệu do người dùng gửi lên bằng Quick Sort chọn pivot ngẫu nhiên với bộ sinh số khởi tạo bằng một hằng số cố định. Phân tích lỗ hổng từ chối dịch vụ (DoS).",
+    "reference_answer": "Đảm bảo kỳ vọng O(n log n) của Quick Sort ngẫu nhiên dựa trên giả định kẻ tấn công KHÔNG biết trước các lựa chọn pivot. Nếu bộ sinh số được khởi tạo bằng hằng số (hoặc theo thời gian dễ đoán), dãy pivot hoàn toàn xác định; kẻ tấn công có thể mô phỏng thuật toán và xây dựng đầu vào khiến mọi pivot đều là phần tử nhỏ nhất/lớn nhất (kỹ thuật 'antiquicksort' của McIlroy thậm chí làm được với so sánh tùy biến), đẩy thời gian lên O(n²) — vài trăm nghìn phần tử đủ làm treo máy chủ. Tương tự với hash flooding. Biện pháp: dùng nguồn ngẫu nhiên không dự đoán được cho mỗi lần chạy; tốt hơn là dùng thuật toán có đảm bảo trường hợp xấu nhất O(n log n) như Introsort (chuyển sang Heap Sort khi độ sâu đệ quy vượt ngưỡng), Merge Sort/TimSort; và giới hạn kích thước đầu vào từ người dùng.",
+    "key_points": [
+      "Đảm bảo kỳ vọng chỉ đúng khi pivot không dự đoán được; seed cố định cho phép dựng đầu vào xấu nhất",
+      "Dùng ngẫu nhiên không dự đoán được, ưu tiên thuật toán có đảm bảo xấu nhất (Introsort, TimSort), giới hạn đầu vào"
+    ],
+    "id": "Q_DSA_294"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Hàng đợi (Queue)",
+    "concept": "Fibonacci Heap: lý thuyết và thực tế",
+    "difficulty": "Hard",
+    "question": "Fibonacci heap cho decrease-key phân bổ O(1), giúp Dijkstra đạt O(E + V log V) so với O(E log V) của binary heap. Vì sao trong thực tế binary heap (hoặc pairing heap) thường nhanh hơn?",
+    "reference_answer": "Fibonacci heap 'lười': chèn và decrease-key chỉ cắt cây và đưa lên danh sách gốc (O(1) phân bổ), mọi việc tổ chức lại dồn vào extract-min (O(log n) phân bổ, có thể O(n) cho một lần đơn lẻ). Tuy tốt về tiệm cận, nhưng: (1) hằng số lớn — mỗi nút có nhiều con trỏ (cha, con, anh em trái phải, bậc, cờ đánh dấu), thao tác cắt và gộp nhiều bước; (2) các nút rải rác trên heap nên kém cục bộ cache, trong khi binary heap nằm gọn trong một mảng liền kề; (3) lợi thế chỉ thể hiện khi E ≫ V log V và số lần decrease-key rất lớn, điều hiếm gặp với đồ thị thưa thực tế; (4) độ phức tạp phân bổ có thể gây độ trễ đột biến. Vì vậy các thư viện thường dùng binary heap (hoặc d-ary heap giảm chiều cao) với lazy deletion, hoặc pairing heap — đơn giản hơn và nhanh trong thực nghiệm. Đây là ví dụ kinh điển về khoảng cách giữa tối ưu tiệm cận và hiệu năng thực.",
+    "key_points": [
+      "Fibonacci heap tốt tiệm cận nhờ thao tác lười, decrease-key O(1) phân bổ",
+      "Hằng số lớn, kém cục bộ cache, lợi thế chỉ với đồ thị rất dày; thực tế dùng binary/d-ary/pairing heap"
+    ],
+    "id": "Q_DSA_295"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Thuật toán Misra-Gries tìm phần tử phổ biến trong luồng",
+    "difficulty": "Hard",
+    "question": "Tìm mọi phần tử xuất hiện nhiều hơn n/k lần trong một luồng dữ liệu rất dài với bộ nhớ O(k). Trình bày thuật toán Misra-Gries và tính chất đảm bảo của nó.",
+    "reference_answer": "Duy trì tối đa k - 1 cặp (phần tử, bộ đếm). Với mỗi phần tử x của luồng: nếu x đang có bộ đếm thì tăng lên 1; nếu chưa có và còn chỗ thì thêm (x, 1); nếu hết chỗ thì GIẢM mọi bộ đếm đi 1 và loại các phần tử về 0 (coi như x cùng k - 1 phần tử khác 'triệt tiêu' lẫn nhau). Mỗi lần giảm xóa đi k lần xuất hiện (k - 1 bộ đếm và chính x), nên tổng số lần giảm tối đa n/k; vì vậy bộ đếm của mỗi phần tử ước lượng thấp hơn tần suất thật không quá n/k. Hệ quả: mọi phần tử có tần suất > n/k chắc chắn còn lại trong danh sách cuối. Danh sách có thể chứa dương tính giả, nên nếu được phép đọc lại luồng lần hai thì đếm chính xác các ứng viên để lọc. Với k = 2 đây là thuật toán bỏ phiếu đa số Boyer-Moore. Ứng dụng: phát hiện IP gửi nhiều request, từ khóa nóng.",
+    "key_points": [
+      "Giữ k - 1 bộ đếm; hết chỗ thì giảm mọi bộ đếm, mỗi lần giảm triệt tiêu k lần xuất hiện",
+      "Ước lượng thấp hơn tối đa n/k nên mọi phần tử > n/k được giữ lại; cần lượt hai để loại dương tính giả"
+    ],
+    "id": "Q_DSA_296"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Đồ thị (Graph)",
+    "concept": "Thứ tự vòng lặp trong Floyd-Warshall",
+    "difficulty": "Hard",
+    "question": "Một lập trình viên viết Floyd-Warshall với thứ tự vòng lặp for i: for j: for k: dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]). Kết quả sai với một số đồ thị. Giải thích vì sao vòng lặp k phải ở ngoài cùng.",
+    "reference_answer": "Floyd-Warshall là quy hoạch động theo tập đỉnh trung gian: sau khi xử lý xong k, dist[i][j] là đường ngắn nhất từ i tới j chỉ dùng các đỉnh trung gian trong {0, ..., k}. Để tính đúng ở bước k, cần dist[i][k] và dist[k][j] đã là giá trị tối ưu với tập trung gian {0, ..., k-1} cho MỌI cặp — điều này chỉ đúng khi toàn bộ bảng đã hoàn tất bước k - 1, tức k phải là vòng lặp ngoài cùng. Với k ở trong cùng, mỗi ô dist[i][j] chỉ được xét đúng một lượt, và lúc đó các giá trị dist[i][k], dist[k][j] của những ô chưa được xử lý vẫn chỉ là trọng số cạnh trực tiếp, chưa phản ánh đường đi qua các đỉnh trung gian khác; vì vậy dist[i][j] có thể bỏ sót các đường đi cần nhiều đỉnh trung gian. (Thực nghiệm cho thấy chạy bản sai lặp lại 3 lần sẽ hội tụ, nhưng đó không phải là thuật toán đúng.) Lưu ý thêm: cập nhật tại chỗ trong cùng bước k là an toàn vì dist[i][k] và dist[k][j] không thay đổi trong bước k (nếu không có chu trình âm).",
+    "key_points": [
+      "Floyd-Warshall là DP theo tập đỉnh trung gian {0..k}, cần cả bảng hoàn tất bước k - 1",
+      "k phải ở vòng ngoài cùng; đặt k bên trong dùng giá trị chưa tối ưu và bỏ sót đường đi"
+    ],
+    "id": "Q_DSA_297"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Cây (Tree)",
+    "concept": "Duyệt cây Morris với bộ nhớ O(1)",
+    "difficulty": "Hard",
+    "question": "Duyệt in-order cây nhị phân thông thường cần O(h) bộ nhớ cho stack (O(n) với cây lệch). Thuật toán duyệt Morris đạt O(1) bộ nhớ phụ bằng cách nào, và có những hạn chế gì?",
+    "reference_answer": "Morris tận dụng các con trỏ phải đang null của cây để tạm làm 'đường quay về' (threading). Tại nút cur: nếu cur không có con trái thì thăm cur và đi sang phải. Nếu có con trái, tìm nút tiền nhiệm in-order pre (nút phải nhất của cây con trái): nếu pre.right là null thì đặt pre.right = cur (tạo luồng tạm) và đi sang trái; nếu pre.right đã trỏ về cur (đã duyệt xong cây con trái) thì khôi phục pre.right = null, thăm cur và đi sang phải. Mỗi cạnh được đi qua tối đa vài lần nên tổng thời gian O(n), bộ nhớ phụ O(1). Hạn chế: thuật toán TẠM THỜI SỬA cấu trúc cây — không an toàn khi có luồng khác đọc cây đồng thời, cây bất biến/chỉ đọc không dùng được, và nếu dừng giữa chừng (break, ngoại lệ) mà không khôi phục thì cây bị hỏng; hằng số thời gian lớn hơn duyệt bằng stack.",
+    "key_points": [
+      "Dùng con trỏ phải null của nút tiền nhiệm làm luồng quay về tạm thời, xóa khi quay lại",
+      "O(n) thời gian, O(1) bộ nhớ nhưng tạm sửa cây: không an toàn đa luồng, cây chỉ đọc, dừng giữa chừng làm hỏng cây"
+    ],
+    "id": "Q_DSA_298"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Bảng băm (Hash Table)",
+    "concept": "Thứ tự duyệt không xác định của bảng băm",
+    "difficulty": "Hard",
+    "question": "Một chương trình in kết quả bằng cách duyệt HashMap/set của Python (với chuỗi) và test hồi quy so sánh đầu ra với file mẫu. Test lúc pass lúc fail dù code không đổi. Phân tích nguyên nhân và cách khắc phục.",
+    "reference_answer": "Thứ tự duyệt của bảng băm phụ thuộc vào giá trị băm và dung lượng bảng, không phải thứ tự chèn hay thứ tự khóa. Nhiều môi trường còn cố ý NGẪU NHIÊN HÓA hàm băm của chuỗi theo mỗi tiến trình (Python PYTHONHASHSEED, Go map duyệt ngẫu nhiên có chủ đích, Rust SipHash với khóa ngẫu nhiên) để chống tấn công hash flooding — nên thứ tự thay đổi giữa các lần chạy. Ngoài ra thay đổi phiên bản thư viện, kích thước ban đầu, lịch sử chèn/xóa cũng đổi thứ tự. Hậu quả: test không ổn định (flaky), đầu ra không tái lập được, khác biệt giữa máy. Khắc phục: không dựa vào thứ tự duyệt của bảng băm; sắp xếp khóa trước khi in, hoặc dùng cấu trúc có thứ tự xác định (LinkedHashMap giữ thứ tự chèn, TreeMap theo khóa; dict của Python 3.7+ giữ thứ tự chèn nhưng set thì không); so sánh kết quả dưới dạng tập hợp trong test.",
+    "key_points": [
+      "Thứ tự duyệt bảng băm phụ thuộc giá trị băm/dung lượng và thường bị ngẫu nhiên hóa để chống hash flooding",
+      "Không dựa vào thứ tự đó: sắp xếp trước khi xuất, dùng cấu trúc có thứ tự, so sánh dạng tập hợp"
+    ],
+    "id": "Q_DSA_299"
+  },
+  {
+    "language": "vi",
+    "subject": "Cấu trúc dữ liệu và giải thuật",
+    "competency": "Cấu trúc dữ liệu và giải thuật",
+    "topic": "Hàng đợi (Queue)",
+    "concept": "Bánh xe định thời (Timer Wheel) so với Heap",
+    "difficulty": "Hard",
+    "question": "Một máy chủ quản lý 10 triệu kết nối, mỗi kết nối có timer timeout bị đặt lại mỗi khi có dữ liệu đến (rất thường xuyên) và hiếm khi thực sự hết hạn. Vì sao dùng min-heap cho các timer là không hiệu quả và bánh xe định thời (timing wheel) giải quyết thế nào?",
+    "reference_answer": "Với min-heap, mỗi lần đặt lại timer là xóa/cập nhật một phần tử ở giữa heap (O(log n), cần lưu vị trí) hoặc chèn mục mới để lazy deletion (heap phình to bởi các mục lỗi thời); với hàng chục triệu lần đặt lại mỗi giây, chi phí log n và việc kém cục bộ cache trở nên đáng kể. Timing wheel là mảng vòng gồm N ô, mỗi ô ứng với một khoảng thời gian (tick) và chứa danh sách liên kết đôi các timer hết hạn trong tick đó. Thêm/xóa/đặt lại timer O(1): tính ô = (hiện tại + thời hạn) mod N và chuyển nút sang danh sách mới. Mỗi tick chỉ xử lý ô hiện tại. Với thời hạn dài hơn chu kỳ bánh xe, dùng bánh xe phân cấp (như kim giờ-phút-giây) hoặc lưu số vòng. Đánh đổi: độ chính xác bị làm tròn theo tick, và tốn chi phí quét các ô trống. Được dùng trong nhân Linux, Netty, Kafka.",
+    "key_points": [
+      "Heap tốn O(log n) mỗi lần đặt lại, phình to nếu dùng lazy deletion, kém cache",
+      "Timing wheel: mảng vòng các ô theo tick, thao tác O(1); thời hạn dài dùng bánh xe phân cấp; đổi lại độ chính xác theo tick"
+    ],
+    "id": "Q_DSA_300"
+  }
+]

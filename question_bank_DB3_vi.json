@@ -1,0 +1,2252 @@
+[
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kiến trúc hệ CSDL",
+    "concept": "Kiến trúc ba lược đồ ANSI/SPARC",
+    "difficulty": "Easy",
+    "question": "Kiến trúc ba mức (ba lược đồ) ANSI/SPARC của hệ quản trị CSDL gồm những mức nào?",
+    "reference_answer": "Gồm ba mức: (1) Mức ngoài (external/view level) — các khung nhìn riêng cho từng nhóm người dùng/ứng dụng, chỉ thấy phần dữ liệu liên quan; (2) Mức khái niệm (conceptual/logical level) — mô tả toàn bộ cấu trúc logic của CSDL: các bảng, thuộc tính, quan hệ, ràng buộc; (3) Mức trong (internal/physical level) — mô tả cách dữ liệu được lưu trữ vật lý: file, trang, chỉ mục, phương pháp truy cập.",
+    "key_points": [
+      "Ba mức: ngoài (view), khái niệm (logical), trong (physical)",
+      "Mỗi mức che giấu chi tiết của mức thấp hơn"
+    ],
+    "id": "Q_DB3_001"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kiến trúc hệ CSDL",
+    "concept": "Độc lập dữ liệu logic và vật lý",
+    "difficulty": "Easy",
+    "question": "Phân biệt độc lập dữ liệu vật lý (physical data independence) và độc lập dữ liệu logic (logical data independence).",
+    "reference_answer": "Độc lập dữ liệu vật lý: có thể thay đổi cách lưu trữ vật lý (thêm chỉ mục, đổi cấu trúc file, chuyển ổ đĩa) mà không phải sửa lược đồ khái niệm và ứng dụng. Độc lập dữ liệu logic: có thể thay đổi lược đồ khái niệm (thêm cột, tách bảng) mà không phải sửa các khung nhìn ngoài và ứng dụng đang dùng chúng. Độc lập logic khó đạt hơn vì ứng dụng thường phụ thuộc trực tiếp vào cấu trúc bảng.",
+    "key_points": [
+      "Độc lập vật lý: đổi cách lưu trữ không ảnh hưởng lược đồ logic",
+      "Độc lập logic: đổi lược đồ logic không ảnh hưởng view/ứng dụng; khó đạt hơn"
+    ],
+    "id": "Q_DB3_002"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kiến trúc hệ CSDL",
+    "concept": "Hệ quản trị CSDL so với hệ thống file",
+    "difficulty": "Easy",
+    "question": "Nêu các ưu điểm chính của việc dùng hệ quản trị CSDL (DBMS) so với lưu dữ liệu trong các file riêng lẻ của từng ứng dụng.",
+    "reference_answer": "DBMS giảm dư thừa và mâu thuẫn dữ liệu nhờ lưu tập trung; cung cấp ngôn ngữ truy vấn khai báo (SQL) thay vì phải viết chương trình đọc file cho mỗi nhu cầu; đảm bảo ràng buộc toàn vẹn; hỗ trợ truy cập đồng thời an toàn qua giao dịch; có cơ chế sao lưu, phục hồi sau sự cố; và kiểm soát bảo mật, phân quyền tập trung. Hệ thống file buộc mỗi ứng dụng tự xử lý các vấn đề này.",
+    "key_points": [
+      "DBMS giảm dư thừa, đảm bảo toàn vẹn, có ngôn ngữ truy vấn khai báo",
+      "Hỗ trợ đồng thời, phục hồi sự cố và phân quyền tập trung"
+    ],
+    "id": "Q_DB3_003"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Mô hình quan hệ",
+    "concept": "Siêu khóa (Superkey)",
+    "difficulty": "Easy",
+    "question": "Siêu khóa (superkey) là gì và quan hệ của nó với khóa ứng viên (candidate key) như thế nào?",
+    "reference_answer": "Siêu khóa là một tập thuộc tính mà giá trị của nó xác định duy nhất mỗi bộ trong quan hệ (không có hai bộ trùng giá trị trên tập đó). Khóa ứng viên là siêu khóa TỐI THIỂU — bỏ bất kỳ thuộc tính nào khỏi nó thì không còn là siêu khóa. Ví dụ với SinhVien(maSV, email, ten): {maSV, ten} là siêu khóa nhưng không tối thiểu; {maSV} và {email} là khóa ứng viên.",
+    "key_points": [
+      "Siêu khóa: tập thuộc tính xác định duy nhất mỗi bộ",
+      "Khóa ứng viên là siêu khóa tối thiểu"
+    ],
+    "id": "Q_DB3_004"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Thủ tục lưu trữ (Stored Procedure)",
+    "difficulty": "Easy",
+    "question": "Stored Procedure là gì?",
+    "reference_answer": "Stored Procedure là một tập các câu lệnh SQL (kèm cấu trúc điều khiển như biến, IF, vòng lặp) được đặt tên, biên dịch và lưu trữ ngay trong CSDL. Ứng dụng gọi nó bằng tên (CALL/EXEC) kèm tham số. Nó giúp đóng gói logic xử lý dữ liệu, giảm số lần trao đổi qua mạng giữa ứng dụng và CSDL, và có thể phân quyền thực thi riêng.",
+    "key_points": [
+      "Stored Procedure là khối lệnh SQL được đặt tên, lưu trong CSDL",
+      "Gọi bằng tên kèm tham số; giảm round-trip mạng và đóng gói logic"
+    ],
+    "id": "Q_DB3_005"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Hàm do người dùng định nghĩa và thủ tục",
+    "difficulty": "Easy",
+    "question": "Hàm do người dùng định nghĩa (User-Defined Function) khác Stored Procedure ở điểm nào?",
+    "reference_answer": "Hàm luôn TRẢ VỀ một giá trị (vô hướng hoặc bảng) và có thể được dùng trực tiếp bên trong câu truy vấn (SELECT tinhThue(gia) FROM ...). Thủ tục được gọi như một câu lệnh độc lập, có thể trả về nhiều tập kết quả hoặc tham số đầu ra, và thường được phép thực hiện thay đổi dữ liệu và quản lý giao dịch; trong nhiều hệ quản trị, hàm bị hạn chế không được sửa dữ liệu.",
+    "key_points": [
+      "Hàm trả về giá trị và dùng được trong câu truy vấn",
+      "Thủ tục gọi độc lập, linh hoạt hơn về thay đổi dữ liệu và giao dịch"
+    ],
+    "id": "Q_DB3_006"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Trigger - khái niệm",
+    "difficulty": "Easy",
+    "question": "Trigger trong CSDL là gì? Phân biệt trigger BEFORE và AFTER.",
+    "reference_answer": "Trigger là đoạn mã được CSDL tự động thực thi khi xảy ra một sự kiện trên bảng (INSERT, UPDATE, DELETE). Trigger BEFORE chạy trước khi thao tác được áp dụng — thường dùng để kiểm tra hoặc chỉnh sửa dữ liệu sắp ghi (chuẩn hóa chữ hoa, gán giá trị mặc định). Trigger AFTER chạy sau khi thao tác đã thực hiện — thường dùng để ghi nhật ký (audit) hoặc cập nhật bảng liên quan.",
+    "key_points": [
+      "Trigger tự động chạy khi có INSERT/UPDATE/DELETE trên bảng",
+      "BEFORE để kiểm tra/sửa dữ liệu sắp ghi; AFTER để audit hoặc cập nhật liên quan"
+    ],
+    "id": "Q_DB3_007"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Con trỏ (Cursor)",
+    "difficulty": "Easy",
+    "question": "Cursor trong lập trình CSDL dùng để làm gì?",
+    "reference_answer": "SQL vốn xử lý theo tập hợp (set-based). Cursor cho phép duyệt kết quả của một truy vấn TỪNG DÒNG MỘT bên trong stored procedure hoặc ứng dụng: khai báo cursor cho một SELECT, mở, FETCH từng dòng để xử lý, rồi đóng. Nó hữu ích khi cần logic phức tạp cho từng dòng, nhưng thường chậm hơn nhiều so với câu lệnh xử lý theo tập.",
+    "key_points": [
+      "Cursor duyệt kết quả truy vấn từng dòng",
+      "Linh hoạt nhưng thường chậm hơn xử lý theo tập hợp"
+    ],
+    "id": "Q_DB3_008"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL DDL",
+    "concept": "Sequence và cột tự tăng",
+    "difficulty": "Easy",
+    "question": "Cột tự tăng (AUTO_INCREMENT/IDENTITY) và đối tượng SEQUENCE dùng để làm gì?",
+    "reference_answer": "Cả hai dùng để sinh giá trị số nguyên tăng dần duy nhất, thường làm khóa chính nhân tạo (surrogate key) mà không cần ứng dụng tự tính. Cột tự tăng gắn với một bảng cụ thể; SEQUENCE là đối tượng độc lập trong CSDL, có thể dùng chung cho nhiều bảng và lấy giá trị kế tiếp bằng NEXTVAL/nextval() ở bất kỳ đâu.",
+    "key_points": [
+      "Sinh giá trị tăng dần duy nhất, thường làm khóa nhân tạo",
+      "Identity gắn với bảng; Sequence độc lập, dùng chung được"
+    ],
+    "id": "Q_DB3_009"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Bảo mật CSDL",
+    "concept": "Lệnh GRANT và REVOKE",
+    "difficulty": "Easy",
+    "question": "Lệnh GRANT và REVOKE trong SQL dùng để làm gì? Cho ví dụ.",
+    "reference_answer": "GRANT cấp quyền trên đối tượng CSDL cho người dùng hoặc vai trò, ví dụ GRANT SELECT, INSERT ON DonHang TO nhanvien_banhang; REVOKE thu hồi quyền đã cấp, ví dụ REVOKE INSERT ON DonHang FROM nhanvien_banhang. Các quyền phổ biến gồm SELECT, INSERT, UPDATE, DELETE, EXECUTE, và quyền quản trị như CREATE, ALTER.",
+    "key_points": [
+      "GRANT cấp quyền, REVOKE thu hồi quyền",
+      "Quyền áp dụng trên đối tượng cụ thể cho người dùng hoặc vai trò"
+    ],
+    "id": "Q_DB3_010"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Bảo mật CSDL",
+    "concept": "Vai trò (Role)",
+    "difficulty": "Easy",
+    "question": "Vai trò (role) trong quản trị quyền CSDL giúp ích gì so với cấp quyền trực tiếp cho từng người dùng?",
+    "reference_answer": "Role là một nhóm quyền được đặt tên (ví dụ ke_toan, quan_ly_kho). Thay vì cấp hàng chục quyền riêng lẻ cho từng người, quản trị viên cấp quyền cho role rồi gán role cho người dùng. Khi chính sách thay đổi chỉ cần sửa quyền của role; khi nhân viên chuyển bộ phận chỉ cần đổi role. Điều này giảm sai sót và dễ kiểm toán.",
+    "key_points": [
+      "Role là nhóm quyền được đặt tên, gán cho người dùng",
+      "Đơn giản hóa quản trị, giảm sai sót, dễ kiểm toán"
+    ],
+    "id": "Q_DB3_011"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL cơ bản",
+    "concept": "Phân loại câu lệnh SQL: DDL, DML, DCL, TCL",
+    "difficulty": "Easy",
+    "question": "Các câu lệnh SQL được phân thành những nhóm nào? Cho ví dụ mỗi nhóm.",
+    "reference_answer": "DDL (Data Definition Language) định nghĩa cấu trúc: CREATE, ALTER, DROP. DML (Data Manipulation Language) thao tác dữ liệu: SELECT, INSERT, UPDATE, DELETE (một số tài liệu tách SELECT thành DQL). DCL (Data Control Language) quản lý quyền: GRANT, REVOKE. TCL (Transaction Control Language) điều khiển giao dịch: COMMIT, ROLLBACK, SAVEPOINT.",
+    "key_points": [
+      "DDL: cấu trúc; DML: dữ liệu; DCL: quyền; TCL: giao dịch",
+      "Ví dụ: CREATE/INSERT/GRANT/COMMIT"
+    ],
+    "id": "Q_DB3_012"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL cơ bản",
+    "concept": "So sánh TRUNCATE, DELETE và DROP",
+    "difficulty": "Easy",
+    "question": "Phân biệt TRUNCATE TABLE, DELETE FROM (không WHERE) và DROP TABLE.",
+    "reference_answer": "DELETE FROM xóa từng dòng dữ liệu, ghi log từng dòng, kích hoạt trigger, có thể kèm WHERE và rollback được; cấu trúc bảng còn nguyên. TRUNCATE xóa toàn bộ dữ liệu bằng cách giải phóng các trang dữ liệu, nhanh hơn nhiều, thường không kích hoạt trigger DELETE và đặt lại bộ đếm tự tăng; cấu trúc bảng vẫn còn. DROP TABLE xóa hẳn cả bảng: cấu trúc, dữ liệu, chỉ mục, ràng buộc.",
+    "key_points": [
+      "DELETE xóa từng dòng, có WHERE, kích hoạt trigger; TRUNCATE xóa toàn bộ nhanh, giữ cấu trúc",
+      "DROP xóa luôn cả định nghĩa bảng"
+    ],
+    "id": "Q_DB3_013"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL nâng cao cơ bản",
+    "concept": "Biểu thức CASE",
+    "difficulty": "Easy",
+    "question": "Biểu thức CASE trong SQL dùng để làm gì? Cho ví dụ phân loại điểm.",
+    "reference_answer": "CASE cho phép trả về giá trị khác nhau theo điều kiện ngay trong câu truy vấn, tương tự if-else. Ví dụ: SELECT ten, CASE WHEN diem >= 8 THEN 'Giỏi' WHEN diem >= 6.5 THEN 'Khá' WHEN diem >= 5 THEN 'Trung bình' ELSE 'Yếu' END AS xepLoai FROM SinhVien; Các điều kiện được xét theo thứ tự, nhánh đúng đầu tiên được chọn; không khớp nhánh nào và không có ELSE thì trả về NULL.",
+    "key_points": [
+      "CASE trả về giá trị theo điều kiện trong câu truy vấn",
+      "Xét điều kiện theo thứ tự; thiếu ELSE thì trả NULL"
+    ],
+    "id": "Q_DB3_014"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL nâng cao cơ bản",
+    "concept": "Hàm COALESCE",
+    "difficulty": "Easy",
+    "question": "Hàm COALESCE(a, b, c, ...) trả về giá trị gì? Cho ví dụ ứng dụng.",
+    "reference_answer": "COALESCE trả về giá trị KHÁC NULL đầu tiên trong danh sách đối số (trả NULL nếu tất cả đều NULL). Ứng dụng: thay NULL bằng giá trị mặc định khi hiển thị hoặc tính toán, ví dụ SELECT ten, COALESCE(soDienThoai, email, 'Chưa có liên hệ') FROM KhachHang; hoặc SUM(COALESCE(giamGia, 0)).",
+    "key_points": [
+      "COALESCE trả về đối số khác NULL đầu tiên",
+      "Dùng để thay NULL bằng giá trị dự phòng"
+    ],
+    "id": "Q_DB3_015"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL nâng cao cơ bản",
+    "concept": "Hàm NULLIF",
+    "difficulty": "Easy",
+    "question": "Hàm NULLIF(a, b) hoạt động thế nào và thường được dùng để tránh lỗi gì?",
+    "reference_answer": "NULLIF(a, b) trả về NULL nếu a bằng b, ngược lại trả về a. Ứng dụng phổ biến là tránh lỗi chia cho 0: SELECT doanhThu / NULLIF(soDonHang, 0) — khi soDonHang = 0, mẫu số thành NULL nên kết quả là NULL thay vì lỗi. Nó cũng dùng để chuyển các giá trị 'giả rỗng' như chuỗi rỗng thành NULL: NULLIF(ghiChu, '').",
+    "key_points": [
+      "NULLIF(a, b) trả NULL nếu a = b, ngược lại trả a",
+      "Dùng để tránh chia cho 0 và chuẩn hóa giá trị rỗng thành NULL"
+    ],
+    "id": "Q_DB3_016"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL DDL",
+    "concept": "Kiểu dữ liệu thời gian và múi giờ",
+    "difficulty": "Easy",
+    "question": "Phân biệt kiểu TIMESTAMP (không múi giờ) và TIMESTAMP WITH TIME ZONE (ví dụ timestamptz trong PostgreSQL).",
+    "reference_answer": "TIMESTAMP không múi giờ chỉ lưu 'ngày giờ trên đồng hồ' như được nhập, không biết nó thuộc múi giờ nào — 10:00 ở Hà Nội và 10:00 ở Tokyo trông giống hệt nhau. TIMESTAMP WITH TIME ZONE lưu một thời điểm tuyệt đối (thường quy về UTC bên trong) và chuyển đổi theo múi giờ phiên khi hiển thị, nên so sánh và tính toán giữa các múi giờ là chính xác. Với hệ thống nhiều vùng, nên lưu thời điểm sự kiện bằng kiểu có múi giờ/UTC.",
+    "key_points": [
+      "TIMESTAMP không lưu múi giờ, chỉ là giờ đồng hồ",
+      "TIMESTAMPTZ biểu diễn thời điểm tuyệt đối, chuẩn hóa về UTC; phù hợp hệ thống đa múi giờ"
+    ],
+    "id": "Q_DB3_017"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL DDL",
+    "concept": "So sánh CHAR và VARCHAR",
+    "difficulty": "Easy",
+    "question": "Kiểu CHAR(n) và VARCHAR(n) khác nhau như thế nào?",
+    "reference_answer": "CHAR(n) có độ dài CỐ ĐỊNH: giá trị ngắn hơn n sẽ được đệm khoảng trắng cho đủ n ký tự, phù hợp với dữ liệu luôn cùng độ dài như mã tỉnh 2 ký tự. VARCHAR(n) có độ dài THAY ĐỔI tối đa n, chỉ lưu đúng số ký tự thực tế cộng vài byte độ dài, tiết kiệm bộ nhớ với dữ liệu độ dài biến thiên như họ tên, địa chỉ.",
+    "key_points": [
+      "CHAR độ dài cố định, đệm khoảng trắng",
+      "VARCHAR độ dài thay đổi, tiết kiệm bộ nhớ cho dữ liệu dài ngắn khác nhau"
+    ],
+    "id": "Q_DB3_018"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL cơ bản",
+    "concept": "Hàm xử lý chuỗi cơ bản",
+    "difficulty": "Easy",
+    "question": "Kể tên và nêu tác dụng của một số hàm xử lý chuỗi phổ biến trong SQL.",
+    "reference_answer": "UPPER/LOWER chuyển chữ hoa/thường; LENGTH (hoặc LEN, CHAR_LENGTH) lấy độ dài; SUBSTRING(s, vt, n) cắt chuỗi con; CONCAT hoặc toán tử || nối chuỗi; TRIM/LTRIM/RTRIM loại bỏ khoảng trắng; REPLACE(s, a, b) thay thế chuỗi con; POSITION/INSTR/CHARINDEX tìm vị trí chuỗi con. Ví dụ: SELECT UPPER(TRIM(ho)) || ' ' || ten FROM NhanVien.",
+    "key_points": [
+      "Các hàm phổ biến: UPPER/LOWER, LENGTH, SUBSTRING, CONCAT/||, TRIM, REPLACE",
+      "Tên hàm có thể khác nhau giữa các hệ quản trị"
+    ],
+    "id": "Q_DB3_019"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL nâng cao cơ bản",
+    "concept": "Hàm cửa sổ LAG và LEAD",
+    "difficulty": "Easy",
+    "question": "Hàm cửa sổ LAG() và LEAD() dùng để làm gì? Cho ví dụ.",
+    "reference_answer": "LAG(cot, k) trả về giá trị của cột ở dòng đứng TRƯỚC dòng hiện tại k vị trí, LEAD(cot, k) trả về giá trị ở dòng SAU, theo thứ tự xác định trong OVER(ORDER BY ...). Ví dụ tính doanh thu tháng này so với tháng trước: SELECT thang, doanhThu, doanhThu - LAG(doanhThu) OVER (ORDER BY thang) AS chenhLech FROM DoanhThuThang; Dòng đầu tiên không có dòng trước nên LAG trả NULL (hoặc giá trị mặc định nếu chỉ định).",
+    "key_points": [
+      "LAG lấy giá trị dòng trước, LEAD lấy giá trị dòng sau theo thứ tự cửa sổ",
+      "Dùng để so sánh với kỳ trước/sau mà không cần self-join"
+    ],
+    "id": "Q_DB3_020"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL nâng cao cơ bản",
+    "concept": "Bảng tạm (Temporary Table)",
+    "difficulty": "Easy",
+    "question": "Bảng tạm (temporary table) có đặc điểm gì và khi nào nên dùng?",
+    "reference_answer": "Bảng tạm chỉ tồn tại trong phạm vi một phiên kết nối (hoặc một giao dịch) và tự động bị xóa khi phiên kết thúc; các phiên khác không nhìn thấy dữ liệu của nó. Dùng khi cần lưu kết quả trung gian của một xử lý nhiều bước phức tạp (ví dụ báo cáo cần lọc, tổng hợp qua nhiều giai đoạn), giúp chia nhỏ truy vấn khó và tái sử dụng kết quả trung gian nhiều lần.",
+    "key_points": [
+      "Bảng tạm chỉ tồn tại trong phiên/giao dịch, tự xóa khi kết thúc",
+      "Dùng lưu kết quả trung gian cho xử lý nhiều bước"
+    ],
+    "id": "Q_DB3_021"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kiến trúc hệ CSDL",
+    "concept": "Schema (lược đồ không gian tên)",
+    "difficulty": "Easy",
+    "question": "Trong các hệ như PostgreSQL hay SQL Server, 'schema' (ví dụ ketoan.HoaDon, kho.HoaDon) là gì?",
+    "reference_answer": "Schema là một không gian tên (namespace) logic bên trong một database, dùng để nhóm các bảng, view, hàm liên quan. Nó cho phép hai bảng cùng tên tồn tại trong các schema khác nhau, tổ chức CSDL theo phân hệ nghiệp vụ, và phân quyền theo schema (cho phép phòng kế toán truy cập toàn bộ schema ketoan).",
+    "key_points": [
+      "Schema là không gian tên nhóm các đối tượng trong một database",
+      "Giúp tổ chức theo phân hệ, tránh trùng tên và phân quyền theo nhóm"
+    ],
+    "id": "Q_DB3_022"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kiến trúc hệ CSDL",
+    "concept": "Từ điển dữ liệu (System Catalog)",
+    "difficulty": "Easy",
+    "question": "System Catalog (từ điển dữ liệu) của DBMS chứa thông tin gì?",
+    "reference_answer": "System Catalog là tập các bảng hệ thống do DBMS tự quản lý, chứa siêu dữ liệu (metadata) về chính CSDL: danh sách bảng, cột, kiểu dữ liệu, ràng buộc, chỉ mục, view, người dùng, quyền, thống kê dữ liệu phục vụ tối ưu truy vấn. Có thể truy vấn nó bằng SQL, ví dụ qua INFORMATION_SCHEMA.COLUMNS hoặc pg_catalog.",
+    "key_points": [
+      "System Catalog lưu metadata về cấu trúc, quyền, thống kê của CSDL",
+      "Truy vấn được bằng SQL qua INFORMATION_SCHEMA hoặc bảng hệ thống"
+    ],
+    "id": "Q_DB3_023"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "OLTP và OLAP",
+    "difficulty": "Easy",
+    "question": "Phân biệt hệ thống OLTP và OLAP.",
+    "reference_answer": "OLTP (Online Transaction Processing) phục vụ nghiệp vụ hằng ngày: rất nhiều giao dịch nhỏ, ngắn, đọc/ghi vài dòng (đặt hàng, chuyển tiền), yêu cầu độ trễ thấp và tính nhất quán; lược đồ thường chuẩn hóa. OLAP (Online Analytical Processing) phục vụ phân tích: ít truy vấn nhưng phức tạp, quét và tổng hợp hàng triệu dòng (doanh thu theo vùng theo quý), chủ yếu đọc; lược đồ thường phi chuẩn hóa dạng sao.",
+    "key_points": [
+      "OLTP: nhiều giao dịch nhỏ đọc/ghi, chuẩn hóa, độ trễ thấp",
+      "OLAP: truy vấn phân tích tổng hợp lớn, chủ yếu đọc, lược đồ sao"
+    ],
+    "id": "Q_DB3_024"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "Kho dữ liệu (Data Warehouse)",
+    "difficulty": "Easy",
+    "question": "Data Warehouse là gì và nó khác CSDL nghiệp vụ thông thường ở điểm nào?",
+    "reference_answer": "Data Warehouse là kho dữ liệu tập trung, tích hợp dữ liệu từ nhiều hệ thống nguồn (bán hàng, kho, CRM...), được tổ chức theo chủ đề, lưu trữ lịch sử dài hạn và chủ yếu phục vụ phân tích, báo cáo, ra quyết định. Khác với CSDL nghiệp vụ (chỉ phản ánh trạng thái hiện tại, cập nhật liên tục), dữ liệu trong kho thường được nạp định kỳ, ít bị sửa và được tối ưu cho truy vấn tổng hợp.",
+    "key_points": [
+      "Data Warehouse tích hợp dữ liệu nhiều nguồn, theo chủ đề, có lịch sử",
+      "Phục vụ phân tích, nạp định kỳ, tối ưu cho truy vấn tổng hợp"
+    ],
+    "id": "Q_DB3_025"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "Lược đồ hình sao: bảng sự kiện và bảng chiều",
+    "difficulty": "Easy",
+    "question": "Trong lược đồ hình sao (star schema), bảng sự kiện (fact table) và bảng chiều (dimension table) chứa loại dữ liệu nào?",
+    "reference_answer": "Bảng sự kiện nằm ở trung tâm, chứa các số đo định lượng của sự kiện nghiệp vụ (số lượng bán, doanh thu, chi phí) cùng các khóa ngoại trỏ tới các bảng chiều; thường rất nhiều dòng. Bảng chiều chứa thông tin mô tả ngữ cảnh để lọc và nhóm: Thời gian (ngày, tháng, quý), Sản phẩm (tên, loại, nhãn hiệu), Cửa hàng (tên, khu vực), Khách hàng. Các bảng chiều bao quanh bảng sự kiện tạo hình ngôi sao.",
+    "key_points": [
+      "Fact table chứa số đo định lượng và khóa ngoại tới các chiều",
+      "Dimension table chứa thuộc tính mô tả để lọc/nhóm (thời gian, sản phẩm, địa điểm)"
+    ],
+    "id": "Q_DB3_026"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "Quy trình ETL",
+    "difficulty": "Easy",
+    "question": "ETL là viết tắt của gì và mỗi bước làm nhiệm vụ gì?",
+    "reference_answer": "ETL gồm Extract — trích xuất dữ liệu từ các hệ thống nguồn (CSDL nghiệp vụ, file, API); Transform — làm sạch, chuẩn hóa định dạng, loại bỏ trùng lặp, chuyển đổi mã, tính toán, tích hợp dữ liệu từ nhiều nguồn; Load — nạp dữ liệu đã xử lý vào kho dữ liệu đích. Biến thể ELT nạp dữ liệu thô vào kho trước rồi biến đổi bên trong kho, phổ biến với kho dữ liệu đám mây mạnh.",
+    "key_points": [
+      "Extract: lấy dữ liệu nguồn; Transform: làm sạch, chuẩn hóa; Load: nạp vào kho",
+      "ELT là biến thể biến đổi sau khi nạp, phổ biến trên kho đám mây"
+    ],
+    "id": "Q_DB3_027"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "NoSQL và so sánh",
+    "concept": "CSDL đồ thị (Graph Database)",
+    "difficulty": "Easy",
+    "question": "CSDL đồ thị (như Neo4j) biểu diễn dữ liệu như thế nào và phù hợp với loại bài toán nào?",
+    "reference_answer": "CSDL đồ thị lưu dữ liệu dưới dạng các NÚT (thực thể, ví dụ Người, Sản phẩm) và CẠNH (mối quan hệ, ví dụ BAN_BE, DA_MUA), cả nút và cạnh đều có thuộc tính. Nó phù hợp với bài toán mà mối quan hệ là trọng tâm và cần duyệt nhiều bước: mạng xã hội (bạn của bạn), gợi ý sản phẩm, phát hiện gian lận qua chuỗi giao dịch, tìm đường đi trong mạng lưới.",
+    "key_points": [
+      "Dữ liệu là nút và cạnh, đều có thuộc tính",
+      "Phù hợp bài toán quan hệ phức tạp, duyệt nhiều bước như mạng xã hội, gợi ý, chống gian lận"
+    ],
+    "id": "Q_DB3_028"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "NoSQL và so sánh",
+    "concept": "CSDL trong bộ nhớ (In-memory Database)",
+    "difficulty": "Easy",
+    "question": "CSDL trong bộ nhớ (ví dụ Redis) có đặc điểm gì và thường được dùng cho mục đích nào?",
+    "reference_answer": "CSDL trong bộ nhớ lưu dữ liệu chủ yếu trên RAM thay vì đĩa, nên đọc/ghi cực nhanh (độ trễ dưới mili giây). Redis cung cấp các cấu trúc dữ liệu như chuỗi, hash, list, set, sorted set. Thường dùng làm bộ đệm (cache) cho CSDL chính, lưu phiên đăng nhập, bảng xếp hạng thời gian thực, giới hạn tần suất truy cập, hàng đợi tin nhắn. Nhược điểm: dung lượng bị giới hạn bởi RAM và cần cấu hình lưu bền (snapshot, append-only log) để không mất dữ liệu khi khởi động lại.",
+    "key_points": [
+      "Lưu dữ liệu trên RAM, tốc độ rất cao",
+      "Dùng cho cache, session, bảng xếp hạng, rate limit; cần cấu hình lưu bền"
+    ],
+    "id": "Q_DB3_029"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lưu trữ và tổ chức file",
+    "concept": "Lưu trữ theo dòng và theo cột",
+    "difficulty": "Easy",
+    "question": "Phân biệt cách lưu trữ theo dòng (row-store) và theo cột (column-store).",
+    "reference_answer": "Row-store lưu toàn bộ các cột của một dòng liền nhau trên đĩa, nên đọc/ghi trọn một bản ghi rất hiệu quả — phù hợp OLTP. Column-store lưu tất cả giá trị của cùng một cột liền nhau, nên truy vấn chỉ cần vài cột trên hàng triệu dòng (SUM(doanhThu) theo vùng) chỉ đọc đúng các cột cần, và dữ liệu cùng kiểu nén rất tốt — phù hợp OLAP/kho dữ liệu.",
+    "key_points": [
+      "Row-store: các cột của một dòng liền nhau, tốt cho OLTP",
+      "Column-store: các giá trị một cột liền nhau, đọc ít cột và nén tốt, hợp OLAP"
+    ],
+    "id": "Q_DB3_030"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lưu trữ và tổ chức file",
+    "concept": "Trang dữ liệu (Page/Block)",
+    "difficulty": "Easy",
+    "question": "Vì sao DBMS đọc/ghi dữ liệu theo đơn vị 'trang' (page, thường 4KB-16KB) chứ không theo từng dòng?",
+    "reference_answer": "Đĩa (và cả SSD) truy xuất hiệu quả theo khối; chi phí của một lần truy cập đĩa chủ yếu nằm ở việc định vị, nên đọc cả một khối không tốn hơn nhiều so với đọc vài byte. Vì vậy DBMS tổ chức dữ liệu thành các trang kích thước cố định, mỗi trang chứa nhiều dòng; trang là đơn vị đọc/ghi giữa đĩa và bộ đệm (buffer pool), là đơn vị khóa trong một số trường hợp và là cơ sở để ước lượng chi phí truy vấn (số trang I/O).",
+    "key_points": [
+      "Trang là đơn vị đọc/ghi giữa đĩa và bộ đệm, chứa nhiều dòng",
+      "Phù hợp cách thiết bị lưu trữ hoạt động; chi phí truy vấn ước lượng theo số trang I/O"
+    ],
+    "id": "Q_DB3_031"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lưu trữ và tổ chức file",
+    "concept": "Tệp heap (Heap File)",
+    "difficulty": "Easy",
+    "question": "Tệp heap (heap file) là cách tổ chức dữ liệu như thế nào và có ưu, nhược điểm gì?",
+    "reference_answer": "Heap file lưu các bản ghi không theo thứ tự nào: bản ghi mới được chèn vào bất kỳ trang nào còn chỗ trống. Ưu điểm: chèn rất nhanh. Nhược điểm: tìm kiếm theo một giá trị phải quét toàn bộ file (full scan) nếu không có chỉ mục hỗ trợ. Trong PostgreSQL, bảng mặc định là heap và các chỉ mục trỏ tới vị trí bản ghi trong heap.",
+    "key_points": [
+      "Heap file lưu bản ghi không theo thứ tự",
+      "Chèn nhanh nhưng tìm kiếm cần full scan nếu không có chỉ mục"
+    ],
+    "id": "Q_DB3_032"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Sao chép dữ liệu Primary-Replica",
+    "difficulty": "Easy",
+    "question": "Mô hình sao chép (replication) primary-replica (master-slave) hoạt động như thế nào và mang lại lợi ích gì?",
+    "reference_answer": "Một máy chủ primary nhận mọi thao tác ghi, sau đó các thay đổi (thường qua log giao dịch) được truyền và áp dụng lên một hoặc nhiều replica. Replica phục vụ các truy vấn đọc. Lợi ích: phân tải đọc ra nhiều máy, tăng tính sẵn sàng (khi primary hỏng có thể nâng một replica lên thay), và có thể đặt replica ở vùng địa lý khác gần người dùng.",
+    "key_points": [
+      "Primary nhận ghi, replica nhận bản sao thay đổi và phục vụ đọc",
+      "Lợi ích: mở rộng đọc, tăng sẵn sàng, phân bố địa lý"
+    ],
+    "id": "Q_DB3_033"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Nhóm kết nối (Connection Pool)",
+    "difficulty": "Easy",
+    "question": "Connection pool trong ứng dụng truy cập CSDL là gì và vì sao cần thiết?",
+    "reference_answer": "Connection pool duy trì sẵn một tập kết nối CSDL đã mở; khi cần truy vấn, ứng dụng mượn một kết nối từ pool và trả lại sau khi dùng thay vì mở/đóng kết nối mới. Mở kết nối tốn kém (bắt tay TCP, xác thực, cấp phát tài nguyên phía server), và CSDL chỉ chịu được số kết nối đồng thời giới hạn, nên pool giúp giảm độ trễ và kiểm soát tải lên CSDL.",
+    "key_points": [
+      "Pool giữ sẵn các kết nối để tái sử dụng",
+      "Giảm chi phí mở kết nối và giới hạn số kết nối tới CSDL"
+    ],
+    "id": "Q_DB3_034"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Câu lệnh chuẩn bị sẵn (Prepared Statement)",
+    "difficulty": "Easy",
+    "question": "Prepared statement là gì?",
+    "reference_answer": "Prepared statement là câu lệnh SQL được gửi tới CSDL với các vị trí tham số giữ chỗ (ví dụ SELECT * FROM SinhVien WHERE maSV = ?), được phân tích cú pháp (và có thể lập kế hoạch) trước, sau đó thực thi nhiều lần với các giá trị tham số khác nhau được truyền riêng. Lợi ích: an toàn trước SQL injection vì giá trị không được ghép vào chuỗi SQL, và có thể nhanh hơn khi chạy lặp lại.",
+    "key_points": [
+      "Câu lệnh với tham số giữ chỗ, được chuẩn bị trước, thực thi nhiều lần",
+      "Chống SQL injection và có thể tái sử dụng kế hoạch thực thi"
+    ],
+    "id": "Q_DB3_035"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Ánh xạ đối tượng - quan hệ (ORM)",
+    "difficulty": "Easy",
+    "question": "ORM (Object-Relational Mapping) là gì? Kể tên vài công cụ ORM phổ biến.",
+    "reference_answer": "ORM là kỹ thuật/công cụ tự động ánh xạ giữa đối tượng trong ngôn ngữ lập trình hướng đối tượng và bảng trong CSDL quan hệ: lớp ↔ bảng, thuộc tính ↔ cột, đối tượng ↔ dòng, quan hệ giữa đối tượng ↔ khóa ngoại. Lập trình viên thao tác với đối tượng, ORM sinh SQL tương ứng. Công cụ phổ biến: Hibernate/JPA (Java), Entity Framework (.NET), SQLAlchemy và Django ORM (Python), Sequelize/Prisma (Node.js).",
+    "key_points": [
+      "ORM ánh xạ lớp-bảng, đối tượng-dòng, tự sinh SQL",
+      "Ví dụ: Hibernate, Entity Framework, SQLAlchemy, Prisma"
+    ],
+    "id": "Q_DB3_036"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL DDL",
+    "concept": "Database Migration",
+    "difficulty": "Easy",
+    "question": "Database migration (di trú lược đồ) trong phát triển phần mềm là gì?",
+    "reference_answer": "Migration là các script thay đổi lược đồ CSDL (tạo bảng, thêm cột, tạo chỉ mục...) được đánh số phiên bản, lưu trong mã nguồn và chạy theo thứ tự bằng công cụ như Flyway, Liquibase, Alembic. Công cụ ghi nhận phiên bản đã áp dụng trong một bảng riêng, nhờ đó mọi môi trường (dev, test, production) có lược đồ đồng nhất, thay đổi được review và có thể tái tạo.",
+    "key_points": [
+      "Migration là script thay đổi lược đồ có phiên bản, lưu cùng mã nguồn",
+      "Giúp các môi trường đồng nhất, theo dõi và tái tạo được thay đổi"
+    ],
+    "id": "Q_DB3_037"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL cơ bản",
+    "concept": "UPSERT (chèn hoặc cập nhật)",
+    "difficulty": "Easy",
+    "question": "Thao tác UPSERT là gì? Cho ví dụ cú pháp trong PostgreSQL hoặc MySQL.",
+    "reference_answer": "UPSERT là chèn một dòng mới, nhưng nếu dòng với khóa đó đã tồn tại thì cập nhật thay vì báo lỗi trùng khóa. PostgreSQL: INSERT INTO TonKho(maSP, soLuong) VALUES ('SP01', 10) ON CONFLICT (maSP) DO UPDATE SET soLuong = TonKho.soLuong + EXCLUDED.soLuong; MySQL: INSERT ... ON DUPLICATE KEY UPDATE soLuong = soLuong + VALUES(soLuong); Chuẩn SQL có lệnh MERGE với chức năng tương tự.",
+    "key_points": [
+      "UPSERT: chèn nếu chưa có, cập nhật nếu đã tồn tại khóa",
+      "Cú pháp ON CONFLICT (PostgreSQL), ON DUPLICATE KEY UPDATE (MySQL), MERGE (chuẩn)"
+    ],
+    "id": "Q_DB3_038"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL cơ bản",
+    "concept": "Toán tử INTERSECT và EXCEPT",
+    "difficulty": "Easy",
+    "question": "Toán tử INTERSECT và EXCEPT (MINUS) trong SQL dùng để làm gì? Điều kiện để áp dụng là gì?",
+    "reference_answer": "INTERSECT trả về các dòng xuất hiện trong CẢ HAI kết quả truy vấn; EXCEPT (Oracle gọi là MINUS) trả về các dòng có trong truy vấn thứ nhất nhưng KHÔNG có trong truy vấn thứ hai. Ví dụ tìm khách hàng mua năm 2023 nhưng không mua năm 2024 bằng EXCEPT. Điều kiện: hai truy vấn phải có cùng số cột và kiểu dữ liệu tương thích theo thứ tự; mặc định kết quả loại bỏ dòng trùng.",
+    "key_points": [
+      "INTERSECT: phần chung; EXCEPT: có ở truy vấn đầu, không có ở truy vấn sau",
+      "Hai truy vấn cần cùng số cột, kiểu tương thích; mặc định loại trùng"
+    ],
+    "id": "Q_DB3_039"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Lịch trình tuần tự (Serial Schedule)",
+    "difficulty": "Easy",
+    "question": "Lịch trình (schedule) của các giao dịch là gì? Thế nào là lịch trình tuần tự?",
+    "reference_answer": "Lịch trình là một thứ tự thực hiện xen kẽ các thao tác đọc/ghi của nhiều giao dịch đồng thời, giữ nguyên thứ tự thao tác bên trong mỗi giao dịch. Lịch trình tuần tự là lịch trình trong đó các giao dịch chạy lần lượt, giao dịch này kết thúc hoàn toàn rồi giao dịch kia mới bắt đầu, không xen kẽ. Lịch trình tuần tự luôn cho kết quả đúng nhưng hiệu năng thấp vì không tận dụng được tính đồng thời.",
+    "key_points": [
+      "Lịch trình là thứ tự xen kẽ các thao tác của nhiều giao dịch",
+      "Lịch trình tuần tự không xen kẽ, luôn đúng nhưng hiệu năng thấp"
+    ],
+    "id": "Q_DB3_040"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Tính khả tuần tự (Serializability)",
+    "difficulty": "Easy",
+    "question": "Một lịch trình được gọi là khả tuần tự (serializable) khi nào? Vì sao đây là tiêu chuẩn đúng đắn của điều khiển đồng thời?",
+    "reference_answer": "Một lịch trình xen kẽ là khả tuần tự nếu kết quả thực hiện của nó TƯƠNG ĐƯƠNG với kết quả của một lịch trình tuần tự nào đó của cùng các giao dịch. Vì mỗi giao dịch riêng lẻ được giả định là đúng, chạy tuần tự luôn giữ CSDL nhất quán; do đó một lịch trình xen kẽ tương đương với lịch trình tuần tự cũng giữ được tính nhất quán, trong khi vẫn cho phép thực hiện đồng thời để tăng hiệu năng.",
+    "key_points": [
+      "Khả tuần tự: kết quả tương đương với một lịch trình tuần tự nào đó",
+      "Đảm bảo nhất quán mà vẫn cho phép xen kẽ để tăng hiệu năng"
+    ],
+    "id": "Q_DB3_041"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Phụ thuộc hàm",
+    "concept": "Bao đóng của tập thuộc tính (Attribute Closure)",
+    "difficulty": "Easy",
+    "question": "Bao đóng của một tập thuộc tính X (ký hiệu X+) đối với tập phụ thuộc hàm F là gì?",
+    "reference_answer": "X+ là tập TẤT CẢ các thuộc tính có thể được suy ra (xác định hàm) từ X dựa trên tập phụ thuộc hàm F và các tiên đề Armstrong. Ví dụ với F = {A → B, B → C}, ta có {A}+ = {A, B, C}. Bao đóng dùng để kiểm tra một phụ thuộc X → Y có suy ra được từ F không (Y ⊆ X+) và để kiểm tra X có phải siêu khóa không (X+ chứa mọi thuộc tính).",
+    "key_points": [
+      "X+ là tập mọi thuộc tính được xác định bởi X theo F",
+      "Dùng kiểm tra phụ thuộc hàm suy diễn và kiểm tra siêu khóa"
+    ],
+    "id": "Q_DB3_042"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Chuẩn hóa",
+    "concept": "Phân rã bảo toàn thông tin (Lossless-join Decomposition)",
+    "difficulty": "Easy",
+    "question": "Phân rã một quan hệ thành các quan hệ nhỏ hơn được gọi là bảo toàn thông tin (lossless-join) khi nào?",
+    "reference_answer": "Phân rã R thành R1 và R2 là bảo toàn thông tin nếu kết tự nhiên (natural join) R1 ⋈ R2 cho ra CHÍNH XÁC quan hệ R ban đầu — không mất bộ nào và không sinh ra bộ 'giả' (spurious tuple). Nếu phân rã không bảo toàn thông tin, việc kết lại sẽ tạo ra dữ liệu sai lệch. Đây là yêu cầu bắt buộc khi chuẩn hóa.",
+    "key_points": [
+      "Lossless-join: kết các quan hệ con cho lại đúng quan hệ gốc",
+      "Không bảo toàn sẽ sinh bộ giả; là yêu cầu bắt buộc khi chuẩn hóa"
+    ],
+    "id": "Q_DB3_043"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Chuẩn hóa",
+    "concept": "Bảo toàn phụ thuộc (Dependency Preservation)",
+    "difficulty": "Easy",
+    "question": "Phân rã bảo toàn phụ thuộc hàm (dependency preserving) nghĩa là gì và vì sao nó quan trọng?",
+    "reference_answer": "Phân rã bảo toàn phụ thuộc nếu mọi phụ thuộc hàm của quan hệ gốc đều có thể kiểm tra được (trực tiếp hoặc suy diễn) chỉ bằng các phụ thuộc nằm gọn trong từng quan hệ con. Nếu không bảo toàn, để kiểm tra một ràng buộc nghiệp vụ, CSDL phải kết các bảng lại mỗi lần cập nhật — tốn kém, nên ràng buộc thường bị bỏ qua và dữ liệu có thể vi phạm.",
+    "key_points": [
+      "Mọi phụ thuộc gốc kiểm tra được trong các quan hệ con",
+      "Không bảo toàn thì kiểm tra ràng buộc cần join, tốn kém và dễ bị bỏ qua"
+    ],
+    "id": "Q_DB3_044"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "NoSQL và so sánh",
+    "concept": "BASE so với ACID",
+    "difficulty": "Easy",
+    "question": "Mô hình BASE trong các hệ NoSQL phân tán là viết tắt của gì và khác ACID ở tinh thần nào?",
+    "reference_answer": "BASE là Basically Available (cơ bản luôn sẵn sàng), Soft state (trạng thái có thể thay đổi theo thời gian dù không có thao tác mới, do đồng bộ dần), Eventually consistent (nhất quán cuối cùng). ACID ưu tiên tính đúng đắn và nhất quán chặt chẽ của từng giao dịch; BASE ưu tiên tính sẵn sàng và khả năng mở rộng, chấp nhận dữ liệu tạm thời không nhất quán giữa các bản sao.",
+    "key_points": [
+      "BASE: Basically Available, Soft state, Eventually consistent",
+      "ACID ưu tiên nhất quán chặt; BASE ưu tiên sẵn sàng và mở rộng"
+    ],
+    "id": "Q_DB3_045"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL DDL",
+    "concept": "Kiểu dữ liệu JSON trong CSDL quan hệ",
+    "difficulty": "Easy",
+    "question": "Nhiều hệ quản trị quan hệ hiện đại hỗ trợ kiểu dữ liệu JSON (ví dụ JSONB trong PostgreSQL). Kiểu này cho phép làm gì?",
+    "reference_answer": "Kiểu JSON cho phép lưu dữ liệu bán cấu trúc (các thuộc tính linh hoạt, lồng nhau) ngay trong một cột của bảng quan hệ, đồng thời truy vấn bên trong bằng toán tử/hàm chuyên dụng (ví dụ thuocTinh->>'mau' = 'đỏ'). JSONB của PostgreSQL lưu dạng nhị phân đã phân tích, hỗ trợ chỉ mục GIN để tìm kiếm nhanh. Phù hợp cho các thuộc tính thay đổi theo loại sản phẩm, metadata, payload sự kiện.",
+    "key_points": [
+      "Kiểu JSON lưu dữ liệu bán cấu trúc trong một cột quan hệ",
+      "Có toán tử truy vấn và chỉ mục (GIN với JSONB) để tìm kiếm"
+    ],
+    "id": "Q_DB3_046"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Bảo mật CSDL",
+    "concept": "Mã hóa dữ liệu khi lưu trữ và khi truyền",
+    "difficulty": "Easy",
+    "question": "Phân biệt mã hóa dữ liệu khi lưu trữ (encryption at rest) và khi truyền (encryption in transit) đối với CSDL.",
+    "reference_answer": "Encryption at rest mã hóa dữ liệu nằm trên đĩa (file dữ liệu, log, bản sao lưu), bảo vệ khi ổ đĩa hoặc file backup bị đánh cắp (ví dụ Transparent Data Encryption). Encryption in transit mã hóa dữ liệu trên đường truyền giữa ứng dụng và CSDL hoặc giữa các node (TLS/SSL), chống nghe lén và giả mạo trên mạng. Hai lớp này bổ sung cho nhau và không thay thế việc phân quyền truy cập.",
+    "key_points": [
+      "At rest: mã hóa dữ liệu trên đĩa và backup",
+      "In transit: mã hóa đường truyền bằng TLS; cả hai bổ sung cho nhau"
+    ],
+    "id": "Q_DB3_047"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Bảo mật CSDL",
+    "concept": "Nguyên tắc đặc quyền tối thiểu (Least Privilege)",
+    "difficulty": "Easy",
+    "question": "Áp dụng nguyên tắc đặc quyền tối thiểu cho tài khoản CSDL mà một ứng dụng web sử dụng như thế nào?",
+    "reference_answer": "Tài khoản của ứng dụng chỉ nên có đúng các quyền cần thiết cho chức năng của nó: ví dụ SELECT, INSERT, UPDATE trên các bảng nghiệp vụ liên quan, không có quyền DROP, ALTER, GRANT hay truy cập bảng hệ thống, và tuyệt đối không dùng tài khoản quản trị (root/sa/postgres). Có thể tách tài khoản chỉ đọc cho báo cáo và tài khoản riêng cho migration. Khi ứng dụng bị khai thác (ví dụ SQL injection), thiệt hại bị giới hạn trong phạm vi quyền đó.",
+    "key_points": [
+      "Tài khoản ứng dụng chỉ có quyền tối thiểu cần thiết, không dùng tài khoản quản trị",
+      "Giới hạn thiệt hại khi bị tấn công; tách tài khoản theo mục đích"
+    ],
+    "id": "Q_DB3_048"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL cơ bản",
+    "concept": "Hàm xử lý ngày giờ",
+    "difficulty": "Easy",
+    "question": "Kể tên một số hàm xử lý ngày giờ thông dụng trong SQL và cho ví dụ lấy các đơn hàng trong 30 ngày gần nhất.",
+    "reference_answer": "Các hàm phổ biến: CURRENT_DATE, CURRENT_TIMESTAMP/NOW() lấy thời điểm hiện tại; EXTRACT(YEAR FROM ngay) hoặc YEAR(ngay) lấy thành phần năm/tháng/ngày; DATE_ADD/DATEADD hoặc toán tử + INTERVAL cộng trừ thời gian; DATEDIFF tính khoảng cách. Ví dụ (PostgreSQL): SELECT * FROM DonHang WHERE ngayDat >= CURRENT_DATE - INTERVAL '30 days'; (MySQL): WHERE ngayDat >= DATE_SUB(CURDATE(), INTERVAL 30 DAY).",
+    "key_points": [
+      "Hàm thông dụng: CURRENT_DATE/NOW, EXTRACT, DATE_ADD/INTERVAL, DATEDIFF",
+      "Cú pháp khác nhau giữa các hệ quản trị"
+    ],
+    "id": "Q_DB3_049"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Mô hình ER",
+    "concept": "Ký hiệu Crow's Foot",
+    "difficulty": "Easy",
+    "question": "Trong ký hiệu Crow's Foot (chân chim) của sơ đồ ER, các ký hiệu ở đầu đường quan hệ biểu thị điều gì?",
+    "reference_answer": "Crow's Foot biểu thị bản số (cardinality) và tính bắt buộc ở mỗi đầu quan hệ: vạch thẳng (|) nghĩa là 'một', hình chân chim (ba nhánh) nghĩa là 'nhiều', vòng tròn (O) nghĩa là 'không/tùy chọn'. Kết hợp lại: || là đúng một (bắt buộc), O| là không hoặc một, |< là một hoặc nhiều, O< là không hoặc nhiều. Ví dụ KhachHang ||——O< DonHang: mỗi đơn hàng thuộc đúng một khách hàng, mỗi khách hàng có không hoặc nhiều đơn hàng.",
+    "key_points": [
+      "Vạch thẳng là một, chân chim là nhiều, vòng tròn là tùy chọn",
+      "Kết hợp biểu thị cả bản số và tính bắt buộc ở mỗi đầu"
+    ],
+    "id": "Q_DB3_050"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Phụ thuộc hàm",
+    "concept": "Thuật toán tính bao đóng thuộc tính",
+    "difficulty": "Medium",
+    "question": "Cho R(A, B, C, D, E) và F = {A → B, BC → D, D → E, E → A}. Tính {A, C}+ và cho biết {A, C} có phải là khóa của R không.",
+    "reference_answer": "Thuật toán: bắt đầu với X+ = {A, C}, lặp lại việc áp dụng mọi phụ thuộc có vế trái nằm trong X+ để thêm vế phải, đến khi không thêm được gì. A → B: thêm B, X+ = {A, B, C}. BC → D: thêm D, X+ = {A, B, C, D}. D → E: thêm E, X+ = {A, B, C, D, E}. Vì {A, C}+ chứa mọi thuộc tính nên {A, C} là siêu khóa. Kiểm tra tính tối thiểu: {A}+ = {A, B} và {C}+ = {C} đều không đủ, nên {A, C} là khóa ứng viên.",
+    "key_points": [
+      "Lặp áp dụng phụ thuộc có vế trái ⊆ X+ cho đến khi không đổi: {A,C}+ = {A,B,C,D,E}",
+      "Bao đóng chứa mọi thuộc tính và không tập con thực sự nào đủ, nên {A,C} là khóa ứng viên"
+    ],
+    "id": "Q_DB3_051"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Phụ thuộc hàm",
+    "concept": "Phủ tối thiểu (Minimal Cover)",
+    "difficulty": "Medium",
+    "question": "Phủ tối thiểu (minimal/canonical cover) của một tập phụ thuộc hàm là gì? Nêu ba bước để tìm nó.",
+    "reference_answer": "Phủ tối thiểu là một tập phụ thuộc hàm tương đương với F (suy ra đúng các phụ thuộc như F) nhưng không có phần dư thừa. Các bước: (1) Tách vế phải để mỗi phụ thuộc chỉ có một thuộc tính bên phải (A → BC thành A → B, A → C). (2) Loại thuộc tính thừa ở vế trái: với XA → B, nếu B thuộc X+ (tính theo F hiện tại) thì thay bằng X → B. (3) Loại phụ thuộc thừa: bỏ X → A nếu A vẫn thuộc X+ khi tính với các phụ thuộc còn lại. Phủ tối thiểu là đầu vào của thuật toán tổng hợp 3NF.",
+    "key_points": [
+      "Phủ tối thiểu tương đương F nhưng không dư thừa",
+      "Ba bước: tách vế phải, bỏ thuộc tính thừa vế trái, bỏ phụ thuộc thừa"
+    ],
+    "id": "Q_DB3_052"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Chuẩn hóa",
+    "concept": "Kiểm tra phân rã hai bảng có bảo toàn thông tin",
+    "difficulty": "Medium",
+    "question": "Cho R(maSV, tenSV, maLop, tenLop) với F = {maSV → tenSV, maSV → maLop, maLop → tenLop}. Phân rã thành R1(maSV, tenSV, maLop) và R2(maLop, tenLop) có bảo toàn thông tin không? Giải thích bằng tiêu chuẩn kiểm tra.",
+    "reference_answer": "Tiêu chuẩn cho phân rã thành hai quan hệ: phân rã là lossless-join khi và chỉ khi thuộc tính chung R1 ∩ R2 là siêu khóa của R1 hoặc của R2 (tức (R1 ∩ R2) → R1 hoặc (R1 ∩ R2) → R2 thuộc F+). Ở đây R1 ∩ R2 = {maLop}, và maLop → tenLop nên {maLop}+ ⊇ R2 = {maLop, tenLop}, tức maLop là khóa của R2. Vậy phân rã bảo toàn thông tin. Đồng thời các phụ thuộc đều nằm gọn trong R1 hoặc R2 nên phân rã cũng bảo toàn phụ thuộc.",
+    "key_points": [
+      "Phân rã hai bảng là lossless nếu phần giao là siêu khóa của một trong hai bảng",
+      "maLop là khóa của R2 nên phân rã bảo toàn thông tin (và bảo toàn phụ thuộc)"
+    ],
+    "id": "Q_DB3_053"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Chuẩn hóa",
+    "concept": "Đánh đổi giữa BCNF và 3NF",
+    "difficulty": "Medium",
+    "question": "Vì sao trong thực tế người ta đôi khi dừng ở 3NF thay vì luôn phân rã tới BCNF? Minh họa với R(sinhVien, monHoc, giangVien) có F = {(sinhVien, monHoc) → giangVien, giangVien → monHoc}.",
+    "reference_answer": "Luôn có thể phân rã về 3NF vừa bảo toàn thông tin VỪA bảo toàn phụ thuộc (thuật toán tổng hợp), nhưng phân rã BCNF chỉ đảm bảo bảo toàn thông tin, có thể làm mất phụ thuộc. Trong ví dụ, giangVien → monHoc vi phạm BCNF (giangVien không phải siêu khóa), nhưng R đạt 3NF vì monHoc là thuộc tính khóa. Phân rã BCNF thành (giangVien, monHoc) và (sinhVien, giangVien) làm mất phụ thuộc (sinhVien, monHoc) → giangVien: không thể kiểm tra trong một bảng rằng một sinh viên chỉ có một giảng viên cho mỗi môn, phải join mới phát hiện vi phạm. Vì vậy chọn 3NF để giữ ràng buộc, chấp nhận một chút dư thừa.",
+    "key_points": [
+      "3NF luôn đạt được kèm bảo toàn phụ thuộc; BCNF có thể làm mất phụ thuộc",
+      "Ví dụ phân rã BCNF mất ràng buộc (sinhVien, monHoc) → giangVien, nên đôi khi chọn 3NF"
+    ],
+    "id": "Q_DB3_054"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Đồ thị ưu tiên (Precedence Graph)",
+    "difficulty": "Medium",
+    "question": "Mô tả cách dùng đồ thị ưu tiên (precedence graph) để kiểm tra một lịch trình có khả tuần tự xung đột (conflict-serializable) hay không.",
+    "reference_answer": "Mỗi giao dịch là một đỉnh. Hai thao tác xung đột khi thuộc hai giao dịch khác nhau, cùng truy cập một mục dữ liệu và ít nhất một là ghi (R-W, W-R, W-W). Với mỗi cặp xung đột mà thao tác của Ti xuất hiện trước thao tác của Tj trong lịch trình, thêm cạnh Ti → Tj. Lịch trình khả tuần tự xung đột khi và chỉ khi đồ thị KHÔNG có chu trình; khi đó một sắp xếp topo của đồ thị cho ra thứ tự tuần tự tương đương. Ví dụ R1(A) W2(A) W1(A) cho cạnh T1 → T2 và T2 → T1, có chu trình nên không khả tuần tự.",
+    "key_points": [
+      "Đỉnh là giao dịch, cạnh Ti → Tj khi thao tác xung đột của Ti đứng trước của Tj",
+      "Không có chu trình ⇔ khả tuần tự xung đột; sắp xếp topo cho thứ tự tuần tự tương đương"
+    ],
+    "id": "Q_DB3_055"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Strict Two-Phase Locking",
+    "difficulty": "Medium",
+    "question": "Strict 2PL khác 2PL cơ bản ở điểm nào, và vì sao hầu hết DBMS dùng strict 2PL?",
+    "reference_answer": "2PL cơ bản chỉ yêu cầu giao dịch có pha tăng (chỉ xin khóa) rồi pha giảm (chỉ nhả khóa) — đảm bảo khả tuần tự nhưng cho phép nhả khóa ghi TRƯỚC khi commit. Khi đó giao dịch khác có thể đọc dữ liệu chưa commit; nếu giao dịch đầu abort thì giao dịch đọc cũng phải abort theo (cascading abort), và lịch trình có thể không phục hồi được. Strict 2PL giữ mọi khóa GHI (exclusive) cho đến khi commit/abort, loại bỏ cascading abort và đảm bảo lịch trình phục hồi được; Rigorous 2PL giữ cả khóa đọc tới cuối. Đây là lý do strict/rigorous 2PL được dùng phổ biến.",
+    "key_points": [
+      "2PL cơ bản cho nhả khóa ghi trước commit, gây cascading abort",
+      "Strict 2PL giữ khóa ghi đến khi kết thúc giao dịch, đảm bảo khả phục hồi và tránh abort dây chuyền"
+    ],
+    "id": "Q_DB3_056"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Độ mịn khóa và khóa ý định (Intention Locks)",
+    "difficulty": "Medium",
+    "question": "Vì sao DBMS cần khóa ý định (IS, IX) khi hỗ trợ khóa ở nhiều mức độ mịn (bảng, trang, dòng)?",
+    "reference_answer": "Với khóa đa mức, một giao dịch có thể khóa cả bảng (ví dụ khi ALTER hoặc quét toàn bộ) trong khi giao dịch khác khóa từng dòng. Muốn khóa X cả bảng, hệ thống phải biết có ai đang khóa dòng nào trong bảng không — kiểm tra từng dòng là quá tốn kém. Khóa ý định giải quyết điều này: trước khi khóa S/X một dòng, giao dịch phải đặt IS/IX lên bảng (và trang) chứa nó. Khi đó yêu cầu khóa X trên bảng chỉ cần kiểm tra tương thích với các khóa trên chính bảng: X xung đột với IS/IX nên bị chờ. Ma trận tương thích: IS tương thích với IS, IX, S; IX tương thích với IS, IX; S tương thích với IS, S.",
+    "key_points": [
+      "Khóa ý định đặt ở mức cao hơn để báo hiệu có khóa ở mức dưới",
+      "Giúp kiểm tra xung đột khóa toàn bảng mà không duyệt từng dòng"
+    ],
+    "id": "Q_DB3_057"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Deadlock",
+    "concept": "Phòng ngừa deadlock: Wait-Die và Wound-Wait",
+    "difficulty": "Medium",
+    "question": "So sánh hai chiến lược phòng ngừa deadlock dựa trên timestamp: Wait-Die và Wound-Wait.",
+    "reference_answer": "Mỗi giao dịch có timestamp lúc bắt đầu (nhỏ hơn = già hơn). Wait-Die (không chiếm quyền): nếu giao dịch già yêu cầu khóa do giao dịch trẻ giữ thì được CHỜ; nếu giao dịch trẻ yêu cầu khóa của giao dịch già thì tự ABORT ('chết') và khởi động lại với timestamp cũ. Wound-Wait (chiếm quyền): giao dịch già yêu cầu khóa của giao dịch trẻ thì 'làm bị thương' — buộc giao dịch trẻ abort; giao dịch trẻ yêu cầu khóa của giao dịch già thì chờ. Cả hai đều chỉ cho phép chờ theo một chiều tuổi nên không có chu trình chờ; việc giữ nguyên timestamp khi khởi động lại đảm bảo không bị đói vì giao dịch sẽ dần trở thành già nhất. Wound-Wait thường gây ít abort hơn.",
+    "key_points": [
+      "Wait-Die: già chờ trẻ, trẻ gặp già thì tự abort",
+      "Wound-Wait: già buộc trẻ abort, trẻ chờ già; chờ một chiều nên không có chu trình, giữ timestamp tránh đói"
+    ],
+    "id": "Q_DB3_058"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Giao thức thứ tự timestamp (Timestamp Ordering)",
+    "difficulty": "Medium",
+    "question": "Giao thức điều khiển đồng thời theo thứ tự timestamp (Basic Timestamp Ordering) hoạt động như thế nào?",
+    "reference_answer": "Mỗi giao dịch T có timestamp TS(T); mỗi mục dữ liệu X lưu R-TS(X) (timestamp lớn nhất đã đọc) và W-TS(X) (lớn nhất đã ghi). Khi T đọc X: nếu TS(T) < W-TS(X) (một giao dịch 'trẻ hơn' đã ghi X) thì T bị abort; ngược lại cho đọc và cập nhật R-TS(X). Khi T ghi X: nếu TS(T) < R-TS(X) hoặc TS(T) < W-TS(X) thì abort; ngược lại cho ghi và cập nhật W-TS(X). Giao thức đảm bảo lịch trình tương đương thứ tự timestamp, không dùng khóa nên không có deadlock, nhưng có thể gây nhiều abort khi xung đột cao. Quy tắc ghi Thomas cho phép bỏ qua thao tác ghi đã lỗi thời thay vì abort.",
+    "key_points": [
+      "Mỗi mục lưu R-TS và W-TS; thao tác đến 'muộn' so với giao dịch trẻ hơn bị abort",
+      "Không dùng khóa, không deadlock nhưng có thể abort nhiều; Thomas write rule bỏ qua ghi lỗi thời"
+    ],
+    "id": "Q_DB3_059"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Phục hồi dữ liệu",
+    "concept": "Undo log và Redo log",
+    "difficulty": "Medium",
+    "question": "So sánh nguyên tắc ghi log kiểu Undo và kiểu Redo trong phục hồi sau sự cố.",
+    "reference_answer": "Undo logging ghi giá trị CŨ của dữ liệu; quy tắc: bản ghi log phải lên đĩa trước khi dữ liệu thay đổi được ghi xuống đĩa, và mọi trang dữ liệu bị sửa phải được ghi xuống đĩa TRƯỚC khi ghi bản ghi COMMIT. Phục hồi: hoàn tác các giao dịch chưa commit. Redo logging ghi giá trị MỚI; quy tắc: KHÔNG được ghi trang dữ liệu đã sửa xuống đĩa trước khi log và bản ghi COMMIT lên đĩa. Phục hồi: làm lại các giao dịch đã commit. Undo buộc ghi dữ liệu lúc commit (chậm), Redo buộc giữ trang trong bộ đệm tới commit (tốn bộ nhớ). Undo/Redo logging (như ARIES) ghi cả hai giá trị, cho phép linh hoạt nhất (chính sách steal/no-force).",
+    "key_points": [
+      "Undo: ghi giá trị cũ, dữ liệu phải lên đĩa trước COMMIT, phục hồi bằng hoàn tác",
+      "Redo: ghi giá trị mới, dữ liệu chỉ lên đĩa sau COMMIT, phục hồi bằng làm lại; Undo/Redo cho phép steal/no-force"
+    ],
+    "id": "Q_DB3_060"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Phục hồi dữ liệu",
+    "concept": "Shadow Paging so với Write-Ahead Logging",
+    "difficulty": "Medium",
+    "question": "Shadow paging là gì và vì sao hầu hết DBMS hiện đại chọn WAL thay vì shadow paging?",
+    "reference_answer": "Shadow paging không ghi đè trang cũ: khi giao dịch sửa một trang, hệ thống ghi bản mới ra vị trí khác và cập nhật một bảng trang mới; khi commit, chỉ cần chuyển nguyên tử con trỏ gốc sang bảng trang mới, abort thì bỏ bảng mới. Ưu điểm: phục hồi đơn giản, không cần undo/redo. Nhược điểm: dữ liệu bị phân mảnh (trang liên quan không còn nằm liền nhau, phá vỡ thứ tự cluster), chi phí sao chép bảng trang, khó hỗ trợ nhiều giao dịch đồng thời sửa cùng trang, và commit phải ghi mọi trang thay đổi. WAL chỉ cần ghi tuần tự log nhỏ lúc commit, giữ dữ liệu tại chỗ và hỗ trợ đồng thời tốt nên hiệu quả hơn (dù ý tưởng copy-on-write vẫn được dùng trong một số hệ như LMDB, hệ thống file).",
+    "key_points": [
+      "Shadow paging ghi trang mới ra chỗ khác, commit bằng đổi con trỏ gốc",
+      "Nhược điểm: phân mảnh dữ liệu, khó đồng thời, chi phí commit; WAL ghi log tuần tự hiệu quả hơn"
+    ],
+    "id": "Q_DB3_061"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL nâng cao cơ bản",
+    "concept": "Tổng lũy kế với khung cửa sổ",
+    "difficulty": "Medium",
+    "question": "Viết truy vấn tính doanh thu lũy kế theo ngày trong từng tháng, và giải thích vai trò của mệnh đề ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW.",
+    "reference_answer": "SELECT ngay, doanhThu, SUM(doanhThu) OVER (PARTITION BY DATE_TRUNC('month', ngay) ORDER BY ngay ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS luyKe FROM DoanhThuNgay; PARTITION BY tạo cửa sổ riêng cho mỗi tháng (lũy kế bắt đầu lại từ đầu tháng), ORDER BY xác định thứ tự, còn khung ROWS BETWEEN ... chỉ rõ cộng từ dòng đầu phân vùng tới dòng hiện tại. Lưu ý: khi có ORDER BY mà không ghi khung, mặc định là RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW, với các ngày trùng nhau sẽ được cộng gộp cùng lúc — dùng ROWS để tính theo từng dòng rõ ràng.",
+    "key_points": [
+      "SUM() OVER (PARTITION BY ... ORDER BY ... ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) cho tổng lũy kế",
+      "Khung mặc định là RANGE, gộp các dòng có giá trị ORDER BY trùng; dùng ROWS để tính theo từng dòng"
+    ],
+    "id": "Q_DB3_062"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Gom nhóm dữ liệu",
+    "concept": "ROLLUP, CUBE và GROUPING SETS",
+    "difficulty": "Medium",
+    "question": "Phân biệt GROUP BY ROLLUP(vung, cuaHang), GROUP BY CUBE(vung, cuaHang) và GROUPING SETS khi làm báo cáo doanh thu.",
+    "reference_answer": "ROLLUP(vung, cuaHang) tạo các mức tổng phân cấp: (vung, cuaHang), (vung) — tổng mỗi vùng, và () — tổng toàn bộ; phù hợp dữ liệu có phân cấp. CUBE(vung, cuaHang) tạo mọi tổ hợp: (vung, cuaHang), (vung), (cuaHang), () — thêm cả tổng theo cửa hàng bất kể vùng. GROUPING SETS cho phép liệt kê chính xác các tổ hợp muốn có, ví dụ GROUPING SETS ((vung), (thang), ()). Các dòng tổng có giá trị NULL ở cột được gộp; dùng hàm GROUPING(cot) để phân biệt NULL do gộp với NULL thật trong dữ liệu.",
+    "key_points": [
+      "ROLLUP: tổng phân cấp; CUBE: mọi tổ hợp; GROUPING SETS: chỉ định tổ hợp tùy ý",
+      "Dòng tổng có NULL ở cột gộp; dùng GROUPING() để phân biệt với NULL thật"
+    ],
+    "id": "Q_DB3_063"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Gom nhóm dữ liệu",
+    "concept": "Tổng hợp có điều kiện (Pivot bằng CASE)",
+    "difficulty": "Medium",
+    "question": "Viết truy vấn biến bảng DonHang(maKH, nam, tien) thành báo cáo mỗi khách hàng một dòng, mỗi năm 2022, 2023, 2024 một cột tổng tiền.",
+    "reference_answer": "Dùng tổng hợp có điều kiện: SELECT maKH, SUM(CASE WHEN nam = 2022 THEN tien ELSE 0 END) AS nam2022, SUM(CASE WHEN nam = 2023 THEN tien ELSE 0 END) AS nam2023, SUM(CASE WHEN nam = 2024 THEN tien ELSE 0 END) AS nam2024 FROM DonHang GROUP BY maKH; Mỗi CASE chọn giá trị chỉ cho năm tương ứng, SUM gộp theo khách hàng. Một số hệ có cú pháp FILTER (SUM(tien) FILTER (WHERE nam = 2022)) hoặc PIVOT. Hạn chế: danh sách cột phải biết trước; số cột động cần SQL động.",
+    "key_points": [
+      "Pivot bằng SUM(CASE WHEN ... THEN ... ELSE 0 END) kết hợp GROUP BY",
+      "Có thể dùng FILTER hoặc PIVOT; cột động cần SQL động"
+    ],
+    "id": "Q_DB3_064"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL nâng cao cơ bản",
+    "concept": "Tìm và xóa bản ghi trùng lặp",
+    "difficulty": "Medium",
+    "question": "Bảng KhachHang bị nhập trùng nhiều dòng cùng email. Viết cách xóa các dòng trùng, chỉ giữ lại dòng có id nhỏ nhất cho mỗi email.",
+    "reference_answer": "Dùng hàm cửa sổ đánh số trong mỗi nhóm email: WITH xh AS (SELECT id, ROW_NUMBER() OVER (PARTITION BY email ORDER BY id) AS rn FROM KhachHang) DELETE FROM KhachHang WHERE id IN (SELECT id FROM xh WHERE rn > 1); Hoặc cách cổ điển: DELETE FROM KhachHang k WHERE EXISTS (SELECT 1 FROM KhachHang k2 WHERE k2.email = k.email AND k2.id < k.id); Trước khi xóa nên chạy SELECT kiểm tra, xử lý các bảng con đang tham chiếu tới dòng sắp xóa (chuyển khóa ngoại sang dòng được giữ), và sau đó thêm ràng buộc UNIQUE(email) để ngăn tái diễn — lưu ý chuẩn hóa chữ hoa/thường và khoảng trắng trước khi so sánh.",
+    "key_points": [
+      "Dùng ROW_NUMBER() OVER (PARTITION BY email ORDER BY id) và xóa rn > 1, hoặc EXISTS với id nhỏ hơn",
+      "Kiểm tra trước, xử lý bảng con tham chiếu, rồi thêm UNIQUE để ngăn tái diễn"
+    ],
+    "id": "Q_DB3_065"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Trigger mức dòng và mức câu lệnh",
+    "difficulty": "Medium",
+    "question": "Phân biệt trigger FOR EACH ROW và FOR EACH STATEMENT. Với câu UPDATE ảnh hưởng 10.000 dòng, mỗi loại chạy bao nhiêu lần và phù hợp mục đích nào?",
+    "reference_answer": "Trigger mức dòng (FOR EACH ROW) chạy một lần cho MỖI dòng bị ảnh hưởng — 10.000 lần — và truy cập được giá trị cũ/mới của dòng (OLD/NEW); phù hợp chuẩn hóa dữ liệu từng dòng, kiểm tra ràng buộc phức tạp theo dòng, ghi audit chi tiết từng dòng. Trigger mức câu lệnh (FOR EACH STATEMENT) chạy đúng MỘT lần cho cả câu lệnh, kể cả khi không dòng nào bị ảnh hưởng; phù hợp ghi log 'ai đã chạy lệnh gì', làm mới bảng tổng hợp một lần, hoặc kiểm tra tổng thể (với transition table trong PostgreSQL). Trigger mức dòng trên thao tác hàng loạt có thể làm chậm đáng kể.",
+    "key_points": [
+      "Row-level chạy cho từng dòng, có OLD/NEW; statement-level chạy một lần cho cả lệnh",
+      "Row-level hợp kiểm tra/audit từng dòng nhưng tốn kém khi cập nhật hàng loạt"
+    ],
+    "id": "Q_DB3_066"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Ưu và nhược điểm của Stored Procedure",
+    "difficulty": "Medium",
+    "question": "Phân tích ưu, nhược điểm của việc đặt logic xử lý dữ liệu trong stored procedure so với trong mã ứng dụng.",
+    "reference_answer": "Ưu điểm: xử lý gần dữ liệu nên giảm số round-trip mạng (một lời gọi thay vì hàng chục câu truy vấn); có thể phân quyền chỉ cho EXECUTE thủ tục mà không cho truy cập trực tiếp bảng; logic dùng chung cho nhiều ứng dụng khác ngôn ngữ; kế hoạch thực thi được tái sử dụng. Nhược điểm: ngôn ngữ thủ tục (PL/SQL, T-SQL) kém biểu đạt, khó kiểm thử đơn vị, khó quản lý phiên bản và triển khai cùng ứng dụng; gắn chặt vào một hệ quản trị (vendor lock-in); dồn tải tính toán lên CSDL vốn khó mở rộng ngang hơn tầng ứng dụng. Thường hợp lý cho các thao tác xử lý tập dữ liệu lớn, còn logic nghiệp vụ phức tạp nên ở ứng dụng.",
+    "key_points": [
+      "Ưu: giảm round-trip, phân quyền tinh, dùng chung, tái sử dụng kế hoạch",
+      "Nhược: khó test/version, vendor lock-in, dồn tải lên CSDL khó mở rộng"
+    ],
+    "id": "Q_DB3_067"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Bảo mật CSDL",
+    "concept": "Cơ chế Prepared Statement chống SQL Injection",
+    "difficulty": "Medium",
+    "question": "Giải thích ở mức cơ chế vì sao prepared statement (tham số hóa) ngăn được SQL injection, còn việc tự 'escape' chuỗi thì không đáng tin cậy bằng.",
+    "reference_answer": "Với prepared statement, cấu trúc câu SQL (khung lệnh) được gửi và phân tích cú pháp TRƯỚC, các giá trị tham số được truyền riêng như DỮ LIỆU, không bao giờ được phân tích như mã SQL — dù người dùng nhập ' OR '1'='1 thì đó cũng chỉ là một chuỗi so sánh với cột. Việc tự escape dựa vào việc lập trình viên nhớ escape đúng ở mọi nơi, đúng ngữ cảnh (chuỗi, số, tên cột, LIKE), đúng bảng mã ký tự; chỉ cần quên một chỗ hoặc gặp trường hợp mã hóa đặc biệt là bị khai thác. Lưu ý: tham số chỉ thay được giá trị, không thay được tên bảng/cột hay từ khóa ORDER BY — những phần đó phải kiểm tra theo danh sách trắng (whitelist).",
+    "key_points": [
+      "Prepared statement tách cấu trúc lệnh và dữ liệu, tham số không bao giờ được hiểu là mã SQL",
+      "Escape thủ công dễ sót; tên bảng/cột động phải kiểm tra bằng whitelist"
+    ],
+    "id": "Q_DB3_068"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Xác định kích thước connection pool",
+    "difficulty": "Medium",
+    "question": "Một nhóm tăng kích thước connection pool từ 20 lên 500 với hy vọng tăng thông lượng, nhưng hệ thống chậm hơn. Giải thích hiện tượng này.",
+    "reference_answer": "Máy chủ CSDL chỉ có số lõi CPU và băng thông đĩa hữu hạn; số truy vấn thực sự chạy song song hiệu quả xấp xỉ vài lần số lõi. Khi có 500 kết nối cùng hoạt động: CPU phải chuyển ngữ cảnh liên tục giữa các tiến trình/luồng, tranh chấp khóa và latch nội bộ tăng mạnh, bộ nhớ bị chia cho nhiều phiên (mỗi kết nối tốn RAM cho work_mem/sort buffer), bộ đệm bị xáo trộn. Kết quả là mỗi truy vấn chậm đi và tổng thông lượng giảm. Kích thước pool nên nhỏ, dựa trên đo đạc (một công thức tham khảo: số lõi × 2 + số ổ đĩa), để các yêu cầu dư chờ trong hàng đợi của pool thay vì dồn vào CSDL; đồng thời cộng dồn pool của mọi instance ứng dụng không được vượt giới hạn của CSDL.",
+    "key_points": [
+      "Quá nhiều kết nối gây chuyển ngữ cảnh, tranh chấp khóa, tốn bộ nhớ trên CSDL",
+      "Pool nên nhỏ và dựa trên đo đạc; yêu cầu dư chờ ở pool; tính tổng pool của mọi instance"
+    ],
+    "id": "Q_DB3_069"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Lazy loading và Eager loading trong ORM",
+    "difficulty": "Medium",
+    "question": "So sánh lazy loading và eager loading trong ORM khi tải danh sách DonHang kèm các DongHang.",
+    "reference_answer": "Lazy loading chỉ tải DonHang; danh sách DongHang chỉ được truy vấn khi code truy cập tới nó lần đầu. Ưu: không tải dữ liệu thừa khi không cần. Nhược: duyệt 100 đơn hàng và truy cập dòng hàng của từng đơn sinh ra 1 + 100 truy vấn (vấn đề N+1), và lỗi khi truy cập ngoài phiên làm việc. Eager loading tải luôn DongHang ngay từ đầu (JOIN FETCH hoặc truy vấn IN thứ hai): ít truy vấn hơn nhưng có thể tải thừa dữ liệu, và JOIN với nhiều collection gây bùng nổ tích Descartes. Cách tốt: mặc định lazy, chỉ eager có chủ đích cho từng trường hợp sử dụng (fetch join, entity graph, batch fetching).",
+    "key_points": [
+      "Lazy: tải khi cần, tiết kiệm nhưng dễ gây N+1",
+      "Eager: tải trước, ít truy vấn nhưng có thể thừa dữ liệu hoặc nổ tích Descartes; nên chọn theo từng use case"
+    ],
+    "id": "Q_DB3_070"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL DDL",
+    "concept": "Migration không gián đoạn: mô hình Expand-Contract",
+    "difficulty": "Medium",
+    "question": "Cần đổi tên cột hoTen thành tenDayDu trong bảng KhachHang đang được ứng dụng sử dụng liên tục, triển khai rolling (nhiều phiên bản ứng dụng chạy song song). Mô tả quy trình expand-contract.",
+    "reference_answer": "Không thể đổi tên trực tiếp vì phiên bản ứng dụng cũ vẫn đọc hoTen. Quy trình: (1) Expand: thêm cột mới tenDayDu (nullable). (2) Triển khai ứng dụng ghi đồng thời vào cả hai cột, vẫn đọc cột cũ. (3) Backfill: sao chép dữ liệu cũ sang cột mới theo lô nhỏ. (4) Triển khai ứng dụng đọc từ cột mới (vẫn ghi cả hai để có thể quay lui). (5) Khi mọi phiên bản đã dùng cột mới, ngừng ghi cột cũ. (6) Contract: xóa cột hoTen. Mỗi bước đều tương thích ngược với phiên bản liền trước, nên có thể rollback ứng dụng bất cứ lúc nào.",
+    "key_points": [
+      "Không đổi tên trực tiếp vì phiên bản cũ còn dùng cột cũ",
+      "Expand (thêm cột, ghi kép, backfill) → chuyển đọc → contract (xóa cột cũ), mỗi bước tương thích ngược"
+    ],
+    "id": "Q_DB3_071"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Chỉ mục (Index)",
+    "concept": "Chỉ mục một phần (Partial Index)",
+    "difficulty": "Medium",
+    "question": "Partial index (chỉ mục có điều kiện WHERE) là gì? Cho ví dụ tình huống phù hợp.",
+    "reference_answer": "Partial index chỉ đánh chỉ mục cho tập con các dòng thỏa một điều kiện, ví dụ CREATE INDEX idx_dh_chua_xu_ly ON DonHang(ngayTao) WHERE trangThai = 'CHO_XU_LY'; Phù hợp khi truy vấn thường xuyên chỉ nhắm tới một phần nhỏ dữ liệu (đơn chờ xử lý chỉ chiếm 1% bảng 50 triệu dòng): chỉ mục nhỏ hơn rất nhiều, nhanh hơn, tốn ít chi phí bảo trì khi ghi. Nó cũng dùng để tạo ràng buộc duy nhất có điều kiện, như UNIQUE(email) WHERE daXoa = false. Truy vấn phải có điều kiện khớp (hoặc suy ra được) với điều kiện của chỉ mục mới dùng được.",
+    "key_points": [
+      "Partial index chỉ đánh chỉ mục các dòng thỏa điều kiện",
+      "Nhỏ, nhanh, rẻ khi ghi; dùng cho truy vấn nhắm tập con hoặc unique có điều kiện"
+    ],
+    "id": "Q_DB3_072"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Chỉ mục (Index)",
+    "concept": "Chỉ mục trên biểu thức (Expression Index)",
+    "difficulty": "Medium",
+    "question": "Truy vấn WHERE LOWER(email) = 'an@x.com' không dùng được chỉ mục trên cột email. Giải thích và đưa ra giải pháp.",
+    "reference_answer": "Chỉ mục B-tree trên email lưu các giá trị email gốc đã sắp xếp; điều kiện so sánh trên LOWER(email) là giá trị đã biến đổi, không khớp thứ tự trong chỉ mục nên optimizer không dùng được (phải quét toàn bảng và tính LOWER cho từng dòng). Giải pháp: tạo chỉ mục trên biểu thức CREATE INDEX idx_email_lower ON NguoiDung(LOWER(email)); — truy vấn dùng đúng biểu thức đó sẽ tận dụng chỉ mục. Có thể kết hợp UNIQUE để chặn email trùng không phân biệt hoa thường. Giải pháp thay thế: lưu sẵn email đã chuẩn hóa, hoặc dùng kiểu/collation không phân biệt hoa thường (citext).",
+    "key_points": [
+      "Hàm áp lên cột làm chỉ mục trên cột gốc không dùng được",
+      "Tạo chỉ mục trên biểu thức LOWER(email), hoặc lưu dữ liệu đã chuẩn hóa/collation không phân biệt hoa thường"
+    ],
+    "id": "Q_DB3_073"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Tối ưu truy vấn",
+    "concept": "Thuật toán Sort-Merge Join",
+    "difficulty": "Medium",
+    "question": "Mô tả thuật toán Sort-Merge Join và khi nào optimizer ưu tiên nó so với Hash Join.",
+    "reference_answer": "Sort-Merge Join sắp xếp cả hai bảng theo cột kết nối (nếu chưa có thứ tự sẵn), rồi duyệt song song hai danh sách đã sắp xếp như trộn hai dãy trong merge sort, ghép các dòng có cùng khóa. Chi phí chủ yếu là sắp xếp O(n log n) cộng một lượt trộn tuyến tính. Optimizer ưu tiên khi: dữ liệu đầu vào đã có thứ tự (lấy từ chỉ mục B-tree hoặc từ bước trước), kết quả cần ORDER BY theo cột join, điều kiện join là bất đẳng thức/phạm vi (hash join chỉ hỗ trợ so sánh bằng), hoặc dữ liệu quá lớn so với bộ nhớ khiến bảng băm phải tràn ra đĩa.",
+    "key_points": [
+      "Sắp xếp hai đầu vào theo khóa join rồi trộn tuyến tính",
+      "Hợp khi đầu vào đã sắp xếp, cần kết quả có thứ tự, join không phải bằng nhau, hoặc bộ nhớ hạn chế"
+    ],
+    "id": "Q_DB3_074"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lưu trữ và tổ chức file",
+    "concept": "Sắp xếp ngoài trong DBMS (External Merge Sort)",
+    "difficulty": "Medium",
+    "question": "Khi cần ORDER BY một bảng 100GB với bộ đệm chỉ 1GB, DBMS dùng external merge sort như thế nào? Số lượt đọc/ghi phụ thuộc vào gì?",
+    "reference_answer": "Pha 1 (tạo run): đọc lần lượt từng khối 1GB vào bộ nhớ, sắp xếp trong bộ nhớ rồi ghi ra đĩa thành một 'run' đã sắp xếp — được khoảng 100 run. Pha 2 (trộn): dùng B-1 trang bộ đệm làm đầu vào và 1 trang đầu ra để trộn nhiều run cùng lúc (k-way merge với heap), tạo các run lớn hơn, lặp đến khi còn một run. Số lượt = 1 + ⌈log_(B-1)(số run)⌉, mỗi lượt đọc và ghi toàn bộ dữ liệu một lần. Với bộ đệm đủ lớn, thường chỉ cần 2 lượt. Vì vậy tăng bộ nhớ sắp xếp (work_mem/sort_buffer) có thể giảm hẳn một lượt I/O, và chỉ mục có sẵn thứ tự giúp tránh sắp xếp.",
+    "key_points": [
+      "Pha tạo run sắp xếp từng phần vừa bộ nhớ, pha trộn k-way gộp các run",
+      "Số lượt I/O ≈ 1 + log_(B-1)(số run); tăng bộ nhớ sắp xếp hoặc dùng chỉ mục để giảm chi phí"
+    ],
+    "id": "Q_DB3_075"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Tối ưu truy vấn",
+    "concept": "Ước lượng độ chọn lọc và histogram",
+    "difficulty": "Medium",
+    "question": "Optimizer ước lượng số dòng thỏa điều kiện WHERE gia BETWEEN 100 AND 200 như thế nào? Vai trò của histogram là gì?",
+    "reference_answer": "Optimizer dựa vào thống kê được thu thập (ANALYZE): số dòng, số giá trị phân biệt, giá trị phổ biến nhất (MCV) và histogram mô tả phân bố giá trị. Nếu chỉ biết min/max và giả định phân bố đều, độ chọn lọc ≈ (200 - 100)/(max - min) — sai lớn khi dữ liệu lệch. Histogram (thường dạng chia đều số dòng mỗi bucket — equi-depth) cho biết khoảng [100, 200] chiếm bao nhiêu bucket, nên ước lượng sát thực tế hơn. Ước lượng số dòng quyết định lựa chọn quét chỉ mục hay quét toàn bảng, thứ tự join và thuật toán join, nên thống kê sai dẫn tới kế hoạch tệ.",
+    "key_points": [
+      "Optimizer ước lượng từ thống kê: số dòng, số giá trị phân biệt, MCV, histogram",
+      "Histogram nắm phân bố lệch, giúp ước lượng số dòng chính xác — quyết định chọn chỉ mục và thứ tự join"
+    ],
+    "id": "Q_DB3_076"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lưu trữ và tổ chức file",
+    "concept": "Column-store cho truy vấn phân tích",
+    "difficulty": "Medium",
+    "question": "Truy vấn SELECT vung, SUM(doanhThu) FROM BanHang GROUP BY vung trên bảng 1 tỷ dòng, 80 cột. Giải thích vì sao column-store có thể nhanh hơn row-store hàng chục lần.",
+    "reference_answer": "Row-store phải đọc toàn bộ các trang chứa cả 80 cột của mọi dòng dù chỉ cần 2 cột — đọc thừa khoảng 40 lần dữ liệu. Column-store chỉ đọc hai cột vung và doanhThu. Thêm vào đó, dữ liệu cùng cột có kiểu và giá trị tương tự nên nén rất tốt (dictionary encoding cho vung, run-length encoding khi đã sắp xếp), giảm I/O thêm nhiều lần; và thực thi theo vector (xử lý theo lô cột, tận dụng SIMD và cache CPU) nhanh hơn xử lý từng dòng. Đánh đổi: column-store chậm khi cần đọc/ghi trọn từng dòng hoặc cập nhật lẻ tẻ.",
+    "key_points": [
+      "Column-store chỉ đọc các cột cần thiết thay vì toàn bộ dòng",
+      "Nén theo cột hiệu quả và thực thi vector hóa; đổi lại chậm với ghi/đọc từng dòng"
+    ],
+    "id": "Q_DB3_077"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lưu trữ và tổ chức file",
+    "concept": "LSM-Tree so với B-Tree",
+    "difficulty": "Medium",
+    "question": "So sánh LSM-Tree (dùng trong Cassandra, RocksDB) và B-Tree về hiệu năng ghi và đọc.",
+    "reference_answer": "B-Tree cập nhật dữ liệu TẠI CHỖ: mỗi lần ghi phải tìm đúng trang lá và ghi lại trang đó (ghi ngẫu nhiên), đọc nhanh và ổn định vì mỗi khóa chỉ nằm ở một vị trí. LSM-Tree ghi vào bộ nhớ (memtable) và log tuần tự, khi đầy thì xả ra đĩa thành file đã sắp xếp bất biến (SSTable); các file được gộp (compaction) định kỳ ở nền. Ưu: ghi tuần tự nên thông lượng ghi rất cao. Nhược: đọc có thể phải kiểm tra nhiều file (giảm nhờ Bloom filter), compaction tiêu tốn I/O và CPU nền (write amplification), độ trễ đọc kém ổn định hơn. LSM hợp với khối lượng ghi lớn (log, IoT, time series), B-Tree hợp với OLTP cân bằng đọc ghi.",
+    "key_points": [
+      "B-Tree cập nhật tại chỗ, đọc nhanh ổn định, ghi ngẫu nhiên",
+      "LSM ghi tuần tự thông lượng cao, đọc có thể qua nhiều file, tốn chi phí compaction"
+    ],
+    "id": "Q_DB3_078"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "Lược đồ hình sao và lược đồ bông tuyết",
+    "difficulty": "Medium",
+    "question": "So sánh lược đồ hình sao (star schema) và lược đồ bông tuyết (snowflake schema).",
+    "reference_answer": "Star schema: mỗi bảng chiều là một bảng phi chuẩn hóa, ví dụ DimSanPham chứa luôn tenLoai, tenNhom, tenNhanHieu. Snowflake schema chuẩn hóa bảng chiều thành nhiều bảng phân cấp: DimSanPham → DimLoai → DimNhom. Star: truy vấn đơn giản hơn, ít JOIN, thường nhanh hơn, dễ hiểu với người làm báo cáo, nhưng dư thừa dữ liệu trong bảng chiều. Snowflake: tiết kiệm lưu trữ, dễ duy trì nhất quán khi thuộc tính phân cấp thay đổi, nhưng nhiều JOIN hơn. Vì bảng chiều thường nhỏ so với bảng sự kiện, star schema được ưu tiên trong đa số kho dữ liệu.",
+    "key_points": [
+      "Star: bảng chiều phi chuẩn hóa, ít JOIN, truy vấn đơn giản",
+      "Snowflake: bảng chiều chuẩn hóa nhiều tầng, ít dư thừa nhưng nhiều JOIN; star thường được ưu tiên"
+    ],
+    "id": "Q_DB3_079"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "Độ chi tiết (Grain) của bảng sự kiện",
+    "difficulty": "Medium",
+    "question": "Vì sao 'xác định grain' (mỗi dòng của bảng sự kiện đại diện cho điều gì) là bước đầu tiên quan trọng nhất khi thiết kế bảng sự kiện?",
+    "reference_answer": "Grain quyết định ý nghĩa của mỗi dòng (ví dụ 'một dòng sản phẩm trên một hóa đơn' hay 'tổng doanh thu một cửa hàng mỗi ngày'), từ đó quyết định chiều nào gắn được và số đo nào hợp lệ. Grain càng chi tiết (atomic) càng linh hoạt: có thể tổng hợp lên mọi mức, trả lời câu hỏi chưa lường trước; grain tổng hợp sẵn nhỏ gọn nhưng không thể khoan sâu xuống (không biết sản phẩm nào bán cùng sản phẩm nào). Trộn nhiều grain trong một bảng sự kiện (vừa dòng chi tiết vừa dòng tổng) gây đếm trùng khi cộng. Vì vậy cần thống nhất grain trước khi chọn chiều và số đo.",
+    "key_points": [
+      "Grain xác định ý nghĩa mỗi dòng, quyết định chiều và số đo hợp lệ",
+      "Grain chi tiết linh hoạt hơn; trộn nhiều grain trong một bảng gây đếm trùng"
+    ],
+    "id": "Q_DB3_080"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "Nạp gia tăng và Change Data Capture",
+    "difficulty": "Medium",
+    "question": "So sánh nạp toàn bộ (full load) và nạp gia tăng (incremental load) trong ETL. Change Data Capture (CDC) hỗ trợ nạp gia tăng như thế nào?",
+    "reference_answer": "Full load xóa và nạp lại toàn bộ dữ liệu mỗi lần: đơn giản, luôn đúng, nhưng tốn thời gian và tải lên hệ nguồn khi dữ liệu lớn. Incremental load chỉ nạp phần thay đổi kể từ lần trước: nhanh, giảm tải, nhưng cần cách xác định chính xác phần thay đổi. Cách đơn giản là dùng cột updated_at, nhưng dễ bỏ sót các dòng bị XÓA và các cập nhật không đổi cột này. CDC đọc trực tiếp nhật ký giao dịch của CSDL nguồn (binlog, WAL) để thu mọi INSERT/UPDATE/DELETE theo đúng thứ tự mà không cần sửa ứng dụng hay quét bảng — công cụ như Debezium phát các thay đổi thành luồng sự kiện.",
+    "key_points": [
+      "Full load đơn giản nhưng tốn kém; incremental nhanh nhưng phải xác định đúng phần thay đổi",
+      "CDC đọc log giao dịch thu mọi thay đổi kể cả DELETE, đúng thứ tự, không cần sửa ứng dụng"
+    ],
+    "id": "Q_DB3_081"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Sao chép đồng bộ và bất đồng bộ",
+    "difficulty": "Medium",
+    "question": "So sánh replication đồng bộ (synchronous) và bất đồng bộ (asynchronous) về độ bền dữ liệu và hiệu năng.",
+    "reference_answer": "Đồng bộ: primary chỉ báo commit thành công sau khi ít nhất một replica xác nhận đã nhận (và ghi bền) thay đổi. Ưu: primary hỏng đột ngột không mất giao dịch đã commit. Nhược: mỗi commit chịu thêm độ trễ mạng, và nếu replica chậm/không phản hồi thì ghi bị chặn. Bất đồng bộ: primary commit ngay, thay đổi được gửi sang replica sau. Ưu: độ trễ ghi thấp, primary không phụ thuộc replica. Nhược: replica có độ trễ (lag); nếu primary hỏng, các giao dịch chưa kịp sao chép bị mất khi chuyển sang replica. Giải pháp lai: bán đồng bộ (chờ một trong N replica) hoặc đồng bộ trong cùng vùng, bất đồng bộ sang vùng xa.",
+    "key_points": [
+      "Đồng bộ: không mất dữ liệu đã commit nhưng tăng độ trễ và phụ thuộc replica",
+      "Bất đồng bộ: nhanh nhưng có lag và có thể mất giao dịch khi failover; có phương án bán đồng bộ"
+    ],
+    "id": "Q_DB3_082"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Độ trễ replica và tính nhất quán đọc-sau-ghi",
+    "difficulty": "Medium",
+    "question": "Người dùng cập nhật ảnh đại diện (ghi vào primary), trang tải lại đọc từ replica và vẫn thấy ảnh cũ. Giải thích và nêu các cách đảm bảo 'read-your-writes'.",
+    "reference_answer": "Với replication bất đồng bộ, replica có thể trễ vài trăm mili giây đến vài giây so với primary; đọc từ replica ngay sau khi ghi có thể chưa thấy thay đổi. Cách đảm bảo read-your-writes: (1) đọc từ primary đối với dữ liệu người dùng vừa sửa (ví dụ hồ sơ của chính mình) hoặc trong một khoảng thời gian ngắn sau khi ghi; (2) ghi nhớ vị trí log (LSN/GTID) của lần ghi trong phiên, chỉ đọc từ replica đã áp dụng tới vị trí đó, nếu không thì chờ hoặc chuyển sang primary; (3) gắn phiên người dùng với một replica cố định để ít nhất đảm bảo đọc đơn điệu (không thấy dữ liệu 'lùi' về quá khứ).",
+    "key_points": [
+      "Replica bất đồng bộ trễ nên đọc ngay sau ghi có thể thấy dữ liệu cũ",
+      "Giải pháp: đọc primary cho dữ liệu vừa sửa, theo dõi LSN của phiên, gắn phiên với replica"
+    ],
+    "id": "Q_DB3_083"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Quorum đọc ghi (N, R, W)",
+    "difficulty": "Medium",
+    "question": "Trong hệ lưu trữ sao chép N bản (như Cassandra, DynamoDB), giải thích điều kiện R + W > N và ý nghĩa của việc chọn các giá trị R, W khác nhau.",
+    "reference_answer": "Mỗi khóa được lưu ở N bản sao; một thao tác ghi thành công khi W bản xác nhận, đọc thành công khi nhận phản hồi từ R bản. Nếu R + W > N thì tập bản sao được đọc và tập được ghi luôn giao nhau ít nhất một bản, nên lần đọc chắc chắn chạm tới ít nhất một bản có giá trị mới nhất (dùng timestamp/phiên bản để chọn). Ví dụ N = 3: W = 2, R = 2 cân bằng; W = 3, R = 1 cho đọc nhanh nhưng ghi thất bại nếu một node chết; W = 1, R = 3 ngược lại. R + W ≤ N (như R = W = 1) cho độ trễ thấp và sẵn sàng cao nhưng có thể đọc dữ liệu cũ. Ngay cả khi R + W > N vẫn có các trường hợp biên (ghi thất bại một phần, sloppy quorum) nên không tương đương nhất quán mạnh hoàn toàn.",
+    "key_points": [
+      "R + W > N đảm bảo tập đọc và tập ghi giao nhau, đọc thấy bản mới nhất",
+      "Điều chỉnh R, W để đánh đổi độ trễ, độ sẵn sàng và tính nhất quán; vẫn có trường hợp biên"
+    ],
+    "id": "Q_DB3_084"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "NoSQL và so sánh",
+    "concept": "CSDL đồ thị và truy vấn nhiều bước",
+    "difficulty": "Medium",
+    "question": "Truy vấn 'tìm bạn của bạn của bạn (3 bước) của một người dùng' trên mạng xã hội 100 triệu người. So sánh cách làm bằng SQL với self-join và bằng CSDL đồ thị.",
+    "reference_answer": "Trong SQL, mỗi bước là một self-join trên bảng QuanHeBan (hàng tỷ dòng): ba bước là ba phép join, mỗi bước tra chỉ mục và kết quả trung gian bùng nổ theo cấp số nhân, chi phí phụ thuộc vào kích thước toàn bảng và chỉ mục (O(log n) cho mỗi lần tra). CSDL đồ thị dùng 'index-free adjacency': mỗi nút lưu con trỏ trực tiếp tới các cạnh kề, nên duyệt một bước có chi phí tỉ lệ với số láng giềng chứ không phụ thuộc kích thước toàn đồ thị; truy vấn biểu diễn tự nhiên (MATCH (a)-[:BAN*3]->(c)). Tuy nhiên với truy vấn tổng hợp trên toàn bộ dữ liệu, hoặc nút siêu kết nối (người nổi tiếng triệu bạn), CSDL đồ thị cũng gặp khó; và chi phí vận hành thêm một hệ thống phải được cân nhắc.",
+    "key_points": [
+      "SQL cần nhiều self-join, chi phí mỗi bước phụ thuộc kích thước bảng và chỉ mục",
+      "Đồ thị duyệt theo con trỏ kề, chi phí tỉ lệ số láng giềng; vẫn gặp khó với tổng hợp toàn cục và nút siêu kết nối"
+    ],
+    "id": "Q_DB3_085"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "NoSQL và so sánh",
+    "concept": "Mô hình Cache-aside với Redis",
+    "difficulty": "Medium",
+    "question": "Mô tả mô hình cache-aside khi dùng Redis làm bộ đệm cho bảng SanPham, và các chiến lược vô hiệu hóa (invalidate) cache khi dữ liệu thay đổi.",
+    "reference_answer": "Cache-aside (lazy loading): khi đọc, ứng dụng tìm trong Redis trước; nếu có (hit) thì trả về; nếu không (miss) thì đọc từ CSDL, ghi vào Redis kèm thời gian sống (TTL) rồi trả về. Khi cập nhật sản phẩm: ghi vào CSDL rồi XÓA khóa tương ứng trong cache (thay vì ghi đè giá trị mới) để lần đọc kế tiếp nạp lại dữ liệu mới nhất. TTL đóng vai trò lưới an toàn, đảm bảo dữ liệu cũ không tồn tại vĩnh viễn nếu việc xóa bị lỗi. Các mô hình khác: write-through (ghi qua cache đồng thời vào CSDL), write-behind (ghi cache trước, đẩy xuống CSDL sau — nhanh nhưng rủi ro mất dữ liệu).",
+    "key_points": [
+      "Cache-aside: đọc cache, miss thì đọc CSDL rồi nạp cache có TTL",
+      "Khi cập nhật: ghi CSDL rồi xóa khóa cache; TTL là lưới an toàn; có các mô hình write-through, write-behind"
+    ],
+    "id": "Q_DB3_086"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "NoSQL và so sánh",
+    "concept": "Chỉ mục phụ toàn cục trong NoSQL",
+    "difficulty": "Medium",
+    "question": "Trong DynamoDB, bảng DonHang có khóa phân vùng maKH. Cần truy vấn 'mọi đơn hàng có trạng thái DANG_GIAO'. Giải thích vấn đề và vai trò của Global Secondary Index (GSI).",
+    "reference_answer": "Hệ key-value/wide-column phân tán dữ liệu theo khóa phân vùng; truy vấn hiệu quả chỉ khi biết khóa phân vùng (lấy đơn của một khách hàng). Truy vấn theo trangThai buộc phải quét toàn bộ bảng trên mọi phân vùng (Scan) — rất tốn kém. GSI là một bản sao dữ liệu được tổ chức với khóa phân vùng khác (ví dụ trangThai, khóa sắp xếp ngayTao), được hệ thống tự cập nhật khi bảng gốc thay đổi, cho phép truy vấn hiệu quả theo khóa mới. Đánh đổi: tốn thêm lưu trữ và chi phí ghi (mỗi lần ghi bảng gốc kéo theo ghi chỉ mục), GSI thường chỉ nhất quán cuối cùng, và khóa có ít giá trị như trangThai dễ tạo phân vùng nóng — thường cần thêm hậu tố ngẫu nhiên (write sharding).",
+    "key_points": [
+      "NoSQL truy vấn hiệu quả theo khóa phân vùng; thuộc tính khác phải scan toàn bảng",
+      "GSI là bản sao tổ chức theo khóa khác, tốn ghi/lưu trữ, nhất quán cuối cùng, cẩn thận phân vùng nóng"
+    ],
+    "id": "Q_DB3_087"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Race condition của mẫu SELECT rồi INSERT",
+    "difficulty": "Medium",
+    "question": "Ứng dụng kiểm tra SELECT COUNT(*) FROM NguoiDung WHERE email = ? rồi mới INSERT nếu chưa tồn tại. Vì sao vẫn có thể xuất hiện email trùng, và giải pháp đúng là gì?",
+    "reference_answer": "Hai request đồng thời cùng chạy SELECT, cả hai thấy count = 0 (dưới READ COMMITTED, hoặc cả REPEATABLE READ/snapshot vì dòng mới chưa tồn tại để khóa), rồi cả hai INSERT — khoảng hở giữa kiểm tra và hành động (check-then-act) cho phép trùng lặp. Giải pháp đúng là để CSDL đảm bảo: tạo ràng buộc UNIQUE(email), rồi INSERT trực tiếp và xử lý lỗi vi phạm unique (hoặc dùng INSERT ... ON CONFLICT DO NOTHING/UPDATE). Ràng buộc unique được thực thi nguyên tử bên trong CSDL thông qua chỉ mục, nên không có khoảng hở. Dùng SERIALIZABLE cũng ngăn được nhưng cần cơ chế retry.",
+    "key_points": [
+      "Check-then-act có khoảng hở giữa SELECT và INSERT, hai giao dịch có thể cùng chèn",
+      "Dùng UNIQUE constraint + INSERT xử lý lỗi/ON CONFLICT để CSDL đảm bảo nguyên tử"
+    ],
+    "id": "Q_DB3_088"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL DDL",
+    "concept": "Khoảng trống trong giá trị Sequence",
+    "difficulty": "Medium",
+    "question": "Vì sao giá trị của cột tự tăng/sequence có thể bị nhảy cóc (1, 2, 5, 6...) và vì sao không nên 'sửa' điều này?",
+    "reference_answer": "Để đảm bảo hiệu năng đồng thời, sequence cấp giá trị KHÔNG theo giao dịch: một giá trị đã lấy ra sẽ không bị trả lại khi giao dịch rollback (nếu không, mọi giao dịch khác phải chờ để biết giá trị có được dùng hay không — trở thành nút cổ chai). Ngoài ra, nhiều hệ cấp phát sẵn một khối giá trị vào bộ nhớ đệm (cache) để giảm I/O, khởi động lại máy chủ sẽ bỏ phần còn lại; INSERT thất bại do vi phạm ràng buộc cũng tiêu tốn giá trị. Không nên ép dãy liên tục (ví dụ dùng MAX(id)+1) vì sẽ gây khóa và race condition. Nếu nghiệp vụ cần số liên tục (số hóa đơn theo luật) thì phải dùng cơ chế riêng có khóa, tách khỏi khóa chính.",
+    "key_points": [
+      "Sequence không trả lại giá trị khi rollback, có cache, insert lỗi cũng tiêu tốn giá trị",
+      "Không ép liên tục bằng MAX+1; số liên tục theo nghiệp vụ cần cơ chế riêng có khóa"
+    ],
+    "id": "Q_DB3_089"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Bảo mật CSDL",
+    "concept": "WITH GRANT OPTION và thu hồi dây chuyền",
+    "difficulty": "Medium",
+    "question": "Người dùng A cấp quyền SELECT trên bảng LuongNhanVien cho B kèm WITH GRANT OPTION, B tiếp tục cấp cho C. Sau đó A thu hồi quyền của B. Chuyện gì xảy ra với quyền của C?",
+    "reference_answer": "WITH GRANT OPTION cho phép người nhận tiếp tục cấp quyền đó cho người khác, tạo thành chuỗi cấp quyền. Khi A thu hồi quyền của B: nếu dùng REVOKE ... CASCADE, quyền mà B đã cấp lại cho C (và những người C đã cấp tiếp) cũng bị thu hồi theo, trừ khi C còn nhận quyền đó từ một nguồn độc lập khác. Nếu dùng RESTRICT (mặc định trong nhiều hệ), lệnh thu hồi sẽ bị từ chối vì còn quyền phụ thuộc. Đây là lý do cần hạn chế WITH GRANT OPTION với dữ liệu nhạy cảm: nó làm phân tán quyền kiểm soát và khó kiểm toán ai đang có quyền.",
+    "key_points": [
+      "WITH GRANT OPTION cho phép cấp lại quyền, tạo chuỗi phụ thuộc",
+      "REVOKE CASCADE thu hồi theo chuỗi (trừ khi có nguồn khác), RESTRICT từ chối; nên hạn chế với dữ liệu nhạy cảm"
+    ],
+    "id": "Q_DB3_090"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "NoSQL và so sánh",
+    "concept": "JSONB so với cột chuẩn hóa",
+    "difficulty": "Medium",
+    "question": "Khi nào nên lưu thuộc tính sản phẩm trong một cột JSONB, và khi nào nên tách thành các cột/bảng chuẩn hóa?",
+    "reference_answer": "JSONB phù hợp khi thuộc tính đa dạng và thay đổi theo loại sản phẩm (điện thoại có RAM, áo có size và chất liệu), không có quy tắc nghiệp vụ chặt, chủ yếu được hiển thị hoặc lọc đơn giản, hoặc là dữ liệu bán cấu trúc từ bên ngoài (payload webhook). Nên tách thành cột/bảng chuẩn hóa khi: thuộc tính có mặt ở mọi dòng, cần ràng buộc (NOT NULL, kiểu, khóa ngoại, CHECK), cần JOIN hoặc tổng hợp thường xuyên, cần thống kê chính xác cho optimizer, hoặc thuộc tính quan trọng cho nghiệp vụ (giá, tồn kho). Cách lai phổ biến: cột chuẩn cho thuộc tính cốt lõi, JSONB cho phần mở rộng.",
+    "key_points": [
+      "JSONB cho thuộc tính đa dạng, linh hoạt, ít ràng buộc",
+      "Cột chuẩn hóa cho thuộc tính cốt lõi cần ràng buộc, JOIN, tổng hợp, thống kê; thường dùng mô hình lai"
+    ],
+    "id": "Q_DB3_091"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL DDL",
+    "concept": "Lưu trữ thời gian theo UTC",
+    "difficulty": "Medium",
+    "question": "Vì sao khuyến nghị lưu thời điểm sự kiện theo UTC (hoặc kiểu có múi giờ) và chỉ chuyển sang giờ địa phương khi hiển thị? Nêu một ngoại lệ.",
+    "reference_answer": "Lưu giờ địa phương không kèm múi giờ gây mơ hồ khi hệ thống có người dùng/máy chủ ở nhiều múi giờ, và giờ mùa hè (DST) làm một số giờ địa phương lặp lại hai lần hoặc không tồn tại — so sánh, sắp xếp và tính khoảng cách thời gian có thể sai. UTC là trục thời gian tuyệt đối, liên tục, nên lưu UTC giúp mọi phép toán đúng; việc hiển thị theo múi giờ người dùng được làm ở tầng trình bày. Ngoại lệ: các thời điểm TƯƠNG LAI gắn với giờ địa phương theo ý định con người (cuộc hẹn 9h sáng tại TP.HCM năm sau) nên lưu giờ địa phương kèm tên múi giờ (Asia/Ho_Chi_Minh), vì quy tắc múi giờ có thể thay đổi trước thời điểm đó.",
+    "key_points": [
+      "Giờ địa phương không múi giờ mơ hồ, sai khi DST và đa múi giờ; UTC là trục tuyệt đối",
+      "Ngoại lệ: sự kiện tương lai theo giờ địa phương nên lưu giờ địa phương + tên múi giờ"
+    ],
+    "id": "Q_DB3_092"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Đại số quan hệ",
+    "concept": "Phép tính quan hệ bộ (Tuple Relational Calculus)",
+    "difficulty": "Medium",
+    "question": "Phép tính quan hệ bộ (Tuple Relational Calculus) khác đại số quan hệ ở tính chất nào? Biểu diễn truy vấn 'sinh viên có điểm trên 8' bằng phép tính quan hệ bộ.",
+    "reference_answer": "Đại số quan hệ là ngôn ngữ THỦ TỤC: mô tả chuỗi phép toán (chọn, chiếu, kết...) để tính ra kết quả. Phép tính quan hệ bộ là ngôn ngữ KHAI BÁO dựa trên logic vị từ: chỉ mô tả kết quả cần thỏa điều kiện gì, không nói cách tính. Ví dụ: { t | t ∈ SinhVien ∧ t.diem > 8 }. Truy vấn có lượng từ: sinh viên đã đăng ký ít nhất một môn: { t | t ∈ SinhVien ∧ ∃ d ∈ DangKy (d.maSV = t.maSV) }. Định lý Codd chứng minh đại số quan hệ và phép tính quan hệ an toàn (safe) có khả năng biểu diễn tương đương; SQL chịu ảnh hưởng của phép tính quan hệ (tính khai báo), còn bộ tối ưu dịch nó sang dạng đại số để thực thi.",
+    "key_points": [
+      "Đại số quan hệ là thủ tục, phép tính quan hệ là khai báo dựa trên logic vị từ",
+      "Ví dụ { t | t ∈ SinhVien ∧ t.diem > 8 }; hai ngôn ngữ (dạng an toàn) tương đương về khả năng biểu diễn"
+    ],
+    "id": "Q_DB3_093"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL nâng cao cơ bản",
+    "concept": "LATERAL join (CROSS APPLY)",
+    "difficulty": "Medium",
+    "question": "Viết truy vấn lấy 3 đơn hàng gần nhất của MỖI khách hàng bằng LATERAL join, và giải thích LATERAL cho phép điều gì mà subquery trong FROM thông thường không làm được.",
+    "reference_answer": "SELECT k.maKH, d.* FROM KhachHang k CROSS JOIN LATERAL (SELECT * FROM DonHang dh WHERE dh.maKH = k.maKH ORDER BY dh.ngayDat DESC LIMIT 3) d; (SQL Server dùng CROSS APPLY với TOP 3). Subquery thông thường trong FROM được đánh giá độc lập, không thể tham chiếu tới cột của bảng đứng trước nó. LATERAL cho phép subquery tham chiếu tới từng dòng của bảng bên trái — giống một vòng lặp 'với mỗi khách hàng, chạy truy vấn con này'. Khi có chỉ mục (maKH, ngayDat DESC), mỗi lần chạy chỉ đọc 3 dòng, hiệu quả hơn đánh số ROW_NUMBER trên toàn bảng đơn hàng nếu số khách hàng nhỏ. Dùng LEFT JOIN LATERAL ... ON true để giữ cả khách hàng chưa có đơn.",
+    "key_points": [
+      "LATERAL cho phép subquery trong FROM tham chiếu cột của bảng bên trái, như vòng lặp theo từng dòng",
+      "Phù hợp bài toán top-N mỗi nhóm khi có chỉ mục phù hợp; LEFT JOIN LATERAL để giữ dòng không có kết quả"
+    ],
+    "id": "Q_DB3_094"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Khóa tư vấn (Advisory Lock)",
+    "difficulty": "Medium",
+    "question": "Advisory lock (ví dụ pg_advisory_lock trong PostgreSQL) là gì và dùng trong tình huống nào?",
+    "reference_answer": "Advisory lock là khóa do ỨNG DỤNG tự định nghĩa ý nghĩa, gắn với một số/khóa bất kỳ chứ không gắn với dòng hay bảng; CSDL chỉ đảm bảo loại trừ tương hỗ, còn việc tôn trọng khóa là quy ước giữa các tiến trình ứng dụng. Ứng dụng: đảm bảo chỉ một instance chạy một tác vụ định kỳ (cron) tại một thời điểm trong cụm nhiều máy chủ, tuần tự hóa việc xử lý theo một khóa nghiệp vụ (mọi thao tác trên ví của một khách hàng), chạy migration an toàn. Ưu: tận dụng CSDL sẵn có làm dịch vụ khóa phân tán đơn giản. Lưu ý: khóa mức phiên phải được giải phóng tường minh (cẩn thận với connection pool), và nó không bảo vệ dữ liệu khỏi code không xin khóa.",
+    "key_points": [
+      "Advisory lock là khóa do ứng dụng định nghĩa ý nghĩa, không gắn với dòng/bảng",
+      "Dùng cho tác vụ đơn instance, tuần tự hóa theo khóa nghiệp vụ; cần giải phóng đúng và mọi bên phải tuân thủ"
+    ],
+    "id": "Q_DB3_095"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Chuẩn hóa",
+    "concept": "Phụ thuộc kết nối và dạng chuẩn 5 (5NF)",
+    "difficulty": "Medium",
+    "question": "Phụ thuộc kết nối (join dependency) là gì và dạng chuẩn 5 (5NF) giải quyết vấn đề gì mà 4NF chưa giải quyết?",
+    "reference_answer": "Phụ thuộc kết nối nói rằng quan hệ R luôn bằng kết của các phép chiếu R1, R2, ..., Rn của nó; phụ thuộc đa trị là trường hợp đặc biệt với n = 2. 5NF yêu cầu mọi phụ thuộc kết nối không tầm thường đều được suy ra từ các khóa. Ví dụ CungCap(nhaCungCap, sanPham, duAn) với quy tắc 'nếu NCC cung cấp sản phẩm P, và P được dùng trong dự án D, và NCC tham gia dự án D thì NCC cung cấp P cho D': quan hệ không thể phân rã lossless thành 2 bảng nhưng có thể phân rã thành 3 bảng hai cột. Giữ ở dạng một bảng ba cột thì phải chèn nhiều bộ cùng lúc để duy trì quy tắc. Trên thực tế 5NF hiếm gặp và thường chỉ cần quan tâm khi có quan hệ nhiều ngôi với ràng buộc vòng như vậy.",
+    "key_points": [
+      "Join dependency: quan hệ bằng kết của nhiều phép chiếu; MVD là trường hợp n = 2",
+      "5NF xử lý trường hợp chỉ phân rã lossless được thành từ 3 bảng trở lên; hiếm gặp trong thực tế"
+    ],
+    "id": "Q_DB3_096"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Chỉ mục (Index)",
+    "concept": "Phân vùng dọc và phân vùng ngang",
+    "difficulty": "Medium",
+    "question": "So sánh phân vùng dọc (vertical partitioning) và phân vùng ngang (horizontal partitioning) và cho ví dụ ứng dụng.",
+    "reference_answer": "Phân vùng ngang chia các DÒNG của bảng thành nhiều phần theo một tiêu chí (theo khoảng thời gian, theo vùng, theo hash khóa), mỗi phần có cùng cấu trúc cột — ví dụ bảng NhatKy chia theo tháng để truy vấn một tháng chỉ quét một phân vùng và xóa dữ liệu cũ bằng cách bỏ cả phân vùng. Phân vùng dọc chia các CỘT thành nhiều bảng có chung khóa chính — ví dụ tách cột moTa (văn bản dài), anhDaiDien (BLOB) của SanPham sang bảng SanPhamChiTiet, để bảng chính nhỏ gọn, nhiều dòng hơn trong mỗi trang, quét và cache hiệu quả hơn cho các truy vấn thường xuyên chỉ cần vài cột. Đánh đổi của phân vùng dọc: cần JOIN khi cần đủ thông tin.",
+    "key_points": [
+      "Ngang: chia dòng theo tiêu chí, cùng cấu trúc; hợp dữ liệu theo thời gian/vùng",
+      "Dọc: chia cột sang bảng khác chung khóa; tách cột lớn/ít dùng, đổi lại cần JOIN"
+    ],
+    "id": "Q_DB3_097"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "Báo cáo trên Read Replica so với kho dữ liệu",
+    "difficulty": "Medium",
+    "question": "Một công ty chạy báo cáo phân tích nặng trực tiếp trên read replica của CSDL nghiệp vụ. Phân tích ưu, nhược điểm so với xây dựng kho dữ liệu riêng.",
+    "reference_answer": "Read replica: triển khai nhanh, dữ liệu gần thời gian thực, không tải trực tiếp lên primary. Nhược: lược đồ chuẩn hóa cho OLTP buộc truy vấn báo cáo JOIN nhiều bảng, chậm; row-store và chỉ mục OLTP không tối ưu cho quét tổng hợp; truy vấn dài trên replica có thể xung đột với việc áp dụng thay đổi (PostgreSQL phải hủy truy vấn hoặc làm replica bị trễ), và replica là ứng viên failover nên hiệu năng của nó vẫn quan trọng; chỉ có dữ liệu hiện tại của một hệ thống, không có lịch sử và không tích hợp nguồn khác. Kho dữ liệu: lược đồ sao, column-store, lưu lịch sử, tích hợp nhiều nguồn, chất lượng dữ liệu được làm sạch, nhưng tốn công xây dựng ETL và dữ liệu có độ trễ. Thường bắt đầu bằng replica và chuyển dần sang kho dữ liệu khi nhu cầu phân tích tăng.",
+    "key_points": [
+      "Replica: nhanh triển khai, gần thời gian thực nhưng lược đồ OLTP chậm cho phân tích và có thể xung đột replication",
+      "Kho dữ liệu: tối ưu phân tích, có lịch sử, tích hợp nguồn, đổi lại chi phí ETL và độ trễ"
+    ],
+    "id": "Q_DB3_098"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Bảo mật CSDL",
+    "concept": "Nhật ký kiểm toán (Database Auditing)",
+    "difficulty": "Medium",
+    "question": "Kiểm toán CSDL (auditing) nên ghi lại những thông tin gì, và vì sao không nên chỉ dựa vào bảng log do chính ứng dụng ghi?",
+    "reference_answer": "Bản ghi kiểm toán nên có: ai (tài khoản CSDL và danh tính người dùng cuối), làm gì (loại thao tác, câu lệnh, đối tượng bị tác động, giá trị trước/sau với dữ liệu nhạy cảm), khi nào (thời điểm chính xác), từ đâu (địa chỉ IP, ứng dụng), kết quả (thành công/thất bại, bị từ chối quyền). Chỉ dựa vào log của ứng dụng là chưa đủ vì các truy cập đi vòng ứng dụng (quản trị viên chạy SQL trực tiếp, công cụ báo cáo, tài khoản bị đánh cắp) sẽ không được ghi lại; và người có quyền sửa bảng log có thể xóa dấu vết. Cần kiểm toán ở mức CSDL (pgAudit, SQL Server Audit) và đẩy log ra hệ thống riêng chỉ ghi thêm (append-only/WORM), tách quyền quản trị CSDL và quyền quản lý log.",
+    "key_points": [
+      "Ghi ai, làm gì, khi nào, từ đâu, kết quả; giá trị trước/sau với dữ liệu nhạy cảm",
+      "Log ứng dụng bỏ sót truy cập trực tiếp và có thể bị xóa; cần audit mức CSDL, lưu tách biệt append-only"
+    ],
+    "id": "Q_DB3_099"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Tối ưu truy vấn",
+    "concept": "Điều kiện sargable",
+    "difficulty": "Medium",
+    "question": "Vì sao điều kiện WHERE YEAR(ngayDat) = 2024 thường chậm dù có chỉ mục trên ngayDat? Viết lại cho hiệu quả và giải thích khái niệm 'sargable'.",
+    "reference_answer": "Điều kiện 'sargable' (Search ARGument ABLE) là điều kiện mà DBMS có thể dùng chỉ mục để tìm kiếm theo phạm vi — cột phải đứng 'trần' một phía của phép so sánh. YEAR(ngayDat) = 2024 áp hàm lên cột nên chỉ mục B-tree trên ngayDat không dùng được để định vị, phải quét toàn bộ và tính YEAR cho từng dòng. Viết lại: WHERE ngayDat >= '2024-01-01' AND ngayDat < '2025-01-01' — đây là điều kiện phạm vi trên chính cột nên dùng được index range scan. Tương tự cần tránh gia * 1.1 > 100 (viết gia > 100/1.1), tenKH LIKE '%an' (ký tự đại diện đầu), hoặc so sánh khác kiểu dữ liệu.",
+    "key_points": [
+      "Sargable: cột đứng trần trong điều kiện để dùng chỉ mục theo phạm vi",
+      "Viết lại YEAR(ngay) = 2024 thành khoảng [2024-01-01, 2025-01-01); tránh hàm/phép tính trên cột và LIKE bắt đầu bằng %"
+    ],
+    "id": "Q_DB3_100"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL nâng cao cơ bản",
+    "concept": "Phân trang không ổn định do ORDER BY không duy nhất",
+    "difficulty": "Hard",
+    "question": "API danh sách sản phẩm phân trang bằng ORDER BY gia LIMIT 20 OFFSET ?. Người dùng phản ánh có sản phẩm xuất hiện ở cả trang 1 và trang 2, trong khi một số sản phẩm không bao giờ xuất hiện. Phân tích nguyên nhân.",
+    "reference_answer": "Khi nhiều sản phẩm có cùng giá, ORDER BY gia không xác định thứ tự giữa chúng; SQL không đảm bảo thứ tự ổn định giữa các lần thực thi. Mỗi truy vấn trang có thể dùng kế hoạch khác nhau (quét song song, sort khác thuật toán, top-N heapsort, dữ liệu trong bộ đệm khác nhau), nên các dòng cùng giá có thể được sắp xếp khác nhau ở mỗi lần — dòng ở vị trí 20 lần này lại ở vị trí 21 lần sau, gây lặp hoặc mất. Khắc phục: thêm một cột duy nhất làm tiêu chí phụ (ORDER BY gia, id) để thứ tự là toàn phần và xác định; tốt hơn nữa dùng keyset pagination (WHERE (gia, id) > (:giaCuoi, :idCuoi)) cũng dựa trên khóa duy nhất. Lưu ý thêm: dữ liệu bị chèn/xóa giữa các lần gọi cũng làm lệch OFFSET.",
+    "key_points": [
+      "ORDER BY trên cột không duy nhất không đảm bảo thứ tự ổn định giữa các lần thực thi",
+      "Thêm cột duy nhất làm tiêu chí phụ để có thứ tự toàn phần; ưu tiên keyset pagination"
+    ],
+    "id": "Q_DB3_101"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Serializable Snapshot Isolation và lỗi tuần tự hóa",
+    "difficulty": "Hard",
+    "question": "Sau khi chuyển một hệ thống PostgreSQL sang mức SERIALIZABLE để chặn write skew, ứng dụng bắt đầu gặp lỗi 'could not serialize access due to read/write dependencies' dù không có hai giao dịch nào thực sự xung đột về logic nghiệp vụ. Phân tích nguyên nhân và yêu cầu thiết kế đi kèm.",
+    "reference_answer": "PostgreSQL hiện thực SERIALIZABLE bằng SSI (Serializable Snapshot Isolation): theo dõi các phụ thuộc đọc-ghi (rw-antidependency) giữa các giao dịch đồng thời và abort một giao dịch khi phát hiện cấu trúc 'nguy hiểm' có thể dẫn tới chu trình. Việc theo dõi được thực hiện ở mức độ thô (khóa predicate có thể nâng từ dòng lên trang hoặc cả quan hệ khi nhiều, quét toàn bảng khóa cả quan hệ) nên có DƯƠNG TÍNH GIẢ: abort cả những giao dịch thực tế vẫn tuần tự hóa được. Vì vậy dùng SERIALIZABLE bắt buộc ứng dụng phải có cơ chế THỬ LẠI (retry) toàn bộ giao dịch khi gặp lỗi tuần tự hóa (SQLSTATE 40001), giao dịch phải ngắn và idempotent về tác dụng phụ bên ngoài. Giảm tỷ lệ abort: có chỉ mục phù hợp để tránh quét toàn bảng, khai báo READ ONLY cho giao dịch chỉ đọc, giữ giao dịch ngắn.",
+    "key_points": [
+      "SSI theo dõi phụ thuộc đọc-ghi ở mức thô nên có dương tính giả, abort cả giao dịch không thực sự xung đột",
+      "Bắt buộc có cơ chế retry toàn giao dịch; giảm abort bằng chỉ mục, READ ONLY, giao dịch ngắn"
+    ],
+    "id": "Q_DB3_102"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Deadlock",
+    "concept": "Deadlock do gap lock/next-key lock khi chèn đồng thời",
+    "difficulty": "Hard",
+    "question": "Trong MySQL InnoDB (REPEATABLE READ), hai giao dịch cùng chạy: SELECT ... FROM DatCho WHERE maPhong = 5 AND ngay = '2024-12-24' FOR UPDATE (không tìm thấy dòng nào), sau đó INSERT dòng tương ứng nếu chưa có. Hệ thống thường xuyên deadlock. Giải thích cơ chế.",
+    "reference_answer": "Khi SELECT ... FOR UPDATE không tìm thấy dòng, InnoDB vẫn đặt GAP LOCK (khóa khoảng trống) trên khoảng chỉ mục nơi dòng đó lẽ ra nằm, để ngăn phantom. Gap lock giữa các giao dịch TƯƠNG THÍCH với nhau, nên cả hai giao dịch đều giữ được gap lock trên cùng khoảng. Sau đó mỗi giao dịch INSERT cần 'insert intention lock' trên khoảng đó — xung đột với gap lock mà giao dịch kia đang giữ. Hai bên chờ nhau → deadlock, InnoDB phát hiện và rollback một bên. Khắc phục: dùng ràng buộc UNIQUE(maPhong, ngay) và INSERT trực tiếp (xử lý lỗi trùng) hoặc INSERT ... ON DUPLICATE KEY; hoặc dùng READ COMMITTED (giảm gap lock); hoặc khóa một dòng 'cha' cố định (phòng) trước; và luôn có cơ chế retry deadlock.",
+    "key_points": [
+      "SELECT FOR UPDATE không thấy dòng vẫn đặt gap lock; gap lock giữa các giao dịch tương thích nhau",
+      "INSERT cần insert intention lock xung đột với gap lock của bên kia gây deadlock; dùng UNIQUE + insert trực tiếp hoặc giảm mức cô lập"
+    ],
+    "id": "Q_DB3_103"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Leo thang khóa (Lock Escalation)",
+    "difficulty": "Hard",
+    "question": "Một job cập nhật 50.000 dòng của bảng DonHang trong một giao dịch trên SQL Server khiến toàn bộ ứng dụng bán hàng bị treo dù các dòng khác không liên quan. Phân tích nguyên nhân 'lock escalation' và cách xử lý.",
+    "reference_answer": "Mỗi khóa dòng tốn bộ nhớ trong lock manager; khi một giao dịch giữ quá nhiều khóa trên một đối tượng (SQL Server: khoảng 5.000 khóa), hệ thống tự động LEO THANG thành một khóa duy nhất ở mức bảng (hoặc phân vùng) để tiết kiệm tài nguyên. Khóa X ở mức bảng chặn mọi giao dịch khác đọc (dưới mức khóa đọc) hoặc ghi BẤT KỲ dòng nào của bảng cho tới khi job commit — toàn ứng dụng bị treo. Xử lý: chia job thành nhiều giao dịch nhỏ theo lô (vài nghìn dòng mỗi lô) commit thường xuyên; chạy ngoài giờ cao điểm; có thể tắt/điều chỉnh escalation cho bảng (đánh đổi bộ nhớ); dùng row versioning (RCSI) để người đọc không bị chặn bởi khóa ghi.",
+    "key_points": [
+      "Quá nhiều khóa dòng khiến DBMS leo thang thành khóa bảng",
+      "Khóa bảng chặn mọi giao dịch khác; chia lô nhỏ, chạy ngoài giờ cao điểm, điều chỉnh escalation, dùng row versioning"
+    ],
+    "id": "Q_DB3_104"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Ràng buộc",
+    "concept": "Khóa ngoại không có chỉ mục ở bảng con",
+    "difficulty": "Hard",
+    "question": "Xóa một dòng trong bảng KhachHang (bảng cha) mất tới vài giây và trong lúc đó các thao tác ghi vào DonHang (bảng con có khóa ngoại maKH nhưng KHÔNG có chỉ mục trên maKH) bị chặn. Giải thích nguyên nhân.",
+    "reference_answer": "Khi xóa (hoặc cập nhật khóa) dòng cha, CSDL phải kiểm tra bảng con xem còn dòng nào tham chiếu tới không (để thực thi RESTRICT/CASCADE/SET NULL). Không có chỉ mục trên cột khóa ngoại maKH, việc kiểm tra này phải QUÉT TOÀN BỘ bảng DonHang (hàng chục triệu dòng) cho mỗi dòng cha bị xóa — xóa 1.000 khách hàng là 1.000 lần quét. Ngoài ra, một số hệ (Oracle) còn đặt khóa ở mức bảng con trong suốt thao tác khi khóa ngoại không có chỉ mục, chặn ghi đồng thời. Khắc phục: tạo chỉ mục trên cột khóa ngoại ở bảng con — hầu hết CSDL không tự tạo (khác với khóa chính). Chỉ mục này cũng giúp các phép JOIN cha-con.",
+    "key_points": [
+      "Xóa dòng cha buộc kiểm tra bảng con; thiếu chỉ mục trên FK thì phải quét toàn bảng con",
+      "Một số hệ còn khóa bảng con; luôn tạo chỉ mục trên cột khóa ngoại vì CSDL thường không tự tạo"
+    ],
+    "id": "Q_DB3_105"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Phục hồi dữ liệu",
+    "concept": "Ba pha phục hồi ARIES và bản ghi bù (CLR)",
+    "difficulty": "Hard",
+    "question": "Thuật toán phục hồi ARIES gồm những pha nào? Vì sao trong pha Undo, ARIES ghi các bản ghi bù (Compensation Log Record - CLR)?",
+    "reference_answer": "Ba pha: (1) Analysis — đọc log từ checkpoint gần nhất để xác định các giao dịch đang hoạt động lúc sự cố (cần undo) và các trang bẩn (dirty page) có thể chưa được ghi xuống đĩa, từ đó tìm điểm bắt đầu redo. (2) Redo — 'lặp lại lịch sử': làm lại MỌI thay đổi (kể cả của giao dịch chưa commit) từ điểm bắt đầu, dùng LSN trên trang để bỏ qua thay đổi đã có trên đĩa, đưa CSDL về đúng trạng thái lúc sự cố. (3) Undo — hoàn tác các giao dịch chưa commit theo thứ tự ngược. Mỗi thao tác hoàn tác được ghi một CLR có con trỏ 'undoNextLSN' trỏ tới bản ghi cần hoàn tác tiếp theo. Nếu hệ thống lại sập GIỮA pha Undo, lần phục hồi sau sẽ redo các CLR và tiếp tục từ undoNextLSN, không hoàn tác lại hai lần — đảm bảo phục hồi idempotent và có giới hạn công việc dù sự cố lặp lại.",
+    "key_points": [
+      "Analysis xác định giao dịch đang chạy và trang bẩn; Redo lặp lại lịch sử; Undo hoàn tác giao dịch chưa commit",
+      "CLR ghi lại thao tác hoàn tác kèm undoNextLSN để sự cố trong lúc phục hồi không gây hoàn tác lặp"
+    ],
+    "id": "Q_DB3_106"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Phục hồi dữ liệu",
+    "concept": "Ghi trang bị rách (Torn Page) và Full Page Writes",
+    "difficulty": "Hard",
+    "question": "Trang CSDL 8KB nhưng thiết bị lưu trữ chỉ đảm bảo ghi nguyên tử 512B hoặc 4KB. Phân tích rủi ro 'torn page' khi mất điện và cách PostgreSQL (full_page_writes) hoặc InnoDB (doublewrite buffer) xử lý.",
+    "reference_answer": "Nếu mất điện giữa lúc ghi một trang 8KB, trang trên đĩa có thể chứa một nửa nội dung mới và một nửa cũ — trang 'rách', cấu trúc không hợp lệ. WAL thông thường chỉ ghi thay đổi dạng delta (ví dụ 'thêm bộ X vào vị trí Y'), mà áp delta lên một trang hỏng thì không thể phục hồi đúng. PostgreSQL full_page_writes: lần đầu một trang bị sửa sau mỗi checkpoint, ghi TOÀN BỘ ảnh trang vào WAL; khi phục hồi, dùng ảnh đầy đủ này thay cho trang rách rồi áp các delta sau đó. InnoDB doublewrite buffer: trước khi ghi trang vào vị trí thật, ghi nó vào một vùng doublewrite tuần tự và fsync; nếu trang thật bị rách thì khôi phục từ bản trong doublewrite. Cả hai đều đánh đổi thêm I/O ghi; chỉ tắt được khi hệ thống file/thiết bị đảm bảo ghi nguyên tử theo trang (ví dụ ZFS).",
+    "key_points": [
+      "Mất điện giữa lúc ghi trang lớn hơn đơn vị nguyên tử của thiết bị tạo trang nửa cũ nửa mới",
+      "Full page writes (ghi cả ảnh trang vào WAL) hoặc doublewrite buffer giúp khôi phục; đánh đổi thêm I/O ghi"
+    ],
+    "id": "Q_DB3_107"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Phục hồi dữ liệu",
+    "concept": "fsync và bộ đệm ghi của ổ đĩa",
+    "difficulty": "Hard",
+    "question": "Một CSDL báo COMMIT thành công, nhưng sau khi mất điện đột ngột, vài giao dịch đã commit biến mất. Cấu hình không có lỗi rõ ràng. Phân tích các tầng có thể 'nói dối' về độ bền.",
+    "reference_answer": "Tính bền (Durability) dựa vào việc log được ghi xuống phương tiện lưu trữ bền vững trước khi báo commit, thông qua fsync/fdatasync. Các tầng có thể phá vỡ đảm bảo này: (1) cấu hình CSDL nới lỏng (synchronous_commit=off, innodb_flush_log_at_trx_commit=2) chấp nhận mất vài giao dịch cuối để tăng tốc; (2) bộ đệm ghi (write cache) của ổ đĩa/RAID controller báo 'đã ghi' khi dữ liệu mới nằm trong RAM của thiết bị, nếu không có pin/tụ dự phòng thì mất điện là mất dữ liệu; (3) hệ thống ảo hóa/lưu trữ mạng bỏ qua lệnh flush; (4) xử lý lỗi fsync sai: trên Linux, nếu fsync báo lỗi rồi được gọi lại, trang bẩn có thể đã bị đánh dấu sạch và lần gọi sau 'thành công' dù dữ liệu chưa được ghi (sự cố 'fsyncgate' khiến PostgreSQL đổi sang chiến lược panic khi fsync lỗi). Biện pháp: kiểm tra cấu hình độ bền, dùng thiết bị có bảo vệ mất điện, kiểm thử bằng cách rút điện thật, và có replication đồng bộ/backup.",
+    "key_points": [
+      "Độ bền phụ thuộc fsync thực sự đưa log xuống phương tiện bền vững",
+      "Các tầng có thể phá vỡ: cấu hình nới lỏng, write cache không pin, ảo hóa bỏ qua flush, xử lý lỗi fsync sai"
+    ],
+    "id": "Q_DB3_108"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Split-brain khi chuyển đổi dự phòng",
+    "difficulty": "Hard",
+    "question": "Một cụm primary-replica dùng cơ chế tự động failover dựa trên heartbeat. Sau một sự cố mạng tạm thời, cả hai node đều tin mình là primary và cùng nhận ghi. Phân tích hậu quả và các cơ chế phòng tránh.",
+    "reference_answer": "Đây là split-brain: phân vùng mạng khiến replica không nhận được heartbeat nên tự nâng lên primary, trong khi primary cũ vẫn sống và tiếp tục phục vụ một phần client. Hai node nhận các ghi khác nhau, dữ liệu phân kỳ (cùng một id được cấp cho hai bản ghi khác nhau, số dư bị trừ ở hai nơi); khi mạng phục hồi không có cách hợp nhất tự động an toàn — phải loại bỏ ghi của một bên hoặc hòa giải thủ công. Phòng tránh: (1) quyết định failover dựa trên đồng thuận đa số (quorum) với số node lẻ hoặc node trọng tài (witness) — bên thiểu số không được tự nâng cấp; (2) fencing/STONITH: cô lập hẳn primary cũ (tắt nguồn, chặn mạng, thu hồi IP ảo) trước khi nâng node mới; (3) fencing token/epoch tăng dần để tầng lưu trữ từ chối ghi từ primary cũ; (4) primary tự hạ cấp khi mất liên lạc với đa số.",
+    "key_points": [
+      "Phân vùng mạng khiến hai node cùng là primary, dữ liệu phân kỳ không hợp nhất tự động được",
+      "Phòng tránh bằng quorum/witness, fencing (STONITH), fencing token, primary tự hạ cấp khi mất đa số"
+    ],
+    "id": "Q_DB3_109"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Logical replication và thay đổi lược đồ",
+    "difficulty": "Hard",
+    "question": "Hệ thống dùng logical replication (PostgreSQL publication/subscription) để đồng bộ dữ liệu sang một CSDL phân tích. Sau một lần ALTER TABLE thêm cột ở nguồn, replication dừng hẳn và log WAL ở nguồn phình to đầy đĩa. Phân tích nguyên nhân.",
+    "reference_answer": "Logical replication truyền các thay đổi ở mức dòng (đã giải mã) chứ không truyền DDL; thay đổi lược đồ ở nguồn KHÔNG được tự động áp dụng ở đích. Khi các dòng có cột mới được gửi sang mà bảng đích chưa có cột đó, subscriber báo lỗi và dừng áp dụng. Trong lúc đó replication slot ở nguồn vẫn giữ lại mọi WAL chưa được subscriber xác nhận để không mất thay đổi, nên WAL tích tụ không giới hạn cho tới khi đầy đĩa — có thể làm sập cả CSDL nghiệp vụ. Quy trình đúng: áp dụng DDL ở đích trước (thêm cột), rồi mới ở nguồn; giám sát độ trễ và dung lượng giữ lại của replication slot, đặt giới hạn (max_slot_wal_keep_size) và cảnh báo; xóa slot bị bỏ rơi.",
+    "key_points": [
+      "Logical replication không truyền DDL; cột mới ở nguồn làm subscriber lỗi và dừng",
+      "Replication slot giữ WAL chưa xác nhận làm đầy đĩa nguồn; áp DDL ở đích trước, giám sát và giới hạn slot"
+    ],
+    "id": "Q_DB3_110"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Last-Write-Wins và lệch đồng hồ",
+    "difficulty": "Hard",
+    "question": "Một hệ NoSQL đa vùng giải quyết xung đột ghi bằng Last-Write-Wins (LWW) dựa trên timestamp của máy chủ nhận ghi. Phân tích vì sao cách này có thể làm mất dữ liệu một cách im lặng.",
+    "reference_answer": "LWW giữ lại bản ghi có timestamp lớn nhất và loại bỏ các bản khác. (1) Hai cập nhật đồng thời thực sự (người dùng A thêm sản phẩm vào giỏ ở vùng 1, người dùng B trên thiết bị khác thêm sản phẩm khác ở vùng 2) — một trong hai bị vứt bỏ hoàn toàn dù cả hai đều hợp lệ, vì LWW không có khái niệm hợp nhất. (2) Đồng hồ các máy chủ lệch nhau (NTP chỉ đảm bảo sai lệch vài mili giây, có lúc nhảy lùi): một ghi xảy ra SAU theo thời gian thực nhưng trên máy có đồng hồ chậm sẽ bị coi là cũ hơn và bị loại, ghi mới bị mất. Không có lỗi nào được báo. Giải pháp: dùng cơ chế phát hiện đồng thời (vector clock/version vector) để giữ các phiên bản xung đột và hợp nhất theo ngữ nghĩa, dùng CRDT (ví dụ OR-Set cho giỏ hàng), hoặc điều phối ghi qua một leader/đồng thuận cho dữ liệu cần chính xác.",
+    "key_points": [
+      "LWW loại bỏ cập nhật đồng thời hợp lệ mà không hợp nhất",
+      "Lệch đồng hồ khiến ghi mới hơn bị coi là cũ và mất im lặng; dùng version vector, CRDT hoặc leader/đồng thuận"
+    ],
+    "id": "Q_DB3_111"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Vector clock và các phiên bản anh em (siblings)",
+    "difficulty": "Hard",
+    "question": "Giải thích cách vector clock giúp phát hiện ghi đồng thời trong hệ lưu trữ không có leader (như Dynamo/Riak), và trách nhiệm phát sinh cho ứng dụng.",
+    "reference_answer": "Mỗi phiên bản dữ liệu kèm một vector clock: ánh xạ từ node (hoặc client) tới bộ đếm số lần cập nhật. Khi so sánh hai phiên bản: nếu vector của A ≤ vector của B ở mọi thành phần thì A là tổ tiên của B, B ghi đè an toàn; nếu không bên nào ≤ bên nào thì hai ghi là ĐỒNG THỜI (không biết tới nhau) — hệ thống giữ cả hai làm 'siblings' thay vì chọn bừa. Khi đọc, ứng dụng nhận nhiều phiên bản và phải tự hợp nhất theo ngữ nghĩa nghiệp vụ (hợp các giỏ hàng), rồi ghi lại kèm vector đã gộp. Trách nhiệm/rủi ro: logic hợp nhất phức tạp (xóa phần tử trong hợp giỏ hàng có thể bị 'sống lại' nếu không lưu tombstone), số siblings có thể tăng nếu client không gửi lại context, và vector có thể phình to cần cắt tỉa.",
+    "key_points": [
+      "Vector clock so sánh từng thành phần để phân biệt quan hệ nhân quả và ghi đồng thời",
+      "Ghi đồng thời được giữ làm siblings, ứng dụng phải hợp nhất theo ngữ nghĩa; cẩn thận phần tử bị xóa sống lại và vector phình to"
+    ],
+    "id": "Q_DB3_112"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Giao dịch (Transaction)",
+    "concept": "Saga và cạm bẫy của giao dịch bù trừ",
+    "difficulty": "Hard",
+    "question": "Quy trình đặt tour gồm ba dịch vụ: đặt vé máy bay, đặt khách sạn, trừ tiền, được điều phối bằng Saga (mỗi bước có hành động bù trừ). Phân tích những vấn đề mà Saga không giải quyết được như giao dịch ACID.",
+    "reference_answer": "(1) Thiếu cô lập: các bước đã commit cục bộ ngay, nên trạng thái trung gian (vé đã giữ nhưng chưa trừ tiền) hiển thị cho các giao dịch khác — có thể gây đọc bẩn ở mức nghiệp vụ (khách thấy 'đã đặt' rồi bị hủy), cập nhật bị mất giữa các saga chạy song song. Cần các biện pháp ngữ nghĩa: trạng thái 'đang chờ' (semantic lock), thiết kế thứ tự bước để bước dễ thất bại nhất chạy trước. (2) Bù trừ không phải lúc nào cũng hoàn tác được: email xác nhận đã gửi, vé phạt hủy có phí — bù trừ chỉ là hành động nghiệp vụ ngược, không phải rollback. (3) Bản thân hành động bù trừ có thể thất bại, phải thử lại vô hạn nên phải idempotent. (4) Thông điệp có thể bị gửi lặp/đến sai thứ tự, ví dụ lệnh hủy đến trước lệnh đặt. (5) Truy vết và gỡ lỗi khó. Vì vậy Saga đánh đổi tính cô lập để có tính sẵn sàng và khả năng mở rộng.",
+    "key_points": [
+      "Saga thiếu cô lập: trạng thái trung gian bị nhìn thấy, cần semantic lock và sắp xếp bước",
+      "Bù trừ không phải rollback, có thể thất bại hoặc không hoàn tác được, phải idempotent và chịu được thông điệp lặp/sai thứ tự"
+    ],
+    "id": "Q_DB3_113"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Giao dịch (Transaction)",
+    "concept": "Ghi kép (Dual Write) và Transactional Outbox",
+    "difficulty": "Hard",
+    "question": "Dịch vụ DonHang sau khi INSERT đơn hàng vào CSDL thì publish sự kiện 'DonHangDaTao' lên Kafka. Phân tích vì sao đây là vấn đề 'dual write' và mô hình Transactional Outbox khắc phục như thế nào.",
+    "reference_answer": "CSDL và Kafka là hai hệ độc lập, không có giao dịch chung. Nếu commit CSDL thành công rồi publish thất bại (mạng lỗi, tiến trình chết) thì đơn hàng tồn tại nhưng các dịch vụ khác không bao giờ biết; nếu publish trước rồi commit thất bại thì sự kiện về một đơn hàng không tồn tại. Thử lại không giải quyết triệt để vì tiến trình có thể chết giữa hai bước. Transactional Outbox: trong CÙNG giao dịch CSDL, vừa INSERT đơn hàng vừa INSERT một bản ghi sự kiện vào bảng outbox — đảm bảo nguyên tử. Một tiến trình relay riêng (polling hoặc CDC đọc log) đọc outbox và publish lên Kafka, đánh dấu đã gửi. Relay có thể gửi lặp (at-least-once) nên consumer phải idempotent (lưu id sự kiện đã xử lý); thứ tự theo từng thực thể cần được giữ (partition theo mã đơn hàng).",
+    "key_points": [
+      "Ghi vào CSDL và message broker không nguyên tử, tiến trình chết giữa chừng gây mất hoặc thừa sự kiện",
+      "Outbox ghi sự kiện cùng giao dịch CSDL, relay publish sau; at-least-once nên consumer phải idempotent và giữ thứ tự theo thực thể"
+    ],
+    "id": "Q_DB3_114"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "NoSQL và so sánh",
+    "concept": "Cache stampede (Thundering herd)",
+    "difficulty": "Hard",
+    "question": "Trang chủ một sàn thương mại điện tử cache danh sách 'sản phẩm nổi bật' trong Redis với TTL 60 giây. Đúng lúc khóa hết hạn trong giờ cao điểm, CSDL nhận hàng nghìn truy vấn nặng giống hệt nhau cùng lúc và bị quá tải. Phân tích và đề xuất giải pháp.",
+    "reference_answer": "Với cache-aside, khi khóa nóng hết hạn, mọi request đến trong khoảng thời gian tái tạo cache (truy vấn nặng mất vài giây) đều thấy miss và cùng lao vào CSDL tính lại cùng một kết quả — cache stampede. Tải đột biến làm truy vấn càng chậm, kéo dài cửa sổ miss, có thể gây sập dây chuyền. Giải pháp: (1) khóa tái tạo — chỉ một request (giữ khóa SETNX/mutex) được tính lại, các request khác chờ ngắn hoặc trả về dữ liệu cũ; (2) stale-while-revalidate: lưu cả thời điểm hết hạn mềm, khi gần hết hạn thì trả dữ liệu cũ và làm mới ở nền; (3) hết hạn sớm có xác suất (probabilistic early expiration) để các request tự làm mới ngẫu nhiên trước hạn; (4) thêm jitter ngẫu nhiên vào TTL để nhiều khóa không hết hạn cùng lúc; (5) với dữ liệu cực nóng, chủ động làm mới bằng job nền thay vì để hết hạn.",
+    "key_points": [
+      "Khóa nóng hết hạn khiến nhiều request cùng miss và cùng truy vấn CSDL",
+      "Giải pháp: khóa tái tạo, stale-while-revalidate, hết hạn sớm xác suất, jitter TTL, làm mới chủ động"
+    ],
+    "id": "Q_DB3_115"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "NoSQL và so sánh",
+    "concept": "Race condition gây cache lưu dữ liệu cũ vĩnh viễn",
+    "difficulty": "Hard",
+    "question": "Hệ thống dùng cache-aside: khi cập nhật thì ghi CSDL rồi xóa cache. Dù vậy, đôi khi cache vẫn giữ giá cũ của sản phẩm cho tới khi hết TTL (24 giờ). Mô tả một trình tự xen kẽ gây ra lỗi này và cách giảm thiểu.",
+    "reference_answer": "Trình tự: (1) Request đọc R thấy cache miss, đọc từ CSDL được giá cũ 100 (chưa kịp ghi vào cache). (2) Request ghi W cập nhật CSDL thành 120, rồi xóa khóa cache (lúc này cache vẫn đang trống nên xóa không có tác dụng). (3) R ghi giá trị cũ 100 vào cache. Kết quả: cache giữ 100 trong khi CSDL là 120, tới khi TTL hết. Ngoài ra, nếu việc xóa cache thất bại (Redis tạm lỗi) cũng gây dữ liệu cũ. Giảm thiểu: TTL ngắn hơn cho dữ liệu quan trọng; xóa trễ lần hai (delayed double delete) sau vài trăm mili giây; ghi vào cache có điều kiện phiên bản (chỉ ghi nếu phiên bản mới hơn phiên bản đang có, ví dụ qua Lua script hoặc lease token kiểu Memcache); hoặc dùng CDC từ log CSDL để vô hiệu hóa cache theo đúng thứ tự commit và có retry.",
+    "key_points": [
+      "Đọc dữ liệu cũ, ghi mới + xóa cache, rồi đọc ghi giá trị cũ vào cache — cache cũ tới hết TTL",
+      "Giảm thiểu bằng TTL ngắn, xóa trễ lần hai, ghi cache theo phiên bản/lease, vô hiệu hóa qua CDC"
+    ],
+    "id": "Q_DB3_116"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "LazyInitializationException và Open Session in View",
+    "difficulty": "Hard",
+    "question": "Trong ứng dụng Spring/Hibernate, controller trả về entity DonHang để serialize JSON và gặp LazyInitializationException ở danh sách dongHang. Một đồng nghiệp đề xuất bật Open Session in View (OSIV) để 'sửa'. Phân tích lỗi và rủi ro của giải pháp này.",
+    "reference_answer": "Lỗi xảy ra vì dongHang được ánh xạ lazy; khi tầng view/serializer truy cập nó, persistence context (phiên Hibernate) đã đóng sau khi phương thức service kết thúc, nên không thể nạp thêm dữ liệu. OSIV giữ phiên (và thường cả kết nối CSDL) mở suốt vòng đời request, kể cả lúc render view. Rủi ro: (1) kết nối CSDL bị giữ lâu hơn nhiều (trong lúc serialize, gọi dịch vụ khác) làm cạn connection pool khi tải cao; (2) truy vấn lazy âm thầm phát sinh ở tầng view, khó nhận ra N+1 query; (3) truy vấn chạy ngoài giao dịch rõ ràng, dữ liệu có thể không nhất quán; (4) serializer duyệt quan hệ có thể kéo theo cả đồ thị đối tượng. Cách tốt hơn: tắt OSIV, xác định rõ dữ liệu cần cho mỗi use case và nạp trong service (fetch join, entity graph, projection), trả về DTO thay vì entity.",
+    "key_points": [
+      "Lazy collection bị truy cập sau khi phiên đóng gây LazyInitializationException",
+      "OSIV giữ phiên/kết nối cả request: cạn pool, ẩn N+1, truy vấn ngoài giao dịch; nên nạp có chủ đích và trả DTO"
+    ],
+    "id": "Q_DB3_117"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Rò rỉ kết nối và deadlock ở connection pool",
+    "difficulty": "Hard",
+    "question": "Ứng dụng có pool 10 kết nối. Mỗi request lấy một kết nối để mở giao dịch, rồi bên trong gọi một hàm tiện ích tự lấy THÊM một kết nối khác từ pool để ghi log. Dưới tải cao, toàn bộ ứng dụng treo vĩnh viễn dù CSDL rảnh. Phân tích.",
+    "reference_answer": "Khi có 10 request đồng thời, mỗi request đã giữ 1 kết nối (pool cạn) và đều đang chờ lấy kết nối thứ hai cho hàm ghi log — không ai trả kết nối vì đang chờ, không ai lấy được kết nối mới: deadlock ở mức tài nguyên ứng dụng (pool deadlock), CSDL không hề biết. Lỗi chỉ xuất hiện khi số request đồng thời ≥ kích thước pool, nên kiểm thử nhẹ không phát hiện. Liên quan: rò rỉ kết nối (lấy mà không trả do quên đóng trong nhánh ngoại lệ) cũng dần làm cạn pool. Khắc phục: không lấy nhiều kết nối lồng nhau trong một luồng — dùng chung kết nối/giao dịch hiện tại hoặc ghi log bất đồng bộ; nếu buộc phải dùng giao dịch độc lập thì tách pool riêng; luôn dùng try-with-resources; cấu hình timeout lấy kết nối và bật phát hiện rò rỉ (leakDetectionThreshold).",
+    "key_points": [
+      "Mỗi luồng giữ một kết nối và chờ kết nối thứ hai khi pool cạn gây pool deadlock",
+      "Tránh lấy kết nối lồng nhau, tách pool nếu cần, luôn đóng kết nối, đặt timeout và phát hiện rò rỉ"
+    ],
+    "id": "Q_DB3_118"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Giao dịch (Transaction)",
+    "concept": "Timeout câu lệnh, timeout khóa và phiên idle trong giao dịch",
+    "difficulty": "Hard",
+    "question": "Phân tích vai trò của ba loại giới hạn: statement_timeout, lock_timeout và idle_in_transaction_session_timeout (PostgreSQL) trong việc bảo vệ hệ thống, và cạm bẫy khi chỉ đặt timeout ở phía ứng dụng.",
+    "reference_answer": "statement_timeout hủy câu lệnh chạy quá lâu (truy vấn báo cáo vô tình quét toàn bảng). lock_timeout hủy câu lệnh nếu phải chờ khóa quá lâu — đặc biệt quan trọng với DDL: một ALTER TABLE chờ khóa sẽ chặn mọi truy vấn xếp hàng sau nó. idle_in_transaction_session_timeout đóng phiên mở giao dịch rồi không làm gì (ứng dụng quên commit, đang chờ API ngoài), vì phiên đó giữ khóa và ngăn VACUUM dọn dòng chết. Cạm bẫy khi chỉ dùng timeout phía ứng dụng: ứng dụng bỏ cuộc và trả lỗi cho người dùng, nhưng câu lệnh vẫn tiếp tục chạy trên CSDL (tiêu tốn tài nguyên, giữ khóa) nếu không gửi lệnh hủy; khi ứng dụng retry, các truy vấn chồng chất làm CSDL quá tải. Nên đặt timeout ở cả hai phía, phía CSDL ngắn hơn hoặc bằng phía ứng dụng.",
+    "key_points": [
+      "statement_timeout chặn truy vấn chạy lâu; lock_timeout chặn chờ khóa (đặc biệt DDL); idle-in-transaction đóng phiên treo giữ khóa",
+      "Timeout chỉ ở ứng dụng không dừng câu lệnh trên CSDL, retry gây chồng tải; cần đặt ở cả hai phía"
+    ],
+    "id": "Q_DB3_119"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL DDL",
+    "concept": "Hàng đợi khóa khi ALTER TABLE trên bảng nóng",
+    "difficulty": "Hard",
+    "question": "Chạy ALTER TABLE DonHang ADD COLUMN ghiChu TEXT (thao tác vốn chỉ mất vài mili giây) trên production lại khiến toàn bộ API đọc/ghi bảng DonHang treo hơn một phút. Giải thích cơ chế và cách thực hiện an toàn.",
+    "reference_answer": "ALTER TABLE cần khóa ACCESS EXCLUSIVE trên bảng, xung đột với mọi khóa khác kể cả khóa của SELECT. Nếu đang có một giao dịch dài (báo cáo chạy 60 giây) giữ khóa đọc trên DonHang, ALTER phải chờ. Điểm nguy hiểm: hàng đợi khóa là FIFO — mọi truy vấn mới (kể cả SELECT đơn giản) đến sau ALTER cũng phải xếp hàng SAU nó vì yêu cầu của chúng xung đột với khóa ALTER đang chờ. Vì vậy một thao tác 'tức thời' biến thành chặn toàn bộ bảng trong suốt thời gian giao dịch dài kia còn chạy. Cách an toàn: đặt lock_timeout ngắn (vài giây) cho phiên chạy migration và retry nhiều lần; kiểm tra và tránh giao dịch dài trước khi chạy; với các thay đổi viết lại bảng (đổi kiểu cột, thêm cột NOT NULL có giá trị mặc định tính toán trên phiên bản cũ) cần dùng chiến lược expand-contract hoặc công cụ online schema change.",
+    "key_points": [
+      "ALTER cần khóa độc quyền, phải chờ giao dịch dài đang giữ khóa đọc",
+      "Hàng đợi khóa FIFO khiến mọi truy vấn sau ALTER cũng bị chặn; dùng lock_timeout ngắn + retry, tránh giao dịch dài, online schema change"
+    ],
+    "id": "Q_DB3_120"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Tối ưu truy vấn",
+    "concept": "Ước lượng sai do các cột tương quan",
+    "difficulty": "Hard",
+    "question": "Truy vấn WHERE thanhPho = 'Hà Nội' AND quan = 'Cầu Giấy' trả về 50.000 dòng, nhưng optimizer ước lượng chỉ 50 dòng và chọn nested loop join khiến truy vấn chạy rất chậm. Phân tích nguyên nhân.",
+    "reference_answer": "Optimizer mặc định giả định các điều kiện ĐỘC LẬP thống kê: độ chọn lọc tổng = tích độ chọn lọc từng điều kiện. Nếu thanhPho = 'Hà Nội' chọn 10% và quan = 'Cầu Giấy' chọn 1% thì ước lượng 0,1%. Nhưng hai cột tương quan hoàn toàn (Cầu Giấy luôn thuộc Hà Nội), độ chọn lọc thực là 1% — sai số 10 lần, và sai số này nhân lên qua mỗi phép join tiếp theo. Ước lượng quá thấp khiến optimizer chọn nested loop (tốt cho ít dòng) thay vì hash join, và đặt bảng sai thứ tự. Khắc phục: tạo thống kê mở rộng đa cột (CREATE STATISTICS ... (dependencies) ON thanhPho, quan trong PostgreSQL, hoặc thống kê trên chỉ mục tổng hợp ở các hệ khác), chuẩn hóa lược đồ để bỏ cột dư thừa, hoặc trong trường hợp bất khả kháng dùng gợi ý (hint)/viết lại truy vấn.",
+    "key_points": [
+      "Optimizer giả định các điều kiện độc lập, nhân độ chọn lọc; cột tương quan khiến ước lượng thấp nghiêm trọng",
+      "Ước lượng sai dẫn tới chọn nested loop và thứ tự join sai; dùng thống kê đa cột hoặc điều chỉnh lược đồ/truy vấn"
+    ],
+    "id": "Q_DB3_121"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Tối ưu truy vấn",
+    "concept": "Thống kê lỗi thời sau khi nạp dữ liệu hàng loạt",
+    "difficulty": "Hard",
+    "question": "Một job ETL hằng đêm xóa rồi nạp lại 20 triệu dòng vào bảng tạm trung gian, sau đó ngay lập tức chạy truy vấn JOIN lớn trên bảng này. Truy vấn thỉnh thoảng chạy 5 phút, thỉnh thoảng chạy 5 giờ. Phân tích.",
+    "reference_answer": "Optimizer dựa vào thống kê bảng (số dòng, phân bố); thống kê chỉ được cập nhật khi chạy ANALYZE thủ công hoặc khi autovacuum/auto-stats kích hoạt sau một ngưỡng thay đổi, việc này diễn ra bất đồng bộ. Ngay sau khi nạp, thống kê có thể vẫn phản ánh trạng thái cũ (ví dụ bảng rỗng, 0 dòng), nên optimizer chọn kế hoạch cho bảng nhỏ (nested loop, quét không dùng chỉ mục) — thảm họa với 20 triệu dòng. Thời gian chạy biến động tùy theo việc auto-analyze có kịp chạy trước truy vấn hay không. Khắc phục: chạy ANALYZE tường minh trên bảng ngay sau bước nạp và trước truy vấn; với bảng tạm (temporary table) cần đặc biệt chú ý vì autovacuum không xử lý chúng; theo dõi kế hoạch thực thi trong log (auto_explain) để phát hiện biến động.",
+    "key_points": [
+      "Thống kê không cập nhật kịp sau nạp hàng loạt khiến optimizer lập kế hoạch cho bảng nhỏ",
+      "Thời gian chạy biến động theo việc auto-analyze kịp chạy hay không; chạy ANALYZE tường minh sau khi nạp"
+    ],
+    "id": "Q_DB3_122"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Phình to bảng do MVCC, VACUUM và XID wraparound",
+    "difficulty": "Hard",
+    "question": "Một bảng PostgreSQL chỉ có 1 triệu dòng 'sống' nhưng chiếm 80GB và truy vấn ngày càng chậm. Đồng thời có một phiên báo cáo mở giao dịch từ 3 ngày trước. Phân tích mối liên hệ và rủi ro nghiêm trọng hơn có thể xảy ra.",
+    "reference_answer": "Với MVCC, UPDATE/DELETE không xóa dòng cũ ngay mà tạo phiên bản mới; dòng cũ thành 'dòng chết' và chỉ được VACUUM dọn khi không còn giao dịch nào có thể nhìn thấy nó. Giao dịch mở 3 ngày giữ 'đường chân trời' (xmin horizon) cố định ở quá khứ, nên mọi dòng chết sinh ra sau đó đều không dọn được — bảng phình to (bloat), chỉ mục cũng phình, quét chậm và tốn I/O. Rủi ro nghiêm trọng hơn: PostgreSQL dùng mã giao dịch 32-bit; VACUUM phải 'đóng băng' các dòng cũ để tránh tràn vòng mã giao dịch (XID wraparound). Nếu đóng băng bị cản trở quá lâu, hệ thống sẽ cảnh báo rồi buộc phải dừng nhận ghi để bảo vệ dữ liệu. Khắc phục: giám sát và giới hạn giao dịch dài (idle_in_transaction_session_timeout), điều chỉnh autovacuum cho bảng cập nhật nhiều, dùng pg_repack để thu hồi dung lượng, giám sát tuổi XID.",
+    "key_points": [
+      "Dòng chết của MVCC chỉ dọn được khi không còn giao dịch nào thấy chúng; giao dịch dài chặn VACUUM gây bloat",
+      "Rủi ro XID wraparound buộc CSDL dừng ghi; giới hạn giao dịch dài, tinh chỉnh autovacuum, giám sát tuổi XID"
+    ],
+    "id": "Q_DB3_123"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lưu trữ và tổ chức file",
+    "concept": "Write stall và khuếch đại trong LSM-Tree",
+    "difficulty": "Hard",
+    "question": "Một cụm RocksDB/Cassandra chịu tải ghi cao liên tục bỗng xuất hiện các giai đoạn độ trễ ghi tăng vọt hàng giây (write stall). Phân tích mối liên hệ với compaction và các loại khuếch đại (amplification).",
+    "reference_answer": "LSM ghi nhanh vì chỉ ghi tuần tự vào memtable/SSTable, nhưng đẩy chi phí sang compaction nền: gộp các SSTable để loại bản cũ và giữ số file đọc hợp lý. Khi tốc độ ghi vượt quá khả năng compaction (giới hạn băng thông đĩa/CPU), số file ở tầng L0 hoặc số memtable chờ xả tăng vượt ngưỡng; để tránh đọc chậm vô hạn và cạn đĩa, engine chủ động làm chậm hoặc dừng ghi — write stall. Ba loại khuếch đại đánh đổi nhau: write amplification (mỗi byte dữ liệu bị ghi lại nhiều lần qua các tầng), read amplification (một lần đọc phải kiểm tra nhiều file), space amplification (bản cũ chưa được gộp chiếm chỗ). Leveled compaction giảm read/space amp nhưng tăng write amp; size-tiered ngược lại. Xử lý: chọn chiến lược compaction theo tải, dự trù băng thông đĩa cho compaction, giới hạn tốc độ ghi đầu vào, giám sát số file L0 và pending compaction bytes.",
+    "key_points": [
+      "Compaction không theo kịp tốc độ ghi khiến engine chủ động làm chậm/dừng ghi (write stall)",
+      "Đánh đổi giữa write, read và space amplification; chọn chiến lược compaction theo tải và dự trù tài nguyên"
+    ],
+    "id": "Q_DB3_124"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "NoSQL và so sánh",
+    "concept": "Tombstone trong Cassandra và truy vấn chậm",
+    "difficulty": "Hard",
+    "question": "Một bảng Cassandra dùng làm hàng đợi công việc: worker đọc các dòng mới nhất của một phân vùng rồi xóa sau khi xử lý. Sau vài tuần, truy vấn đọc ngày càng chậm và có lúc thất bại với lỗi TombstoneOverwhelmingException. Phân tích.",
+    "reference_answer": "Trong LSM phân tán, DELETE không xóa dữ liệu ngay mà ghi một 'tombstone' (dấu mộ) — cần thiết để đánh dấu xóa lan tới các bản sao và các SSTable cũ. Tombstone chỉ bị loại bỏ sau gc_grace_seconds (mặc định 10 ngày, để các bản sao kịp sửa chữa) và sau compaction. Mô hình hàng đợi xóa liên tục tạo ra hàng triệu tombstone trong cùng phân vùng; mỗi lần đọc 'các dòng mới nhất' phải quét qua tất cả tombstone trước khi tìm được dữ liệu sống — chậm dần, tốn bộ nhớ, và vượt ngưỡng an toàn thì truy vấn bị hủy. Đây là anti-pattern 'queue trên Cassandra'. Giải pháp: dùng hệ thống hàng đợi chuyên dụng (Kafka, RabbitMQ); nếu bắt buộc, thiết kế phân vùng theo khung thời gian (bucket) để bỏ cả phân vùng cũ thay vì xóa từng dòng, dùng TTL kết hợp TimeWindowCompactionStrategy, và giảm gc_grace_seconds có cân nhắc.",
+    "key_points": [
+      "DELETE tạo tombstone tồn tại tới hết gc_grace và compaction; đọc phải quét qua tombstone",
+      "Hàng đợi trên Cassandra là anti-pattern; dùng message queue chuyên dụng hoặc phân vùng theo thời gian + TTL"
+    ],
+    "id": "Q_DB3_125"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lưu trữ và tổ chức file",
+    "concept": "Cập nhật lẻ trong column-store và delta store",
+    "difficulty": "Hard",
+    "question": "Sau khi chuyển bảng DonHang sang lưu trữ dạng cột để tăng tốc báo cáo, các thao tác UPDATE từng đơn hàng (đổi trạng thái) trở nên rất chậm. Giải thích và nêu cách các hệ thống thực tế xử lý.",
+    "reference_answer": "Trong column-store, một dòng bị phân tán thành nhiều mảnh nằm ở nhiều cột, mỗi cột được nén thành khối lớn (hàng chục nghìn đến triệu giá trị). Cập nhật một giá trị đòi hỏi giải nén, sửa và nén lại cả khối của cột đó, đồng thời phải định vị dòng ở mọi cột — rất tốn kém so với row-store sửa một trang. Các hệ thực tế dùng kiến trúc lai: ghi mới vào một 'delta store' dạng dòng (row-group mở) và đánh dấu xóa dòng cũ bằng delete bitmap; truy vấn đọc hợp nhất phần cột nén với delta; tiến trình nền định kỳ gộp delta vào các khối cột nén (tuple mover). Hệ quả: column-store vẫn hợp với nạp theo lô và ít cập nhật; với nghiệp vụ cập nhật thường xuyên, nên giữ OLTP ở row-store và đồng bộ sang column-store/HTAP cho phân tích.",
+    "key_points": [
+      "Cập nhật một giá trị trong column-store phải giải nén/nén lại khối cột và chạm nhiều cột",
+      "Hệ thực tế dùng delta store dạng dòng + delete bitmap, gộp nền; nên tách OLTP (row) và phân tích (column)"
+    ],
+    "id": "Q_DB3_126"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Phân vùng nóng do chọn khóa phân vùng sai",
+    "difficulty": "Hard",
+    "question": "Bảng SuKienIoT trong DynamoDB/Cassandra dùng khóa phân vùng là ngay (yyyy-mm-dd) để dễ truy vấn theo ngày. Hệ thống bị throttle liên tục dù tổng dung lượng thông lượng cấp phát còn dư nhiều. Phân tích.",
+    "reference_answer": "Dữ liệu và thông lượng được chia theo khóa phân vùng; mỗi phân vùng vật lý có giới hạn thông lượng riêng. Với khóa là ngày, mọi sự kiện của ngày hiện tại từ hàng triệu thiết bị đều dồn vào CÙNG một phân vùng — phân vùng nóng (hot partition) bị quá tải và throttle, trong khi các phân vùng của ngày cũ hầu như không có tải; tổng thông lượng cấp phát vô nghĩa vì không được phân bổ đều. Khắc phục: chọn khóa có độ phân tán cao phù hợp mẫu truy cập (maThietBi, hoặc maThietBi + ngày); nếu cần truy vấn theo ngày, thêm hậu tố shard (ngay#0..ngay#N, chọn ngẫu nhiên hoặc theo hash thiết bị khi ghi) rồi truy vấn song song N phân vùng khi đọc (write sharding), hoặc dùng chỉ mục phụ/luồng dữ liệu sang hệ phân tích cho truy vấn theo thời gian.",
+    "key_points": [
+      "Khóa phân vùng theo ngày dồn mọi ghi hiện tại vào một phân vùng nóng bị throttle",
+      "Chọn khóa phân tán cao theo mẫu truy cập; dùng write sharding (hậu tố) khi cần gom theo ngày"
+    ],
+    "id": "Q_DB3_127"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Sharding theo tenant và tenant khổng lồ",
+    "difficulty": "Hard",
+    "question": "Một SaaS shard dữ liệu theo maCongTy (mỗi công ty nằm trọn trên một shard) để mọi truy vấn và giao dịch của một công ty diễn ra trên một node. Sau khi ký hợp đồng với một tập đoàn lớn, shard chứa tập đoàn này quá tải. Phân tích đánh đổi và hướng xử lý.",
+    "reference_answer": "Shard theo tenant có lợi lớn: truy vấn/JOIN/giao dịch của một tenant không cần đi qua nhiều node, cô lập dữ liệu tốt. Nhưng nó giả định mỗi tenant đủ nhỏ để vừa một node; phân phối kích thước tenant thường lệch rất mạnh (luật lũy thừa), nên một tenant 'cá voi' có thể vượt năng lực một shard, đồng thời làm ảnh hưởng các tenant khác cùng shard (noisy neighbor). Hướng xử lý: (1) cô lập tenant lớn lên shard/cụm riêng có tài nguyên mạnh hơn; (2) shard bên trong tenant lớn theo khóa thứ cấp (maCongTy + maChiNhanh/maNguoiDung), chấp nhận một số truy vấn của tenant đó phải phân tán; (3) thiết kế sẵn bảng ánh xạ tenant → shard (directory-based sharding) để di chuyển tenant mà không đổi hàm băm; (4) giới hạn tài nguyên theo tenant. Bài học: chọn shard key cần xem xét phân phối thực tế và khả năng tái cân bằng.",
+    "key_points": [
+      "Shard theo tenant giữ truy vấn/giao dịch cục bộ nhưng giả định tenant đủ nhỏ",
+      "Tenant khổng lồ gây quá tải và noisy neighbor; cô lập, shard thứ cấp bên trong tenant, dùng bảng ánh xạ tenant → shard"
+    ],
+    "id": "Q_DB3_128"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Sinh ID phân tán kiểu Snowflake và đồng hồ chạy lùi",
+    "difficulty": "Hard",
+    "question": "Hệ thống sinh ID 64-bit kiểu Twitter Snowflake (timestamp mili giây + mã máy + bộ đếm). Sau khi NTP chỉnh đồng hồ một máy lùi 2 giây, hệ thống ghi nhận lỗi trùng khóa chính. Phân tích và đề xuất cách phòng tránh.",
+    "reference_answer": "ID Snowflake chỉ duy nhất nếu trên mỗi máy, cặp (timestamp, bộ đếm) không bao giờ lặp lại. Khi đồng hồ chạy lùi 2 giây, máy sẽ sinh lại các timestamp đã dùng trong 2 giây trước; bộ đếm thường được đặt lại theo mỗi mili giây nên có thể tạo ra đúng các ID đã cấp — trùng khóa. Ngoài ra, ID còn mất tính tăng dần theo thời gian mà nhiều hệ dựa vào. Phòng tránh: lưu timestamp lần cấp cuối; nếu đồng hồ hiện tại nhỏ hơn thì chờ cho tới khi vượt (với lệch nhỏ) hoặc từ chối sinh ID và báo động (với lệch lớn); cấu hình NTP chỉ 'slew' (chỉnh chậm dần) thay vì 'step'; đảm bảo mã máy là duy nhất (cấp từ dịch vụ điều phối, không tự đặt tay). Phương án khác: UUID v7 kèm ngẫu nhiên đủ lớn, hoặc cấp khối ID từ sequence trung tâm.",
+    "key_points": [
+      "Đồng hồ chạy lùi khiến máy tái sử dụng timestamp và sinh lại ID đã cấp",
+      "Lưu timestamp cuối, chờ hoặc từ chối khi đồng hồ lùi, NTP slew, mã máy duy nhất; hoặc UUID v7/cấp khối ID"
+    ],
+    "id": "Q_DB3_129"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "SQL DDL",
+    "concept": "Lỗi lập lịch do giờ mùa hè (DST)",
+    "difficulty": "Hard",
+    "question": "Một hệ thống quốc tế lưu lịch nhắc thuốc hằng ngày lúc 08:00 bằng cách lưu thời điểm UTC của lần nhắc đầu tiên rồi cộng thêm 24 giờ mỗi ngày. Người dùng ở châu Âu phản ánh từ cuối tháng 3, nhắc nhở đến lúc 09:00. Phân tích và đề xuất thiết kế đúng.",
+    "reference_answer": "Khi chuyển sang giờ mùa hè, đồng hồ địa phương nhảy lên 1 giờ; '08:00 địa phương' giờ tương ứng với một thời điểm UTC sớm hơn 1 giờ so với trước. Việc cộng đúng 24 giờ tuyệt đối trên trục UTC giữ nguyên giờ UTC nên hiển thị thành 09:00 địa phương. Lưu ý thêm: có ngày chỉ dài 23 hoặc 25 giờ địa phương, và có giờ địa phương không tồn tại (02:30 ngày chuyển sang giờ mùa hè) hoặc tồn tại hai lần. Thiết kế đúng: với sự kiện lặp theo ý định con người, lưu quy tắc theo giờ địa phương (08:00 hằng ngày) kèm tên múi giờ IANA (Europe/Berlin), và tính thời điểm UTC của từng lần xuất hiện tại thời điểm cần dùng bằng thư viện múi giờ cập nhật; định nghĩa rõ cách xử lý giờ không tồn tại/trùng lặp. Còn thời điểm sự kiện đã xảy ra thì lưu UTC.",
+    "key_points": [
+      "Cộng 24 giờ trên UTC không giữ được giờ địa phương khi chuyển DST",
+      "Sự kiện lặp theo giờ địa phương nên lưu quy tắc + múi giờ IANA và tính thời điểm UTC khi cần; xử lý giờ không tồn tại/trùng"
+    ],
+    "id": "Q_DB3_130"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Ràng buộc",
+    "concept": "Chuẩn hóa Unicode làm vô hiệu ràng buộc UNIQUE",
+    "difficulty": "Hard",
+    "question": "Bảng NguoiDung có UNIQUE(tenDangNhap) nhưng vẫn tồn tại hai tài khoản 'Thủy' trông giống hệt nhau, và kẻ xấu lợi dụng để mạo danh. Phân tích nguyên nhân liên quan tới Unicode và cách phòng tránh.",
+    "reference_answer": "Trong Unicode, cùng một ký tự hiển thị có thể có nhiều biểu diễn: dạng dựng sẵn (precomposed, 'ủ' là một code point — NFC) và dạng tổ hợp (chữ 'u' + dấu móc + dấu hỏi kết hợp — NFD). Hai chuỗi trông giống hệt nhưng khác byte, nên ràng buộc UNIQUE (so sánh theo byte hoặc collation không chuẩn hóa) coi là khác nhau. Ngoài ra còn ký tự đồng hình khác bảng chữ (chữ 'а' Cyrillic so với 'a' Latin), ký tự vô hình (zero-width), khác biệt hoa thường. Phòng tránh: chuẩn hóa chuỗi về một dạng (NFC, hoặc NFKC cho định danh) trước khi lưu và so sánh — tại tầng ứng dụng và/hoặc bằng ràng buộc CHECK (normalize(col) = col) hoặc chỉ mục unique trên biểu thức chuẩn hóa + chữ thường; hạn chế tập ký tự cho tên đăng nhập; áp dụng kiểm tra 'confusable' (Unicode TR39) cho định danh công khai.",
+    "key_points": [
+      "Cùng ký tự hiển thị có nhiều biểu diễn byte (NFC/NFD), ký tự đồng hình, ký tự vô hình — UNIQUE coi là khác nhau",
+      "Chuẩn hóa NFC/NFKC + chữ thường trước khi lưu, unique trên biểu thức chuẩn hóa, giới hạn tập ký tự, kiểm tra confusable"
+    ],
+    "id": "Q_DB3_131"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Trigger lồng nhau và đệ quy",
+    "difficulty": "Hard",
+    "question": "Bảng TonKho có trigger AFTER UPDATE cập nhật bảng TongHopKho; bảng TongHopKho lại có trigger cập nhật ngược TonKho để 'đồng bộ'. Sau một lần sửa nhỏ, cập nhật một dòng mất vài phút hoặc báo lỗi vượt độ sâu lồng nhau. Phân tích các rủi ro của trigger dây chuyền.",
+    "reference_answer": "Trigger kích hoạt trigger khác tạo thành chuỗi; nếu có vòng (A → B → A) sẽ dẫn tới đệ quy, chỉ dừng khi hệ thống chạm giới hạn độ sâu (SQL Server 32 cấp, PostgreSQL có thể tràn stack) hoặc khi điều kiện dừng ngẫu nhiên thỏa — gây lỗi hoặc thao tác lặp tốn kém. Ngay cả khi không có vòng, trigger dây chuyền tạo 'logic ẩn': một câu UPDATE đơn giản kéo theo hàng chục thao tác không thấy được trong mã ứng dụng, khó dự đoán hiệu năng (đặc biệt với trigger mức dòng trên cập nhật hàng loạt), khó debug, thứ tự thực thi nhiều trigger cùng sự kiện có thể không xác định, và tăng thời gian giữ khóa dẫn tới deadlock. Khắc phục: tránh vòng phụ thuộc (dữ liệu tổng hợp chỉ một chiều), dùng điều kiện chặn (WHEN, pg_trigger_depth()), cân nhắc thay bằng tính toán tập trung trong ứng dụng, view/materialized view, hoặc job tổng hợp.",
+    "key_points": [
+      "Trigger gọi trigger có thể tạo đệ quy tới giới hạn độ sâu hoặc lặp tốn kém",
+      "Logic ẩn khó dự đoán hiệu năng, khó debug, tăng giữ khóa; tránh vòng, dùng điều kiện chặn, cân nhắc thay thế"
+    ],
+    "id": "Q_DB3_132"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Chỉ mục (Index)",
+    "concept": "Khai báo sai tính bất biến của hàm (IMMUTABLE) trong chỉ mục",
+    "difficulty": "Hard",
+    "question": "Một lập trình viên tạo hàm ngayDiaPhuong(ts timestamptz) trả về ts chuyển sang ngày theo múi giờ của phiên, khai báo IMMUTABLE để có thể tạo chỉ mục trên biểu thức ngayDiaPhuong(thoiDiem). Phân tích hậu quả.",
+    "reference_answer": "PostgreSQL chỉ cho dùng hàm IMMUTABLE trong chỉ mục vì giá trị chỉ mục được tính một lần lúc ghi và giả định luôn giống khi tính lại. Hàm này thực chất phụ thuộc thiết lập TimeZone của phiên (lẽ ra là STABLE): cùng một ts nhưng phiên ở múi giờ khác cho ra ngày khác. Hậu quả: chỉ mục lưu giá trị tính theo múi giờ của phiên đã ghi; truy vấn từ phiên khác múi giờ dùng chỉ mục sẽ trả về kết quả SAI (thiếu hoặc thừa dòng) mà không có lỗi; kết quả còn khác nhau tùy truy vấn dùng chỉ mục hay quét bảng, và REINDEX có thể làm 'thay đổi' dữ liệu tìm thấy. Đây là hỏng chỉ mục logic. Cách đúng: đưa múi giờ thành tham số cố định trong hàm (ts AT TIME ZONE 'Asia/Ho_Chi_Minh') thì mới thực sự IMMUTABLE, hoặc lưu sẵn cột ngày đã tính.",
+    "key_points": [
+      "Chỉ mục giả định hàm IMMUTABLE luôn cho cùng kết quả; hàm phụ thuộc thiết lập phiên vi phạm giả định",
+      "Kết quả truy vấn sai im lặng, khác nhau giữa index scan và table scan; cố định tham số hoặc lưu cột tính sẵn"
+    ],
+    "id": "Q_DB3_133"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Lập trình CSDL",
+    "concept": "Xử lý từng dòng bằng cursor (RBAR) so với xử lý tập hợp",
+    "difficulty": "Hard",
+    "question": "Stored procedure cập nhật giá cho 2 triệu sản phẩm bằng cursor, mỗi vòng lặp SELECT tỷ lệ chiết khấu rồi UPDATE một dòng, chạy mất 3 giờ. Phân tích vì sao chậm và cách viết lại.",
+    "reference_answer": "Cách tiếp cận RBAR (Row By Agonizing Row) chịu chi phí cố định cho MỖI dòng: chuyển ngữ cảnh giữa ngôn ngữ thủ tục và bộ máy SQL, phân tích/thực thi câu lệnh riêng, tra chỉ mục riêng, ghi log và giữ khóa cho từng câu — nhân với 2 triệu lần. Optimizer cũng không thể chọn chiến lược tổng thể tốt (hash join, quét tuần tự). Viết lại theo tập hợp: một câu UPDATE SanPham s SET gia = s.gia * (1 - c.tyLe) FROM ChietKhau c WHERE c.maLoai = s.maLoai; — CSDL tự chọn hash join và xử lý theo lô, thường nhanh hơn hàng trăm lần. Với khối lượng rất lớn, chia thành vài lô (theo khoảng id) để giới hạn kích thước giao dịch, log và thời gian giữ khóa. Cursor chỉ nên dùng khi logic từng dòng thực sự không biểu diễn được bằng SQL tập hợp.",
+    "key_points": [
+      "RBAR chịu chi phí cố định mỗi dòng (chuyển ngữ cảnh, thực thi, log, khóa) và chặn tối ưu toàn cục",
+      "Viết lại bằng một câu UPDATE ... FROM theo tập hợp, chia lô khi quá lớn; chỉ dùng cursor khi bất khả kháng"
+    ],
+    "id": "Q_DB3_134"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Mô hình quan hệ",
+    "concept": "Mô hình Entity-Attribute-Value (EAV)",
+    "difficulty": "Hard",
+    "question": "Để 'linh hoạt', một hệ thống lưu mọi thuộc tính sản phẩm trong một bảng ThuocTinh(maSP, tenThuocTinh, giaTri VARCHAR). Phân tích các vấn đề của mô hình EAV này khi hệ thống lớn lên.",
+    "reference_answer": "(1) Mất kiểu dữ liệu và ràng buộc: mọi giá trị là chuỗi, không thể NOT NULL, CHECK, khóa ngoại theo từng thuộc tính; dữ liệu bẩn ('100', '100.0', 'một trăm') lẫn lộn. (2) Truy vấn phức tạp và chậm: lấy một sản phẩm với 10 thuộc tính cần pivot hoặc 10 self-join; lọc 'giá < 500 và màu = đỏ' cần nhiều join/subquery, so sánh số trên cột chuỗi không dùng được chỉ mục hiệu quả. (3) Optimizer không có thống kê theo từng thuộc tính nên ước lượng kém. (4) Bảng phình rất nhiều dòng, chỉ mục lớn. (5) Ràng buộc nghiệp vụ dồn vào ứng dụng, tên thuộc tính gõ sai tạo thuộc tính 'mới'. Thay thế: cột chuẩn cho thuộc tính cốt lõi, bảng con theo loại sản phẩm, hoặc cột JSONB có schema kiểm tra cho phần thực sự động.",
+    "key_points": [
+      "EAV mất kiểu và ràng buộc, dữ liệu bẩn, tên thuộc tính tùy tiện",
+      "Truy vấn cần nhiều join/pivot, chậm, khó thống kê; thay bằng cột chuẩn + bảng con/JSONB có kiểm tra"
+    ],
+    "id": "Q_DB3_135"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Hàm tổng hợp",
+    "concept": "Kết quả SUM số thực không xác định khi chạy song song",
+    "difficulty": "Hard",
+    "question": "Báo cáo tính SUM(giaTriDouble) trên 100 triệu dòng cho ra kết quả khác nhau ở chữ số thập phân thứ 6 giữa các lần chạy, khiến đối soát tự động báo lệch. Dữ liệu không đổi. Giải thích.",
+    "reference_answer": "Phép cộng dấu phẩy động (FLOAT/DOUBLE) không có tính kết hợp: (a + b) + c có thể khác a + (b + c) do làm tròn ở mỗi bước. Khi CSDL thực thi song song (parallel query), dữ liệu được chia cho nhiều worker, mỗi worker tính tổng riêng rồi gộp lại; cách chia và thứ tự gộp phụ thuộc vào lịch chạy và kế hoạch thực thi, nên thứ tự cộng thay đổi giữa các lần — kết quả lệch ở các chữ số cuối. Cộng các số có độ lớn rất khác nhau còn làm mất các giá trị nhỏ. Khắc phục: dùng NUMERIC/DECIMAL (cộng chính xác, có tính kết hợp) cho dữ liệu cần đối soát như tiền; nếu buộc dùng số thực, so sánh với dung sai, làm tròn kết quả tới độ chính xác có nghĩa, hoặc ép thực thi tuần tự với thứ tự xác định (đánh đổi hiệu năng).",
+    "key_points": [
+      "Cộng số thực không có tính kết hợp; thứ tự cộng thay đổi khi chạy song song làm kết quả lệch",
+      "Dùng DECIMAL cho dữ liệu cần chính xác; với số thực thì so sánh có dung sai hoặc làm tròn"
+    ],
+    "id": "Q_DB3_136"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Bảo mật CSDL",
+    "concept": "Quyền được xóa dữ liệu (GDPR) và bản sao lưu",
+    "difficulty": "Hard",
+    "question": "Một khách hàng yêu cầu xóa toàn bộ dữ liệu cá nhân theo GDPR. Nhóm đã DELETE các dòng trong CSDL chính. Phân tích những nơi dữ liệu vẫn còn tồn tại và các chiến lược thiết kế để đáp ứng yêu cầu này.",
+    "reference_answer": "Dữ liệu cá nhân có thể còn ở: bản sao lưu (backup, snapshot), log giao dịch/WAL đã lưu trữ phục vụ point-in-time recovery, replica và kho dữ liệu phân tích, cache, chỉ mục tìm kiếm (Elasticsearch), hàng đợi tin nhắn/event store bất biến, file export, log ứng dụng và log audit. Việc xóa khỏi backup bất biến thường không khả thi. Chiến lược: (1) crypto-shredding — mã hóa dữ liệu cá nhân của mỗi người dùng bằng khóa riêng, lưu khóa tách biệt; xóa khóa là làm dữ liệu ở mọi nơi (kể cả backup) trở nên không đọc được; (2) tách dữ liệu định danh vào kho riêng, các hệ khác chỉ giữ mã giả danh (pseudonymization); (3) lập bản đồ luồng dữ liệu cá nhân và quy trình xóa lan truyền (sự kiện 'xóa người dùng' tới mọi hệ thống); (4) chính sách lưu giữ backup có thời hạn và quy trình xóa lại sau khi khôi phục từ backup cũ.",
+    "key_points": [
+      "Dữ liệu còn trong backup, WAL lưu trữ, replica, kho phân tích, cache, chỉ mục tìm kiếm, event store, log",
+      "Chiến lược: crypto-shredding, tách và giả danh hóa dữ liệu định danh, lan truyền sự kiện xóa, thời hạn lưu giữ backup"
+    ],
+    "id": "Q_DB3_137"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Bảo mật CSDL",
+    "concept": "Leo thang đặc quyền qua hàm SECURITY DEFINER",
+    "difficulty": "Hard",
+    "question": "Quản trị viên tạo hàm doiMatKhau(ten, matKhauMoi) với SECURITY DEFINER (chạy với quyền của người tạo — superuser) để người dùng thường đổi mật khẩu. Phân tích các rủi ro leo thang đặc quyền.",
+    "reference_answer": "Hàm SECURITY DEFINER chạy với quyền của chủ sở hữu, nên mọi lỗ hổng bên trong trở thành lỗ hổng với quyền superuser. (1) search_path: nếu hàm gọi bảng/hàm/toán tử không ghi rõ schema, kẻ tấn công có thể tạo đối tượng cùng tên trong schema mà họ kiểm soát và nằm trước trong search_path, khiến hàm thực thi mã của họ với quyền superuser. (2) SQL động ghép chuỗi từ tham số (EXECUTE 'ALTER USER ' || ten ...) mở đường SQL injection. (3) Thiếu kiểm tra quyền nghiệp vụ: hàm không kiểm tra ten có phải là người gọi (session_user) hay không, ai cũng đổi được mật khẩu người khác, kể cả admin. (4) Quyền EXECUTE mặc định cấp cho PUBLIC. Biện pháp: đặt SET search_path cố định và an toàn trong định nghĩa hàm, ghi đầy đủ schema, dùng format() với %I/%L hoặc tham số, kiểm tra danh tính người gọi, REVOKE EXECUTE FROM PUBLIC và chỉ cấp cho vai trò cần thiết, chủ sở hữu hàm nên là vai trò có quyền tối thiểu chứ không phải superuser.",
+    "key_points": [
+      "SECURITY DEFINER chạy với quyền chủ sở hữu: lỗi trong hàm thành lỗ hổng mức superuser",
+      "Rủi ro search_path, SQL injection, thiếu kiểm tra người gọi, EXECUTE cho PUBLIC; cố định search_path, kiểm tra quyền, chủ sở hữu quyền tối thiểu"
+    ],
+    "id": "Q_DB3_138"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Bảo mật CSDL",
+    "concept": "Mã hóa cấp cột và khả năng truy vấn",
+    "difficulty": "Hard",
+    "question": "Để bảo vệ số CCCD và số điện thoại, nhóm phát triển mã hóa các cột này ở tầng ứng dụng. Phân tích đánh đổi giữa mã hóa ngẫu nhiên (randomized) và mã hóa tất định (deterministic) đối với khả năng truy vấn và bảo mật.",
+    "reference_answer": "Mã hóa ngẫu nhiên (AES-GCM với IV ngẫu nhiên): cùng một giá trị cho ra bản mã khác nhau mỗi lần — bảo mật mạnh, nhưng CSDL không thể tìm kiếm bằng so sánh bằng, không thể JOIN, UNIQUE hay đánh chỉ mục trên cột đó; tìm 'khách hàng có số điện thoại X' buộc phải giải mã toàn bộ. Mã hóa tất định: cùng giá trị cho cùng bản mã, nên hỗ trợ được tìm kiếm bằng, UNIQUE, JOIN và chỉ mục — nhưng rò rỉ thông tin: kẻ tấn công thấy được các dòng trùng giá trị, phân tích tần suất, và với miền giá trị nhỏ (giới tính, mã tỉnh) có thể đoán ngược. Không loại nào hỗ trợ truy vấn phạm vi hay LIKE (cần mã hóa bảo toàn thứ tự — còn rò rỉ nhiều hơn). Mô hình thường dùng: lưu bản mã ngẫu nhiên kèm một cột 'blind index' (HMAC có khóa bí mật của giá trị đã chuẩn hóa) để tìm kiếm bằng; quản lý khóa trong KMS tách biệt và có quy trình xoay khóa.",
+    "key_points": [
+      "Mã hóa ngẫu nhiên an toàn hơn nhưng mất khả năng tìm kiếm, chỉ mục, UNIQUE, JOIN",
+      "Mã hóa tất định cho phép tìm bằng nhưng rò rỉ tần suất/trùng lặp; dùng blind index (HMAC) + KMS"
+    ],
+    "id": "Q_DB3_139"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Phục hồi dữ liệu",
+    "concept": "Event Sourcing: phát lại, tiến hóa lược đồ sự kiện và snapshot",
+    "difficulty": "Hard",
+    "question": "Hệ thống ví điện tử dùng Event Sourcing: trạng thái số dư được tính bằng cách phát lại toàn bộ sự kiện NapTien, RutTien, ChuyenTien. Sau hai năm, nảy sinh các vấn đề về hiệu năng và tiến hóa. Phân tích các thách thức chính.",
+    "reference_answer": "(1) Hiệu năng phát lại: tài khoản có hàng trăm nghìn sự kiện thì mỗi lần nạp trạng thái phải phát lại tất cả — cần snapshot định kỳ (lưu trạng thái tại sự kiện thứ N, chỉ phát lại phần sau), nhưng snapshot phải được tái tạo khi logic tính trạng thái thay đổi. (2) Tiến hóa lược đồ sự kiện: sự kiện là bất biến và tồn tại mãi, nên mọi phiên bản cấu trúc cũ phải tiếp tục đọc được — cần versioning và 'upcaster' chuyển sự kiện cũ sang dạng mới khi đọc; không thể sửa lịch sử như UPDATE. (3) Thay đổi logic nghiệp vụ: phát lại sự kiện cũ với code mới có thể cho ra kết quả khác quá khứ (ví dụ quy tắc tính phí mới) — sự kiện phải ghi lại kết quả quyết định, không chỉ ý định. (4) Truy vấn: không thể truy vấn trực tiếp event store theo thuộc tính, cần các projection/read model được cập nhật bất đồng bộ (CQRS) với độ trễ và khả năng xây lại. (5) Dữ liệu cá nhân trong sự kiện bất biến gây khó với yêu cầu xóa. Event sourcing mạnh ở audit và tái hiện lịch sử nhưng tăng đáng kể độ phức tạp.",
+    "key_points": [
+      "Phát lại toàn bộ chậm, cần snapshot; lược đồ sự kiện bất biến cần versioning và upcaster",
+      "Thay đổi logic làm phát lại khác quá khứ, truy vấn cần projection (CQRS), dữ liệu cá nhân khó xóa"
+    ],
+    "id": "Q_DB3_140"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "Bảo đảm thứ tự và trùng lặp trong CDC",
+    "difficulty": "Hard",
+    "question": "Pipeline CDC (Debezium → Kafka → kho dữ liệu) đôi khi làm trạng thái đơn hàng trong kho bị 'lùi' (đã giao rồi lại thành đang giao), và có đơn hàng bị đếm hai lần. Phân tích nguyên nhân và cách thiết kế consumer.",
+    "reference_answer": "(1) Thứ tự: CDC đọc log theo đúng thứ tự commit, nhưng nếu topic Kafka được phân vùng không theo khóa chính của đơn hàng, các thay đổi của cùng một đơn có thể nằm ở các partition khác nhau và được xử lý song song sai thứ tự; consumer song song hoặc retry cũng có thể đảo thứ tự. (2) Trùng lặp: CDC và Kafka thường đảm bảo at-least-once — khi connector khởi động lại từ offset đã lưu trước đó, một số sự kiện được gửi lại; consumer dùng INSERT/cộng dồn sẽ đếm hai lần. Thiết kế consumer: partition theo khóa chính để giữ thứ tự cho từng thực thể; ghi vào đích theo kiểu upsert idempotent; chỉ áp dụng thay đổi nếu vị trí log (LSN/binlog position) hoặc phiên bản mới hơn giá trị đã lưu cho thực thể đó (bỏ qua sự kiện cũ/trùng); xử lý riêng sự kiện xóa (tombstone) và snapshot ban đầu xen với luồng thay đổi.",
+    "key_points": [
+      "Partition không theo khóa chính và xử lý song song làm đảo thứ tự thay đổi của cùng thực thể",
+      "At-least-once gây sự kiện lặp; consumer cần upsert idempotent và so sánh LSN/phiên bản trước khi áp dụng"
+    ],
+    "id": "Q_DB3_141"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Ràng buộc duy nhất toàn cục trên CSDL đã shard",
+    "difficulty": "Hard",
+    "question": "Bảng NguoiDung được shard theo maNguoiDung trên 16 node. Yêu cầu: email phải duy nhất trên toàn hệ thống. Vì sao ràng buộc UNIQUE(email) thông thường không đủ, và có những cách thiết kế nào?",
+    "reference_answer": "Mỗi shard chỉ thực thi UNIQUE trên dữ liệu cục bộ của nó; hai người dùng có cùng email nhưng maNguoiDung băm vào hai shard khác nhau sẽ không bị phát hiện. Kiểm tra bằng cách truy vấn mọi shard rồi mới chèn thì có race condition (hai yêu cầu cùng kiểm tra rồi cùng chèn) và rất tốn kém. Các cách thiết kế: (1) bảng tra cứu email → maNguoiDung được shard THEO EMAIL; đăng ký phải ghi vào cả hai nơi — cần giao dịch phân tán hoặc quy trình hai bước có bù trừ (đặt chỗ email trước, tạo người dùng sau, dọn bản ghi mồ côi); (2) dùng CSDL phân tán có hỗ trợ chỉ mục duy nhất toàn cục (Spanner, CockroachDB) — thực chất cũng là chỉ mục shard theo email với giao dịch phân tán, đánh đổi độ trễ; (3) dịch vụ đặt chỗ tập trung cho định danh; (4) nếu khả thi, chọn khóa shard sao cho ràng buộc trở thành cục bộ.",
+    "key_points": [
+      "UNIQUE chỉ có hiệu lực trong từng shard; kiểm tra mọi shard rồi chèn có race condition",
+      "Giải pháp: bảng tra cứu shard theo email với giao dịch phân tán/đặt chỗ, CSDL có chỉ mục unique toàn cục, dịch vụ đặt chỗ"
+    ],
+    "id": "Q_DB3_142"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "Sự kiện và chiều đến muộn (Late-arriving data)",
+    "difficulty": "Hard",
+    "question": "Trong kho dữ liệu, một giao dịch bán hàng ngày 10 được nạp vào ngày 15 do hệ thống POS ngoại tuyến, và thông tin khách hàng mới đăng ký tại quầy chỉ đến sau giao dịch của chính họ. Phân tích các vấn đề và cách xử lý.",
+    "reference_answer": "(1) Fact đến muộn: báo cáo ngày 10 đã chạy và gửi đi giờ không còn đúng; với chiều thay đổi chậm (SCD type 2), giao dịch phải gắn với phiên bản chiều có hiệu lực vào NGÀY 10 (ví dụ hạng thành viên khi đó), không phải phiên bản hiện tại — cần tra cứu theo khoảng thời gian hiệu lực. Các bảng tổng hợp/partition theo ngày cũ phải được tính lại (phân biệt ngày sự kiện và ngày nạp, thiết kế pipeline cho phép tính lại cửa sổ trễ). (2) Chiều đến muộn: khi nạp fact mà khách hàng chưa có trong bảng chiều, nếu loại bỏ fact thì mất doanh thu, nếu gán khóa 'Không xác định' thì mất liên kết. Cách chuẩn: tạo bản ghi chiều 'giữ chỗ' (inferred member) chỉ với khóa tự nhiên, gắn fact vào đó, và khi thông tin đầy đủ đến thì cập nhật bản ghi giữ chỗ (không tạo phiên bản SCD mới cho lần cập nhật đầu tiên).",
+    "key_points": [
+      "Fact đến muộn phải gắn phiên bản chiều có hiệu lực tại ngày sự kiện và kích hoạt tính lại tổng hợp",
+      "Chiều đến muộn xử lý bằng bản ghi giữ chỗ (inferred member), cập nhật khi dữ liệu đầy đủ"
+    ],
+    "id": "Q_DB3_143"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Kho dữ liệu",
+    "concept": "Bẫy hố sâu (Chasm Trap) khi join hai bảng sự kiện",
+    "difficulty": "Hard",
+    "question": "Báo cáo cần doanh thu bán hàng và số tiền hoàn trả theo sản phẩm. Truy vấn JOIN DimSanPham với cả FactBanHang và FactHoanTra rồi SUM cả hai cột, kết quả doanh thu bị thổi phồng gấp nhiều lần. Phân tích và viết lại cho đúng.",
+    "reference_answer": "Hai bảng sự kiện có quan hệ nhiều-một với cùng một chiều nhưng không liên quan trực tiếp với nhau. Khi JOIN cả hai qua chiều sản phẩm, với mỗi sản phẩm có m dòng bán và k dòng hoàn trả, phép JOIN tạo m × k dòng (tích Descartes cục bộ) — mỗi dòng bán bị lặp k lần, mỗi dòng hoàn trả lặp m lần, nên SUM bị nhân lên. Đây là 'chasm trap'. Lỗi khó phát hiện vì truy vấn chạy bình thường và với sản phẩm chỉ có một dòng hoàn trả thì kết quả lại đúng. Cách đúng (drill-across): tổng hợp TỪNG bảng sự kiện theo sản phẩm trước trong các subquery/CTE riêng, rồi mới JOIN các kết quả đã tổng hợp (một dòng mỗi sản phẩm) với nhau và với chiều, dùng FULL OUTER JOIN/COALESCE để giữ sản phẩm chỉ có ở một bên.",
+    "key_points": [
+      "JOIN hai bảng sự kiện qua chung một chiều tạo m × k dòng, làm SUM bị nhân lên",
+      "Tổng hợp từng bảng sự kiện riêng trước rồi mới JOIN kết quả (drill-across), giữ dòng một phía bằng FULL OUTER JOIN"
+    ],
+    "id": "Q_DB3_144"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Giao dịch (Transaction)",
+    "concept": "Xóa hàng loạt dữ liệu lớn trên hệ thống đang chạy",
+    "difficulty": "Hard",
+    "question": "Cần xóa 300 triệu dòng log cũ hơn 1 năm từ bảng NhatKy (tổng 1 tỷ dòng) trên production. Câu DELETE FROM NhatKy WHERE ngay < ... chạy một lần gây nhiều sự cố. Phân tích các sự cố và đề xuất cách làm.",
+    "reference_answer": "Một DELETE khổng lồ là một giao dịch duy nhất: (1) giữ khóa trên hàng trăm triệu dòng lâu (có thể leo thang khóa), chặn các thao tác khác; (2) sinh lượng log/WAL cực lớn, có thể làm đầy đĩa log, và nếu bị hủy giữa chừng thì rollback còn mất thời gian tương đương; (3) replica phải áp dụng cùng khối lượng, độ trễ replication tăng vọt; (4) với MVCC, tạo hàng trăm triệu dòng chết cần VACUUM, bảng vẫn chiếm dung lượng; (5) giao dịch dài cản trở dọn dẹp toàn hệ thống. Cách làm: tốt nhất là thiết kế phân vùng theo thời gian để xóa dữ liệu cũ bằng DROP/DETACH PARTITION (gần như tức thời, không sinh dòng chết). Nếu chưa có phân vùng: xóa theo lô nhỏ (ví dụ 10.000 dòng theo khoảng khóa chính có chỉ mục), commit mỗi lô, nghỉ giữa các lô, theo dõi độ trễ replica và tốc độ sinh log; hoặc với tỷ lệ xóa lớn, tạo bảng mới chứa dữ liệu cần giữ rồi hoán đổi.",
+    "key_points": [
+      "DELETE khổng lồ một giao dịch gây khóa dài, log khổng lồ, rollback lâu, replica trễ, dòng chết",
+      "Ưu tiên phân vùng theo thời gian và DROP PARTITION; nếu không thì xóa theo lô nhỏ có giám sát hoặc tạo bảng mới rồi hoán đổi"
+    ],
+    "id": "Q_DB3_145"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Chỉ mục (Index)",
+    "concept": "Tạo chỉ mục trực tuyến và chỉ mục không hợp lệ",
+    "difficulty": "Hard",
+    "question": "Để tránh khóa bảng, nhóm dùng CREATE INDEX CONCURRENTLY (PostgreSQL) trên bảng 500GB. Quá trình bị hủy giữa chừng do một lỗi, và vài ngày sau phát hiện ghi chậm hơn dù truy vấn không dùng chỉ mục mới. Phân tích.",
+    "reference_answer": "CREATE INDEX CONCURRENTLY không giữ khóa chặn ghi, thay vào đó quét bảng nhiều lượt và chờ các giao dịch đang chạy kết thúc; nó không chạy được trong khối giao dịch và nếu thất bại (vi phạm unique, deadlock, bị hủy) thì KHÔNG tự dọn dẹp: chỉ mục vẫn tồn tại ở trạng thái INVALID. Chỉ mục INVALID không được dùng cho truy vấn nhưng VẪN được cập nhật mỗi khi INSERT/UPDATE — chịu chi phí ghi mà không có lợi ích, và nếu là chỉ mục unique còn có thể gây lỗi khó hiểu. Thêm vào đó, quá trình tạo đồng thời chờ các giao dịch dài nên có thể chạy rất lâu. Xử lý: kiểm tra pg_index.indisvalid sau khi tạo, DROP INDEX CONCURRENTLY chỉ mục hỏng rồi tạo lại; giám sát tiến độ (pg_stat_progress_create_index); tránh giao dịch dài trong lúc tạo.",
+    "key_points": [
+      "Tạo chỉ mục đồng thời thất bại để lại chỉ mục INVALID không tự xóa",
+      "Chỉ mục INVALID không phục vụ truy vấn nhưng vẫn tốn chi phí ghi; kiểm tra indisvalid, xóa và tạo lại"
+    ],
+    "id": "Q_DB3_146"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Điều khiển đồng thời",
+    "concept": "Hàng đợi công việc trong CSDL với SKIP LOCKED",
+    "difficulty": "Hard",
+    "question": "Nhiều worker cùng lấy công việc từ bảng CongViec(trangThai = 'CHO'). Cách ban đầu SELECT ... LIMIT 1 rồi UPDATE gây hai worker nhận cùng việc; chuyển sang SELECT ... FOR UPDATE thì các worker xếp hàng chờ nhau. Phân tích và giải pháp FOR UPDATE SKIP LOCKED, kèm các lưu ý.",
+    "reference_answer": "SELECT rồi UPDATE không nguyên tử nên có race. FOR UPDATE khóa dòng, nhưng mọi worker cùng nhắm tới dòng 'đầu tiên' nên phải chờ worker trước commit — tuần tự hóa toàn bộ, mất tính song song. FOR UPDATE SKIP LOCKED cho phép mỗi worker bỏ qua các dòng đang bị worker khác khóa và lấy ngay dòng kế tiếp chưa bị khóa: SELECT id FROM CongViec WHERE trangThai = 'CHO' ORDER BY id LIMIT 1 FOR UPDATE SKIP LOCKED; rồi cập nhật trạng thái trong cùng giao dịch. Lưu ý: (1) nếu giữ giao dịch suốt thời gian xử lý việc (vài phút), khóa và kết nối bị giữ lâu — thường nên đánh dấu 'DANG_XU_LY' kèm thời hạn thuê (lease) rồi commit ngay, xử lý ngoài giao dịch, có job thu hồi việc quá hạn; (2) worker chết giữa chừng thì việc phải được nhận lại, nên xử lý phải idempotent; (3) cần chỉ mục phù hợp (partial index trên trangThai = 'CHO'); (4) bảng cập nhật liên tục sinh nhiều dòng chết cần VACUUM tốt; (5) SKIP LOCKED cho cái nhìn không nhất quán, không dùng cho truy vấn nghiệp vụ thông thường.",
+    "key_points": [
+      "SKIP LOCKED cho phép worker bỏ qua dòng đang bị khóa, lấy việc song song không trùng",
+      "Nên dùng lease + commit sớm thay vì giữ giao dịch dài, xử lý idempotent, có chỉ mục và VACUUM phù hợp"
+    ],
+    "id": "Q_DB3_147"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "CSDL phân tán",
+    "concept": "Thứ tự ID không phải thứ tự commit",
+    "difficulty": "Hard",
+    "question": "Một job đồng bộ định kỳ lấy dữ liệu mới bằng WHERE id > :idLonNhatLanTruoc (id từ sequence). Thỉnh thoảng có đơn hàng không bao giờ được đồng bộ. Giải thích vì sao và đề xuất cách đúng.",
+    "reference_answer": "Giá trị sequence được cấp tại thời điểm INSERT, nhưng giao dịch có thể commit muộn hơn nhiều. Ví dụ: giao dịch A lấy id 100 nhưng còn đang xử lý; giao dịch B lấy id 101 và commit ngay. Job chạy, chỉ thấy 101 (100 chưa commit nên chưa nhìn thấy), ghi nhận idLonNhat = 101. Sau đó A commit với id 100 — lần chạy sau tìm id > 101 nên bỏ sót vĩnh viễn đơn 100. Vấn đề tương tự với cột thời gian tạo (gán lúc bắt đầu, commit lúc sau). Cách đúng: dùng CDC đọc log theo thứ tự commit; hoặc chỉ đồng bộ tới một 'mốc an toàn' thấp hơn mọi giao dịch còn đang hoạt động (PostgreSQL: pg_snapshot_xmin), lùi một khoảng an toàn và chấp nhận xử lý lại (upsert idempotent); hoặc dùng bảng outbox với cờ đã xử lý thay vì dựa vào thứ tự id.",
+    "key_points": [
+      "Id được cấp lúc INSERT nhưng commit có thể muộn, dòng id nhỏ xuất hiện sau dòng id lớn",
+      "Dùng CDC theo thứ tự commit, mốc an toàn theo giao dịch đang hoạt động kèm xử lý lại idempotent, hoặc outbox có cờ"
+    ],
+    "id": "Q_DB3_148"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Ràng buộc",
+    "concept": "NULL trong ràng buộc UNIQUE nhiều cột",
+    "difficulty": "Hard",
+    "question": "Bảng CauHinh(maCongTy, maChiNhanh NULL, khoa, giaTri) có UNIQUE(maCongTy, maChiNhanh, khoa), với maChiNhanh = NULL nghĩa là cấu hình cấp công ty. Vẫn xuất hiện nhiều dòng trùng cấu hình cấp công ty. Giải thích và đề xuất cách sửa.",
+    "reference_answer": "Theo chuẩn SQL, NULL không bằng NULL (so sánh cho UNKNOWN), nên đa số hệ quản trị (PostgreSQL, Oracle với một số trường hợp, MySQL) coi hai bộ ('CT1', NULL, 'thue') là KHÁC nhau đối với ràng buộc UNIQUE — có thể chèn vô số dòng trùng cấu hình cấp công ty. (SQL Server ngược lại chỉ cho phép một NULL, gây hành vi khác khi chuyển hệ.) Cách sửa: (1) không dùng NULL mang nghĩa nghiệp vụ — dùng giá trị đặc biệt như mã chi nhánh 'TAT_CA' hoặc 0; (2) tạo hai partial unique index: UNIQUE(maCongTy, khoa) WHERE maChiNhanh IS NULL và UNIQUE(maCongTy, maChiNhanh, khoa) WHERE maChiNhanh IS NOT NULL; (3) PostgreSQL 15+ hỗ trợ UNIQUE NULLS NOT DISTINCT; (4) chỉ mục trên biểu thức COALESCE(maChiNhanh, ...).",
+    "key_points": [
+      "UNIQUE coi các NULL là khác nhau nên cho phép trùng khi một cột là NULL; hành vi khác nhau giữa các hệ",
+      "Sửa bằng giá trị đặc biệt thay NULL, partial unique index, NULLS NOT DISTINCT hoặc chỉ mục COALESCE"
+    ],
+    "id": "Q_DB3_149"
+  },
+  {
+    "language": "vi",
+    "subject": "Các hệ cơ sở dữ liệu",
+    "competency": "3_Các hệ cơ sở dữ liệu",
+    "topic": "Hàm tổng hợp",
+    "concept": "Phân bổ tiền và sai lệch do làm tròn",
+    "difficulty": "Hard",
+    "question": "Cần chia một hóa đơn 100.000 đồng cho 3 phòng ban theo tỷ lệ bằng nhau và lưu từng phần vào bảng PhanBo(DECIMAL(18,0)). Tổng các phần sau khi làm tròn là 99.999 hoặc 100.001 tùy cách làm. Phân tích và đề xuất thuật toán phân bổ đúng.",
+    "reference_answer": "Kể cả dùng DECIMAL, khi chia 100.000/3 = 33.333,33... rồi làm tròn từng phần riêng lẻ về đồng, tổng các phần (3 × 33.333 = 99.999) không còn bằng tổng ban đầu — lệch 1 đồng; làm tròn lên thì thừa. Với hàng triệu hóa đơn, sai lệch tích lũy làm báo cáo đối soát không khớp. Thuật toán đúng (largest remainder): tính phần nguyên (làm tròn xuống) cho từng bên, tính phần dư còn lại = tổng - Σ phần nguyên, rồi cộng thêm từng đơn vị nhỏ nhất cho các bên có phần lẻ lớn nhất (hoặc theo quy tắc nghiệp vụ cố định, ví dụ bên đầu tiên) cho đến khi hết phần dư. Kết quả: 33.334, 33.333, 33.333, tổng đúng 100.000. Quy tắc phải xác định (deterministic) để tính lại cho cùng kết quả; nên có ràng buộc/kiểm tra đối soát tổng phân bổ = tổng gốc.",
+    "key_points": [
+      "Làm tròn từng phần riêng lẻ khiến tổng các phần lệch tổng gốc, sai lệch tích lũy",
+      "Dùng phân bổ phần dư lớn nhất: làm tròn xuống rồi chia phần dư theo quy tắc xác định; kiểm tra tổng đối soát"
+    ],
+    "id": "Q_DB3_150"
+  }
+]

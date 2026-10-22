@@ -1,0 +1,2252 @@
+[
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "The equals() method",
+    "difficulty": "Easy",
+    "question": "What is the equals() method in Java used for, and how does it differ from the == operator when comparing two objects?",
+    "reference_answer": "When applied to two reference variables, == only checks whether they point to the SAME memory location (the same object). equals() is designed to compare LOGICAL/content equality (for example, two Student objects with the same student ID are considered equal even though they are different objects in memory). The default implementation of equals() in Object actually still uses ==, so any class that needs content-based comparison must override equals().",
+    "key_points": [
+      "== compares identity (same reference), equals() compares logical/content equality",
+      "Object's default equals() behaves like ==; override it for content-based comparison"
+    ],
+    "id": "Q_OOP3_001"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "The hashCode() method",
+    "difficulty": "Easy",
+    "question": "What value does hashCode() return and which data structures mainly use it?",
+    "reference_answer": "hashCode() returns an integer (int) representing the object, used as a 'hash code' to determine the location (bucket) where the object is stored in hash-based structures such as HashMap, HashSet and Hashtable. Thanks to hashCode, these structures can quickly narrow the search before calling equals() for an exact comparison.",
+    "key_points": [
+      "hashCode() returns an integer used as the object's hash code",
+      "HashMap and HashSet use it to pick a bucket before comparing with equals()"
+    ],
+    "id": "Q_OOP3_002"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "The toString() method",
+    "difficulty": "Easy",
+    "question": "Why should you override toString() in your own classes?",
+    "reference_answer": "By default, Object.toString() returns a string like ClassName@hexCode (e.g., Student@1b6d3586), which carries almost no useful information. Overriding toString() gives a readable representation of the object's state, which is very helpful for logging, debugging, IDE inspection and error messages. However, sensitive data (passwords, tokens) should not be included in toString().",
+    "key_points": [
+      "Default toString() only returns the class name and a hex hash code",
+      "Overriding toString() helps logging/debugging, but avoid exposing sensitive data"
+    ],
+    "id": "Q_OOP3_003"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "Object as the root of all classes",
+    "difficulty": "Easy",
+    "question": "What role does the Object class play in Java's class hierarchy?",
+    "reference_answer": "Object is the root of Java's entire inheritance tree: any class that does not explicitly extend another class implicitly extends Object. As a result, every object has common methods such as equals(), hashCode(), toString() and getClass(), and a variable of type Object can refer to any object.",
+    "key_points": [
+      "Every Java class implicitly extends Object if it extends no other class",
+      "Object provides common methods such as equals, hashCode, toString, getClass"
+    ],
+    "id": "Q_OOP3_004"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "The Comparable interface",
+    "difficulty": "Easy",
+    "question": "What is the Comparable<T> interface in Java used for? Which method must be implemented?",
+    "reference_answer": "Comparable<T> defines the 'natural ordering' of a class's objects. The implementing class must write int compareTo(T other), returning a negative number if the current object is smaller than other, 0 if equal, and a positive number if larger. Objects can then be sorted with Collections.sort() or used in TreeSet/TreeMap without supplying an extra comparator.",
+    "key_points": [
+      "Comparable defines an object's natural ordering via compareTo()",
+      "compareTo returns negative/0/positive for less than/equal/greater than"
+    ],
+    "id": "Q_OOP3_005"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "The Comparator interface",
+    "difficulty": "Easy",
+    "question": "How does Comparator<T> differ from Comparable<T>?",
+    "reference_answer": "Comparable is implemented INSIDE the class being compared and allows only one natural ordering. Comparator is a SEPARATE comparison object outside the class (implementing int compare(T a, T b)), allowing many different orderings (by name, by score, by date of birth...) without modifying the class's source code, even for third-party library classes.",
+    "key_points": [
+      "Comparable lives inside the class and gives a single natural ordering",
+      "Comparator is external and allows many sort criteria without changing the original class"
+    ],
+    "id": "Q_OOP3_006"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Enumerated types (Enum)",
+    "difficulty": "Easy",
+    "question": "What is an enum in Java, and why should you use an enum instead of int constants (e.g., STATUS_NEW = 0, STATUS_CANCELLED = 1)?",
+    "reference_answer": "An enum is a special type that defines a finite set of named constant values (e.g., enum Status { NEW, PROCESSING, CANCELLED }). Compared to int constants, enums are type-safe: the compiler prevents passing an arbitrary invalid integer, code is more readable, enums can be used in switch, and each enum value can carry its own fields and methods.",
+    "key_points": [
+      "An enum is a finite set of named constants and a type of its own",
+      "Type-safe, readable, can have fields/methods — better than int constants"
+    ],
+    "id": "Q_OOP3_007"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Record (Java 16+)",
+    "difficulty": "Easy",
+    "question": "What is a record in Java (since version 16), and what kind of data is it suited for?",
+    "reference_answer": "A record is a concise class declaration for objects that only carry immutable data (data carriers), e.g., record Point(int x, int y) {}. The compiler automatically generates the constructor, accessor methods (x(), y()), equals(), hashCode() and toString(). A record's fields are final, so records are well suited for Value Objects, DTOs and returning multiple values.",
+    "key_points": [
+      "A record is an immutable data class with auto-generated constructor, accessors, equals, hashCode, toString",
+      "Suited for pure-data Value Objects/DTOs"
+    ],
+    "id": "Q_OOP3_008"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Nested classes and lambda expressions",
+    "concept": "Inner class",
+    "difficulty": "Easy",
+    "question": "What is special about a non-static inner class in Java compared to a regular class?",
+    "reference_answer": "An inner class (non-static nested class) is declared inside another class, and each of its objects is always tied to a specific object of the enclosing (outer) class. Therefore it can directly access all members of the enclosing object, including private ones. To create an inner class object you need an existing outer object (outer.new Inner()).",
+    "key_points": [
+      "An inner class is bound to a specific instance of the enclosing class",
+      "It can access even private members of the enclosing class"
+    ],
+    "id": "Q_OOP3_009"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Nested classes and lambda expressions",
+    "concept": "Static nested class",
+    "difficulty": "Easy",
+    "question": "What is the core difference between a static nested class and a (non-static) inner class?",
+    "reference_answer": "A static nested class does not hold a reference to any object of the enclosing class; it behaves like an independent class that is merely placed in the outer class's namespace for logical grouping. Hence you can create it without an outer object (new Outer.Nested()), and it can only directly access the static members of the outer class.",
+    "key_points": [
+      "A static nested class neither needs nor holds a reference to an outer object",
+      "It only directly accesses the outer class's static members; used to group related classes"
+    ],
+    "id": "Q_OOP3_010"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Nested classes and lambda expressions",
+    "concept": "Anonymous class",
+    "difficulty": "Easy",
+    "question": "What is an anonymous class and when is it typically used?",
+    "reference_answer": "An anonymous class is a class without a name, declared and instantiated in place, usually to quickly implement an interface or extend a class for one-off use, e.g., new Comparator<Student>() { public int compare(...) {...} }. It is commonly used for callbacks, UI event handling, or short implementations that do not justify a separate class.",
+    "key_points": [
+      "An anonymous class is declared and instantiated in place, without a name",
+      "Used for one-off implementations such as callbacks and listeners"
+    ],
+    "id": "Q_OOP3_011"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Nested classes and lambda expressions",
+    "concept": "Lambda expressions",
+    "difficulty": "Easy",
+    "question": "What is a lambda expression in Java and which construct can it replace?",
+    "reference_answer": "A lambda is a concise syntax for an anonymous function, of the form (parameters) -> expression or block, e.g., (a, b) -> a.getScore() - b.getScore(). A lambda can only be used where a functional interface (an interface with exactly one abstract method) is expected, and it typically replaces an anonymous class implementing that interface, making code shorter and more readable.",
+    "key_points": [
+      "A lambda is an anonymous function with syntax (params) -> body",
+      "Used instead of anonymous classes when the target type is a functional interface"
+    ],
+    "id": "Q_OOP3_012"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "Functional Interface",
+    "difficulty": "Easy",
+    "question": "What is a functional interface? What does the @FunctionalInterface annotation do?",
+    "reference_answer": "A functional interface is an interface with EXACTLY ONE abstract method (it may have additional default/static methods), e.g., Runnable, Comparator, Function<T,R>, Predicate<T>. It is the target type for lambdas and method references. The @FunctionalInterface annotation asks the compiler to check and report an error if the interface has more than one abstract method, protecting the design intent.",
+    "key_points": [
+      "A functional interface has exactly one abstract method",
+      "@FunctionalInterface makes the compiler enforce this constraint"
+    ],
+    "id": "Q_OOP3_013"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Encapsulation",
+    "concept": "Package",
+    "difficulty": "Easy",
+    "question": "What are packages in Java used for in organizing object-oriented code?",
+    "reference_answer": "A package groups related classes/interfaces into a single namespace (e.g., com.company.sales.order). It helps avoid class-name conflicts between libraries, organizes source code by feature/module, and works with the default (package-private) access modifier to restrict access to within the same package.",
+    "key_points": [
+      "A package groups related classes into a namespace",
+      "Avoids name conflicts and supports package-level access control"
+    ],
+    "id": "Q_OOP3_014"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "The final keyword with reference variables",
+    "difficulty": "Easy",
+    "question": "Does declaring final List<String> list = new ArrayList<>(); make the list immutable (no adding/removing elements)? Explain.",
+    "reference_answer": "No. final on a reference variable only prevents REASSIGNING the variable to another object (list = new ArrayList<>() would be a compile error). The object the variable points to can still change state normally, so list.add(...) and list.remove(...) are still valid. For an immutable list you must use List.of(...) or Collections.unmodifiableList(...).",
+    "key_points": [
+      "final on a reference only forbids reassignment, not modification of the object",
+      "For real immutability use immutable collections such as List.of"
+    ],
+    "id": "Q_OOP3_015"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Method overloading",
+    "concept": "Variable arguments (Varargs)",
+    "difficulty": "Easy",
+    "question": "What are varargs (e.g., int sum(int... numbers)) and what constraints apply when declaring them?",
+    "reference_answer": "Varargs allow a method to accept any number of arguments of the same type; inside the method, the varargs parameter is treated as an array. Constraints: each method can have at most one varargs parameter and it must be the LAST parameter. You can call sum(), sum(1), sum(1, 2, 3) or pass an array directly.",
+    "key_points": [
+      "Varargs accept any number of arguments, handled as an array inside",
+      "Only one varargs parameter, and it must come last"
+    ],
+    "id": "Q_OOP3_016"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Wrapper classes and autoboxing",
+    "difficulty": "Easy",
+    "question": "What are wrapper classes such as Integer and Double? What are autoboxing and unboxing?",
+    "reference_answer": "Wrapper classes are object classes wrapping primitive types (int → Integer, double → Double...), needed because collections and generics only work with objects. Autoboxing is Java automatically converting a primitive to its wrapper object (int → Integer) and unboxing is the reverse, letting you write list.add(5) instead of list.add(Integer.valueOf(5)).",
+    "key_points": [
+      "Wrapper classes box primitives into objects for collections/generics",
+      "Autoboxing/unboxing are automatic conversions between primitives and wrappers"
+    ],
+    "id": "Q_OOP3_017"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Immutability of String",
+    "difficulty": "Easy",
+    "question": "Why is a String object in Java said to be immutable? What are the benefits?",
+    "reference_answer": "Once created, a String's content cannot change; methods like toUpperCase() or concat() all return a NEW String. Immutability makes Strings safe to share across threads, enables reuse via the String pool, makes them safe as HashMap keys (the hashCode never changes), and prevents accidental modification when passed as parameters (e.g., file paths, URLs).",
+    "key_points": [
+      "Every 'modifying' operation on a String creates a new String",
+      "Benefits: thread safety, String pool, stable HashMap keys, safe sharing"
+    ],
+    "id": "Q_OOP3_018"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object lifecycle",
+    "concept": "Shallow copy vs deep copy",
+    "difficulty": "Easy",
+    "question": "Distinguish between a shallow copy and a deep copy of an object.",
+    "reference_answer": "A shallow copy creates a new object but only copies field values; for reference fields, the copy and the original point to the SAME child objects, so modifying a child object through one affects the other. A deep copy recursively copies child objects as well, producing a structure completely independent of the original.",
+    "key_points": [
+      "Shallow copy: reference fields still share child objects",
+      "Deep copy: copies recursively, the copy is fully independent"
+    ],
+    "id": "Q_OOP3_019"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object lifecycle",
+    "concept": "The Cloneable interface and clone()",
+    "difficulty": "Easy",
+    "question": "What is unusual about the Cloneable interface in Java compared to ordinary interfaces?",
+    "reference_answer": "Cloneable is a 'marker interface' — it declares no methods. It only serves as a flag telling Object.clone() that the class allows cloning; calling clone() on an object that does not implement Cloneable throws CloneNotSupportedException. By default, clone() performs a shallow copy.",
+    "key_points": [
+      "Cloneable is a marker interface with no methods",
+      "Object.clone() checks for Cloneable and performs a shallow copy by default"
+    ],
+    "id": "Q_OOP3_020"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "The Iterator interface",
+    "difficulty": "Easy",
+    "question": "What are the main methods of the Iterator<T> interface and what is it used for?",
+    "reference_answer": "Iterator provides a way to traverse the elements of a collection sequentially without knowing its internal structure. Main methods: hasNext() checks whether more elements remain, next() returns the next element, and remove() (optional) safely removes the element most recently returned by next() during iteration.",
+    "key_points": [
+      "Iterator has hasNext(), next(), remove() (optional)",
+      "Allows traversing a collection without exposing its internals"
+    ],
+    "id": "Q_OOP3_021"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "The Iterable interface and the for-each loop",
+    "difficulty": "Easy",
+    "question": "What must a custom class do to be usable in a for-each loop (for (X x : obj))?",
+    "reference_answer": "The class must implement Iterable<X> and provide an iterator() method returning an Iterator<X>. The compiler translates a for-each loop into a call to iterator() followed by a hasNext()/next() loop, so any class implementing Iterable can use this syntax.",
+    "key_points": [
+      "Implement Iterable<T> and provide iterator()",
+      "for-each is compiled into a loop using an Iterator"
+    ],
+    "id": "Q_OOP3_022"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Abstraction",
+    "concept": "Program to an interface",
+    "difficulty": "Easy",
+    "question": "Why should you declare List<String> list = new ArrayList<>(); instead of ArrayList<String> list = new ArrayList<>();?",
+    "reference_answer": "Declaring the variable by its interface type (List) instead of the concrete implementation (ArrayList) means the rest of the code depends only on the general contract of List. When you need to switch to LinkedList or another implementation, you only change the instantiation point, without affecting the code that uses it. This is the principle 'program to an interface, not an implementation'.",
+    "key_points": [
+      "Declaring by interface makes code depend only on the general contract",
+      "Implementations can be swapped without affecting client code"
+    ],
+    "id": "Q_OOP3_023"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Abstract Factory Pattern - concept",
+    "difficulty": "Easy",
+    "question": "What problem does the Abstract Factory Pattern solve?",
+    "reference_answer": "Abstract Factory provides an interface for creating a FAMILY of related or dependent objects without specifying concrete classes. For example, a GUIFactory with createButton() and createDialog(); WindowsFactory and MacFactory implement it to create components of a consistent style. The client only works with the abstract factory, guaranteeing the created products are always compatible with each other.",
+    "key_points": [
+      "Abstract Factory creates a family of related objects through a common interface",
+      "Ensures products of the same family are compatible; client does not depend on concrete classes"
+    ],
+    "id": "Q_OOP3_024"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Prototype Pattern - concept",
+    "difficulty": "Easy",
+    "question": "How does the Prototype Pattern create new objects?",
+    "reference_answer": "Prototype creates new objects by COPYING (cloning) an existing prototype object instead of calling a constructor and initializing from scratch. It is useful when initialization is expensive (reading configuration, querying data) or when many similar objects are needed, and it lets the client create objects without knowing the concrete class.",
+    "key_points": [
+      "Prototype creates objects by copying a prototype object",
+      "Useful when initialization is expensive or many similar objects are needed"
+    ],
+    "id": "Q_OOP3_025"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Iterator Pattern - concept",
+    "difficulty": "Easy",
+    "question": "What does the Iterator Pattern separate from what?",
+    "reference_answer": "The Iterator Pattern separates HOW to traverse elements from the STORAGE STRUCTURE of the collection. The collection only needs to provide an iterator object; the client traverses through the iterator via a uniform interface (hasNext/next) regardless of whether the underlying storage is an array, a linked list or a tree. This allows changing the storage structure or offering multiple traversal methods without changing client code.",
+    "key_points": [
+      "Separates traversal from internal storage structure",
+      "Clients traverse via a uniform interface regardless of the underlying structure"
+    ],
+    "id": "Q_OOP3_026"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Chain of Responsibility - concept",
+    "difficulty": "Easy",
+    "question": "How does the Chain of Responsibility Pattern work?",
+    "reference_answer": "Chain of Responsibility arranges handler objects into a chain; a request is passed along the chain, and each handler either handles it or forwards it to the next handler. The sender does not need to know which handler will process it. Example: an expense approval system going Team Lead → Department Head → Director depending on the amount.",
+    "key_points": [
+      "Handlers are linked into a chain; requests are forwarded along it",
+      "Decouples the sender from the specific handler"
+    ],
+    "id": "Q_OOP3_027"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Mediator Pattern - concept",
+    "difficulty": "Easy",
+    "question": "What problem between objects does the Mediator Pattern reduce?",
+    "reference_answer": "When many objects communicate directly with each other, the links grow like a 'spider web' (n objects can have up to n(n-1) links). Mediator introduces a coordinating intermediary object: objects only communicate with the mediator instead of with each other, reducing coupling between them. For example, an air traffic control tower coordinates aircraft instead of the aircraft contacting each other directly.",
+    "key_points": [
+      "Mediator coordinates communication among many objects",
+      "Reduces direct links and coupling between objects"
+    ],
+    "id": "Q_OOP3_028"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Memento Pattern - concept",
+    "difficulty": "Easy",
+    "question": "Which feature is the Memento Pattern typically used to implement?",
+    "reference_answer": "Memento allows capturing (snapshotting) the internal state of an object at a point in time and restoring it later without violating encapsulation. It is typically used to implement Undo/Redo, game save points or editor checkpoints. Three roles: Originator (the original object), Memento (the state snapshot), Caretaker (the holder of mementos).",
+    "key_points": [
+      "Memento saves and restores an object's state without breaking encapsulation",
+      "Used for Undo/Redo and checkpoints; roles: Originator, Memento, Caretaker"
+    ],
+    "id": "Q_OOP3_029"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Flyweight Pattern - concept",
+    "difficulty": "Easy",
+    "question": "Which resource does the Flyweight Pattern save, and how?",
+    "reference_answer": "Flyweight saves MEMORY when a huge number of similar objects are needed, by SHARING the common part of their state among many objects instead of each object keeping its own copy. For example, a text editor shares font-format objects among millions of identical characters, storing only each character's position separately.",
+    "key_points": [
+      "Flyweight saves memory when there are very many similar objects",
+      "Shares common state instead of duplicating it for each object"
+    ],
+    "id": "Q_OOP3_030"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Bridge Pattern - concept",
+    "difficulty": "Easy",
+    "question": "Which two parts of a system does the Bridge Pattern decouple?",
+    "reference_answer": "Bridge decouples the ABSTRACTION (what the client uses) from the IMPLEMENTATION (how it is concretely done) so the two can evolve independently. For example, a Shape class (Circle, Square) holds a reference to a Renderer interface (OpenGLRenderer, SVGRenderer); adding a new shape or a new rendering method does not require creating every combination of subclasses.",
+    "key_points": [
+      "Bridge separates abstraction from implementation via composition",
+      "Both dimensions can be extended independently, avoiding a subclass explosion"
+    ],
+    "id": "Q_OOP3_031"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object-oriented architecture",
+    "concept": "The MVC pattern",
+    "difficulty": "Easy",
+    "question": "What three components make up the MVC (Model-View-Controller) pattern and what is the role of each?",
+    "reference_answer": "The Model holds data and business logic; the View is responsible for displaying data to the user; the Controller receives user actions, asks the Model to process them and selects an appropriate View to display the result. Separating the three roles lets you change the UI without affecting business logic and vice versa.",
+    "key_points": [
+      "Model: data + business logic; View: presentation; Controller: input handling and coordination",
+      "Separation allows UI and business logic to change independently"
+    ],
+    "id": "Q_OOP3_032"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Coupling & Cohesion",
+    "concept": "Law of Demeter",
+    "difficulty": "Easy",
+    "question": "What does the Law of Demeter ('only talk to your immediate friends') state?",
+    "reference_answer": "The Law of Demeter advises that an object's method should only call methods of: itself, its parameters, objects it creates, and its direct components — it should not 'reach through' another object to call further (e.g., avoid order.getCustomer().getAddress().getCity()). The goal is to reduce dependence on other objects' internal structure.",
+    "key_points": [
+      "Only call methods of yourself, parameters, created objects and direct components",
+      "Avoid call chains through multiple objects to reduce coupling"
+    ],
+    "id": "Q_OOP3_033"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "GRASP principles",
+    "concept": "GRASP - Information Expert",
+    "difficulty": "Easy",
+    "question": "To which class does the Information Expert principle in GRASP suggest assigning a responsibility?",
+    "reference_answer": "Information Expert advises assigning a responsibility to the class that HOLDS the information needed to fulfill it. For example, calculating an order's total belongs to the Order class (which holds the list of line items), while calculating each line's subtotal belongs to OrderLine (which has the quantity and unit price).",
+    "key_points": [
+      "Assign a responsibility to the class with enough information to fulfill it",
+      "Increases cohesion and reduces passing data back and forth"
+    ],
+    "id": "Q_OOP3_034"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "GRASP principles",
+    "concept": "GRASP - Creator",
+    "difficulty": "Easy",
+    "question": "According to GRASP's Creator principle, which class should be responsible for creating objects of class B?",
+    "reference_answer": "Class A should create B if A contains or aggregates B, records B, closely uses B, or has the initializing data for B. For example, Order should create OrderLines because it contains them. This principle reduces coupling since A is already related to B.",
+    "key_points": [
+      "A should create B if A contains, records, closely uses, or has the initializing data for B",
+      "Keeps coupling low because the A-B relationship already exists"
+    ],
+    "id": "Q_OOP3_035"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "GRASP principles",
+    "concept": "GRASP - Controller",
+    "difficulty": "Easy",
+    "question": "Which design question does the Controller principle in GRASP answer?",
+    "reference_answer": "Controller answers: which object (outside the UI layer) should receive and coordinate a system event (e.g., 'place order', 'checkout')? The answer is a controller object representing the whole system or a use case scenario. The controller receives requests from the UI and delegates to domain objects, keeping business logic out of the UI.",
+    "key_points": [
+      "The controller is the first object beyond the UI to receive and coordinate system events",
+      "It delegates to domain objects, separating UI from business logic"
+    ],
+    "id": "Q_OOP3_036"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "UML",
+    "concept": "CRC cards (Class-Responsibility-Collaborator)",
+    "difficulty": "Easy",
+    "question": "What parts does a CRC card used in object-oriented design consist of?",
+    "reference_answer": "A CRC card is a small card describing a class with three parts: Class (class name), Responsibilities (what the class knows and does), and Collaborators (other classes it needs to work with to fulfill its responsibilities). CRC cards help a team brainstorm and allocate responsibilities quickly before drawing detailed UML.",
+    "key_points": [
+      "A CRC card has Class, Responsibilities, Collaborators",
+      "A lightweight tool for assigning responsibilities in early design"
+    ],
+    "id": "Q_OOP3_037"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "UML",
+    "concept": "Sequence Diagram",
+    "difficulty": "Easy",
+    "question": "What does a UML Sequence Diagram represent?",
+    "reference_answer": "A Sequence Diagram shows interactions among objects in TIME ORDER for a specific scenario: objects are placed horizontally with lifelines extending downward, messages (method calls) are horizontal arrows between lifelines, and time flows from top to bottom.",
+    "key_points": [
+      "A Sequence Diagram shows object interactions in time order",
+      "Elements: lifelines, messages (arrows), time flowing downward"
+    ],
+    "id": "Q_OOP3_038"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "UML",
+    "concept": "Use Case Diagram",
+    "difficulty": "Easy",
+    "question": "What are the basic components of a UML Use Case Diagram?",
+    "reference_answer": "A Use Case Diagram consists of: Actors (users or external systems interacting with the system), Use Cases (functions the system provides, drawn as ellipses), the system boundary, and relationships among them (association, include, extend, generalization). It describes what the system does from the user's perspective, not how it is implemented.",
+    "key_points": [
+      "Components: Actor, Use Case, system boundary, relationships",
+      "Describes functionality from the user's perspective, not implementation"
+    ],
+    "id": "Q_OOP3_039"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "UML",
+    "concept": "State Machine Diagram",
+    "difficulty": "Easy",
+    "question": "What kind of objects is a UML State Machine Diagram suited to describe?",
+    "reference_answer": "A State Machine Diagram describes the STATES an object can go through during its lifetime and the event-triggered TRANSITIONS between them. It suits objects whose behavior strongly depends on state, e.g., an Order (New → Paid → Shipping → Completed / Cancelled) or a vending machine.",
+    "key_points": [
+      "Describes an object's states and event-driven transitions",
+      "Suited to state-dependent objects such as orders"
+    ],
+    "id": "Q_OOP3_040"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "UML",
+    "concept": "Visibility symbols in UML",
+    "difficulty": "Easy",
+    "question": "In a UML class diagram, what do the symbols +, -, #, ~ before attributes/methods mean?",
+    "reference_answer": "They indicate visibility: + is public, - is private, # is protected, ~ is package (Java's default). In addition, static members are usually underlined and abstract members are italicized.",
+    "key_points": [
+      "+ public, - private, # protected, ~ package",
+      "Static is underlined, abstract is italic"
+    ],
+    "id": "Q_OOP3_041"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "UML",
+    "concept": "Multiplicity in UML",
+    "difficulty": "Easy",
+    "question": "What do multiplicities like 1, 0..1, 1..*, * on an association between two UML classes mean?",
+    "reference_answer": "Multiplicity tells how many objects at one end can be linked to an object at the other end: 1 means exactly one, 0..1 means zero or one (optional), 1..* means at least one, * (or 0..*) means zero or many. For example, Customer 1 —— * Order means a customer has many orders and each order belongs to exactly one customer.",
+    "key_points": [
+      "Multiplicity indicates how many objects can be linked at each end",
+      "1, 0..1, 1..*, * mean exactly one, optional, at least one, many"
+    ],
+    "id": "Q_OOP3_042"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Refactoring and code smells",
+    "concept": "Code smell - concept",
+    "difficulty": "Easy",
+    "question": "What is a 'code smell'? Is it a bug?",
+    "reference_answer": "A code smell is a surface indication in source code that hints at a deeper design problem, e.g., overly long methods, overly large classes, duplicated code, long parameter lists. A code smell is NOT a bug — the program still works correctly — but it makes code hard to understand and maintain and prone to future bugs; it is a signal to consider refactoring.",
+    "key_points": [
+      "A code smell is a sign of a design problem",
+      "Not a bug, but it hurts maintainability; a signal to refactor"
+    ],
+    "id": "Q_OOP3_043"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Refactoring and code smells",
+    "concept": "Refactoring - concept",
+    "difficulty": "Easy",
+    "question": "What is refactoring, and what is the most important precondition for doing it?",
+    "reference_answer": "Refactoring is changing the internal structure of source code to make it easier to understand and maintain WITHOUT changing the program's external behavior. The key precondition is a reliable automated test suite to confirm behavior is unchanged after each small step, and refactoring should be done in small, safe steps.",
+    "key_points": [
+      "Refactoring improves structure without changing external behavior",
+      "Requires automated tests and small steps"
+    ],
+    "id": "Q_OOP3_044"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Refactoring and code smells",
+    "concept": "God Class",
+    "difficulty": "Easy",
+    "question": "What is a 'God Class' and why is it considered an anti-pattern?",
+    "reference_answer": "A God Class is a class that takes on too many responsibilities, knows too much and controls too many parts of the system (often thousands of lines and hundreds of methods). It violates SRP, has low cohesion, every change touches it causing conflicts and cascading bugs, and it is hard to test and understand.",
+    "key_points": [
+      "A God Class holds too many responsibilities and too much knowledge",
+      "Violates SRP, low cohesion, hard to test and maintain"
+    ],
+    "id": "Q_OOP3_045"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Exception handling in OOP",
+    "concept": "try-with-resources",
+    "difficulty": "Easy",
+    "question": "What problem does try-with-resources in Java solve? What condition must an object meet to be used with it?",
+    "reference_answer": "try-with-resources automatically closes resources (files, database connections, sockets) when the try block ends, whether normally or due to an exception, avoiding resource leaks and verbose finally code. Objects declared in the try's parentheses must implement AutoCloseable (or Closeable) to have a close() method.",
+    "key_points": [
+      "Automatically calls close() when the try block ends, even on exceptions",
+      "Resources must implement AutoCloseable"
+    ],
+    "id": "Q_OOP3_046"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Inheritance",
+    "concept": "Sealed classes",
+    "difficulty": "Easy",
+    "question": "What does a sealed class (Java 17) allow you to control in inheritance?",
+    "reference_answer": "A sealed class allows a class/interface to specify EXACTLY which classes may extend it via the permits clause, e.g., sealed interface Shape permits Circle, Square, Triangle. Subclasses must be declared final, sealed or non-sealed. The hierarchy is thus closed and known in advance, enabling the compiler to check exhaustiveness in type-based switches.",
+    "key_points": [
+      "A sealed class restricts the set of permitted subclasses via permits",
+      "Subclasses must be final/sealed/non-sealed; supports exhaustive switch checks"
+    ],
+    "id": "Q_OOP3_047"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "getClass() and runtime type information",
+    "difficulty": "Easy",
+    "question": "What information does getClass() return, and how does it differ from the instanceof operator?",
+    "reference_answer": "getClass() returns a Class object representing the EXACT runtime type of the object. instanceof checks whether an object is an instance of a type OR any of its subclasses. So for a subclass GraduateStudent extends Student, s instanceof Student is true but s.getClass() == Student.class is false.",
+    "key_points": [
+      "getClass() returns the exact runtime type",
+      "instanceof accepts subclasses, getClass() compares the exact type"
+    ],
+    "id": "Q_OOP3_048"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "The Optional class - concept",
+    "difficulty": "Easy",
+    "question": "What problem is the Optional<T> class (Java 8+) designed to solve?",
+    "reference_answer": "Optional<T> is a wrapper object that may contain a value or be empty, used mainly as a RETURN TYPE to explicitly express that a result may be absent (e.g., findStudentById() might find nothing). It forces callers to handle the empty case (orElse, orElseThrow, ifPresent, map) instead of receiving null and risking NullPointerException.",
+    "key_points": [
+      "Optional explicitly represents a possibly absent value",
+      "Mainly used as a return type to force callers to handle emptiness, reducing NullPointerException"
+    ],
+    "id": "Q_OOP3_049"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Polymorphism",
+    "concept": "Pattern matching for instanceof (Java 16+)",
+    "difficulty": "Easy",
+    "question": "What does the syntax if (obj instanceof Student s) { ... } (pattern matching for instanceof) improve over the traditional style?",
+    "reference_answer": "The traditional way requires a check followed by a manual cast: if (obj instanceof Student) { Student s = (Student) obj; ... }. Pattern matching combines the type check and the declaration of a casted variable in one step: if the condition is true, s automatically has type Student within the block. The code is shorter and avoids casting mistakes from repeating the type name.",
+    "key_points": [
+      "Combines type checking and casting into one step",
+      "Reduces repetitive code and manual casting errors"
+    ],
+    "id": "Q_OOP3_050"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "The equals()/hashCode() contract",
+    "difficulty": "Medium",
+    "question": "Why is it MANDATORY to override hashCode() when you override equals()? What happens if you forget?",
+    "reference_answer": "Java's contract requires: if a.equals(b) is true then a.hashCode() must equal b.hashCode(). HashMap/HashSet use hashCode first to choose a bucket, then equals to compare within the bucket. If you override only equals but keep the default (identity-based) hashCode, two logically 'equal' objects get different hash codes and land in different buckets: set.add(a); set.contains(b) returns false even though a.equals(b), and a HashSet may contain logically 'duplicate' elements.",
+    "key_points": [
+      "Contract: equal objects must have equal hash codes",
+      "Forgetting hashCode makes HashMap/HashSet miss elements and hold logical duplicates"
+    ],
+    "id": "Q_OOP3_051"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "Required properties of equals()",
+    "difficulty": "Medium",
+    "question": "Which properties must a correct equals() implementation satisfy according to the Java specification?",
+    "reference_answer": "equals() must be: (1) Reflexive: x.equals(x) is true; (2) Symmetric: x.equals(y) if and only if y.equals(x); (3) Transitive: x.equals(y) and y.equals(z) imply x.equals(z); (4) Consistent: repeated calls give the same result if the objects do not change; (5) x.equals(null) is always false. A typical implementation: check this == o, check null and type, cast, then compare significant fields (using Objects.equals for nullable fields).",
+    "key_points": [
+      "Five properties: reflexive, symmetric, transitive, consistent, false for null",
+      "Standard procedure: check reference, null, type, then compare significant fields"
+    ],
+    "id": "Q_OOP3_052"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "Choosing between Comparable and Comparator",
+    "difficulty": "Medium",
+    "question": "A Product class is sorted by code in most cases, but the reporting screen needs to sort by price descending, then by name. How should this be designed?",
+    "reference_answer": "Make Product implement Comparable<Product> with compareTo by product code — the natural ordering used by default (TreeSet, Collections.sort). For the report, create a separate Comparator without modifying the class: Comparator.comparing(Product::getPrice).reversed().thenComparing(Product::getName). This keeps Product clean, and each special sorting need is encapsulated in its own reusable Comparator.",
+    "key_points": [
+      "Put the most common ordering in Comparable (natural ordering)",
+      "Use composed Comparators (comparing, reversed, thenComparing) for special criteria without modifying the class"
+    ],
+    "id": "Q_OOP3_053"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Enums with fields and behavior",
+    "difficulty": "Medium",
+    "question": "Instead of writing a switch on enum ShippingMethod in many places to compute fees, how can the enum itself be leveraged to eliminate those switches?",
+    "reference_answer": "An enum in Java is a full class, so it can have fields, constructors and methods, and each constant can even override an abstract method. E.g., enum ShippingMethod { EXPRESS { double fee(double kg) { return 30000 + kg*5000; } }, ECONOMY { ... }; abstract double fee(double kg); }. The fee logic is attached directly to each constant, so adding a new method only requires adding a constant; the compiler forces fee to be implemented, so no switch branch can be forgotten somewhere.",
+    "key_points": [
+      "Enums can contain fields, constructors, methods, and per-constant methods",
+      "Attaching behavior to enum constants replaces scattered switches; the compiler ensures completeness"
+    ],
+    "id": "Q_OOP3_054"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Singleton via enum",
+    "difficulty": "Medium",
+    "question": "Why does Joshua Bloch (Effective Java) recommend implementing a Singleton as an enum with a single constant (enum Config { INSTANCE; ... })?",
+    "reference_answer": "An enum singleton is guaranteed by the JVM to be initialized exactly once and is thread-safe without manual synchronization. It also automatically resists two common ways of breaking Singletons: serialization/deserialization (Java guarantees enums are not re-created on deserialization) and using reflection to call a private constructor (the JVM forbids instantiating enums via reflection). Drawbacks: it cannot extend another class, and fine-grained lazy initialization is not possible.",
+    "key_points": [
+      "The JVM guarantees one-time initialization and thread safety",
+      "Automatically resists serialization and reflection attacks; limitation: cannot extend another class"
+    ],
+    "id": "Q_OOP3_055"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Records and Value Objects",
+    "difficulty": "Medium",
+    "question": "When should you use a record instead of a regular class, and when is a record NOT appropriate?",
+    "reference_answer": "Records fit pure-data, immutable objects compared by value: DTOs, query results, coordinates, money amounts, composite Map keys. Records are not appropriate when the object needs mutable state (entities with a lifecycle, e.g., an Account whose balance changes), needs to extend another class (records implicitly extend java.lang.Record and are final), needs to hide some fields (every component has a public accessor), or when identity matters more than value.",
+    "key_points": [
+      "Records suit immutable data compared by value (DTOs, value objects)",
+      "Not suited for mutable entities, inheritance needs, hidden fields or identity-based objects"
+    ],
+    "id": "Q_OOP3_056"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Nested classes and lambda expressions",
+    "concept": "Choosing an inner class or a static nested class",
+    "difficulty": "Medium",
+    "question": "When designing a Node class inside a LinkedList class, should Node be a static nested class or an inner class? Why?",
+    "reference_answer": "It should be a static nested class. Node only needs to store data and a reference to the next node; it does not need access to the state of a specific LinkedList object. If declared as an inner class, EVERY Node implicitly holds an extra reference to the enclosing list object, wasting memory (one extra pointer per node) and possibly keeping the outer object alive longer than necessary. General rule: default to static nested, and only use an inner class when you truly need access to the enclosing instance.",
+    "key_points": [
+      "Node does not need the list object's state, so make it static nested",
+      "An inner class implicitly holds an outer reference, costing memory and extending the outer object's lifetime"
+    ],
+    "id": "Q_OOP3_057"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Nested classes and lambda expressions",
+    "concept": "Differences between lambdas and anonymous classes",
+    "difficulty": "Medium",
+    "question": "Besides shorter syntax, how do lambdas differ semantically from anonymous classes?",
+    "reference_answer": "(1) The this keyword: in an anonymous class, this refers to the anonymous class object itself; in a lambda, this refers to the enclosing class's object. (2) A lambda does not introduce a new scope, so it cannot declare a variable with the same name as an outer local variable, whereas an anonymous class can shadow it. (3) A lambda can only implement a functional interface, while an anonymous class can extend an abstract class or implement an interface with several methods and can have its own state. (4) Lambdas are typically implemented by the JVM via invokedynamic, without generating a separate .class file for each lambda.",
+    "key_points": [
+      "In a lambda, this is the enclosing object; in an anonymous class it is the class itself",
+      "Lambdas only target functional interfaces and introduce no new scope; anonymous classes are more flexible and can have state"
+    ],
+    "id": "Q_OOP3_058"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Nested classes and lambda expressions",
+    "concept": "Effectively final variables in captures",
+    "difficulty": "Medium",
+    "question": "Why can lambdas and anonymous classes only use local variables of the enclosing method that are 'effectively final' (never reassigned after initialization)?",
+    "reference_answer": "Local variables live on the method's stack and disappear when the method ends, while a lambda may run later (e.g., on another thread). Therefore Java COPIES the variable's value into the lambda at creation time. If reassignment were allowed, the values inside and outside the lambda would diverge, causing confusion and concurrency bugs. The effectively-final rule guarantees the copy is always correct. To share mutable state, use an object field or a holder object such as AtomicInteger.",
+    "key_points": [
+      "Lambdas keep a copy of local variables because stack variables may be gone when the lambda runs",
+      "Effectively final keeps the copy consistent; for mutable state use a field or a holder like AtomicInteger"
+    ],
+    "id": "Q_OOP3_059"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Nested classes and lambda expressions",
+    "concept": "Method references",
+    "difficulty": "Medium",
+    "question": "There are four kinds of method references in Java. Name them and give an example of each.",
+    "reference_answer": "(1) Reference to a static method: Integer::parseInt equals s -> Integer.parseInt(s). (2) Reference to a method of a particular object: System.out::println equals x -> System.out.println(x). (3) Reference to an instance method of an arbitrary object of a type: String::toUpperCase equals s -> s.toUpperCase() (the first argument becomes the receiver). (4) Reference to a constructor: ArrayList::new equals () -> new ArrayList<>().",
+    "key_points": [
+      "Four kinds: static, method of a particular object, instance method of an arbitrary object of a type, constructor",
+      "A method reference is shorthand for a lambda that only calls an existing method"
+    ],
+    "id": "Q_OOP3_060"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Comparing Abstract Factory and Factory Method",
+    "difficulty": "Medium",
+    "question": "Compare Abstract Factory and Factory Method in terms of mechanism and scope of application.",
+    "reference_answer": "Factory Method relies on INHERITANCE: a superclass defines a creation method and subclasses override it to decide which ONE concrete product to create. Abstract Factory relies on COMPOSITION: the client receives a factory object with SEVERAL creation methods producing a FAMILY of related products (button, dialog, scrollbar of the same style). Factory Method suits deferring the choice of a single product class; Abstract Factory suits guaranteeing that multiple created products are always compatible. In practice, each method in an Abstract Factory is often itself a factory method.",
+    "key_points": [
+      "Factory Method: inheritance, creates one kind of product; Abstract Factory: composition, creates a product family",
+      "Abstract Factory guarantees compatibility among products of the same family"
+    ],
+    "id": "Q_OOP3_061"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Prototype and shallow/deep copying",
+    "difficulty": "Medium",
+    "question": "When implementing Prototype for a Document class containing a List<Page>, what must you watch out for so that the copy does not corrupt the original?",
+    "reference_answer": "If you only use super.clone() (a shallow copy), the copy and the original share the SAME List<Page> object: adding/removing pages on the copy also changes the original. A deep copy at the appropriate level is needed: create a new List and copy each Page (if Page is mutable). It is often better to use a copy constructor or a custom copy() method instead of Cloneable to clearly control what is shared and what is duplicated.",
+    "key_points": [
+      "Shallow clone() makes the copy and original share mutable collections",
+      "Deep-copy mutable components; prefer copy constructors/custom copy methods"
+    ],
+    "id": "Q_OOP3_062"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Fail-fast iterators and ConcurrentModificationException",
+    "difficulty": "Medium",
+    "question": "Why does the code for (Student s : list) { if (s.score < 5) list.remove(s); } usually throw ConcurrentModificationException? What is the correct fix?",
+    "reference_answer": "Iterators of ArrayList/HashMap are 'fail-fast': they record the structural modification count (modCount) at the start and recheck it on every next(). Calling list.remove() directly changes modCount outside the iterator's control, so the next call to next() detects the anomaly and throws. Fix: use an explicit iterator and call it.remove(), or use list.removeIf(s -> s.score < 5), or collect elements to remove into a separate list and remove them afterwards.",
+    "key_points": [
+      "Fail-fast iterators compare modCount; direct structural modification during iteration is detected",
+      "Fix with Iterator.remove(), removeIf(), or removing after iteration"
+    ],
+    "id": "Q_OOP3_063"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Applying Chain of Responsibility to request filters",
+    "difficulty": "Medium",
+    "question": "A web server must check, in order: authentication, authorization, rate limiting and logging before handling a request. Analyze applying Chain of Responsibility instead of writing one long method full of ifs.",
+    "reference_answer": "Each check is encapsulated in its own handler with a common interface (handle(request, next)); each handler either stops the chain (returning 401, 429...) or passes it on. Benefits: each handler has one responsibility (SRP), handlers are easy to test independently, adding/removing/reordering steps only requires reconfiguring the chain (OCP), and chains can be reused across routes. This is exactly the middleware/filter model in Express, Servlet Filters and Spring Security. Note that order matters (e.g., authentication must come before authorization).",
+    "key_points": [
+      "Each check is an independent handler that either stops or forwards",
+      "Easy to add/remove/reorder steps and test individually; this is the real-world middleware/filter model"
+    ],
+    "id": "Q_OOP3_064"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Comparing Mediator and Observer",
+    "difficulty": "Medium",
+    "question": "Mediator and Observer both reduce coupling between objects. How do they differ?",
+    "reference_answer": "Observer sets up a one-to-many relationship: the subject broadcasts notifications, observers subscribe themselves; the subject neither knows nor controls what observers do — information flow is distributed. Mediator centralizes interaction logic in a coordinating object that knows all components and decides who does what when an event occurs — control flow is centralized. Observer suits change notification; Mediator suits objects with complex mutual interactions (e.g., interdependent fields in a form). The two often combine: a mediator may use the observer mechanism to receive events.",
+    "key_points": [
+      "Observer: one-to-many broadcast, distributed flow, subject does not control observers",
+      "Mediator: centralizes coordination logic in an object that knows all components"
+    ],
+    "id": "Q_OOP3_065"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Memento and preserving encapsulation",
+    "difficulty": "Medium",
+    "question": "When implementing Undo for a TextEditor class, why is the Memento designed so that only the Originator can read its contents, not the Caretaker?",
+    "reference_answer": "The Memento contains internal state (content, cursor position, selection...) that only the TextEditor should know. If the Caretaker (the class managing Undo history) could read/modify the memento, it would depend on the Originator's internal structure and could create invalid states, breaking encapsulation. In Java, a Memento is often implemented as a static nested class with private constructor/getters, or with an empty interface exposed outward (narrow interface) and the full implementation visible only to the Originator (wide interface). The Caretaker just stores and returns the memento as a 'sealed box'.",
+    "key_points": [
+      "The Memento contains internal state that only the Originator should read/write",
+      "The Caretaker only holds mementos as sealed boxes (narrow interface) to preserve encapsulation"
+    ],
+    "id": "Q_OOP3_066"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Flyweight - intrinsic and extrinsic state",
+    "difficulty": "Medium",
+    "question": "In the Flyweight Pattern, distinguish intrinsic and extrinsic state using the example of a game rendering a forest of one million trees.",
+    "reference_answer": "Intrinsic state is the SHAREABLE, context-independent part: tree type, 3D model, texture, leaf color — stored in a TreeType flyweight object, of which only a few dozen exist. Extrinsic state depends on each instance: x, y coordinates, size, tilt — stored separately (e.g., in a lightweight array or a Tree object holding only coordinates and a reference to TreeType) and passed in when rendering. Heavy data (textures, meshes) is thus not duplicated a million times. Flyweights must be immutable because they are shared, and are usually obtained through a caching factory.",
+    "key_points": [
+      "Intrinsic: shared, context-independent part stored in the flyweight",
+      "Extrinsic: per-instance part passed in when used; flyweights must be immutable and obtained via a caching factory"
+    ],
+    "id": "Q_OOP3_067"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Distinguishing Bridge and Adapter",
+    "difficulty": "Medium",
+    "question": "Bridge and Adapter both use composition to connect two parts. How do they differ?",
+    "reference_answer": "They differ mainly in INTENT and TIMING: Adapter is an 'after the fact' solution — making an existing class with an incompatible interface work with existing code (e.g., wrapping a third-party payment library). Bridge is an 'up-front' design decision — deliberately separating abstraction and implementation so both dimensions can evolve independently (e.g., Notification × Channel: Email, SMS, Push). Adapter usually wraps one object to change its interface; Bridge designs two parallel hierarchies connected by a reference.",
+    "key_points": [
+      "Adapter: reconciles incompatible interfaces of existing components (retrofit)",
+      "Bridge: proactively separates two varying dimensions so they extend independently"
+    ],
+    "id": "Q_OOP3_068"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object-oriented architecture",
+    "concept": "Comparing MVC, MVP and MVVM",
+    "difficulty": "Medium",
+    "question": "Briefly compare MVC, MVP and MVVM in terms of how the View relates to presentation logic.",
+    "reference_answer": "MVC: the Controller handles input and updates the Model; the View reads/observes the Model to display it, and View and Model may know each other. MVP: the Presenter sits fully in between, the View is passive, only displaying and forwarding events to the Presenter through an interface; the Presenter updates the View explicitly — easy to test because the View can be mocked. MVVM: the ViewModel exposes state and commands, and the View binds to it via two-way data binding, so there is almost no manual UI-update code; the ViewModel does not know the View. The general trend is to separate the View from logic more and more to improve testability.",
+    "key_points": [
+      "MVC: View observes the Model; MVP: Presenter drives a passive View through an interface",
+      "MVVM: View binds to the ViewModel, which does not know the View; the goal is testable separation of logic and UI"
+    ],
+    "id": "Q_OOP3_069"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Coupling & Cohesion",
+    "concept": "Fixing a Law of Demeter violation (Train Wreck)",
+    "difficulty": "Medium",
+    "question": "The code if (order.getCustomer().getWallet().getBalance() >= total) order.getCustomer().getWallet().deduct(total); violates what, and how should it be fixed?",
+    "reference_answer": "This is a 'train wreck' violating the Law of Demeter: the caller must know Customer's internal structure (it has a Wallet) and Wallet's (it has a balance), coupling it to the whole chain of classes; if the wallet storage changes (multiple wallets, reward points), every caller must change. Also, the check-then-deduct logic is in the wrong place. Move the behavior to where the data is (Tell, Don't Ask): customer.pay(total) — inside, Customer delegates to wallet.deduct(amount), and Wallet checks its own balance and throws an exception if insufficient.",
+    "key_points": [
+      "Getter chains across objects couple the caller to the internals of many classes",
+      "Fix by moving behavior to the object owning the data and delegating layer by layer"
+    ],
+    "id": "Q_OOP3_070"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "GRASP principles",
+    "concept": "GRASP - Pure Fabrication",
+    "difficulty": "Medium",
+    "question": "What is the Pure Fabrication principle in GRASP? Give an example.",
+    "reference_answer": "Sometimes assigning responsibility by Information Expert lowers cohesion or increases coupling — e.g., putting the job of saving an Order to the database into the Order class makes the domain class depend on JDBC/SQL. Pure Fabrication advises creating an 'artificial' class that does not correspond to any domain concept, solely to carry that responsibility with high cohesion, e.g., OrderRepository, EmailSenderService, CurrencyConverter. Most services, repositories and adapters in practice are pure fabrications.",
+    "key_points": [
+      "Pure Fabrication: create a class not in the domain model to carry a technical responsibility",
+      "Keeps domain classes highly cohesive and loosely coupled; e.g., Repository, Service"
+    ],
+    "id": "Q_OOP3_071"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "GRASP principles",
+    "concept": "GRASP - Indirection and Protected Variations",
+    "difficulty": "Medium",
+    "question": "Explain the relationship between the Indirection and Protected Variations principles in GRASP.",
+    "reference_answer": "Protected Variations is the GOAL: identify points likely to change or be unstable (payment providers, file formats, tax algorithms) and protect the rest of the system from those changes with a stable interface. Indirection is the MEANS: place an intermediary object between two components so they do not depend directly on each other (adapter, gateway, interface). Most design patterns (Adapter, Facade, Strategy, Observer) are ways of applying Indirection to achieve Protected Variations.",
+    "key_points": [
+      "Protected Variations: shield the system from points of variation with stable interfaces",
+      "Indirection: use intermediaries to remove direct dependencies — the means to that goal"
+    ],
+    "id": "Q_OOP3_072"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Refactoring and code smells",
+    "concept": "Replace Conditional with Polymorphism",
+    "difficulty": "Medium",
+    "question": "The method calculateSalary(Employee e) has switch(e.getType()) with branches FULLTIME, PARTTIME, INTERN, and similar switches appear in calculateBonus() and printPayslip(). Propose a suitable refactoring.",
+    "reference_answer": "Apply 'Replace Conditional with Polymorphism': create an Employee superclass/interface with abstract methods calculateSalary(), calculateBonus(); each type becomes a subclass (FullTimeEmployee, PartTimeEmployee, Intern) implementing them. Adding a new employee type then only requires a new subclass instead of hunting down every switch (satisfying OCP, removing the 'repeated switch' smell). If an employee's type can change during the object's lifetime, use State/Strategy (composition) instead of subclasses.",
+    "key_points": [
+      "Repeated switches on a type code are a code smell",
+      "Replace with polymorphism: each type is a subclass implementing its behavior; use Strategy/State if the type changes at runtime"
+    ],
+    "id": "Q_OOP3_073"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Refactoring and code smells",
+    "concept": "Data Clumps and Introduce Parameter Object",
+    "difficulty": "Medium",
+    "question": "Many methods take the same parameter set (startDate, endDate), like findOrders(startDate, endDate), calculateRevenue(startDate, endDate). What code smell is this and how should it be refactored?",
+    "reference_answer": "This is 'Data Clumps' — a group of data that always travels together but has not been turned into a concept. Refactor with 'Introduce Parameter Object': create a DateRange class/record(startDate, endDate). Benefits: shorter parameter lists, the invariant (startDate <= endDate) is checked once in the constructor, and there is a home for related behavior such as contains(date), overlaps(other), days() instead of repeating it in many places.",
+    "key_points": [
+      "Data Clumps: parameters that always travel together but are not yet a concept",
+      "Introduce Parameter Object groups them into a class, centralizing invariant checks and attracting related behavior"
+    ],
+    "id": "Q_OOP3_074"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Refactoring and code smells",
+    "concept": "Primitive Obsession and Value Objects",
+    "difficulty": "Medium",
+    "question": "A Customer class stores email, phoneNumber and amount all as String/double, and format validation is scattered across the system. Analyze the code smell and how to fix it.",
+    "reference_answer": "This is 'Primitive Obsession' — using primitive types to represent domain concepts with their own rules. Consequences: validation is duplicated or forgotten, parameters are easily swapped (two Strings swapped still compile), and double for money causes rounding errors. Fix with immutable Value Objects: Email, PhoneNumber, Money(amount BigDecimal, currency) — the constructor validates so every existing object is valid, equality is by value, and the compiler distinguishes the types.",
+    "key_points": [
+      "Primitive Obsession: using primitives for domain concepts with rules",
+      "Replace with immutable, self-validating Value Objects: type-safe and precise (BigDecimal for money)"
+    ],
+    "id": "Q_OOP3_075"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Refactoring and code smells",
+    "concept": "Shotgun Surgery and Divergent Change",
+    "difficulty": "Medium",
+    "question": "Distinguish the code smells 'Shotgun Surgery' and 'Divergent Change'.",
+    "reference_answer": "Divergent Change: ONE class is modified for MANY different reasons (changing the database modifies it, changing the report format also modifies it) — a sign the class has multiple responsibilities and should be split (Extract Class). Shotgun Surgery is the opposite: ONE small change forces edits in MANY different classes (changing the tax calculation touches 8 files) — a sign a responsibility is scattered and should be consolidated (Move Method/Move Field). Both relate to poorly allocated responsibilities.",
+    "key_points": [
+      "Divergent Change: one class changes for many reasons; split the class",
+      "Shotgun Surgery: one change spreads across many classes; consolidate the responsibility"
+    ],
+    "id": "Q_OOP3_076"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Refactoring and code smells",
+    "concept": "Extract Class",
+    "difficulty": "Medium",
+    "question": "An Employee class has fields name, salary, houseNumber, street, ward, city, postalCode and address-formatting methods. Analyze and propose a refactoring.",
+    "reference_answer": "The address fields and address-formatting methods form a separate responsibility, highly cohesive with each other but weakly cohesive with the rest of Employee. Apply Extract Class: create an Address class (ideally an immutable value object) holding the fields and formatting behavior, with Employee keeping an Address reference. Result: Employee is leaner, Address is reusable for Customer and Supplier, and changes to address rules affect only one class.",
+    "key_points": [
+      "Groups of tightly related fields and behavior are candidates for extraction",
+      "Extract Class creates a reusable Address, reducing size and increasing cohesion of Employee"
+    ],
+    "id": "Q_OOP3_077"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Refactoring and code smells",
+    "concept": "Middle Man and excessive delegation",
+    "difficulty": "Medium",
+    "question": "What is the 'Middle Man' code smell? Does it contradict the advice to use delegation to follow the Law of Demeter?",
+    "reference_answer": "A Middle Man is a class whose methods mostly just forward calls to another object without adding value. It is the flip side of over-applying the Law of Demeter: to avoid getter chains, too many 'pass-through' delegating methods are added. Balance is needed: delegation is meaningful when it hides details and expresses business behavior; if a class does nothing but delegate, remove the middle man (Remove Middle Man) so clients work directly with the real object, or revisit the allocation of responsibilities.",
+    "key_points": [
+      "Middle Man: a class that mainly forwards calls without adding value",
+      "It results from over-applying Demeter; balance hiding details against empty intermediaries"
+    ],
+    "id": "Q_OOP3_078"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Exception handling in OOP",
+    "concept": "Suppressed exceptions in try-with-resources",
+    "difficulty": "Medium",
+    "question": "In try-with-resources, if the try block throws exception A and then the resource's close() throws exception B, which exception propagates? Where does the other one go?",
+    "reference_answer": "Exception A (from the try block) is the primary exception propagated, since it usually reflects the root cause. Exception B from close() is not lost but attached to A as a 'suppressed exception', retrievable via A.getSuppressed(). This is a big improvement over manual try-finally, where an exception thrown in finally overwrites and loses the original exception.",
+    "key_points": [
+      "The exception from the try block takes priority and propagates",
+      "The close() exception is stored as suppressed (getSuppressed()), not lost as with a manual finally"
+    ],
+    "id": "Q_OOP3_079"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Exception handling in OOP",
+    "concept": "Exception translation between layers",
+    "difficulty": "Medium",
+    "question": "Why should the service layer not let SQLException from the data access layer propagate straight up to the UI layer? How should it be handled?",
+    "reference_answer": "SQLException is an implementation detail of the data layer; letting it propagate makes upper layers depend on the storage technology (switching to NoSQL or an API means changing every place that catches SQLException) and breaks abstraction. Apply 'exception translation': the lower layer catches low-level exceptions and throws exceptions appropriate to its own abstraction level (e.g., OrderNotFoundException, StorageException), while keeping the original as the cause (exception chaining) to preserve debugging information.",
+    "key_points": [
+      "Low-level exceptions leaking upward expose implementation details and increase coupling between layers",
+      "Translate to exceptions at the right abstraction level, keeping the original as the cause"
+    ],
+    "id": "Q_OOP3_080"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "SOLID principles",
+    "concept": "Forms of Dependency Injection",
+    "difficulty": "Medium",
+    "question": "Compare three ways of injecting dependencies: via constructor, via setter and via field (e.g., @Autowired on a field).",
+    "reference_answer": "Constructor injection: dependencies are passed at creation, can be final, the object is always valid, dependencies are visible in the signature, and it is easy to test by passing mocks — the recommended way for required dependencies. Setter injection: suits optional or changeable dependencies, but the object may exist without all its dependencies. Field injection: concise but hides dependencies, cannot be final, is hard to test outside the container (requires reflection), and conceals that a class has too many dependencies.",
+    "key_points": [
+      "Constructor injection: required, immutable, explicit, easy to test — preferred",
+      "Setter for optional dependencies; field injection is concise but hides dependencies and is hard to test"
+    ],
+    "id": "Q_OOP3_081"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "SOLID principles",
+    "concept": "Service Locator vs Dependency Injection",
+    "difficulty": "Medium",
+    "question": "Service Locator (a global lookup class: ServiceLocator.get(EmailService.class)) and Dependency Injection both decouple from concrete classes. Why is DI generally preferred?",
+    "reference_answer": "With a Service Locator, a class 'pulls' its dependencies from a global registry inside method bodies, so dependencies are hidden — looking at the constructor signature does not reveal what the class needs; tests must configure the global registry, easily causing cross-test interference; and the class depends on the ServiceLocator itself. With DI, dependencies are 'pushed' in from outside, declared explicitly in the constructor, and easily replaced by mocks. Service Locator still has uses at system boundaries or in hard-to-change legacy code.",
+    "key_points": [
+      "Service Locator hides dependencies and ties the class to a global registry",
+      "DI declares dependencies explicitly and is easy to test; preferred in most cases"
+    ],
+    "id": "Q_OOP3_082"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object-oriented architecture",
+    "concept": "Repository Pattern",
+    "difficulty": "Medium",
+    "question": "What role does the Repository Pattern play in domain-driven design, and in which layer should its interface live?",
+    "reference_answer": "A Repository acts like an 'in-memory collection of domain objects' (addOrder, findById, findUnpaidOrders), completely hiding storage details (SQL, ORM, API). The repository interface should live in the domain layer and be expressed in business language, while the implementation (JpaOrderRepository) lives in the infrastructure layer — applying DIP: the domain layer does not depend on infrastructure, but the other way around.",
+    "key_points": [
+      "A Repository hides storage behind a collection-like interface of domain objects",
+      "Interface in the domain layer, implementation in infrastructure (applying DIP)"
+    ],
+    "id": "Q_OOP3_083"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "Static and private methods in interfaces",
+    "difficulty": "Medium",
+    "question": "Since Java 8/9, interfaces can have static methods and private methods. What is each used for?",
+    "reference_answer": "Static methods in interfaces provide utility or factory methods tied to that interface (e.g., Comparator.comparing(), List.of()), instead of needing a companion utility class like Collections; they are not inherited by implementing classes and are called via the interface name. Private methods (Java 9) let default or static methods inside the interface share code without exposing it as part of the API.",
+    "key_points": [
+      "Static methods: utilities/factories tied to the interface, called via the interface name",
+      "Private methods: share code among default/static methods without exposing it in the API"
+    ],
+    "id": "Q_OOP3_084"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "UML",
+    "concept": "Reading Sequence Diagrams: synchronous and asynchronous messages",
+    "difficulty": "Medium",
+    "question": "In a Sequence Diagram, distinguish synchronous messages, asynchronous messages and return messages; what does an activation bar represent?",
+    "reference_answer": "A synchronous message (filled arrowhead) means the sender waits for the receiver to finish before continuing — corresponding to a normal method call. An asynchronous message (open arrowhead) means the sender continues immediately without waiting — like sending an event or pushing to a queue. A return message is a dashed arrow back to the caller. An activation bar (narrow rectangle on a lifeline) represents the period during which an object is executing an operation, making nested calls visible.",
+    "key_points": [
+      "Synchronous: filled arrowhead, waits for result; asynchronous: open arrowhead, no waiting; return: dashed",
+      "The activation bar shows the time an object is processing"
+    ],
+    "id": "Q_OOP3_085"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "UML",
+    "concept": "Include and extend relationships in Use Cases",
+    "difficulty": "Medium",
+    "question": "Distinguish <<include>> and <<extend>> relationships between use cases, with examples.",
+    "reference_answer": "<<include>>: the base use case ALWAYS includes the behavior of the included use case; used to factor out shared parts — e.g., both 'Place order' and 'Cancel order' include 'Log in'. The arrow goes from the base use case to the included one. <<extend>>: the extending use case is added to the base use case only under certain conditions (optional) — e.g., 'Apply discount code' extends 'Checkout'. The arrow goes from the extending use case to the base use case.",
+    "key_points": [
+      "include: mandatory behavior, always performed, factors out shared parts",
+      "extend: optional, conditional behavior; arrow from the extending use case to the base"
+    ],
+    "id": "Q_OOP3_086"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "From a State Machine Diagram to the State Pattern",
+    "difficulty": "Medium",
+    "question": "Given a State Machine Diagram for Order with states New, Paid, Shipping, Completed, Cancelled, describe how to turn it into code using the State Pattern.",
+    "reference_answer": "Each state in the diagram becomes a class implementing an OrderState interface, and the events on transition arrows become interface methods (pay(), ship(), confirmReceipt(), cancel()). In each state class, the method for a valid transition performs the action and sets the new state on the Order (context); an event invalid in that state throws an exception. The Order holds a reference to the current state and delegates every call to it. The code thus directly mirrors the diagram and eliminates state-based if-else chains.",
+    "key_points": [
+      "States → classes implementing an interface; transition events → methods",
+      "The context delegates to the current state; invalid transitions throw, removing if-else chains"
+    ],
+    "id": "Q_OOP3_087"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Object Pool Pattern",
+    "difficulty": "Medium",
+    "question": "What is the Object Pool Pattern and why is a connection pool in database applications a classic example?",
+    "reference_answer": "An Object Pool keeps a set of pre-initialized objects for reuse: clients 'borrow' an object from the pool and 'return' it when done instead of creating and destroying objects. It pays off when object creation is expensive and concurrency must be limited. Database connections are the classic example because opening a connection is slow (network handshake, authentication) and the database can only handle a limited number of connections. Caveats: reset the object's state when returning it and always return it (use try-with-resources) to avoid exhausting the pool.",
+    "key_points": [
+      "Object Pool reuses expensive objects instead of constantly creating/destroying them",
+      "Connection pools are the classic example; reset state and always return objects to the pool"
+    ],
+    "id": "Q_OOP3_088"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Encapsulation",
+    "concept": "Unmodifiable views and immutable copies",
+    "difficulty": "Medium",
+    "question": "Compare Collections.unmodifiableList(list) and List.copyOf(list) when returning an internal list from a getter.",
+    "reference_answer": "Collections.unmodifiableList(list) returns a read-only 'view' wrapping the original list: clients cannot modify it through the view, but if the owning object modifies list, clients still see the changes (the view reflects live data), with no copying cost. List.copyOf(list) creates an independent immutable copy at call time: unaffected by later changes, but costs O(n) to copy and does not accept null elements. Choose a view when clients should see updates and to save cost; choose a copy when a stable snapshot is needed (e.g., to iterate on another thread).",
+    "key_points": [
+      "unmodifiableList: read-only view reflecting changes to the original, no copying cost",
+      "List.copyOf: independent immutable copy, O(n), no nulls"
+    ],
+    "id": "Q_OOP3_089"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Cost of string concatenation and StringBuilder",
+    "difficulty": "Medium",
+    "question": "Why can concatenating strings with += in a loop tens of thousands of times be very slow? How does StringBuilder fix this?",
+    "reference_answer": "Because String is immutable, each s += x creates a NEW String object and copies the entire old content plus the new part, so n concatenations with growing length cost O(n²) copying in total and create a lot of garbage for the GC. StringBuilder is a mutable object with an expandable buffer (doubling when full); append just writes at the end with amortized O(1) cost, and toString() is called once at the end — O(n) total.",
+    "key_points": [
+      "String is immutable so += in a loop creates many new objects, O(n²) total",
+      "StringBuilder is mutable with a growable buffer, amortized O(1) append, O(n) total"
+    ],
+    "id": "Q_OOP3_090"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Comparing Integers with == and the Integer cache",
+    "difficulty": "Medium",
+    "question": "Why does Integer a = 100, b = 100; a == b give true, while Integer c = 1000, d = 1000; c == d gives false?",
+    "reference_answer": "Autoboxing uses Integer.valueOf(), which returns CACHED objects for values in the range -128 to 127. So a and b refer to the same cached object and == (reference comparison) returns true. 1000 is outside the cache range, so each boxing creates a new object; c and d are different objects and == returns false. Lesson: always use equals() to compare the values of wrapper objects.",
+    "key_points": [
+      "Integer.valueOf caches objects for values -128..127",
+      "== compares references so the result depends on the cache; always use equals for wrappers"
+    ],
+    "id": "Q_OOP3_091"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Generics",
+    "concept": "Type inference and the diamond operator",
+    "difficulty": "Medium",
+    "question": "How do the diamond operator (Map<String, List<Integer>> m = new HashMap<>();) and type inference help? Are there limitations?",
+    "reference_answer": "The diamond lets the compiler infer the constructor's type arguments from the declared type on the left, avoiding verbose repetition. Similarly, for generic methods like Collections.emptyList(), T is inferred from context. Limitation: inference relies on the target type, so in some complex expressions (call chains, arguments to overloaded methods) the compiler may infer an unintended type (e.g., Object) and you need an explicit type such as Collections.<String>emptyList(). With 'var', be careful: var x = new ArrayList<>() infers ArrayList<Object>.",
+    "key_points": [
+      "Diamond and type inference avoid verbose type repetition",
+      "Inference depends on the target context and sometimes needs explicit types; var with diamond yields Object"
+    ],
+    "id": "Q_OOP3_092"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Generics",
+    "concept": "Dangers of raw types",
+    "difficulty": "Medium",
+    "question": "Raw types (using List instead of List<String>) are still accepted by Java. Why should they be avoided?",
+    "reference_answer": "Raw types exist only for backward compatibility with pre-Java 5 code. With raw types, the compiler disables generic type checking: you can add an Integer to a List meant to hold only Strings without a compile error, and the bug only surfaces at runtime as a ClassCastException far from where it was introduced. Raw types also spread: assigning List<String> to a raw List and back yields unchecked warnings. If you truly do not know the element type, use the wildcard List<?> to keep type safety.",
+    "key_points": [
+      "Raw types disable generic type checks; bugs surface only at runtime (ClassCastException)",
+      "They exist only for backward compatibility; use List<?> when the type is unknown"
+    ],
+    "id": "Q_OOP3_093"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Generics",
+    "concept": "Recursive type bound <T extends Comparable<T>>",
+    "difficulty": "Medium",
+    "question": "Explain the meaning of static <T extends Comparable<T>> T findMax(List<T> list) and why we do not simply write <T extends Comparable>.",
+    "reference_answer": "The declaration requires T to be comparable with ITSELF (e.g., String implements Comparable<String>), so inside the method a.compareTo(b) can be called type-safely with a and b both of type T. Writing <T extends Comparable> (a raw type) loses the information about what is being compared, produces unchecked warnings and allows comparing incompatible types, failing only at runtime. An even more general version is <T extends Comparable<? super T>>, which also accepts subclasses that inherit compareTo from a superclass.",
+    "key_points": [
+      "T extends Comparable<T> guarantees T is comparable with itself, making compareTo type-safe",
+      "Raw Comparable loses type checking; the more general form is Comparable<? super T>"
+    ],
+    "id": "Q_OOP3_094"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Inheritance",
+    "concept": "Sealed classes combined with switch pattern matching",
+    "difficulty": "Medium",
+    "question": "With sealed interface Shape permits Circle, Rectangle and corresponding records, what advantage does a pattern-matching switch for computing area have over a chain of if-instanceof?",
+    "reference_answer": "Because the set of subclasses is closed and known to the compiler, a switch expression (case Circle c -> PI*c.r()*c.r(); case Rectangle r -> r.w()*r.h();) is checked for exhaustiveness: no default branch is needed, and when a new subclass is added to permits, every switch that does not handle it produces a COMPILE ERROR instead of silently falling into a default branch. An if-instanceof chain has no such check and cases are easily forgotten. This 'algebraic data type' approach replaces Visitor when the set of types is stable.",
+    "key_points": [
+      "Sealed + pattern switch is checked for exhaustiveness by the compiler, no default needed",
+      "Adding a new subclass causes compile errors in unhandled switches, safer than if-instanceof"
+    ],
+    "id": "Q_OOP3_095"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object-oriented testing",
+    "concept": "Test doubles: Stub, Mock, Fake",
+    "difficulty": "Medium",
+    "question": "Distinguish the test doubles Stub, Mock and Fake when testing an OrderService that depends on a PaymentGateway.",
+    "reference_answer": "Stub: a stand-in returning canned data (always 'payment succeeded') to put the class under test into a scenario; the test checks STATE/results. Mock: an object programmed with expectations about INTERACTIONS; the test verifies which methods were called, how many times and with what arguments (e.g., verify gateway.charge(500000) was called exactly once). Fake: a working but simplified implementation, e.g., a repository stored in a HashMap instead of a real database. This substitutability is possible because OrderService depends on an interface (DIP).",
+    "key_points": [
+      "Stubs return canned data and check state; mocks verify interactions (what was called, how often)",
+      "Fakes are simplified working implementations (in-memory DB); all rely on dependencies via interfaces"
+    ],
+    "id": "Q_OOP3_096"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Abstraction",
+    "concept": "Design by Contract",
+    "difficulty": "Medium",
+    "question": "What three components make up Design by Contract? Apply them to the method withdraw(amount) of an Account class.",
+    "reference_answer": "Three components: Precondition — what the caller must guarantee before calling: amount > 0 and amount <= balance. Postcondition — what the method guarantees afterwards: new balance = old balance - amount. Class invariant — what is always true for every object in a stable state: balance >= 0. Contracts clearly divide responsibilities between caller and callee and relate directly to LSP: subclasses must not strengthen preconditions or weaken postconditions.",
+    "key_points": [
+      "Three components: precondition, postcondition, class invariant",
+      "Divides responsibility between caller and callee; related to LSP"
+    ],
+    "id": "Q_OOP3_097"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Encapsulation",
+    "concept": "Fail-fast validation in constructors",
+    "difficulty": "Medium",
+    "question": "Why should parameters be validated at the very start of a constructor (e.g., Objects.requireNonNull(email), checking age >= 0) instead of letting errors appear later when the object is used?",
+    "reference_answer": "The fail-fast principle: detect invalid data as early as possible, at the point it enters the system. If an object can be created with a null email, a NullPointerException might only occur hours later in another module (when sending mail), making the origin very hard to trace. Validating in the constructor ensures every existing object satisfies its invariants, gives clear error messages pointing at the real culprit, and spares other methods from re-checking.",
+    "key_points": [
+      "Fail-fast detects errors at the point data enters the system",
+      "Ensures every object is valid, errors are traceable, and repeated checks are avoided"
+    ],
+    "id": "Q_OOP3_098"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Listeners/callbacks and event-driven programming",
+    "difficulty": "Medium",
+    "question": "In UI programming, the listener mechanism (e.g., button.addActionListener(...)) applies which pattern and what does it decouple?",
+    "reference_answer": "A listener is a form of the Observer Pattern combined with callbacks: the button (subject) does not know what will happen when clicked; application code registers an object implementing the listener interface, and the button calls back the listener's method when the event occurs. This decouples a reusable UI component (a library Button) from specific application logic and allows multiple listeners to react to one event. This mechanism is also the foundation of event-driven programming.",
+    "key_points": [
+      "A listener is Observer plus callbacks: the component calls back registered objects on events",
+      "Decouples reusable UI components from application logic and allows multiple listeners"
+    ],
+    "id": "Q_OOP3_099"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object-oriented architecture",
+    "concept": "Package by feature vs package by layer",
+    "difficulty": "Medium",
+    "question": "Compare organizing packages by layer (controller/, service/, repository/) versus by feature (order/, customer/, payment/).",
+    "reference_answer": "Package by layer groups classes with the same technical role together; easy to understand in small projects, but a feature is scattered across packages and most classes must be public for layers to call each other, losing package-level encapsulation. Package by feature groups all classes of a feature in one package: changing a feature touches only one place, package-private can hide details inside the feature exposing only a few public classes, the structure reflects the business, and it is easier to split into modules/microservices later. For medium and large systems, package by feature usually yields higher cohesion.",
+    "key_points": [
+      "By layer: grouped by technical role, features scattered, many public classes",
+      "By feature: grouped by business capability, high cohesion, leverages package-private, easier to modularize"
+    ],
+    "id": "Q_OOP3_100"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "Violating equals() symmetry when a subclass adds a field",
+    "difficulty": "Hard",
+    "question": "Class Point(x, y) has an equals() using instanceof. Subclass ColorPoint(x, y, color) overrides equals() to also compare color, again using instanceof. Analyze why this design violates the equals() contract and the possible solutions.",
+    "reference_answer": "With p = Point(1,2) and q = ColorPoint(1,2,Red): p.equals(q) returns true (q instanceof Point, coordinates equal) but q.equals(p) returns false (p is not a ColorPoint) — symmetry is violated. If ColorPoint is patched to ignore color when comparing with a plain Point, transitivity breaks instead (Red ColorPoint = Point = Blue ColorPoint but Red ≠ Blue). In fact there is no way to extend an instantiable class with a value field while keeping the equals contract using instanceof. Solutions: (1) prefer composition — ColorPoint contains a Point and offers an asPoint() view instead of inheriting; (2) use getClass() != o.getClass() so objects are equal only if they have exactly the same class (but this breaks LSP, as subclasses cannot substitute the superclass in collections); (3) declare Point final/a record.",
+    "key_points": [
+      "Two-way instanceof with an extra subclass field breaks symmetry; patching it breaks transitivity",
+      "Solutions: composition over inheritance, getClass() (trading off LSP), or a final class/record"
+    ],
+    "id": "Q_OOP3_101"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "Mutable objects as HashMap keys",
+    "difficulty": "Hard",
+    "question": "A Student object whose hashCode() is computed from its email field is used as a HashMap key. After put, the program calls s.setEmail(newEmail). Analyze the consequences and the design principle to draw.",
+    "reference_answer": "The object was stored in the bucket matching its OLD hashCode. After the email changes, the new hashCode differs, so map.get(s) or map.containsKey(s) looks in the new bucket and finds nothing — the entry becomes an 'orphan': it cannot be retrieved or removed via remove(s), it still occupies memory (a form of logical memory leak), and a 'duplicate' entry for the same object can be added. Principle: fields participating in equals/hashCode of objects used as keys (or HashSet elements) must be immutable; ideally use an immutable value object (an ID, a record) as the key instead of a whole mutable entity.",
+    "key_points": [
+      "Changing a hashCode field after put leaves the entry in the wrong bucket, unfindable and unremovable",
+      "Keys of HashMap/elements of HashSet must be immutable in the fields used by equals/hashCode"
+    ],
+    "id": "Q_OOP3_102"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "A valid but poor-quality hashCode",
+    "difficulty": "Hard",
+    "question": "Does public int hashCode() { return 42; } violate the equals/hashCode contract? Analyze its impact.",
+    "reference_answer": "It does not violate the contract: equal objects still have equal hash codes (every object has hash code 42). However, all elements fall into the SAME bucket, turning the HashMap into a linked list (or a red-black tree since Java 8 when the bucket grows), so get/put degrade from average O(1) to O(n) (or O(log n) if keys are Comparable). With hundreds of thousands of elements, performance collapses severely with no error reported. Lesson: the contract only ensures correctness; the distribution quality of hashCode determines performance. Use Objects.hash(...) or combine significant fields with prime multipliers.",
+    "key_points": [
+      "A constant does not break the contract but puts all elements in one bucket",
+      "HashMap degrades from O(1) to O(n)/O(log n); performance depends on hashCode distribution"
+    ],
+    "id": "Q_OOP3_103"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "compareTo inconsistent with equals",
+    "difficulty": "Hard",
+    "question": "new BigDecimal(\"1.0\").equals(new BigDecimal(\"1.00\")) is false but compareTo returns 0. Analyze the consequences of adding both values to a HashSet and a TreeSet.",
+    "reference_answer": "HashSet uses equals/hashCode, so it treats 1.0 and 1.00 as two different elements: size 2. TreeSet uses compareTo (or a Comparator) to detect duplicates, so it treats them as equal: size 1. The same data in two 'Set' structures yields different results, violating the expectations of the Set interface (which is defined in terms of equals). Lesson: when compareTo is inconsistent with equals, document it clearly, and when writing a Comparator for TreeSet/TreeMap make sure it returns 0 only when two objects really are duplicates; otherwise elements are silently dropped (e.g., a Comparator comparing only by score loses students with the same score).",
+    "key_points": [
+      "HashSet uses equals, TreeSet uses compareTo, so results differ when the two are inconsistent",
+      "A Comparator returning 0 for distinct objects makes TreeSet/TreeMap silently drop elements"
+    ],
+    "id": "Q_OOP3_104"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "Comparator using subtraction causes overflow",
+    "difficulty": "Hard",
+    "question": "The comparator (a, b) -> a.getId() - b.getId() with int ids looks neat. Analyze the hidden bug.",
+    "reference_answer": "Subtracting two ints can OVERFLOW when the values have opposite signs and large magnitudes: e.g., a = Integer.MAX_VALUE, b = -1, then a - b overflows to a negative number and the Comparator concludes a < b — wrong. The result is an inconsistent ordering that violates the Comparator contract (transitivity), which can make TimSort throw 'Comparison method violates its general contract' or TreeMap place elements wrongly, and the bug only shows up for special data. Correct way: Integer.compare(a.getId(), b.getId()) or Comparator.comparingInt(X::getId).",
+    "key_points": [
+      "a - b can overflow int and flip the sign of the comparison",
+      "Violates the contract, causing wrong ordering or exceptions; use Integer.compare/Comparator.comparingInt"
+    ],
+    "id": "Q_OOP3_105"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Nested classes and lambda expressions",
+    "concept": "Memory leak via implicit references in inner classes",
+    "difficulty": "Hard",
+    "question": "A ReportScreen class (holding many MB of data) creates a non-static inner class BackgroundTask implements Runnable and submits it to a long-lived thread pool. Analyze the memory leak risk.",
+    "reference_answer": "Every inner class object implicitly holds a reference to its enclosing object (ReportScreen.this). As long as BackgroundTask sits in the queue or runs in the thread pool (or is stored in a static list or a long-lived registered callback), the ReportScreen object and all its heavy data cannot be garbage collected, even after the screen is closed. This is a classic leak (e.g., an Android Activity held by a Handler/AsyncTask). Fix: use a static nested class and pass in only the data needed, or hold a weak reference (WeakReference) to the outer object, and cancel the task when the outer object's lifecycle ends.",
+    "key_points": [
+      "Inner classes/lambdas using this implicitly retain the enclosing object, preventing GC",
+      "Use static nested classes, pass only needed data, WeakReference, and cancel tasks with the lifecycle"
+    ],
+    "id": "Q_OOP3_106"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Nested classes and lambda expressions",
+    "concept": "Unregistering a lambda listener does not work",
+    "difficulty": "Hard",
+    "question": "Code registers source.addListener(e -> handle(e)); and later unregisters with source.removeListener(e -> handle(e));. Why is the listener never removed, and what are the consequences?",
+    "reference_answer": "Each evaluation of a lambda expression (capturing this) may create a NEW object; two identically written lambdas are not equal under equals (lambdas do not override equals, comparing by identity). removeListener searches by equals so it cannot find the registered lambda, and the old listener stays in the list. Consequences: events keep being handled unintentionally (handled twice), and the listener holds a reference to this so the object is never collected — a memory leak. Correct approach: store the listener reference in a field when registering (Listener l = this::handle;) and use that same reference to unregister, or have addListener return a handle/Subscription with a cancel() method.",
+    "key_points": [
+      "Two lambdas with the same code are distinct objects and not equal under equals",
+      "Keep the exact registered reference or use an unsubscribe handle; otherwise duplicate handling and memory leaks"
+    ],
+    "id": "Q_OOP3_107"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Double-checked locking without volatile",
+    "difficulty": "Hard",
+    "question": "Analyze the bug in the following lazy Singleton using double-checked locking: if (instance == null) { synchronized (X.class) { if (instance == null) instance = new X(); } } return instance; where instance is not declared volatile.",
+    "reference_answer": "The statement instance = new X() is not atomic: it consists of allocating memory, running the constructor and assigning the reference. The compiler/CPU may reorder these so the reference is assigned BEFORE the constructor finishes. Another thread performing the first check instance == null outside the synchronized block (with no happens-before relationship) may see a non-null instance and use a partially constructed object — fields still holding default values, causing extremely hard-to-reproduce bugs. Fix: declare private static volatile X instance (volatile forbids the reordering and establishes happens-before), or use the holder idiom (a static nested class holding the instance; the JVM guarantees safe class initialization), or an enum singleton.",
+    "key_points": [
+      "Without volatile, the reference assignment may be reordered before the constructor completes",
+      "Other threads may see a half-constructed object; fix with volatile, the holder idiom or an enum"
+    ],
+    "id": "Q_OOP3_108"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Breaking a Singleton via serialization, reflection and cloning",
+    "difficulty": "Hard",
+    "question": "A classic Singleton (private constructor, static getInstance()) implements Serializable. Analyze three ways a second instance can be created and how to defend against them.",
+    "reference_answer": "(1) Serialization: deserialization always creates a new object without calling the constructor; defend by implementing readResolve() returning the single instance (and marking fields transient). (2) Reflection: setAccessible(true) on the private constructor and then newInstance(); defend by throwing an exception in the constructor if the instance already exists (which can still be bypassed if reflection runs before the first initialization). (3) Cloning: if the class (or a superclass) supports clone, it can be duplicated; defend by overriding clone() to throw CloneNotSupportedException. The thorough solution is an enum singleton, which the JVM protects against all three.",
+    "key_points": [
+      "Three holes: deserialization, reflection on the private constructor, clone()",
+      "Defend with readResolve, a constructor check, blocking clone; most robust is an enum singleton"
+    ],
+    "id": "Q_OOP3_109"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object lifecycle",
+    "concept": "Pitfalls of clone() and Cloneable",
+    "difficulty": "Hard",
+    "question": "Why do many experts consider Java's Cloneable/clone() mechanism a flawed design and recommend copy constructors instead?",
+    "reference_answer": "(1) Cloneable does not declare clone(), so clone() cannot be called through the interface type; clone() is protected in Object. (2) Object.clone() creates an object WITHOUT calling a constructor, bypassing every invariant check in the constructor. (3) It is shallow by default, so the class must deep-copy mutable fields itself, but final fields cannot be reassigned in clone(), conflicting with making the class immutable. (4) It requires handling the checked CloneNotSupportedException and casting the result. (5) Subclasses inherit the obligation to clone correctly and easily forget it. A copy constructor (new Document(original)) or a static factory copyOf() is clearer, goes through the constructor, works with final and needs no casting.",
+    "key_points": [
+      "clone() bypasses the constructor, is shallow, conflicts with final fields, and has an awkward API",
+      "Copy constructors/static factories are clear, preserve invariants and work with final"
+    ],
+    "id": "Q_OOP3_110"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Generics",
+    "concept": "Array covariance and ArrayStoreException",
+    "difficulty": "Hard",
+    "question": "The code Object[] arr = new String[3]; arr[0] = 10; compiles but fails at runtime, whereas List<Object> l = new ArrayList<String>(); fails to compile. Analyze this design difference.",
+    "reference_answer": "Arrays in Java are covariant: String[] is a subtype of Object[], so the assignment compiles. But arrays store their actual element type at runtime (reified), so when an Integer is assigned into a String array, the JVM checks and throws ArrayStoreException — the error is only detected at runtime. Generics are invariant: List<String> is not a subtype of List<Object>, so the compiler blocks it immediately, because if allowed, an Integer could be added to a list of Strings without the runtime noticing (due to type erasure). This is why generic arrays (new T[] or new List<String>[]) cannot be created and why List should be preferred over arrays in generic APIs.",
+    "key_points": [
+      "Arrays are covariant and reified: type errors are only detected at runtime via ArrayStoreException",
+      "Generics are invariant and erased, so the compiler must block early; generic arrays cannot be created"
+    ],
+    "id": "Q_OOP3_111"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Generics",
+    "concept": "Heap pollution with generic varargs",
+    "difficulty": "Hard",
+    "question": "The method static <T> T[] toArray(T... items) { return items; } is called from another generic method. Analyze the risk of 'heap pollution' and the role of @SafeVarargs.",
+    "reference_answer": "Varargs are implemented with arrays, and an array of a generic type T is erased to Object[] (or the upper bound). If toArray is called from another generic context, the actual array created has type Object[]; returning it and assigning it to a String[] throws a ClassCastException at a seemingly harmless place. Heap pollution is when a variable of a parameterized type refers to an object that is not of that type. @SafeVarargs is merely the author's promise that the method does not write to the varargs array and does not let the array reference escape; it suppresses warnings but does NOT make the method safe — toArray above is precisely an example that must not be annotated @SafeVarargs.",
+    "key_points": [
+      "Generic varargs create erased arrays; letting the array escape causes hard-to-trace ClassCastExceptions",
+      "@SafeVarargs is only a promise not to write to or leak the array; it does not make code safe"
+    ],
+    "id": "Q_OOP3_112"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "NullPointerException from auto-unboxing",
+    "difficulty": "Hard",
+    "question": "Given Map<String, Integer> stock; both int qty = stock.get(code); and Integer result = condition ? stock.get(code) : 0; can throw NullPointerException. Explain the mechanism.",
+    "reference_answer": "Case 1: get() returns null when the key is absent; assigning null to an int forces auto-unboxing to call null.intValue() → NPE. Case 2 is subtler: the ternary operator has one branch of type Integer and one of type int, and Java's typing rules choose int as the result type, so the Integer branch is unboxed BEFORE being assigned back to Integer result — if get() returns null, an NPE occurs even though the target is an Integer. Prevention: use getOrDefault(code, 0), check null explicitly, or make both branches Integer (Integer.valueOf(0)).",
+    "key_points": [
+      "Assigning null to a primitive triggers unboxing of null → NPE",
+      "A ternary mixing Integer and int forces implicit unboxing; use getOrDefault or unify the types"
+    ],
+    "id": "Q_OOP3_113"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Encapsulation",
+    "concept": "Read-only views still leak changes and lifetime",
+    "difficulty": "Hard",
+    "question": "A Classroom class returns Collections.unmodifiableList(students) to clients. A reporting thread iterates this list while Classroom adds new students. Analyze the hidden problems.",
+    "reference_answer": "(1) A read-only view still reflects changes to the original list; when Classroom modifies the original list while another thread iterates the view, the fail-fast iterator may throw ConcurrentModificationException, or worse, read an inconsistent state because ArrayList is not thread-safe. (2) Unmodifiable applies only to the list itself: the Student objects inside are still mutable, so clients can call s.setScore(...) — shallow encapsulation. (3) Clients may keep the view for a long time, unintentionally retaining all the live data. Solutions depending on needs: return a List.copyOf snapshot for a stable view, use CopyOnWriteArrayList for read-mostly workloads, and use immutable elements or DTOs.",
+    "key_points": [
+      "Read-only views are still affected by changes to the original, causing concurrency bugs",
+      "They protect only the list, not mutable elements; consider copies, CopyOnWrite and immutable elements"
+    ],
+    "id": "Q_OOP3_114"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object lifecycle",
+    "concept": "Leaking 'this' during construction (this escape)",
+    "difficulty": "Hard",
+    "question": "The constructor of a Sensor class calls eventBus.register(this) before all fields are assigned. Analyze the risk in a multi-threaded environment.",
+    "reference_answer": "When this is published before the constructor completes, another thread (e.g., the event dispatch thread) may call the object's methods while fields are not yet assigned — seeing default null/0 values — causing NPEs or wrong behavior. Even final fields are NOT guaranteed to be correctly visible to other threads if this escapes during construction (the final-field guarantee only applies when the constructor finishes without leaking this). If the class has subclasses, the subclass fields are not yet initialized either. Fix: do not register in the constructor; use a static factory that creates a fully constructed object and then registers it (Sensor s = new Sensor(...); bus.register(s); return s;).",
+    "key_points": [
+      "Publishing this in the constructor lets other threads see a half-built object",
+      "It also loses the visibility guarantee of final fields; use a static factory that registers after construction"
+    ],
+    "id": "Q_OOP3_115"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Encapsulation",
+    "concept": "An immutable class that is not final can be broken by subclasses",
+    "difficulty": "Hard",
+    "question": "A Money class has private final fields and no setters, but is not declared final. Analyze how a subclass can break its immutability and the security implications.",
+    "reference_answer": "A subclass can add mutable fields and override methods (getAmount(), toString(), equals) to return values that change over time. Code receiving a Money parameter that trusts it to be immutable (e.g., checks a limit and stores it, uses it as a HashMap key, shares it across threads without synchronization) will be fooled: a malicious 'Money' returns 100 when checked and 1 billion when the transfer executes (a time-of-check/time-of-use bug). Therefore immutable classes should be final (or have a private constructor + static factory), and parameters from untrusted sources should be defensively copied into the standard immutable class.",
+    "key_points": [
+      "A non-final class lets subclasses add mutable state and override accessors",
+      "Code trusting immutability is fooled (TOCTOU); make it final or use a private constructor, and copy defensively"
+    ],
+    "id": "Q_OOP3_116"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object lifecycle",
+    "concept": "finalize() and releasing resources",
+    "difficulty": "Hard",
+    "question": "Why is relying on finalize() to close files/connections a design mistake, and why has it been deprecated?",
+    "reference_answer": "(1) There is no guarantee when finalize() will be called, or even whether it will be called before the program exits — OS resources (file handles, sockets) may run out before the GC runs. (2) Objects with finalize() slow down GC considerably (needing at least two cycles to reclaim). (3) finalize() can 'resurrect' the object by assigning this to a static variable, causing unpredictable behavior, and was exploited in 'finalizer attacks' to capture partially constructed objects. (4) Exceptions in finalize() are silently swallowed. Correct approach: implement AutoCloseable and use try-with-resources for deterministic release; Cleaner is only a last-resort safety net.",
+    "key_points": [
+      "finalize() has no timing guarantee, slows GC, can resurrect objects and swallows exceptions",
+      "Use AutoCloseable + try-with-resources; Cleaner is only a safety net"
+    ],
+    "id": "Q_OOP3_117"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Exception handling in OOP",
+    "concept": "An exception in finally loses the original exception",
+    "difficulty": "Hard",
+    "question": "In legacy code using try { writeData(); } finally { connection.close(); }, if writeData() throws an IOException 'disk full' and then close() throws 'connection already closed', what happens to the error information? What about a return inside finally?",
+    "reference_answer": "An exception thrown from finally completely REPLACES the exception being propagated: the caller only sees 'connection already closed' (a symptom) and entirely loses 'disk full' (the root cause), leading diagnosis in the wrong direction. Worse, if the finally block contains a return, every exception from try is silently swallowed and the method returns as if it succeeded. Fix: use try-with-resources (close exceptions become suppressed), or wrap close() in its own try-catch and call addSuppressed manually; never return/throw from finally.",
+    "key_points": [
+      "An exception in finally overwrites and loses the original exception",
+      "return in finally swallows all exceptions; use try-with-resources or addSuppressed, never return/throw in finally"
+    ],
+    "id": "Q_OOP3_118"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Exception handling in OOP",
+    "concept": "Checked exceptions and lambdas/streams",
+    "difficulty": "Hard",
+    "question": "Why can't you directly call a method that throws IOException inside list.stream().map(f -> readFile(f)), and what are the trade-offs of the common workarounds?",
+    "reference_answer": "The standard functional interfaces (Function, Consumer...) do not declare throws for checked exceptions, so a lambda cannot throw IOException outward. Workarounds: (1) catch and wrap into UncheckedIOException/RuntimeException — simple but loses the 'checked' nature, so callers are not reminded to handle it; (2) define a custom functional interface with throws plus an adapter utility — flexible but more code; (3) return a result type (Either/Result/Optional) per element to handle errors as data — explicit, does not abort the whole stream, but more complex; (4) use a plain for loop when error handling matters. The choice depends on whether an error should stop everything or just skip an element.",
+    "key_points": [
+      "Standard functional interfaces do not allow throwing checked exceptions",
+      "Wrap as unchecked, custom interfaces, Result types or plain loops — each trades clarity against complexity"
+    ],
+    "id": "Q_OOP3_119"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "Default method conflicts when evolving an interface",
+    "difficulty": "Hard",
+    "question": "A library adds a default method sort() to an interface MyList already implemented by thousands of classes. A client class already has a public void sort() method with different semantics (sorting descending). Analyze the consequences.",
+    "reference_answer": "By the 'class wins' rule, the class's method takes precedence over the default method, so the client class still compiles — but their old method now unintentionally becomes the implementation of the interface's sort(). Library code calling myList.sort() expecting ascending order gets descending order: a silent semantic bug. If the signature differs in return type (int sort()), the class fails to compile after upgrading. Moreover, a shared default implementation may break the invariants of implementing classes (e.g., a default removeIf on a synchronized collection that does not hold the lock). Lesson: default methods are not 'free' — choose names unlikely to clash, document clearly, and treat adding methods to a public interface as a risky change.",
+    "key_points": [
+      "Class wins: an existing class method silently becomes the implementation of the new default method",
+      "Can cause compile errors or broken invariants; adding default methods to a public interface is still risky"
+    ],
+    "id": "Q_OOP3_120"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Inheritance",
+    "concept": "Static methods are hidden, not overridden",
+    "difficulty": "Hard",
+    "question": "Class Parent has static void introduce() printing 'Parent', and class Child declares static void introduce() printing 'Child'. With Parent x = new Child(); x.introduce(); what is printed? Why is this a pitfall?",
+    "reference_answer": "It prints 'Parent'. Static methods are bound at compile time based on the DECLARED TYPE of the variable, not the object's actual type; a static method with the same signature in a subclass only HIDES the superclass method rather than overriding it, so there is no polymorphism. Pitfall: calling through an object variable looks like a polymorphic call and developers expect 'Child'. Adding @Override to a static method causes a compile error, so @Override helps detect this; static methods should always be called via the class name.",
+    "key_points": [
+      "Static methods bind at compile time by declared type; subclasses only hide them",
+      "Calling static methods via variables looks polymorphic; use @Override to detect and call via the class name"
+    ],
+    "id": "Q_OOP3_121"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "Overloading equals instead of overriding it",
+    "difficulty": "Hard",
+    "question": "Class Point declares public boolean equals(Point other) { ... } (parameter of type Point instead of Object). Why does list.contains(new Point(1,2)) on an ArrayList<Point> still return false even though the list contains point (1,2)?",
+    "reference_answer": "equals(Point) is an OVERLOAD, not an override of Object.equals(Object), because the signatures differ. Collections call o.equals(Object), so the method chosen is the default equals(Object) (reference comparison), never the custom one. Overloads are selected at compile time by the static type of the argument, while overrides are selected at runtime. The bug is silent because the code compiles fine, and calling p1.equals(p2) directly even gives the right result, causing confusion. Prevention: always declare equals(Object o) and annotate it with @Override so the compiler catches a wrong signature.",
+    "key_points": [
+      "equals(Point) is an overload and does not override equals(Object), so collections never call it",
+      "Overloads are resolved at compile time by static type; use @Override with equals(Object)"
+    ],
+    "id": "Q_OOP3_122"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Inheritance",
+    "concept": "Private methods cannot be overridden",
+    "difficulty": "Hard",
+    "question": "Class Parent has private void validate() and public void process() which calls validate(). Class Child defines public void validate() with different logic. When calling new Child().process(), which validate() runs? What pitfall does this reveal?",
+    "reference_answer": "Parent's validate() runs. Private methods are not inherited and therefore cannot be overridden; validate() in Child is an entirely new, unrelated method. The call to validate() inside Parent's process() is statically bound to Parent's private version. Pitfall: the subclass author thinks they are customizing the superclass behavior (as in Template Method) but it has no effect and no error is reported. To allow customization, the superclass must declare it protected (an intentional hook); always use @Override so the compiler reports an error when nothing is actually overridden.",
+    "key_points": [
+      "Private methods are not inherited; a same-named method in the subclass is a new method",
+      "The superclass call still uses its private version; use protected hooks and @Override to allow customization"
+    ],
+    "id": "Q_OOP3_123"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object-oriented architecture",
+    "concept": "Anemic Domain Model vs Rich Domain Model",
+    "difficulty": "Hard",
+    "question": "Analyze the trade-offs between an Anemic Domain Model (domain objects only have getters/setters, logic lives in Service classes) and a Rich Domain Model (domain objects contain both data and business behavior).",
+    "reference_answer": "The Anemic Domain Model is simple, fits thin CRUD logic and maps easily to ORM/JSON, but it is essentially procedural programming dressed as objects: business invariants are not protected by the objects themselves (anyone can call setStatus), logic is duplicated across services, and invalid states are easy to create. The Rich Domain Model places behavior next to data (order.confirm(), order.addProduct()), protects invariants and expresses the business language, but requires more careful design, may conflict with frameworks requiring empty constructors/setters, and risks overloading entities with responsibilities or infrastructure dependencies. The choice should depend on the complexity of the business logic.",
+    "key_points": [
+      "Anemic: simple, fits CRUD, but invariants are unprotected and logic is scattered",
+      "Rich: protects invariants and expresses the domain, but needs careful design and may conflict with frameworks"
+    ],
+    "id": "Q_OOP3_124"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Coupling & Cohesion",
+    "concept": "Over-applying the Law of Demeter",
+    "difficulty": "Hard",
+    "question": "A team applies the Law of Demeter absolutely, adding to the Order class methods like getCustomerCity(), getCustomerBankName(), getCustomerCardExpiry()... Analyze the consequences and how to strike a balance.",
+    "reference_answer": "Mechanical application turns Order into a 'Middle Man' with a bloated interface; every change in Customer requires another forwarding method in Order — coupling is not reduced, only hidden, and Order loses cohesion because it must know everything about customers. The Law of Demeter targets not depending on the internal structure of objects with behavior; it matters less for pure data structures (DTOs, value objects) and fluent/stream APIs. Balance: ask 'who should be responsible for this behavior' and move behavior to the right place (Tell, Don't Ask); if a client truly needs customer data, return an immutable value object/DTO instead of adding a series of delegating methods.",
+    "key_points": [
+      "Absolute Demeter creates a Middle Man and a bloated interface; coupling is hidden, not reduced",
+      "Apply it to objects with behavior, not DTOs/fluent APIs; move behavior to the right place or return value objects"
+    ],
+    "id": "Q_OOP3_125"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "A Mediator turning into a God Object",
+    "difficulty": "Hard",
+    "question": "A system uses a Mediator to coordinate 30 components of a ticket-booking screen. After a year, the mediator class is 4,000 lines long. Analyze the causes and how to address it.",
+    "reference_answer": "A Mediator moves interaction complexity from the components into one place; if all coordination rules pile up there, it becomes a God Object: low cohesion, every change touches it, hard to test, frequent merge conflicts. Causes: not partitioning by interaction group, using the mediator for both business logic and UI logic. Remedies: split into several smaller mediators per group of tightly interacting components (flight selection, seat selection, payment), move business logic into domain services, shift some simple interactions to an event mechanism (observer) or an explicit state machine, and monitor size/cohesion metrics.",
+    "key_points": [
+      "A Mediator that absorbs all coordination logic easily becomes a God Object",
+      "Split mediators by interaction group, move business logic to services, use events/state machines for simple parts"
+    ],
+    "id": "Q_OOP3_126"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Risks of Chain of Responsibility",
+    "difficulty": "Hard",
+    "question": "Analyze the common risks of using Chain of Responsibility in real systems (e.g., a loan approval processing chain).",
+    "reference_answer": "(1) A request can travel through the whole chain without being handled — without a default handler at the end, it is silently 'swallowed'. (2) Handler order carries implicit business meaning: misconfiguring the order (checking limits before authentication) causes logic bugs or security holes. (3) A handler forgetting to call the next one breaks the chain. (4) Debugging and tracing are hard because control flow is distributed. (5) Long chains add latency and make performance guarantees harder. Mitigations: a default handler at the end that reports an explicit error, centralized order configuration with tests, logging/tracing at each step, and separating the 'who handles it' decision from forwarding.",
+    "key_points": [
+      "Requests may go unhandled, handler order has implicit meaning, chains break easily",
+      "Need a default end handler, centralized tested ordering, and per-step logging/tracing"
+    ],
+    "id": "Q_OOP3_127"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Mutable flyweights and thread safety",
+    "difficulty": "Hard",
+    "question": "A developer saves memory by sharing TextStyle objects (font, size, color) among millions of characters, but TextStyle has a setColor() setter. Analyze the resulting bugs.",
+    "reference_answer": "A flyweight is shared by many logical 'owners'; when one paragraph calls style.setColor(RED) to highlight a word, ALL other characters using that shared object also change color — a widespread semantic bug that is hard to trace. In a multi-threaded environment, modifying a shared object also causes race conditions. Moreover, the factory caches flyweights by key (font, size, color): modifying an object after caching makes the key and content diverge. Principle: flyweights must be immutable; a 'change' is done by obtaining another flyweight from the factory (factory.get(font, size, RED)), and the factory must be thread-safe (e.g., ConcurrentHashMap.computeIfAbsent).",
+    "key_points": [
+      "Modifying a shared flyweight changes it everywhere it is referenced and causes race conditions",
+      "Flyweights must be immutable; obtain a different one from a thread-safe factory to 'change' it"
+    ],
+    "id": "Q_OOP3_128"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Memory cost of Memento and alternatives",
+    "difficulty": "Hard",
+    "question": "An image editor stores a Memento containing the whole image (50MB) after every operation to support 100 Undo steps. Analyze the problem and alternative designs.",
+    "reference_answer": "Storing the entire state at every step costs up to 5GB of memory — infeasible. Options: (1) Command Pattern with undo: each operation stores enough information to reverse itself (a brighten command stores its parameters to darken back), small cost, but not every operation is exactly reversible (blur, cropping loses data). (2) Incremental mementos: store only the changed image tiles — deltas. (3) Hybrid: periodic full snapshots plus a sequence of commands/deltas in between; undo by restoring the nearest snapshot and replaying. (4) Share immutable structure (copy-on-write per tile) so mementos share unchanged parts. Also cap the number of steps or spill old history to disk.",
+    "key_points": [
+      "Full snapshots at every step blow up memory",
+      "Alternatives: Command with undo, deltas/tiles, periodic snapshots + replay, copy-on-write structural sharing"
+    ],
+    "id": "Q_OOP3_129"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "The axis of change in Abstract Factory",
+    "difficulty": "Hard",
+    "question": "A system uses Abstract Factory with a UIFactory interface providing createButton(), createDialog() and 5 implementations (Windows, Mac, Linux, Web, Mobile). Now a new product createSlider() is needed. Analyze the impact and the design lesson.",
+    "reference_answer": "Abstract Factory is easy to extend along the 'add a new family' axis (add a factory implementing all methods), but very hard to extend along the 'add a new product type' axis: the method must be added to the interface and ALL 5 factories plus any external implementations must be changed (breaking compatibility if it is a public API). This illustrates that a pattern satisfies OCP along only one axis of change. Lesson: before choosing a pattern, identify which dimension changes more often; the impact can be reduced with a default method returning a generic implementation, a factory parameterized by product type (create(Class<T> type)) at the cost of type safety, or a registry of creators.",
+    "key_points": [
+      "Abstract Factory makes adding families easy but adding product types hard (every factory must change)",
+      "Choose patterns by the main axis of change; mitigate with default methods, parameterized factories or registries"
+    ],
+    "id": "Q_OOP3_130"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Refactoring and code smells",
+    "concept": "Speculative Generality and premature patterns",
+    "difficulty": "Hard",
+    "question": "A team building a PDF report export feature set up Bridge, Abstract Factory and a plugin loader to 'support Excel, Word, HTML later', but two years later there is still only PDF. Analyze the cost of this decision.",
+    "reference_answer": "This is the 'Speculative Generality' code smell (against YAGNI). Costs: (1) many classes and layers of indirection make code hard to read and hard for newcomers to follow; (2) abstractions based on guesses are often WRONG: when the Excel requirement actually arrives, it may need capabilities the interface did not anticipate (multiple sheets, formulas), forcing the whole structure to be reworked; (3) maintenance and testing cost for unused branches. A better approach: write simply for current needs while keeping code clean and tested; when a second or third variant appears, refactor to extract abstractions based on concrete cases ('rule of three').",
+    "key_points": [
+      "Anticipatory abstraction adds complexity and maintenance cost without delivering value",
+      "Guess-based abstractions are often wrong; refactor when real variants appear (rule of three)"
+    ],
+    "id": "Q_OOP3_131"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "A global event bus and hidden coupling",
+    "difficulty": "Hard",
+    "question": "An application uses a global EventBus: all modules publish/subscribe events via strings like 'order.updated'. Analyze the hidden problems of this architecture.",
+    "reference_answer": "(1) Hidden coupling: modules still depend on each other through event names and payload structures, but these dependencies are invisible in the code (no imports/types); renaming an event or changing a payload breaks subscribers without the compiler noticing. (2) Control flow is hard to trace: who handles an event, and in what order? (3) Ordering and reentrancy: a subscriber publishing new events while handling one can cause infinite loops or inconsistent intermediate states. (4) Error handling: an exception in one subscriber may break others or be swallowed. (5) Memory leaks from forgetting to unsubscribe. Mitigations: use typed events (classes) instead of strings, scope buses per module, document event flows, and use direct calls when the relationship is a clear one-to-one.",
+    "key_points": [
+      "An event bus creates hidden coupling through names/payloads that the compiler cannot check",
+      "Hard to trace, ordering/reentrancy risks, error propagation, leaks; use typed events and limited scopes"
+    ],
+    "id": "Q_OOP3_132"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "SOLID principles",
+    "concept": "Circular dependencies in a DI container",
+    "difficulty": "Hard",
+    "question": "In a Spring application, OrderService needs InventoryService via the constructor, and InventoryService needs OrderService. Analyze the resulting error and why 'fixing' it with field injection or @Lazy only hides the problem.",
+    "reference_answer": "With constructor injection, the container cannot create either object first because each needs the other to exist — a startup error (BeanCurrentlyInCreationException). Switching to field/setter injection or @Lazy lets the container create the objects (assigning dependencies later or via a proxy), but the cycle remains: the two classes are tightly coupled in both directions, an object may be used before all dependencies are set, they are hard to test independently, and it usually signals a wrong split of responsibilities. Root-cause fixes: extract shared logic into a third class both depend on, invert one dependency via an interface/event (Order publishes an event, Inventory listens), or merge them if they are really one responsibility.",
+    "key_points": [
+      "Constructor injection with a cycle prevents the container from instantiating the beans",
+      "Field injection/@Lazy only hide it; fix by extracting a shared class, inverting via interfaces/events, or merging"
+    ],
+    "id": "Q_OOP3_133"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object-oriented testing",
+    "concept": "Overusing mocks couples tests to implementation",
+    "difficulty": "Hard",
+    "question": "The test suite for a PaymentService mocks every dependency and verifies each internal call exactly (order, count, arguments). After a behavior-preserving refactoring, 40 tests fail. Analyze the cause and how to write more robust tests.",
+    "reference_answer": "The tests verify HOW the class works (internal interaction details) rather than observable OUTCOMES — called over-specification. Any implementation change (merging two calls, reordering, adding caching) breaks tests even though behavior is correct, making tests an obstacle to refactoring and eroding trust ('red tests are normal'). Remedies: mock only at system boundaries with real side effects (payment gateway, email sending, time) and only verify interactions that are part of the business contract; use real objects or fakes for internal objects and value objects; prefer checking state/outputs; avoid mocking types you do not own and wrap them behind adapters instead.",
+    "key_points": [
+      "Verifying internal interactions couples tests to implementation, breaking them on refactoring",
+      "Mock only at side-effect boundaries, prefer checking outcomes, use fakes/real objects internally"
+    ],
+    "id": "Q_OOP3_134"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Value objects containing floating-point numbers and equality",
+    "difficulty": "Hard",
+    "question": "A record Coordinate(double lat, double lon) is used as a HashMap key to group duplicate GPS points. Analyze the equals/hashCode issues with double.",
+    "reference_answer": "(1) Floating-point error: two logically identical coordinates computed through different transformations (0.1 + 0.2 vs 0.3) have different bits and are not equal, splitting the key. (2) Records compare doubles with Double.compare, so 0.0 and -0.0 are considered DIFFERENT while NaN equals NaN — unlike the == operator, which is surprising. (3) Treating 'nearby' points as equal via an epsilon breaks the transitivity of equals and makes a consistent hashCode impossible. Approach: normalize to a discrete representation before using it as a key (round to a fixed number of digits, convert to integer micro-degrees, or a geohash), and use spatial structures (grids, KD-trees) for 'nearby' queries.",
+    "key_points": [
+      "Floating-point error gives logically equal values different representations",
+      "Epsilon-based equals breaks transitivity; normalize to a discrete representation before using as a key"
+    ],
+    "id": "Q_OOP3_135"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Persisting enums by ordinal()",
+    "difficulty": "Hard",
+    "question": "A system stores order status in the database using Status.ordinal() (0, 1, 2...). Analyze the risks as development continues.",
+    "reference_answer": "ordinal() is the declaration position of the constant in the enum, depending on the order in the source code. Merely inserting a new status in the middle (e.g., PACKING between PAID and SHIPPING) or reordering makes every old database record be interpreted wrongly — silent data corruption with no error, very hard to detect and recover. The same applies to ordinals in serialized files, APIs or caches. Correct approach: store the constant's name (name()) or a stable code explicitly assigned in the enum (Status(int code) with a never-changing code field) with reverse mapping; with JPA use EnumType.STRING or an AttributeConverter.",
+    "key_points": [
+      "ordinal depends on declaration order; inserting/reordering silently misinterprets old data",
+      "Store name() or an explicit stable code in the enum with reverse mapping"
+    ],
+    "id": "Q_OOP3_136"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Shallow immutability of records and compact constructors",
+    "difficulty": "Hard",
+    "question": "record Classroom(String code, List<Student> students) {} is advertised as immutable. Analyze why that is not entirely true and how to fix it with a compact constructor.",
+    "reference_answer": "Records are only SHALLOWLY immutable: the students field is final and cannot be reassigned, but the List object inside is still mutable. A caller holding the original list passed to the constructor can modify it afterwards, and anyone calling classroom.students().add(...) can change the record's state — corrupting equals/hashCode if the record is a HashMap key. Fix with a compact constructor: record Classroom(String code, List<Student> students) { Classroom { Objects.requireNonNull(code); students = List.copyOf(students); } } — both validating and defensively copying into an immutable list. If Student elements are mutable, the record is still not deeply immutable.",
+    "key_points": [
+      "Records are only shallowly immutable; mutable components can still be modified",
+      "Compact constructors validate and defensively copy (List.copyOf); mutable elements remain a risk"
+    ],
+    "id": "Q_OOP3_137"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Polymorphism",
+    "concept": "The Expression Problem",
+    "difficulty": "Hard",
+    "question": "A system representing expression trees (Num, Add, Mul) needs to add both new NODE TYPES and new OPERATIONS (evaluate, print, simplify, differentiate). Compare the OOP polymorphism approach, Visitor, and sealed + pattern matching from the perspective of the 'Expression Problem'.",
+    "reference_answer": "The Expression Problem states that it is hard to extend along both dimensions without modifying existing code while keeping type safety. OOP polymorphism (each node has evaluate(), print()): adding node types is easy (add a class), but adding operations requires modifying every class. Visitor and sealed + switch pattern matching: adding operations is easy (a new visitor/function), but adding node types requires modifying every visitor/switch — with sealed types, the compiler points out every place to update, safer than Visitor and with less boilerplate. The choice depends on which dimension changes more often: stable types with frequently added operations → sealed/Visitor; stable operations with frequently added types → OOP polymorphism. Advanced techniques (object algebras, type classes) solve both dimensions at the cost of complexity.",
+    "key_points": [
+      "The Expression Problem: hard to extend both data types and operations simultaneously",
+      "OOP makes adding types easy, operations hard; Visitor/sealed the opposite; choose by main axis of change"
+    ],
+    "id": "Q_OOP3_138"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object lifecycle",
+    "concept": "Serialization breaks encapsulation and invariants",
+    "difficulty": "Hard",
+    "question": "Analyze the design and security risks when a business class implements Java's Serializable 'for convenience'.",
+    "reference_answer": "(1) The serialized form becomes a hidden public API: every private field goes into the byte stream, and changing internal structure breaks compatibility with stored data (requiring serialVersionUID and version management). (2) Deserialization creates objects WITHOUT calling the constructor, so all invariant checks in the constructor are bypassed; an attacker can craft a byte stream producing an object in an invalid state (negative balance) or sharing references to internal mutable components. (3) 'Deserialization gadget chain' vulnerabilities allow remote code execution when deserializing untrusted data. Measures: avoid Java serialization for external data, use explicit formats (JSON with DTOs); if unavoidable, use the serialization proxy pattern, validate invariants and defensively copy in readObject, and use deserialization filters.",
+    "key_points": [
+      "Serializable turns private structure into a hidden API that is hard to evolve",
+      "Deserialization bypasses constructors, breaks invariants and can be exploited for code execution; use DTOs/JSON or a serialization proxy"
+    ],
+    "id": "Q_OOP3_139"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Static members",
+    "concept": "ThreadLocal memory leaks in thread pools",
+    "difficulty": "Hard",
+    "question": "A UserContext class uses a static ThreadLocal<User> to store the current request's user in a web application running on a thread pool. Analyze two serious risks of not calling remove() after each request.",
+    "reference_answer": "In a thread pool, threads are REUSED across many requests. (1) Data leaking between requests: if a later request does not overwrite the value (e.g., an anonymous request), it reads the previous request's User — a security hole (a user sees another user's data). (2) Memory leaks: values in ThreadLocalMap are strongly referenced and live as long as the thread (practically forever in a pool); if a value holds a large object graph or references the application's ClassLoader, the old ClassLoader cannot be reclaimed on redeploy (PermGen/Metaspace leak). Measures: always set/remove in try-finally (or in a filter/interceptor), avoid storing large objects, consider passing context explicitly or using ScopedValue.",
+    "key_points": [
+      "Threads are reused, so an old ThreadLocal value can leak into another request",
+      "Values live with the thread causing memory/ClassLoader leaks; always remove in finally"
+    ],
+    "id": "Q_OOP3_140"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object class and fundamental methods",
+    "concept": "equals/hashCode of ORM entities with generated IDs",
+    "difficulty": "Hard",
+    "question": "A JPA entity Order overrides equals/hashCode based on the id field generated by the database on persist. A new object (id = null) is added to a HashSet and then saved to the database. Analyze the bug.",
+    "reference_answer": "Before persisting, id = null so hashCode is computed from null (or all new entities are 'equal' if equals compares null ids). After persisting, id gets a value so hashCode changes — the entity is now in the wrong bucket of the HashSet: contains() returns false, remove() fails, duplicates can be added. Also, several new entities with null ids may be treated as duplicates and dropped from the Set. Solutions: use an immutable natural business key (order number) for equals/hashCode; or generate the id on the application side (UUID) right at construction; or equals by id but hashCode returning a per-class constant (accepting lower performance) and treating id-null objects as equal only to themselves. Also be careful with getClass/instanceof because ORMs create proxy subclasses.",
+    "key_points": [
+      "The id assigned on persist changes hashCode, losing the entity in a HashSet; null-id entities may be treated as duplicates",
+      "Use an immutable business key, early-generated ids (UUID), or a constant hashCode; mind ORM proxies"
+    ],
+    "id": "Q_OOP3_141"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Static members",
+    "concept": "Thread-unsafe lazy initialization",
+    "difficulty": "Hard",
+    "question": "The getter public Config getConfig() { if (config == null) config = readFromFile(); return config; } is called concurrently from many threads. Analyze the bugs that can occur besides reading the file multiple times.",
+    "reference_answer": "(1) Race condition: several threads see null and all call readFromFile(), wasting resources; if Config has side effects (opening connections, registrations), multiple instances coexist and threads hold different objects, causing inconsistent state. (2) Memory visibility: without synchronization, a thread may see a non-null config reference while the fields inside Config are not fully written (a half-built object) due to reordering. (3) A thread might never see the assigned value. Solutions: eager initialization if the cost is acceptable; the holder idiom; synchronized/volatile with correct double-checked locking; or AtomicReference/ConcurrentHashMap.computeIfAbsent; Config should be immutable with final fields.",
+    "key_points": [
+      "Race conditions create multiple instances, with threads holding different objects",
+      "Without synchronization a half-built object may be seen; use the holder idiom, volatile, computeIfAbsent, immutable objects"
+    ],
+    "id": "Q_OOP3_142"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Interface",
+    "concept": "A custom Iterator that breaks the contract",
+    "difficulty": "Hard",
+    "question": "A class implements a custom Iterator over data read from a file, where hasNext() reads ahead one line and advances the file pointer. Analyze the subtle bugs relative to the Iterator contract.",
+    "reference_answer": "The implicit contract: hasNext() must be idempotent with no observable side effects — calling it several times in a row must not change the element next() will return. If each hasNext() reads another line, calling hasNext() twice (common in debugging code or libraries) skips data. Other bugs: next() when exhausted must throw NoSuchElementException rather than return null; an unsupported remove() must throw UnsupportedOperationException; the iterator holds a file resource with no way to close it if the client stops midway. Correct approach: use a 'read-ahead' buffer variable (lookahead) — hasNext() only reads when the buffer is empty, next() takes from the buffer and clears it — and consider combining with AutoCloseable or a Stream with onClose.",
+    "key_points": [
+      "hasNext() must be idempotent and not consume data; next() must throw NoSuchElementException when exhausted",
+      "Use a lookahead buffer, handle remove() and resource release correctly"
+    ],
+    "id": "Q_OOP3_143"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Classes and objects",
+    "concept": "Misusing Optional",
+    "difficulty": "Hard",
+    "question": "Analyze common misuses of Optional: as an entity field type, as a method parameter, calling get() without checking, and Optional<List<T>>.",
+    "reference_answer": "(1) Optional as a field: Optional is not Serializable, adds an extra object per field, and was not designed for this — an absent field should be null internally with a getter returning Optional. (2) Optional as a parameter: forces callers to wrap values, and null can still be passed for the Optional itself (now three states); use overloads or a documented nullable parameter. (3) opt.get() without checking just turns a NullPointerException into a NoSuchElementException, defeating the purpose; use orElse/orElseThrow with a clear message, map/flatMap. (4) Optional<List<T>>: collections already have a natural 'empty' state, so return an empty list instead of an Optional. Also, orElse(expensiveComputation()) always evaluates its argument; use orElseGet(() -> ...) for lazy evaluation.",
+    "key_points": [
+      "Optional is meant for return types; not for fields, parameters, or wrapping collections",
+      "Unchecked get() is pointless; use orElseThrow/map, and orElseGet for expensive defaults"
+    ],
+    "id": "Q_OOP3_144"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Builder with inheritance (generic self-type)",
+    "difficulty": "Hard",
+    "question": "Class Notification has a Builder; subclass EmailNotification needs a Builder that adds a subject() method. Why might new EmailNotification.Builder().content(\"x\").subject(\"y\") fail to compile, and what technique fixes it? What are the trade-offs?",
+    "reference_answer": "content() declared in the parent Builder returns the parent Builder type, so after calling it the static type of the expression is the parent Builder — which lacks subject(), causing a compile error even though the actual object is the child Builder. Fix with the 'generic self-type' (curiously recurring template) pattern: abstract static class Builder<T extends Builder<T>> { T content(String s) { ...; return self(); } protected abstract T self(); }, with the child Builder declared as extends Notification.Builder<Builder> and implementing self() to return this. Trade-offs: complex generic signatures, hard for newcomers to read, lots of boilerplate, and it still cannot prevent a subclass from declaring the wrong type argument; with multiple inheritance levels complexity grows quickly — consider composition or a record + separate builder.",
+    "key_points": [
+      "Parent builder methods return the parent type, losing child builder methods in the call chain",
+      "Use a generic self-type (T extends Builder<T>, self()); trade-offs are complexity and boilerplate"
+    ],
+    "id": "Q_OOP3_145"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object lifecycle",
+    "concept": "Interning/canonical caches and memory leaks",
+    "difficulty": "Hard",
+    "question": "To save memory, a system canonicalizes (interns) ProductCode objects using a static HashMap<String, ProductCode> cache: each code has exactly one object. After a few weeks, the application runs out of memory. Analyze and propose a solution.",
+    "reference_answer": "A static HashMap holds STRONG references to every key and value ever canonicalized and never removes them — including product codes that appeared once and are never used again. The cache grows without bound with the number of distinct codes seen, causing a memory leak despite the original goal of saving memory. Solutions: use weak references so objects no longer used can be reclaimed by the GC (a WeakHashMap with values wrapped in WeakReference, because if the value strongly references the key the entry is never removed), or use a bounded cache by size/time (LRU, Caffeine), or intern only finite, known value sets. The cache must also be thread-safe.",
+    "key_points": [
+      "A static canonical cache holds strong references forever and grows unboundedly",
+      "Use WeakHashMap + WeakReference values, or a size/time-bounded thread-safe cache"
+    ],
+    "id": "Q_OOP3_146"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Polymorphism",
+    "concept": "The cost of polymorphic calls in high-performance code",
+    "difficulty": "Hard",
+    "question": "In a loop processing 100 million elements, calling shape.area() through an interface with 8 implementing classes is significantly slower than when there is only 1 implementing class. Explain the cause at the JVM level and the trade-offs of optimizing.",
+    "reference_answer": "The JVM's JIT optimizes virtual calls by profiling the actual types at each call site: if it sees only 1 type (monomorphic) or 2 types (bimorphic), it can inline the method body directly, enabling further optimizations (removing checks, vectorization). When a call site sees many types (megamorphic), the JIT must use virtual method table lookups (vtable/itable) and cannot inline, which is much slower in tight loops. Possible optimizations: group data by type and process each group (each loop monomorphic), use columnar data structures instead of polymorphic objects, or switch over a sealed type. Trade-off: sacrificing extensibility and clarity of the OOP design; only do this after measurements prove it is a real hotspot.",
+    "key_points": [
+      "The JIT inlines monomorphic/bimorphic calls, while megamorphic ones need table lookups and cannot be inlined",
+      "Optimize by grouping by type, columnar data, or sealed switches; trades extensibility, only after profiling"
+    ],
+    "id": "Q_OOP3_147"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Object-oriented architecture",
+    "concept": "Treating remote calls like local calls",
+    "difficulty": "Hard",
+    "question": "A system uses a Remote Proxy so clients call customer.getName(), customer.getEmail(), customer.getAddress()... as if on a local object, but each getter is actually a network request. Analyze the problems and the principles for designing interfaces of distributed objects.",
+    "reference_answer": "The proxy makes remote calls look local, hiding fundamental differences (the 'fallacies of distributed computing'): (1) latency — a 'chatty' interface with many small getters turns one screen into dozens of round trips, hundreds of times slower; (2) partial failure — each getter may fail due to network errors or timeouts, but the method signature does not express that; (3) consistency — reading fields one by one at different times may mix data from two versions. Principles: design remote interfaces to be 'coarse-grained' — one call returns a complete DTO (Remote Facade + Data Transfer Object), make network errors and timeouts explicit in the API, and design idempotent operations so they can be retried safely.",
+    "key_points": [
+      "Remote calls differ fundamentally from local ones: latency, partial failure, consistency",
+      "Design coarse-grained interfaces (Remote Facade + DTO), make network errors explicit, keep operations idempotent for retries"
+    ],
+    "id": "Q_OOP3_148"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Design Pattern",
+    "concept": "Calling alien methods while holding a lock in Observer",
+    "difficulty": "Hard",
+    "question": "A Warehouse class (subject) implements updateStock() as synchronized, and inside it loops over the observer list calling observer.changed(this). Analyze the deadlock risk and other concurrency bugs.",
+    "reference_answer": "Calling observers while holding a lock means calling 'alien methods': Warehouse does not control what observers do. If an observer, in changed(), waits for another lock held by a second thread, while that second thread needs to call a synchronized method of Warehouse → deadlock. Slow observers (sending email, network calls) hold the lock for a long time, blocking all other threads. An observer calling back into Warehouse and unsubscribing itself during iteration causes ConcurrentModificationException (or reentrancy changing state midway). Fix: inside the synchronized block only update state and take a snapshot of the observer list (or use CopyOnWriteArrayList), then NOTIFY OUTSIDE the synchronized block ('open call'); consider asynchronous notification via an executor.",
+    "key_points": [
+      "Calling observer callbacks while holding a lock can cause deadlocks, blocking and reentrancy bugs",
+      "Update state inside the lock, snapshot the observers, then notify outside the lock (open call) or asynchronously"
+    ],
+    "id": "Q_OOP3_149"
+  },
+  {
+    "language": "en",
+    "subject": "Object-Oriented Programming",
+    "competency": "3_Object-Oriented Programming",
+    "topic": "Static members",
+    "concept": "A shared mutable default object",
+    "difficulty": "Hard",
+    "question": "To avoid null, a Cart class uses private static final List<Product> EMPTY = new ArrayList<>(); and the default constructor sets this.items = EMPTY. Analyze the bug that appears when the system runs in production.",
+    "reference_answer": "Every Cart created with the default constructor shares the SAME ArrayList EMPTY. When one cart calls items.add(p), the product is added to the shared list, so every other 'empty' cart (of other users) suddenly contains it too — data leaking between users, and in a multi-threaded environment the ArrayList structure can also be corrupted. 'final' only prevents reassigning EMPTY; it does not make the list immutable. Correct approach: create a new list for each object (this.items = new ArrayList<>()), or if a shared default is desired it must be truly immutable (List.of()) and code adding elements must replace it with a new list (copy-on-write). This is also the classic 'mutable default argument' pitfall in Python.",
+    "key_points": [
+      "A shared mutable default object makes changes in one object leak into all others",
+      "final does not make the list immutable; create one per instance or share only truly immutable values"
+    ],
+    "id": "Q_OOP3_150"
+  }
+]

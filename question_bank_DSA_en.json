@@ -1,0 +1,2252 @@
+[
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Big-Omega and Big-Theta notation",
+    "difficulty": "Easy",
+    "question": "Besides Big-O, what do Big-Omega (Ω) and Big-Theta (Θ) notations represent?",
+    "reference_answer": "Big-O gives an UPPER BOUND: f(n) = O(g(n)) means f grows no faster than g (up to constant factors) for sufficiently large n. Big-Omega gives a LOWER BOUND: f(n) = Ω(g(n)) means f grows at least as fast as g. Big-Theta gives a TIGHT BOUND: f(n) = Θ(g(n)) when f is both O(g) and Ω(g), i.e., f grows at exactly the same rate as g. For example, Merge Sort is Θ(n log n); linear search is O(n) and Ω(1) when considering all cases.",
+    "key_points": [
+      "Big-O: upper bound; Big-Omega: lower bound; Big-Theta: tight bound (both)",
+      "Θ(g) means growing at exactly the same order as g"
+    ],
+    "id": "Q_DSA_151"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Intuition behind O(log n) complexity",
+    "difficulty": "Easy",
+    "question": "What characteristic does an O(log n) algorithm usually have in how it processes data?",
+    "reference_answer": "An O(log n) algorithm typically shrinks the problem size by a fixed RATIO at each step (e.g., halving), so the number of steps equals the number of times n can be divided by 2 until reaching 1, about log₂ n. Examples: binary search, operations on balanced trees, fast exponentiation. With n = 1 billion, log₂ n is only about 30 steps — doubling the data adds just one step.",
+    "key_points": [
+      "O(log n) arises when each step shrinks the problem by a fixed ratio (often halving)",
+      "Doubling the data adds only one step; n = 1 billion needs about 30 steps"
+    ],
+    "id": "Q_DSA_152"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Queue",
+    "concept": "Double-ended queue (Deque)",
+    "difficulty": "Easy",
+    "question": "How does a double-ended queue (Deque) differ from a Stack and a Queue?",
+    "reference_answer": "A deque allows adding and removing elements at BOTH ends (front and back) in O(1). Thus it generalizes both a Stack (using one end) and a Queue (adding at one end, removing at the other). Deques are used in the sliding-window maximum technique, the 0-1 BFS algorithm, and bounded operation histories.",
+    "key_points": [
+      "A deque allows insertion/removal at both ends in O(1)",
+      "It generalizes both Stack and Queue"
+    ],
+    "id": "Q_DSA_153"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Queue",
+    "concept": "Circular queue",
+    "difficulty": "Easy",
+    "question": "Why is a circular queue usually used when implementing a Queue with an array?",
+    "reference_answer": "With a plain array-based Queue, each dequeue advances the front index, leaving the earlier cells empty and unusable (or requiring an O(n) shift of the whole array). A circular queue treats the array as a ring: the front and rear indices advance modulo the array size ((i + 1) % n), so freed cells are reused and every enqueue/dequeue is O(1).",
+    "key_points": [
+      "A plain array wastes front cells or needs O(n) shifting",
+      "A circular queue uses modular indices to reuse cells, with O(1) operations"
+    ],
+    "id": "Q_DSA_154"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Linked List",
+    "concept": "Circular linked list",
+    "difficulty": "Easy",
+    "question": "How does a circular linked list differ from an ordinary linked list, and what is it used for?",
+    "reference_answer": "In a circular linked list, the last node points back to the first node instead of to null, forming a closed loop. It suits rotation problems: the operating system's Round-Robin scheduling (giving the CPU to each process in turn), lists of players taking turns, the Josephus problem. Traversal needs a stop condition of returning to the starting node to avoid an infinite loop.",
+    "key_points": [
+      "The last node points back to the first, forming a loop",
+      "Used for rotation: Round-Robin, turn-taking; traversal needs a stop condition"
+    ],
+    "id": "Q_DSA_155"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Stack",
+    "concept": "Implementing a Stack with an array vs a linked list",
+    "difficulty": "Easy",
+    "question": "Compare two ways of implementing a Stack: with a (dynamic) array and with a linked list.",
+    "reference_answer": "With a dynamic array: push/pop at the end are O(1) amortized, data is contiguous so it is CPU-cache friendly with little extra memory; but occasionally the array must grow (O(n) copy). With a linked list: push/pop at the head are always truly O(1) with no resizing, but each element costs extra memory for the pointer and nodes are scattered in memory. In practice, the array-based implementation is usually faster.",
+    "key_points": [
+      "Array: amortized O(1), contiguous memory, occasional resizing",
+      "Linked list: true O(1) but pointer overhead and poor cache locality"
+    ],
+    "id": "Q_DSA_156"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Properties of a binary heap",
+    "difficulty": "Easy",
+    "question": "Which properties must a binary Min-Heap satisfy?",
+    "reference_answer": "A binary Min-Heap must satisfy two properties: (1) Shape property — it is a complete binary tree: every level is full except possibly the last, which is filled from left to right. (2) Heap-order property — each node's value is less than or equal to its children's values, so the minimum element is always at the root. Note that a heap imposes no order between siblings (unlike a BST).",
+    "key_points": [
+      "Shape: a complete binary tree",
+      "Order: parent ≤ children (min-heap), minimum at the root; no ordering between siblings"
+    ],
+    "id": "Q_DSA_157"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Sift-up and sift-down operations",
+    "difficulty": "Easy",
+    "question": "When inserting an element into a heap and when extracting the root, which operations restore the heap property?",
+    "reference_answer": "Insertion: place the new element in the last empty position (keeping the complete shape), then 'sift up' — compare with the parent and swap if the order is violated, repeating until correct or reaching the root. Extracting the root: move the last element to the root, then 'sift down' — compare with the smaller child (min-heap) and swap if violated, repeating until correct. Both operations follow a single root-to-leaf path, so they cost O(log n).",
+    "key_points": [
+      "Insert: place at the end then sift up; extract root: move the last element up then sift down",
+      "Each operation follows the tree height, O(log n)"
+    ],
+    "id": "Q_DSA_158"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "Properties of a good hash function",
+    "difficulty": "Easy",
+    "question": "What properties should a good hash function for a Hash Table have?",
+    "reference_answer": "(1) Deterministic: the same key always produces the same hash value. (2) Uniform distribution: keys are spread evenly across buckets, reducing collisions. (3) Fast to compute. (4) Sensitive to changes: slightly different keys (like 'abc' and 'acb') should produce different hash values, using all parts of the key. Hash functions for hash tables do not need the cryptographic properties of secure hash functions.",
+    "key_points": [
+      "Deterministic, uniformly distributed, fast",
+      "Uses all parts of the key so similar keys hash differently"
+    ],
+    "id": "Q_DSA_159"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "The Set and Map abstract data types",
+    "difficulty": "Easy",
+    "question": "Distinguish the Set and Map (dictionary) abstract data types.",
+    "reference_answer": "A Set stores a collection of DISTINCT elements, with main operations: add, remove, and test membership. A Map (Dictionary) stores key-value pairs with unique keys, with main operations: assign a value to a key, look up a value by key, delete by key. Both can be implemented with hash tables (HashSet/HashMap, average O(1)) or balanced trees (TreeSet/TreeMap, O(log n), keeping keys ordered).",
+    "key_points": [
+      "Set: distinct elements; Map: key-value pairs with unique keys",
+      "Implemented via hash tables (average O(1)) or balanced trees (O(log n), ordered)"
+    ],
+    "id": "Q_DSA_160"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Abstract data types (ADT) vs data structures",
+    "difficulty": "Easy",
+    "question": "Distinguish an Abstract Data Type (ADT) from a data structure.",
+    "reference_answer": "An ADT describes a type by its SET OF OPERATIONS and their behavior, without saying how it is implemented — e.g., a Stack is defined by push, pop, top following LIFO. A data structure is a concrete IMPLEMENTATION of an ADT in memory — e.g., a Stack can be implemented with a dynamic array or a linked list. One ADT can have many implementing data structures with different performance.",
+    "key_points": [
+      "ADT: defined by operations and behavior, independent of implementation",
+      "Data structure: how an ADT is realized in memory; one ADT, many implementations"
+    ],
+    "id": "Q_DSA_161"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Divide and Conquer strategy",
+    "difficulty": "Easy",
+    "question": "What three steps make up the Divide and Conquer strategy? Name some algorithms using it.",
+    "reference_answer": "Three steps: (1) Divide — split the problem into smaller subproblems of the same form; (2) Conquer — solve the subproblems recursively, solving small enough ones directly; (3) Combine — merge the subproblem solutions into a solution of the original problem. Examples: Merge Sort, Quick Sort, binary search, Karatsuba multiplication, closest pair of points.",
+    "key_points": [
+      "Three steps: divide, conquer (recursively), combine",
+      "Examples: Merge Sort, Quick Sort, Binary Search, Karatsuba"
+    ],
+    "id": "Q_DSA_162"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Backtracking",
+    "difficulty": "Easy",
+    "question": "What is the backtracking technique?",
+    "reference_answer": "Backtracking builds a solution step by step (e.g., choosing a value for each position); at each step it tries the possible choices in turn, and if a choice leads to a state violating constraints or that cannot become a solution, it 'backtracks' — undoing that choice and trying another. It is usually implemented recursively. Applications: N-Queens, Sudoku, generating permutations/combinations, maze path finding.",
+    "key_points": [
+      "Builds solutions step by step, trying choices and undoing them at dead ends",
+      "Usually recursive; applications: N-Queens, Sudoku, combinatorial generation"
+    ],
+    "id": "Q_DSA_163"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Brute force",
+    "difficulty": "Easy",
+    "question": "What is the brute-force approach? When is it still a reasonable choice?",
+    "reference_answer": "Brute force tries ALL possibilities to find a solution, e.g., checking every pair of elements to find two numbers summing to k (O(n²)). Pros: simple, easy to implement, guaranteed correct. Cons: usually high complexity (high-degree polynomial or exponential). It is still reasonable when the data is small, when a reference solution is needed to test a more optimized algorithm, or when no better algorithm is known.",
+    "key_points": [
+      "Brute force tries everything: simple and correct but slow",
+      "Reasonable for small inputs or as a reference solution for testing"
+    ],
+    "id": "Q_DSA_164"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Pre-order and post-order traversal",
+    "difficulty": "Easy",
+    "question": "Describe pre-order and post-order traversal of a binary tree, with one application of each.",
+    "reference_answer": "Pre-order: visit the current node FIRST, then traverse the left subtree, then the right subtree (Root-Left-Right). Applications: copying a tree, serializing a tree structure (storing the root first to rebuild it), printing a directory structure. Post-order: traverse the left subtree, the right subtree, then visit the current node (Left-Right-Root). Applications: freeing/deleting a tree (children before parent), computing directory sizes (needing children's totals), evaluating expression trees.",
+    "key_points": [
+      "Pre-order: Root-Left-Right, used to copy/serialize trees",
+      "Post-order: Left-Right-Root, used to delete trees and computations needing children's results first"
+    ],
+    "id": "Q_DSA_165"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Depth and height of a node",
+    "difficulty": "Easy",
+    "question": "Distinguish the depth and the height of a node in a tree.",
+    "reference_answer": "The depth of a node is the number of edges on the path from the ROOT down to the node (the root has depth 0). The height of a node is the number of edges on the LONGEST path from the node down to a leaf (leaves have height 0). The height of the tree is the height of the root, which also equals the maximum depth in the tree. Depth is measured 'top-down', height 'bottom-up'.",
+    "key_points": [
+      "Depth: edges from the root down to the node",
+      "Height: edges on the longest path from the node to a leaf; tree height = root height"
+    ],
+    "id": "Q_DSA_166"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "General trees and the left-child right-sibling representation",
+    "difficulty": "Easy",
+    "question": "How can a general tree (each node with an unbounded number of children) be represented using nodes with only two pointers?",
+    "reference_answer": "Use the 'left-child, right-sibling' representation: each node has a pointer to its FIRST CHILD and a pointer to its NEXT SIBLING (the node with the same parent right after it). To traverse a node's children, go to the first child and then follow the chain of sibling pointers. This gives every node a fixed size regardless of its number of children and effectively turns a general tree into a binary tree.",
+    "key_points": [
+      "Each node keeps pointers to its first child and next sibling",
+      "Nodes have a fixed size; a general tree is represented as a binary tree"
+    ],
+    "id": "Q_DSA_167"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Weighted graphs",
+    "difficulty": "Easy",
+    "question": "What is a weighted graph? Give a real-world example.",
+    "reference_answer": "A weighted graph is a graph where each edge is assigned a numeric value (weight) representing the cost, distance, time or capacity of that connection. Examples: a road map with cities as vertices, roads as edges and kilometers as weights; a computer network with latency as weights. Shortest path and minimum spanning tree problems operate on weighted graphs.",
+    "key_points": [
+      "Each edge carries a weight such as distance, cost or time",
+      "The basis for shortest path and minimum spanning tree problems"
+    ],
+    "id": "Q_DSA_168"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Directed Acyclic Graph (DAG)",
+    "difficulty": "Easy",
+    "question": "What is a directed acyclic graph (DAG)? Give an application example.",
+    "reference_answer": "A DAG (Directed Acyclic Graph) is a directed graph with no cycles — you cannot start from a vertex, follow edge directions and return to it. DAGs naturally represent dependencies or orderings: course prerequisites, project tasks (task B starts only after A), software builds, Git commit history. A topological sort always exists for a DAG.",
+    "key_points": [
+      "A DAG is a directed graph without cycles",
+      "Represents dependencies: prerequisites, project tasks, builds; always topologically sortable"
+    ],
+    "id": "Q_DSA_169"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Vertex degree",
+    "difficulty": "Easy",
+    "question": "What is the degree of a vertex? In a directed graph, how do in-degree and out-degree differ?",
+    "reference_answer": "In an undirected graph, the degree of a vertex is the number of edges incident to it. The sum of all degrees equals twice the number of edges (each edge is counted at both ends). In a directed graph, in-degree is the number of edges coming INTO the vertex, and out-degree the number of edges going OUT. For example, on a one-way follow social network, in-degree is your number of followers and out-degree the number of people you follow.",
+    "key_points": [
+      "Degree is the number of incident edges; total degree = 2 × edges in undirected graphs",
+      "Directed graphs: in-degree counts incoming edges, out-degree outgoing"
+    ],
+    "id": "Q_DSA_170"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Paths, simple paths and cycles",
+    "difficulty": "Easy",
+    "question": "Distinguish the concepts of path, simple path and cycle in a graph.",
+    "reference_answer": "A path is a sequence of vertices where consecutive vertices are connected by an edge. A simple path is a path that repeats no vertex. A cycle is a path whose first and last vertices coincide (with at least one edge; in undirected graphs usually requiring at least 3 distinct vertices and no repeated edges). The length of a path is the number of edges (or the total weight in weighted graphs).",
+    "key_points": [
+      "Path: a sequence of vertices joined by edges; simple path: no repeated vertex",
+      "Cycle: a path returning to its starting vertex"
+    ],
+    "id": "Q_DSA_171"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Connected graphs",
+    "difficulty": "Easy",
+    "question": "When is an undirected graph connected?",
+    "reference_answer": "An undirected graph is connected when there is at least one path between EVERY pair of vertices. If not connected, the graph consists of several connected components — each a maximal group of mutually connected vertices. Connectivity can be checked with one BFS/DFS from any vertex: the graph is connected if and only if the traversal visits every vertex.",
+    "key_points": [
+      "Connected: every pair of vertices has a path",
+      "Check with one BFS/DFS visiting all vertices"
+    ],
+    "id": "Q_DSA_172"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "A tree as a special graph",
+    "difficulty": "Easy",
+    "question": "Why does a tree with n vertices always have exactly n - 1 edges?",
+    "reference_answer": "A tree is a connected undirected graph with no cycles. Proof by induction: a 1-vertex tree has 0 edges; every tree with at least 2 vertices has a leaf (a vertex of degree 1); removing that leaf and its edge gives a tree with n - 1 vertices, which by the induction hypothesis has n - 2 edges, so the original tree has n - 1 edges. Consequences: adding any edge to a tree creates a cycle, removing any edge disconnects it.",
+    "key_points": [
+      "A tree: connected, acyclic, always n - 1 edges",
+      "Adding an edge creates a cycle, removing one disconnects it"
+    ],
+    "id": "Q_DSA_173"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Sparse and dense graphs",
+    "difficulty": "Easy",
+    "question": "Distinguish sparse and dense graphs. How does this affect the choice of representation?",
+    "reference_answer": "A graph with V vertices can have up to about V² edges. A sparse graph has far fewer edges than V² (often E is around V, like road networks or social networks — each person knows a few hundred out of billions). A dense graph has E close to V². Sparse graphs should be represented with adjacency lists (O(V + E) memory); dense graphs can use an adjacency matrix (O(V²)) for O(1) edge checks.",
+    "key_points": [
+      "Sparse: E much smaller than V²; dense: E close to V²",
+      "Sparse graphs use adjacency lists, dense graphs can use adjacency matrices"
+    ],
+    "id": "Q_DSA_174"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Sorting",
+    "concept": "Shell Sort",
+    "difficulty": "Easy",
+    "question": "How does Shell Sort improve on Insertion Sort?",
+    "reference_answer": "Insertion Sort is slow when elements are far from their correct positions because each move shifts them only one step. Shell Sort performs Insertion Sort on subsequences of elements a large gap apart, letting elements move far quickly; then it decreases the gap down to 1 (the last pass is ordinary Insertion Sort on a nearly sorted array). The complexity depends on the gap sequence and is usually much better than O(n²).",
+    "key_points": [
+      "Insertion sort on elements a large gap apart, then shrinking the gap to 1",
+      "Lets elements move far quickly; performance depends on the gap sequence"
+    ],
+    "id": "Q_DSA_175"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Sorting",
+    "concept": "Bucket Sort",
+    "difficulty": "Easy",
+    "question": "Describe the idea of Bucket Sort and the condition for it to be efficient.",
+    "reference_answer": "Bucket Sort divides the value range into k equal 'buckets', distributes each element into the bucket corresponding to its value, sorts each bucket separately (often with Insertion Sort), then concatenates the buckets in order. It is efficient (near O(n) on average) when data is relatively UNIFORMLY distributed over a known range, e.g., real numbers in [0, 1). If data piles into a few buckets, performance degrades to that of the algorithm used inside the buckets.",
+    "key_points": [
+      "Distribute elements into buckets by value, sort each bucket, then concatenate",
+      "Efficient when data is uniformly distributed over a known range"
+    ],
+    "id": "Q_DSA_176"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Array",
+    "concept": "Reversing an array in place",
+    "difficulty": "Easy",
+    "question": "Describe how to reverse an array in place and its complexity.",
+    "reference_answer": "Use two indices: left starting at 0 and right at n - 1. While left < right: swap a[left] and a[right], then increment left and decrement right. Each symmetric pair is swapped exactly once. Time complexity O(n) (n/2 swaps), extra memory O(1) since only a few variables are used.",
+    "key_points": [
+      "Two indices move from both ends toward the middle, swapping pairs",
+      "O(n) time, O(1) extra memory"
+    ],
+    "id": "Q_DSA_177"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Array",
+    "concept": "Prefix sum arrays",
+    "difficulty": "Easy",
+    "question": "What is a prefix sum array and which queries does it answer quickly?",
+    "reference_answer": "A prefix sum array P is computed once with P[0] = 0 and P[i] = P[i-1] + a[i-1], i.e., P[i] is the sum of the first i elements. After O(n) preprocessing, the sum of any subarray a[l..r] is computed in O(1) as P[r+1] - P[l]. Very useful for many range-sum queries on an UNCHANGING array. It extends to 2D arrays to compute rectangle sums.",
+    "key_points": [
+      "P[i] is the sum of the first i elements, O(n) preprocessing",
+      "Range sum [l, r] = P[r+1] - P[l] in O(1); suits static arrays"
+    ],
+    "id": "Q_DSA_178"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Searching",
+    "concept": "Interpolation search",
+    "difficulty": "Easy",
+    "question": "How does interpolation search differ from binary search in choosing the comparison position?",
+    "reference_answer": "Binary search always compares with the MIDDLE element of the range. Interpolation search estimates the key's position from its value, like opening a dictionary near the end when looking for 'X': pos = lo + (key - a[lo]) × (hi - lo) / (a[hi] - a[lo]). For sorted arrays with uniformly distributed values, the average complexity is only O(log log n); but with skewed distributions the worst case degrades to O(n).",
+    "key_points": [
+      "Estimates the position from the key's value instead of taking the midpoint",
+      "Average O(log log n) with uniform data, worst case O(n)"
+    ],
+    "id": "Q_DSA_179"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Searching",
+    "concept": "Jump Search",
+    "difficulty": "Easy",
+    "question": "How does Jump Search search a sorted array and what is its complexity?",
+    "reference_answer": "Jump Search jumps through the array in blocks of size m (usually m = √n), checking the last element of each block until it finds a block whose last element is ≥ the key; then it searches linearly within that block. The total number of steps is about n/m + m, minimized when m = √n, so the complexity is O(√n) — slower than binary search but only moving forward (useful when moving backward is expensive, as on tape or skip-linked lists).",
+    "key_points": [
+      "Jump in blocks of √n then search linearly within the block",
+      "O(√n); useful when moving backward is costly"
+    ],
+    "id": "Q_DSA_180"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "The call stack and stack overflow",
+    "difficulty": "Easy",
+    "question": "What role does the call stack play when executing recursive functions, and when does a stack overflow error occur?",
+    "reference_answer": "Each function call pushes a 'frame' (stack frame) containing parameters, local variables and the return address onto the call stack; when the function ends, the frame is popped. With recursion, each level occupies a frame, so recursion depth n costs O(n) stack memory. The call stack has a limited size (usually a few MB); when recursion is too deep (missing base case, or large inputs such as recursively traversing a 1-million-element linked list), the stack fills up causing a stack overflow.",
+    "key_points": [
+      "Each recursive call creates a stack frame; depth n costs O(n) memory",
+      "Stack overflow occurs with excessive depth or a missing base case"
+    ],
+    "id": "Q_DSA_181"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Memoization",
+    "difficulty": "Easy",
+    "question": "What is memoization and when does it speed up a recursive algorithm?",
+    "reference_answer": "Memoization stores the results of function calls keyed by their input parameters (usually in a hash table or array); when the function is called again with the same parameters, the stored result is returned immediately instead of recomputing. It only helps when the recursive algorithm has OVERLAPPING SUBPROBLEMS (the same subproblem solved many times) and the function is pure (same input always gives the same result, no side effects).",
+    "key_points": [
+      "Memoization stores results by parameters to avoid recomputation",
+      "Effective with overlapping subproblems and pure functions"
+    ],
+    "id": "Q_DSA_182"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Greedy Algorithms",
+    "concept": "Huffman coding",
+    "difficulty": "Easy",
+    "question": "What is Huffman coding used for and what greedy strategy is it based on?",
+    "reference_answer": "Huffman coding is used for lossless data compression by assigning variable-length binary codes to characters: frequent characters get short codes, rare ones long codes; the codes are prefix codes (no code is a prefix of another), so decoding is unambiguous. Greedy strategy: repeatedly pick the two nodes with the SMALLEST frequencies (using a priority queue), merge them into a parent node whose frequency is their sum, until one tree remains; a character's code is the path from the root to its leaf (left 0, right 1).",
+    "key_points": [
+      "Huffman compresses losslessly with frequency-based variable-length prefix codes",
+      "Greedy: repeatedly merge the two least frequent nodes using a priority queue"
+    ],
+    "id": "Q_DSA_183"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "String",
+    "concept": "Checking palindromes with two pointers",
+    "difficulty": "Easy",
+    "question": "Describe how to check whether a string is a palindrome using O(1) extra memory.",
+    "reference_answer": "Use two pointers: i at the start and j at the end of the string. While i < j: if s[i] differs from s[j], conclude it is not a palindrome; otherwise increment i and decrement j. If the loop ends without finding a mismatched pair, the string is a palindrome. Complexity O(n) time and O(1) extra memory. If punctuation and case must be ignored, skip non-alphanumeric characters and compare after converting to lowercase.",
+    "key_points": [
+      "Two pointers move inward from both ends comparing characters",
+      "O(n) time, O(1) memory; normalize if punctuation/case should be ignored"
+    ],
+    "id": "Q_DSA_184"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "String",
+    "concept": "Checking whether two strings are anagrams",
+    "difficulty": "Easy",
+    "question": "How can you check whether two strings are anagrams of each other — containing the same characters with the same counts — in O(n) time?",
+    "reference_answer": "Approach 1 (frequency counting): if the lengths differ they are not anagrams; use a count array (for small alphabets) or a hash table, incrementing for each character of the first string and decrementing for each character of the second; finally all counts must be 0. Complexity O(n). Approach 2: sort both strings and compare, simple but O(n log n).",
+    "key_points": [
+      "Count character frequencies with an array/hash table, incrementing for one string and decrementing for the other",
+      "Counting is O(n); sorting and comparing is O(n log n)"
+    ],
+    "id": "Q_DSA_185"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Bit manipulation: checking powers of two",
+    "difficulty": "Easy",
+    "question": "Why does the expression n > 0 && (n & (n - 1)) == 0 check whether n is a power of two?",
+    "reference_answer": "A power of two has exactly ONE 1-bit in binary (e.g., 8 = 1000). Subtracting 1 turns that bit into 0 and all lower bits into 1 (7 = 0111). The AND of the two numbers is 0. For a number that is not a power of two (with two or more 1-bits), subtracting 1 only changes the bits from the lowest 1-bit downward, while higher 1-bits remain, so the AND is non-zero. The condition n > 0 excludes 0. The operation is O(1).",
+    "key_points": [
+      "A power of two has exactly one 1-bit; n - 1 flips that bit and the lower bits",
+      "n & (n - 1) clears the lowest 1-bit; it is 0 only when there is a single 1-bit"
+    ],
+    "id": "Q_DSA_186"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Array",
+    "concept": "Finding the single element with XOR",
+    "difficulty": "Easy",
+    "question": "Given an array where every element appears exactly twice except one that appears once, how do you find it in O(n) time and O(1) memory?",
+    "reference_answer": "XOR all the elements of the array. XOR is commutative and associative, x ^ x = 0 and x ^ 0 = x. Therefore identical pairs cancel to 0 and the final result is the element that appears once. Only one accumulator variable is needed, so memory is O(1), and one pass gives O(n) time.",
+    "key_points": [
+      "XOR all elements: identical pairs cancel to 0",
+      "The result is the single element; O(n) time, O(1) memory"
+    ],
+    "id": "Q_DSA_187"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Euclid's algorithm for the greatest common divisor",
+    "difficulty": "Easy",
+    "question": "Which property is Euclid's algorithm for the greatest common divisor (GCD) based on? What is its complexity?",
+    "reference_answer": "It is based on gcd(a, b) = gcd(b, a mod b) for b ≠ 0, and gcd(a, 0) = a. Iterate (or recurse) until the second number becomes 0. Example: gcd(48, 18) = gcd(18, 12) = gcd(12, 6) = gcd(6, 0) = 6. The complexity is O(log(min(a, b))) because after every two steps the larger number at least halves.",
+    "key_points": [
+      "gcd(a, b) = gcd(b, a mod b), stopping when the second number is 0",
+      "Complexity O(log min(a, b))"
+    ],
+    "id": "Q_DSA_188"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Sieve of Eratosthenes",
+    "difficulty": "Easy",
+    "question": "Describe the Sieve of Eratosthenes for finding all primes up to n.",
+    "reference_answer": "Create a marking array from 2 to n, initially treating everything as prime. For each number p from 2 onward still marked prime, cross out (mark as composite) all multiples of p starting from p² (smaller multiples were already crossed out by smaller primes). Only p up to √n needs to be considered. The numbers left unmarked are prime. Complexity O(n log log n), memory O(n).",
+    "key_points": [
+      "Cross out multiples of each prime p starting from p², considering p up to √n",
+      "Complexity O(n log log n), memory O(n)"
+    ],
+    "id": "Q_DSA_189"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Fast (binary) exponentiation",
+    "difficulty": "Easy",
+    "question": "How can a^n be computed in O(log n) multiplications instead of n?",
+    "reference_answer": "Use fast exponentiation based on the binary representation of n: if n is even, a^n = (a^(n/2))²; if n is odd, a^n = a × a^(n-1). Iterative version: result = 1; while n > 0: if the lowest bit of n is 1, multiply result by a; square a; shift n right by one bit. Each step halves n, so only O(log n) multiplications are needed. It is often combined with taking a modulo at each step to avoid overflow when computing a^n mod m.",
+    "key_points": [
+      "Based on the binary representation of the exponent: square, and multiply when the bit is 1",
+      "O(log n) multiplications; combine with modulo to avoid overflow"
+    ],
+    "id": "Q_DSA_190"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Modular arithmetic and overflow",
+    "difficulty": "Easy",
+    "question": "When a problem asks to output the result 'modulo 10^9 + 7', why should the modulo be taken at every step rather than only at the end?",
+    "reference_answer": "Intermediate results (counts, factorials, powers) can far exceed the range of 64-bit integers, overflowing and producing wrong results. Thanks to (a + b) mod m = ((a mod m) + (b mod m)) mod m and (a × b) mod m = ((a mod m) × (b mod m)) mod m, we can take the modulo after each addition/multiplication to keep intermediate values below m without changing the final result. With m ≈ 10^9, the product of two numbers below m still fits in 64 bits.",
+    "key_points": [
+      "Large intermediate values overflow integer types",
+      "Modular properties of addition/multiplication allow taking the modulo at each step without changing the result"
+    ],
+    "id": "Q_DSA_191"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Sorting",
+    "concept": "Sorting by multiple criteria",
+    "difficulty": "Easy",
+    "question": "How do you sort a list of students by score descending, and by name ascending for equal scores?",
+    "reference_answer": "Use a lexicographic comparison over the tuple of criteria: compare scores first (reversed for descending); only when scores are equal compare names. Python example: sorted(students, key=lambda s: (-s.score, s.name)); Java: Comparator.comparing(Student::getScore).reversed().thenComparing(Student::getName). Alternatively, sort several times with a STABLE algorithm in reverse priority order: first by name, then by score.",
+    "key_points": [
+      "Compare by a tuple of criteria in priority order (lexicographic)",
+      "Or apply stable sorts repeatedly from the secondary to the primary criterion"
+    ],
+    "id": "Q_DSA_192"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Searching",
+    "concept": "Lower bound and upper bound variants",
+    "difficulty": "Easy",
+    "question": "In a sorted array with duplicates, what are the lower bound and upper bound of a value x? Apply them to count occurrences of x.",
+    "reference_answer": "The lower bound is the FIRST position with an element ≥ x; the upper bound is the first position with an element > x. Both can be found with binary search variants in O(log n). The number of occurrences of x equals upper_bound(x) - lower_bound(x). Example array [1, 2, 2, 2, 5], x = 2: lower bound = 1, upper bound = 4, occurrences = 3.",
+    "key_points": [
+      "Lower bound: first position ≥ x; upper bound: first position > x",
+      "Occurrences = upper - lower, computed in O(log n)"
+    ],
+    "id": "Q_DSA_193"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Searching",
+    "concept": "The loop condition in binary search",
+    "difficulty": "Easy",
+    "question": "In a binary search implementation using lo = 0, hi = n - 1, why is the loop condition while (lo <= hi) rather than lo < hi, and why are the updates lo = mid + 1, hi = mid - 1?",
+    "reference_answer": "With hi = n - 1, the search range is the CLOSED interval [lo, hi], so when lo = hi there is still one element to check — using lo < hi would skip it. Since a[mid] has already been compared and is not the answer, the next range excludes mid entirely: lo = mid + 1 or hi = mid - 1; writing lo = mid can loop forever when lo and hi are adjacent. General rule: choose an invariant (closed interval or half-open [lo, hi)) and keep both the stop condition and the updates consistent with it.",
+    "key_points": [
+      "A closed interval [lo, hi] still has one element when lo = hi, so use lo <= hi",
+      "Exclude mid with mid ± 1 to avoid infinite loops; keep the invariant consistent"
+    ],
+    "id": "Q_DSA_194"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "Detecting duplicates with a hash set",
+    "difficulty": "Easy",
+    "question": "How do you check whether an array contains duplicates in O(n) average time?",
+    "reference_answer": "Traverse the array using a hash set of elements seen so far: for each element, if it is already in the set, there is a duplicate; otherwise add it. Each check/insert is O(1) on average, totaling O(n) time and O(n) memory. Compared with sorting and then comparing adjacent elements (O(n log n) time, possibly O(1) extra memory), the hash set is faster but uses more memory.",
+    "key_points": [
+      "Traverse the array, checking and adding elements to a hash set",
+      "O(n) time, O(n) memory; a trade-off against sorting at O(n log n)"
+    ],
+    "id": "Q_DSA_195"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Linked List",
+    "concept": "Finding the middle node with fast/slow pointers",
+    "difficulty": "Easy",
+    "question": "How do you find the middle node of a singly linked list in a SINGLE pass?",
+    "reference_answer": "Use two pointers starting at the head: the slow pointer moves 1 step at a time, the fast pointer 2 steps. When the fast pointer reaches the end of the list (or null), the slow pointer has traveled half the distance and is at the middle node. Complexity O(n) time, O(1) memory, without knowing the list length in advance.",
+    "key_points": [
+      "The slow pointer moves 1 step, the fast pointer 2 steps",
+      "When the fast one reaches the end, the slow one is in the middle; one pass, O(1) memory"
+    ],
+    "id": "Q_DSA_196"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Linked List",
+    "concept": "Detecting a cycle in a linked list (Floyd)",
+    "difficulty": "Easy",
+    "question": "How does Floyd's algorithm (tortoise and hare) detect whether a linked list has a cycle?",
+    "reference_answer": "Use two pointers: the tortoise moves 1 step, the hare 2 steps each time. If the list has no cycle, the hare reaches null and stops. If there is a cycle, both eventually enter the loop; inside it, the distance between the hare and the tortoise decreases by 1 each step, so the hare is guaranteed to catch up with the tortoise. The algorithm is O(n) time, O(1) memory (instead of using a hash set of visited nodes costing O(n)).",
+    "key_points": [
+      "The tortoise moves 1 step, the hare 2; without a cycle the hare reaches null",
+      "With a cycle the two pointers must meet; O(n) time, O(1) memory"
+    ],
+    "id": "Q_DSA_197"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Linked List",
+    "concept": "Reversing a singly linked list",
+    "difficulty": "Easy",
+    "question": "Describe the iterative algorithm for reversing a singly linked list.",
+    "reference_answer": "Use three pointers: prev = null, curr = head. While curr is not null: save next = curr.next; reverse the link curr.next = prev; advance prev = curr, curr = next. When done, prev is the new head of the list. Saving next before reversing is mandatory, otherwise the rest of the list is lost. Complexity O(n) time, O(1) memory.",
+    "key_points": [
+      "Use prev, curr, next; save next before reversing curr.next",
+      "At the end prev is the new head; O(n) time, O(1) memory"
+    ],
+    "id": "Q_DSA_198"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Linked List",
+    "concept": "Sentinel (dummy) nodes",
+    "difficulty": "Easy",
+    "question": "Why do linked list operations (such as deleting elements or merging two lists) often use a dummy node placed before the head?",
+    "reference_answer": "Many operations must handle special cases when changing the head itself (deleting the head, empty lists, inserting at the front). Placing a dummy node before the head gives EVERY real node a predecessor, so the same code works for every position, removing special-case branches and reducing bugs. The result returned is dummy.next. The cost is just one extra node.",
+    "key_points": [
+      "A dummy node before the head gives every real node a predecessor",
+      "Removes special handling for the head/empty list; return dummy.next"
+    ],
+    "id": "Q_DSA_199"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Linear and non-linear data structures",
+    "difficulty": "Easy",
+    "question": "Distinguish linear and non-linear data structures, with examples of each.",
+    "reference_answer": "Linear data structures arrange elements in a sequence, where each element (except the first and last) has exactly one predecessor and one successor, so all can be traversed in a single sequential pass: arrays, linked lists, stacks, queues. Non-linear structures organize elements hierarchically or as networks, where an element can be connected to several others: trees, heaps, graphs. Non-linear structures need dedicated traversal strategies such as DFS, BFS and tree traversal orders.",
+    "key_points": [
+      "Linear: elements in sequence, each with one predecessor and one successor (arrays, lists, stacks, queues)",
+      "Non-linear: hierarchical or network relationships (trees, heaps, graphs), needing dedicated traversals"
+    ],
+    "id": "Q_DSA_200"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Queue",
+    "concept": "Implementing a Queue with two Stacks",
+    "difficulty": "Medium",
+    "question": "Describe how to implement a Queue with two Stacks and prove each operation has amortized O(1) cost.",
+    "reference_answer": "Use an input stack (S_in) and an output stack (S_out). Enqueue: push onto S_in. Dequeue: if S_out is empty, pop every element from S_in and push it onto S_out (reversing the order, so the earliest element is now on top of S_out), then pop from S_out. A single dequeue may cost O(n) when transferring, but over its lifetime each element is pushed onto S_in once, moved to S_out once and popped from S_out once — at most about 4 basic operations. So the total cost of m operations is O(m), i.e., amortized O(1) per operation.",
+    "key_points": [
+      "Enqueue onto S_in; dequeue from S_out, transferring all of S_in only when S_out is empty",
+      "Each element moves a constant number of times, so the amortized cost is O(1)"
+    ],
+    "id": "Q_DSA_201"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Stack",
+    "concept": "Min-Stack with O(1) minimum",
+    "difficulty": "Medium",
+    "question": "Design a Stack supporting push, pop, top and getMin all in O(1).",
+    "reference_answer": "Use an auxiliary stack (minStack) in parallel: when pushing x, push x onto the main stack and push min(x, top of minStack) onto minStack (or only push when x ≤ top of minStack to save space). When popping, pop from both stacks (or pop minStack only when the removed element equals its top). getMin returns the top of minStack. Key idea: at each stack state, the minimum of the elements below is fixed until they are popped, so it can be recorded at push time.",
+    "key_points": [
+      "Use an auxiliary stack storing the minimum at each level of the main stack",
+      "Push/pop both in sync, getMin reads the auxiliary top — all O(1)"
+    ],
+    "id": "Q_DSA_202"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Stack",
+    "concept": "Monotonic stack",
+    "difficulty": "Medium",
+    "question": "How is a monotonic stack used to find the 'next greater element' for each element of an array in O(n)?",
+    "reference_answer": "Traverse the array from left to right, maintaining a stack of indices of elements that have NOT yet found their next greater element, with values decreasing from bottom to top. For the current element a[i]: while the stack is non-empty and a[top] < a[i], a[i] is the next greater element of top — record it and pop. Then push i. Indices left in the stack at the end have no greater element (assign -1). Each index is pushed and popped at most once, so the total is O(n) instead of O(n²) with two nested loops.",
+    "key_points": [
+      "The stack keeps unanswered indices with decreasing values",
+      "A new element pops all smaller ones and is their answer; each index pushed/popped once gives O(n)"
+    ],
+    "id": "Q_DSA_203"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Queue",
+    "concept": "Sliding window maximum with a deque",
+    "difficulty": "Medium",
+    "question": "Given an array of n elements and a window of length k, find the maximum of each window in O(n) using a deque.",
+    "reference_answer": "Maintain a deque of INDICES of elements that could be the maximum of the current or a future window, with values decreasing from front to back. For each i: (1) remove from the front indices that have left the window (≤ i - k); (2) remove from the back indices with values ≤ a[i] — they can never be the maximum because a[i] is larger and lasts longer; (3) append i; (4) when i ≥ k - 1, the window maximum is a[front of deque]. Each index enters and leaves the deque at most once, so the total is O(n), compared with O(n·k) when recomputing the max for each window.",
+    "key_points": [
+      "The deque keeps indices with decreasing values, dropping expired ones at the front and smaller ones at the back",
+      "The front is always the window maximum; each index enters/leaves once, O(n)"
+    ],
+    "id": "Q_DSA_204"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Building a heap in O(n)",
+    "difficulty": "Medium",
+    "question": "Why does building a heap from an array of n elements with 'bottom-up heapify' cost only O(n), while inserting n elements one by one costs O(n log n)?",
+    "reference_answer": "Bottom-up: call sift-down for nodes from the last internal node (index n/2 - 1) back to the root. The cost of sift-down for a node is proportional to its HEIGHT (distance down to the leaves), not its depth. In a complete tree, about n/2 nodes are leaves (cost 0), n/4 have height 1, n/8 height 2... The total cost ≈ n × Σ h/2^(h+1), a series converging to a constant, so the total is O(n). In contrast, inserting one by one uses sift-up, whose cost is proportional to DEPTH; most nodes are at deep levels (about log n), so the total can reach O(n log n).",
+    "key_points": [
+      "Bottom-up uses sift-down, costing by node height; most nodes have small height",
+      "The total Σ n·h/2^(h+1) = O(n); repeated insertion uses sift-up by depth, O(n log n)"
+    ],
+    "id": "Q_DSA_205"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Queue",
+    "concept": "Finding the k largest elements with a size-k heap",
+    "difficulty": "Medium",
+    "question": "Given a very large data stream (not fitting in memory), how do you find the k largest elements? Analyze the complexity.",
+    "reference_answer": "Maintain a MIN-heap of size at most k. For each element x in the stream: if the heap has fewer than k elements, add it; if full and x is larger than the heap's root (the smallest of the current k largest), replace the root with x and sift down. At the end, the heap contains the k largest elements. Complexity O(n log k) time and O(k) memory — much better than sorting everything at O(n log n) and O(n) memory when k is small. Common confusion: finding the k LARGEST uses a MIN-heap, because we need to quickly evict the smallest of the group.",
+    "key_points": [
+      "Maintain a min-heap of k elements, replacing the root when a larger element arrives",
+      "O(n log k) time, O(k) memory; suited for large streams"
+    ],
+    "id": "Q_DSA_206"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Queue",
+    "concept": "Median of a data stream with two heaps",
+    "difficulty": "Medium",
+    "question": "Design a structure supporting adding numbers and querying the current median efficiently.",
+    "reference_answer": "Use two heaps: a 'low' MAX-heap holding the smaller half and a 'high' MIN-heap holding the larger half, with invariants: every element of 'low' ≤ every element of 'high', and their sizes differ by at most 1. Adding x: put it into 'low' if x ≤ top of 'low', otherwise into 'high'; then rebalance by moving the top of the larger heap to the other if the difference exceeds 1. The median is the top of the larger heap (odd count) or the average of both tops (even count). Adding is O(log n), querying O(1).",
+    "key_points": [
+      "A max-heap holds the smaller half, a min-heap the larger half, sizes differing by at most 1",
+      "Insert O(log n); the median is read from the heap tops in O(1)"
+    ],
+    "id": "Q_DSA_207"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "Designing an LRU cache",
+    "difficulty": "Medium",
+    "question": "Design an LRU (Least Recently Used) cache of fixed capacity supporting get and put in O(1).",
+    "reference_answer": "Combine two structures: (1) a hash table mapping key → node in a list, to find elements in O(1); (2) a DOUBLY linked list keeping usage order: the head is the most recently used, the tail the least recently used. get(k): look up the hash table; if present, detach the node and move it to the head (O(1) thanks to prev/next pointers), returning the value. put(k, v): if present, update and move to the head; if absent and the cache is full, remove the tail node (also deleting its key from the hash table), then insert the new node at the head. The doubly linked list is needed to remove an arbitrary node in O(1). Java provides LinkedHashMap with accessOrder = true.",
+    "key_points": [
+      "Hash table for O(1) lookup + doubly linked list for usage order",
+      "get/put move nodes to the head, evict the tail when full; the doubly linked list allows O(1) removal"
+    ],
+    "id": "Q_DSA_208"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Searching",
+    "concept": "Binary search on the answer space",
+    "difficulty": "Medium",
+    "question": "There are n piles of bananas and h hours; each hour a monkey eats at most v bananas from one pile (if a pile has fewer than v, it eats the whole pile and rests the rest of the hour). Find the minimum speed v to finish within h hours. Explain why binary search applies.",
+    "reference_answer": "Instead of searching an array, binary search over the ANSWER SPACE v ∈ [1, max(pile)]. The key condition is MONOTONICITY: if speed v finishes in time, every larger speed does too; the hours needed at speed v are Σ ⌈pile_i / v⌉, computed in O(n). Find the smallest feasible v: if v finishes in time, narrow to the left half (keeping v), otherwise go right. Complexity O(n log M) with M the largest pile. This technique applies to many 'find the minimum/maximum value satisfying a condition' problems as long as the check function is monotonic.",
+    "key_points": [
+      "Binary search over the range of answer values instead of an array",
+      "Requires a monotonic check function; complexity O(n log M)"
+    ],
+    "id": "Q_DSA_209"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Searching",
+    "concept": "Searching a rotated sorted array",
+    "difficulty": "Medium",
+    "question": "A sorted ascending array has been rotated at an unknown position (e.g., [4, 5, 6, 7, 0, 1, 2]), with distinct elements. How do you search for a value in O(log n)?",
+    "reference_answer": "A binary search variant: at each step with mid, at least ONE of the halves [lo, mid] or [mid, hi] is guaranteed sorted. If a[lo] ≤ a[mid], the left half is sorted: if a[lo] ≤ x < a[mid], search left, otherwise right. Otherwise the right half is sorted: if a[mid] < x ≤ a[hi], search right, otherwise left. Each step eliminates half, so O(log n). With duplicates (a[lo] = a[mid] = a[hi]) we cannot tell which half is sorted, and the worst case degrades to O(n).",
+    "key_points": [
+      "At each step one half is guaranteed sorted; check whether x lies in that half",
+      "O(log n) for distinct elements; with duplicates the worst case is O(n)"
+    ],
+    "id": "Q_DSA_210"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Queue",
+    "concept": "Merging k sorted lists",
+    "difficulty": "Medium",
+    "question": "Merge k sorted lists (N elements in total) into one sorted list. Compare merging pairs one after another with using a min-heap.",
+    "reference_answer": "Sequential merging (list 1 with 2, the result with 3, ...): the result list keeps growing, costing O(N·k) in total when lists have similar lengths. Using a min-heap: insert the first element of each list into a heap of size k; repeatedly extract the smallest, append it to the result, and insert the next element from the same list. Each element enters/leaves the heap once at O(log k), totaling O(N log k). Pairwise divide-and-conquer merging (like Merge Sort over the lists) also achieves O(N log k). This is the basis of k-way merge in external sorting.",
+    "key_points": [
+      "Sequential merging costs O(N·k)",
+      "A k-element min-heap or divide-and-conquer merging achieves O(N log k); basis of k-way merge"
+    ],
+    "id": "Q_DSA_211"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Sorting",
+    "concept": "Counting inversions with Merge Sort",
+    "difficulty": "Medium",
+    "question": "The number of inversions of an array is the number of pairs (i, j) with i < j and a[i] > a[j]. How can it be counted in O(n log n) instead of O(n²)?",
+    "reference_answer": "Embed counting into Merge Sort. Inversions = inversions within the left half + within the right half + 'cross' inversions (one element in each half). The halves are counted recursively and are then sorted. During the merge, when an element is taken from the RIGHT half (because it is smaller than the current a[i] of the left half), it is smaller than all remaining elements of the left half (from i to the end, since it is sorted), so add (remaining count in the left half) inversions. The counting cost blends into the O(n) merge step, totaling O(n log n). The inversion count measures 'unsortedness' and equals the number of swaps performed by Bubble Sort.",
+    "key_points": [
+      "Total = inversions in each half + cross inversions, counted during Merge Sort's merge",
+      "When taking from the right half, add the number of remaining left elements; total O(n log n)"
+    ],
+    "id": "Q_DSA_212"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "The Master Theorem",
+    "difficulty": "Medium",
+    "question": "State the Master Theorem for the recurrence T(n) = a·T(n/b) + f(n) and apply it to Merge Sort and binary search.",
+    "reference_answer": "Compare f(n) with n^(log_b a) (the cost of the leaves in the recursion tree): (1) If f(n) = O(n^(log_b a - ε)) — cost concentrated at the leaves — then T(n) = Θ(n^(log_b a)). (2) If f(n) = Θ(n^(log_b a)) — equal cost per level — then T(n) = Θ(n^(log_b a) · log n). (3) If f(n) = Ω(n^(log_b a + ε)) and the regularity condition holds — cost concentrated at the root — then T(n) = Θ(f(n)). Merge Sort: a = 2, b = 2, f(n) = n = n^(log_2 2) → case 2, Θ(n log n). Binary search: a = 1, b = 2, f(n) = 1 = n^0 → case 2, Θ(log n).",
+    "key_points": [
+      "Compare f(n) with n^(log_b a): leaves dominate, balanced, or root dominates",
+      "Merge Sort Θ(n log n) and Binary Search Θ(log n) both fall under case 2"
+    ],
+    "id": "Q_DSA_213"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Karatsuba multiplication",
+    "difficulty": "Medium",
+    "question": "How does Karatsuba's algorithm multiply two n-digit numbers faster than the O(n²) schoolbook method?",
+    "reference_answer": "Split each number into two halves: x = a·10^m + b, y = c·10^m + d. The product xy = ac·10^(2m) + (ad + bc)·10^m + bd normally needs 4 half-size multiplications, giving T(n) = 4T(n/2) + O(n) = O(n²) — no improvement. Karatsuba observes that ad + bc = (a + b)(c + d) - ac - bd, so only 3 multiplications are needed: ac, bd and (a + b)(c + d). The recurrence T(n) = 3T(n/2) + O(n) gives O(n^(log_2 3)) ≈ O(n^1.585). For very large numbers (cryptography, high-precision arithmetic) the improvement is significant; for small numbers overhead makes schoolbook faster, so practical implementations use a cutoff threshold.",
+    "key_points": [
+      "Use (a + b)(c + d) - ac - bd to reduce 4 sub-multiplications to 3",
+      "T(n) = 3T(n/2) + O(n) = O(n^1.585); use a cutoff to schoolbook for small numbers"
+    ],
+    "id": "Q_DSA_214"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Closest pair of points by divide and conquer",
+    "difficulty": "Medium",
+    "question": "Describe the divide-and-conquer algorithm for finding the closest pair among n points in the plane in O(n log n).",
+    "reference_answer": "Sort the points by x, split them in half with a vertical line, recursively find the minimum distances d_left and d_right in the two halves, and set d = min. A closest 'cross' pair (one point in each half) can only lie within a strip of width 2d around the dividing line. Sort the points in the strip by y; each point only needs to be compared with a constant number of following points (at most about 7) because a d × 2d rectangle can only hold a constant number of points pairwise at distance ≥ d. The combine step is O(n) (if a y-sorted list is maintained), so T(n) = 2T(n/2) + O(n) = O(n log n), compared with O(n²) when checking every pair.",
+    "key_points": [
+      "Split by x, solve both halves, only examine the strip of width 2d around the line",
+      "Each strip point is compared with a constant number of following points by y; total O(n log n)"
+    ],
+    "id": "Q_DSA_215"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Backtracking and pruning in the N-Queens problem",
+    "difficulty": "Medium",
+    "question": "In the N-Queens problem, how do you check for conflicts in O(1) when placing each queen, and how does pruning reduce the search space?",
+    "reference_answer": "Place exactly one queen per row, starting from row 0. Use three boolean arrays marking: occupied columns, main diagonals (identified by row - column, offset by n - 1 to be non-negative) and anti-diagonals (row + column). Placing a queen at (r, c) is valid when all three marks are free — an O(1) check; when backtracking, unmark them. Pruning: as soon as a position conflicts, the whole subtree below it is skipped, so the number of states actually explored is far smaller than brute-forcing n^n placements or n! permutations. Further optimizations use bitmasks and symmetry.",
+    "key_points": [
+      "One queen per row; arrays marking columns, (r - c) diagonals and (r + c) diagonals give O(1) checks",
+      "Pruning on conflicts removes entire subtrees, far smaller than brute force"
+    ],
+    "id": "Q_DSA_216"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Generating all subsets with bitmasks",
+    "difficulty": "Medium",
+    "question": "How do you generate all 2^n subsets of an n-element set using bitmasks? When is this approach no longer suitable?",
+    "reference_answer": "Each integer mask from 0 to 2^n - 1 represents a subset: bit i equal to 1 means element i is in the subset. Loop mask from 0 to 2^n - 1 and, for each mask, scan n bits to collect the elements. Total cost O(n·2^n). Pros: simple, non-recursive, easy to use as the state for Bitmask DP. Limitations: the number of subsets grows exponentially, so it is only feasible for small n (about n ≤ 20 - 25), and it is limited by the number of bits in the integer type; larger n requires exploiting problem structure (DP, meet-in-the-middle, pruning).",
+    "key_points": [
+      "Each mask 0..2^n - 1 corresponds to a subset; bit i says whether element i is included",
+      "Cost O(n·2^n), feasible only for small n"
+    ],
+    "id": "Q_DSA_217"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Next permutation algorithm",
+    "difficulty": "Medium",
+    "question": "Describe the algorithm for finding the next lexicographic permutation (next permutation) of a sequence, e.g., [1, 3, 5, 4, 2].",
+    "reference_answer": "(1) From right to left, find the first position i with a[i] < a[i+1] (in the example, i points to 3, since [5, 4, 2] is decreasing). If none exists, the sequence is the largest permutation. (2) From right to left, find the first j with a[j] > a[i] (element 4). (3) Swap a[i] and a[j] → [1, 4, 5, 3, 2]. (4) Reverse the suffix after position i (which is decreasing) to make it increasing → [1, 4, 2, 3, 5]. Complexity O(n) per call, O(1) memory, correctly handling duplicates. Repeating from the ascending sorted sequence generates all permutations in lexicographic order.",
+    "key_points": [
+      "Find the last i with a[i] < a[i+1], the last j with a[j] > a[i], and swap",
+      "Reverse the suffix after i; O(n) per call, handles duplicates"
+    ],
+    "id": "Q_DSA_218"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Topological sort with Kahn's algorithm",
+    "difficulty": "Medium",
+    "question": "Describe Kahn's algorithm (in-degree based) for topological sorting, and how it also detects whether the graph has a cycle.",
+    "reference_answer": "Compute every vertex's in-degree; put all vertices with in-degree 0 (depending on nobody) into a queue. Repeat: take a vertex u out, append it to the result; for each edge u → v, decrement v's in-degree, and if it reaches 0 enqueue v. Complexity O(V + E). If at the end the result has fewer than V vertices, the remaining vertices all have permanently positive in-degree — they lie on (or depend on) a cycle, so the graph is not a DAG. Replacing the queue with a min-heap yields the lexicographically smallest topological order.",
+    "key_points": [
+      "Repeatedly take in-degree-0 vertices and decrement neighbors' in-degrees; O(V + E)",
+      "Fewer than V vertices in the result means a cycle; a min-heap gives the lexicographically smallest order"
+    ],
+    "id": "Q_DSA_219"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Reconstructing shortest paths in Dijkstra",
+    "difficulty": "Medium",
+    "question": "Basic Dijkstra only gives shortest distances. How do you print the actual shortest path from source s to target t?",
+    "reference_answer": "Maintain an additional predecessor array prev[]: whenever an edge u → v reduces the distance (dist[u] + w < dist[v]), besides updating dist[v], set prev[v] = u. After the algorithm finishes, walk back from t following prev[] to s and reverse the resulting sequence to get the path from s to t. If dist[t] is still infinity, there is no path. The prev[] pointers of all vertices form the 'shortest path tree' rooted at s. The extra cost is O(V) memory and O(path length) for reconstruction.",
+    "key_points": [
+      "Store prev[v] = u whenever edge u → v improves dist[v]",
+      "Walk back from t through prev[] and reverse; the pointers form the shortest path tree"
+    ],
+    "id": "Q_DSA_220"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "0-1 BFS",
+    "difficulty": "Medium",
+    "question": "For a graph whose edge weights are only 0 or 1, how do you find shortest paths in O(V + E) instead of Dijkstra's O((V + E) log V)?",
+    "reference_answer": "Use 0-1 BFS with a double-ended queue (deque): when examining an edge u → v with weight w and dist[u] + w < dist[v], update dist[v]; if w = 0 push v to the FRONT of the deque (same distance level as u), if w = 1 push it to the BACK. This keeps the deque holding vertices with non-decreasing distances differing by at most 1, so it acts as a priority queue without a heap. A vertex may be pushed several times but the total cost is O(V + E). Applications: grids where going straight costs 0 and turning costs 1; minimum number of direction changes/walls to break.",
+    "key_points": [
+      "Weight-0 edges push to the front of the deque, weight-1 edges to the back",
+      "The deque acts as a priority queue; total O(V + E)"
+    ],
+    "id": "Q_DSA_221"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Multi-source BFS",
+    "difficulty": "Medium",
+    "question": "In a grid with many hospitals, compute each cell's distance to the NEAREST hospital. Why is running BFS separately from each hospital inefficient, and how does multi-source BFS solve it?",
+    "reference_answer": "Running a separate BFS for each of k hospitals costs O(k·N) where N is the number of cells. Multi-source BFS puts ALL hospitals into the initial queue with distance 0, then runs a normal BFS once. This is equivalent to adding a virtual 'super source' connected to every hospital with weight-0 edges. Since BFS expands layer by layer, the first time a cell is visited gives its distance to the nearest hospital. Total cost O(N). Applications: spreading processes (rotting oranges), distance to the nearest obstacle.",
+    "key_points": [
+      "Put all sources into the initial queue with distance 0 and run BFS once",
+      "Equivalent to adding a virtual super source; O(N) instead of O(k·N)"
+    ],
+    "id": "Q_DSA_222"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Counting islands in a grid (flood fill)",
+    "difficulty": "Medium",
+    "question": "Given an m × n grid of land (1) and water (0), count the islands (land cells connected in 4 directions). Describe the algorithm and implementation caveats.",
+    "reference_answer": "Treat the grid as an implicit graph: each cell is a vertex connected to its 4 neighbors. Scan every cell; when encountering an unvisited land cell, increment the island counter and run DFS/BFS (flood fill) from it to mark all connected land cells as visited. The number of times a flood fill starts equals the number of connected components = the number of islands. Complexity O(m·n). Caveats: check bounds before accessing neighbors; mark cells as visited when pushing them into the queue/stack; for large grids (e.g., 2000 × 2000) recursive DFS can overflow the stack, so use BFS or DFS with an explicit stack; marking directly in the grid is possible if modifying the input is allowed.",
+    "key_points": [
+      "Each unvisited land cell found starts a flood fill marking the whole island and increments the counter",
+      "O(m·n); check bounds, mark on push, avoid deep recursion on large grids"
+    ],
+    "id": "Q_DSA_223"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Shortest paths on a DAG via topological order",
+    "difficulty": "Medium",
+    "question": "Why can shortest paths from one source on a directed acyclic graph (DAG) be found in O(V + E), even with negative weights?",
+    "reference_answer": "Topologically sort the vertices, then process them in that order and 'relax' all outgoing edges of each vertex. Since every edge goes forward in topological order, when processing vertex u all paths into u have already been considered (all vertices before u are finished), so dist[u] is final. Each edge is relaxed exactly once, so O(V + E). There is no non-negative weight requirement as in Dijkstra because there are no cycles. Negating weights (or switching min to max) finds the LONGEST path on a DAG — NP-hard on general graphs but easy on DAGs, used in project scheduling (the critical path).",
+    "key_points": [
+      "Process in topological order and relax edges, each edge once, O(V + E)",
+      "No non-negative weight requirement; switching to max finds the longest path (critical path)"
+    ],
+    "id": "Q_DSA_224"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Cheapest path with at most K edges",
+    "difficulty": "Medium",
+    "question": "Find the cheapest flight route from city A to B with at most K stops. Why does ordinary Dijkstra not solve this correctly, and how does Bellman-Ford with a bounded number of rounds work?",
+    "reference_answer": "Dijkstra optimizes cost while ignoring the number of edges; once a vertex is 'settled' with the minimum cost, that cost may use too many hops, while a more expensive route with fewer hops is the one satisfying the constraint — Dijkstra discards it. Bounded Bellman-Ford: after round i, dist[v] is the minimum cost using at most i edges. Run exactly K + 1 rounds (K stops = K + 1 flights), and in each round relax using a COPY of the previous round's dist — updating in place lets one round relax several consecutive edges and exceed the edge limit. Complexity O(K·E). Alternative: Dijkstra/BFS over states (vertex, edges used).",
+    "key_points": [
+      "Dijkstra ignores the edge-count constraint and may discard valid routes",
+      "Bellman-Ford for K + 1 rounds, each using a copy of the previous dist; O(K·E)"
+    ],
+    "id": "Q_DSA_225"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "Two Sum with a hash table",
+    "difficulty": "Medium",
+    "question": "Given an unsorted array and a target T, find two indices whose values sum to T in O(n). Compare with the two-pointer approach.",
+    "reference_answer": "Traverse the array once with a hash table mapping value → index of elements seen so far. For each a[i], check whether T - a[i] is in the table; if so, return the pair of indices, otherwise add a[i] to the table. Checking before inserting avoids pairing an element with itself. Complexity O(n) average time, O(n) memory. The two-pointer approach requires a sorted array: if sorting is needed first it costs O(n log n) and loses the original indices (which must be stored alongside), but uses O(1) extra memory if the array is already sorted.",
+    "key_points": [
+      "One pass, looking up T - a[i] among seen elements before inserting a[i]",
+      "O(n) time and memory; two pointers need a sorted array, O(1) memory"
+    ],
+    "id": "Q_DSA_226"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Kadane's algorithm for maximum subarray sum",
+    "difficulty": "Medium",
+    "question": "Describe Kadane's algorithm for the maximum sum of a contiguous subarray in O(n), and explain it from a dynamic programming perspective.",
+    "reference_answer": "Let best_end[i] be the maximum sum of a subarray ENDING at i. That subarray is either just a[i], or the best subarray ending at i - 1 extended by a[i]: best_end[i] = max(a[i], best_end[i-1] + a[i]). Meaning: if the accumulated sum so far is negative, drop it and restart from a[i]. The answer is the max of all best_end[i]. Since each step only needs the previous value, two variables suffice: O(1) memory, O(n) time. Note the all-negative case: initialize with a[0] (not 0) to return the largest element rather than an empty subarray.",
+    "key_points": [
+      "best_end[i] = max(a[i], best_end[i-1] + a[i]); the answer is the max over all best_end",
+      "O(n) time, O(1) memory; initialize with a[0] to handle all-negative arrays"
+    ],
+    "id": "Q_DSA_227"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Selecting non-adjacent elements (House Robber)",
+    "difficulty": "Medium",
+    "question": "Given the money in houses arranged in a row, you cannot take from two adjacent houses; find the maximum total. Write the DP formula and extend it to houses arranged in a circle.",
+    "reference_answer": "dp[i] = maximum total considering the first i houses. For house i there are two choices: skip it (dp[i-1]) or take it (dp[i-2] + a[i]), so dp[i] = max(dp[i-1], dp[i-2] + a[i]), with dp[0] = 0, dp[1] = a[1]. Only two variables are needed: O(n) time, O(1) memory. When houses form a circle, the first and last become adjacent, so both cannot be taken: solve two linear problems — excluding the last house (houses 1..n-1) and excluding the first (houses 2..n) — and take the larger result.",
+    "key_points": [
+      "dp[i] = max(dp[i-1], dp[i-2] + a[i]), O(n) time, O(1) memory",
+      "Circular version: solve twice excluding the first or the last house and take the max"
+    ],
+    "id": "Q_DSA_228"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Greedy Algorithms",
+    "concept": "Jump Game with a greedy approach",
+    "difficulty": "Medium",
+    "question": "Given an array a where a[i] is the maximum jump length from position i, check whether the last position is reachable from position 0 in O(n), and explain why greedy is correct.",
+    "reference_answer": "Maintain reach = the farthest reachable position. Iterate i from 0: if i > reach, position i is unreachable, so stop and return false; otherwise update reach = max(reach, i + a[i]); if reach ≥ n - 1 return true. Correctness: the set of reachable positions is always a contiguous range [0, reach] — if position j is reachable, every position before j is too (by jumping shorter), so tracking only the right boundary suffices. There is no need to try every jump combination as DP/brute force does (O(n²) or worse).",
+    "key_points": [
+      "Track the farthest reachable position and stop when i exceeds it",
+      "Correct because reachable positions form a contiguous range; O(n) instead of O(n²) DP"
+    ],
+    "id": "Q_DSA_229"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Sorting",
+    "concept": "Merging overlapping intervals",
+    "difficulty": "Medium",
+    "question": "Given a list of intervals [start, end], merge all overlapping intervals. Describe the algorithm and its complexity.",
+    "reference_answer": "Sort the intervals by start. Traverse them while maintaining the current merged interval: if the next interval's start ≤ the current interval's end, they overlap, so update end = max(both ends) — max is required because a later interval may lie entirely within the previous one; otherwise push the current interval to the result and start a new one. After sorting, comparing only with the last interval in the result suffices because all earlier ones end sooner. Complexity O(n log n) due to sorting; the merging pass is O(n).",
+    "key_points": [
+      "Sort by start, merge when start ≤ current end",
+      "New end = max of both ends; total O(n log n)"
+    ],
+    "id": "Q_DSA_230"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Queue",
+    "concept": "Minimum number of meeting rooms",
+    "difficulty": "Medium",
+    "question": "Given meetings with start and end times, find the minimum number of meeting rooms needed. Present two solutions.",
+    "reference_answer": "Approach 1 (min-heap): sort meetings by start time; keep a min-heap of the end times of rooms in use. For each meeting, if the earliest-ending room (heap top) is free before the start time, reuse it (pop), then push the new end time. The largest heap size is the answer. Approach 2 (sweep line): split into events (time, +1 at start, -1 at end), sort by time (end events before start events at the same time, since the room is freed in time), sweep and track the maximum number of simultaneous meetings. Both are O(n log n). The answer is the maximum number of overlapping intervals at any instant.",
+    "key_points": [
+      "Min-heap of end times: reuse the earliest-free room; the largest heap size is the answer",
+      "Sweep line: +1/-1 events, ends before starts at ties; both O(n log n)"
+    ],
+    "id": "Q_DSA_231"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Array",
+    "concept": "Difference arrays for range updates",
+    "difficulty": "Medium",
+    "question": "You must perform m operations 'add v to every element from l to r' on an n-element array and then print the resulting array. How can you achieve O(n + m) instead of O(n·m)?",
+    "reference_answer": "Use a difference array d with d[i] = a[i] - a[i-1]. Adding v to range [l, r] only changes two positions of the difference array: d[l] += v and d[r+1] -= v — O(1) per operation. After m operations, rebuild the array by taking prefix sums of d: a[i] = a[i-1] + d[i], costing O(n). Total O(n + m). This is the inverse of the prefix sum array. Limitation: it only fits when all updates happen before queries; if updates and queries interleave, a Fenwick tree or segment tree is needed.",
+    "key_points": [
+      "Add to range [l, r] via d[l] += v, d[r+1] -= v in O(1)",
+      "Rebuild with prefix sums O(n); suits updates-then-queries only"
+    ],
+    "id": "Q_DSA_232"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Unbounded Knapsack",
+    "difficulty": "Medium",
+    "question": "How does the recurrence of the unbounded knapsack (each item type can be taken any number of times) differ from 0/1 Knapsack?",
+    "reference_answer": "0/1 Knapsack: dp[i][w] = max(dp[i-1][w], dp[i-1][w - w_i] + v_i) — if item i is taken, move to the subproblem of the items BEFORE i (each item is used once). Unbounded: dp[i][w] = max(dp[i-1][w], dp[i][w - w_i] + v_i) — if item i is taken, stay in row i, allowing item i to be taken again. With a one-dimensional array dp[w] = best value with capacity w, the compact form is dp[w] = max over all items i with w_i ≤ w of dp[w - w_i] + v_i. Complexity O(n·W) (pseudo-polynomial). Applications: rod cutting, coin change with unlimited coins.",
+    "key_points": [
+      "Unbounded stays in row i when taking item i (dp[i][w - w_i]), while 0/1 moves to row i - 1",
+      "One-dimensional form dp[w] = max(dp[w - w_i] + v_i); O(n·W)"
+    ],
+    "id": "Q_DSA_233"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Partitioning an array into two equal-sum subsets",
+    "difficulty": "Medium",
+    "question": "Check whether an array of positive integers can be split into two subsets with equal sums. What problem does it reduce to, and what is the complexity?",
+    "reference_answer": "If the total S is odd it is impossible. If S is even, the problem is equivalent to: does a subset sum to exactly S/2 (Subset Sum) — a form of 0/1 Knapsack. Use a boolean array can[t] = whether sum t is achievable; initialize can[0] = true; for each element x, iterate t DECREASING from S/2 down to x and set can[t] = can[t] or can[t - x] (decreasing so each element is used only once). The answer is can[S/2]. Complexity O(n·S) time, O(S) memory — pseudo-polynomial, efficient when the total is not too large. It can be sped up with a bitset: bits |= bits << x.",
+    "key_points": [
+      "Reduce to Subset Sum with target S/2 (impossible if S is odd)",
+      "Boolean DP iterating t downward per element, O(n·S); optimizable with a bitset"
+    ],
+    "id": "Q_DSA_234"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Longest Palindromic Subsequence",
+    "difficulty": "Medium",
+    "question": "Find the length of the longest palindromic subsequence (not necessarily contiguous) of a string s. Write the DP formula and state its relation to LCS.",
+    "reference_answer": "Let dp[i][j] be the length of the longest palindromic subsequence within s[i..j]. If s[i] = s[j], dp[i][j] = dp[i+1][j-1] + 2 (the two end characters surround an inner palindrome); otherwise dp[i][j] = max(dp[i+1][j], dp[i][j-1]). Base case dp[i][i] = 1. Compute by increasing interval length (or i decreasing, j increasing). Complexity O(n²) time and memory (memory reducible to O(n)). Relation: the answer equals LCS(s, reverse of s). This differs from the longest CONTIGUOUS palindromic substring problem, which has an O(n) solution (Manacher).",
+    "key_points": [
+      "dp[i][j] = dp[i+1][j-1] + 2 if s[i] = s[j], otherwise max(dp[i+1][j], dp[i][j-1])",
+      "O(n²); equals the LCS of s and its reverse"
+    ],
+    "id": "Q_DSA_235"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Word Break",
+    "difficulty": "Medium",
+    "question": "Given a string s and a dictionary, check whether s can be segmented into a sequence of dictionary words. Write the DP formula and analyze the complexity.",
+    "reference_answer": "Let ok[i] = true if the prefix s[0..i) can be segmented. ok[0] = true. ok[i] = true if there exists j < i with ok[j] = true and s[j..i) in the dictionary. The answer is ok[n]. With the dictionary in a hash set, there are O(n²) pairs (j, i), and creating/hashing each substring costs O(length), about O(n³) in the worst case; optimize by only considering j with i - j not exceeding the longest word length L, giving O(n·L²), or use a Trie to walk from position j and find all matching words in one pass. Plain recursion without memoization can blow up exponentially on strings like 'aaaa...ab'.",
+    "key_points": [
+      "ok[i] = exists j with ok[j] and s[j..i) in the dictionary",
+      "Limit word length or use a Trie to optimize; unmemoized recursion can be exponential"
+    ],
+    "id": "Q_DSA_236"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Counting coin change ways: combinations vs permutations",
+    "difficulty": "Medium",
+    "question": "Count the number of ways to make amount S from given denominations (unlimited quantities). Why does the order of the two loops (denominations outer vs amount outer) give two different answers?",
+    "reference_answer": "Use ways[0] = 1. Approach A — outer loop over DENOMINATIONS, inner loop over amounts t increasing: ways[t] += ways[t - c]. Each denomination is 'introduced' in a fixed order, so each multiset of coins is counted exactly once — counting COMBINATIONS (1+2 and 2+1 are the same way). Approach B — outer loop over AMOUNTS, inner loop over denominations: ways[t] = Σ ways[t - c] — at each amount the last coin can be any denomination, so different orders are counted separately — counting PERMUTATIONS/ordered sequences (1+2 differs from 2+1), like the climbing-stairs problem. Both are O(n·S). Determine which one the problem asks for; take a modulo if results are large.",
+    "key_points": [
+      "Denominations in the outer loop: counts combinations (order-independent)",
+      "Amount in the outer loop: counts ordered sequences; both O(n·S)"
+    ],
+    "id": "Q_DSA_237"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Catalan numbers and counting distinct BSTs",
+    "difficulty": "Medium",
+    "question": "How many structurally distinct binary search trees contain the keys 1..n? Derive the recurrence.",
+    "reference_answer": "Let G(n) be the number of distinct BSTs with n keys. Choosing key i as the root: the left subtree contains the i - 1 smaller keys, the right subtree the n - i larger keys; the subtrees are independent, giving G(i-1) × G(n-i) ways. Summing over all root choices: G(n) = Σ_{i=1..n} G(i-1)·G(n-i), with G(0) = G(1) = 1. This is the Catalan sequence: 1, 1, 2, 5, 14, 42..., with closed form C(n) = (2n)! / ((n+1)!·n!), growing roughly like 4^n / n^1.5. Computing via DP takes O(n²). Catalan numbers also count valid parenthesizations, lattice paths not crossing the diagonal, and triangulations of polygons.",
+    "key_points": [
+      "Choosing root i: G(n) = Σ G(i-1)·G(n-i), G(0) = 1",
+      "These are Catalan numbers (2n)!/((n+1)!·n!); they also count valid parentheses and polygon triangulations"
+    ],
+    "id": "Q_DSA_238"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Validating a BST and a common mistake",
+    "difficulty": "Medium",
+    "question": "A BST validation solution only compares each node with its direct left and right children (left < node < right). Why is it wrong? Give the correct approach.",
+    "reference_answer": "The BST property is global: EVERY node in the left subtree must be smaller than the root, not just the direct child. Counterexample: root 10, left child 5, right child of 5 is 15 — every parent-child pair looks 'correct' but 15 lies in the left subtree of 10, violating the property. Correct approach 1: recursively pass a valid range (min, max) to each node; going left updates max = node value, going right updates min = node value; a node outside its range means not a BST. Correct approach 2: in-order traversal checking that values are strictly increasing (only remembering the previous value). Both are O(n). Use sufficiently wide (or null) initial bounds so boundary values of the integer type do not break it.",
+    "key_points": [
+      "Comparing only parent-child pairs misses violations by deeper descendants",
+      "Pass a (min, max) range recursively or check strictly increasing in-order; O(n)"
+    ],
+    "id": "Q_DSA_239"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Lowest common ancestor (LCA) in a BST",
+    "difficulty": "Medium",
+    "question": "How do you find the lowest common ancestor of two nodes p, q in a binary search tree in O(h)?",
+    "reference_answer": "Exploit BST ordering: start from the root; if both p and q are smaller than the current node, the LCA is in the left subtree, so go left; if both are larger, go right; otherwise (p and q are on different sides, or one of them is the current node) the current node is the LCA — the first 'split point' of the two root paths. Complexity O(h) where h is the tree height, O(log n) for balanced trees, O(1) memory iteratively. For a general binary tree (no ordering), a recursive traversal of the whole tree in O(n) is needed.",
+    "key_points": [
+      "From the root: both smaller go left, both larger go right",
+      "The first split point is the LCA; O(h), general trees need O(n)"
+    ],
+    "id": "Q_DSA_240"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Diameter of a tree",
+    "difficulty": "Medium",
+    "question": "The diameter of a binary tree is the length of the longest path between any two nodes. How do you compute it in O(n)?",
+    "reference_answer": "The longest path passes through some 'highest' node u, with length equal to the height of u's left subtree plus the height of its right subtree (in edges, including the edges to u). Use a post-order traversal: the recursive function returns a node's height; at each node, sum the heights of both branches to update a global answer, then return 1 + max(both heights) to the parent. Each node is processed once, so O(n). Common mistake: assuming the diameter always passes through the root. For general trees (as graphs), another method: BFS from any vertex to find the farthest vertex a, then BFS from a to find the farthest vertex b; the a-b distance is the diameter.",
+    "key_points": [
+      "At each node, the path through it = left height + right height; update the answer in post-order",
+      "O(n); the diameter need not pass through the root; general trees can use two BFS passes"
+    ],
+    "id": "Q_DSA_241"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Serializing and deserializing a binary tree",
+    "difficulty": "Medium",
+    "question": "How do you serialize a binary tree to a string and restore it exactly? Why is an in-order sequence alone not enough?",
+    "reference_answer": "A single traversal sequence (in-order or pre-order) does not uniquely determine the tree: many differently shaped trees produce the same in-order sequence (e.g., left-leaning and right-leaning trees with the same keys). A common approach: pre-order traversal recording NULL children with a special marker, e.g., '1,2,#,#,3,4,#,#,#'. To restore, read sequentially: '#' returns null, otherwise create a node and recursively build its left and right subtrees. Both directions are O(n). Alternatives: store pre-order + in-order sequences (with distinct keys), or level-order (BFS) with nulls. For a BST, the pre-order sequence alone suffices because key order determines the structure.",
+    "key_points": [
+      "A traversal without null markers does not uniquely determine a tree",
+      "Pre-order with null markers, read sequentially to rebuild, O(n); BSTs need only pre-order"
+    ],
+    "id": "Q_DSA_242"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Checking height balance in O(n)",
+    "difficulty": "Medium",
+    "question": "A binary tree is height-balanced if at every node the heights of the two subtrees differ by at most 1. Why does computing heights separately at each node cost O(n²) for skewed trees, and what is the optimal approach?",
+    "reference_answer": "Naive approach: at each node call height(left) and height(right), each traversing the whole subtree; for a skewed tree (like a list), the total cost is n + (n-1) + ... = O(n²). Optimal approach: a single post-order traversal where the function returns the node's height, or a special value -1 if the subtree is already unbalanced. At each node: get the left and right heights (if either is -1, return -1 immediately — early exit), if the difference > 1 return -1, otherwise return 1 + max. Each node is visited once, so O(n). This is a general pattern: combine computing information and checking it in the same bottom-up traversal.",
+    "key_points": [
+      "Computing heights separately at each node repeats work, O(n²) for skewed trees",
+      "Post-order returning the height or -1 when unbalanced, with early exit; O(n)"
+    ],
+    "id": "Q_DSA_243"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Augmenting trees with subtree sizes (Order Statistic Tree)",
+    "difficulty": "Medium",
+    "question": "How do you augment a balanced BST to find the k-th smallest element and compute the rank of a value in O(log n)?",
+    "reference_answer": "Store at each node an extra field size = number of nodes in its subtree (size = size(left) + size(right) + 1). Finding the k-th element: at node x with t = size(left): if k = t + 1, x is the answer; if k ≤ t, find the k-th in the left subtree; otherwise find the (k - t - 1)-th in the right subtree. Computing the rank of value v: walk down from the root, adding size(left) + 1 of each node passed whenever going right. Both are O(h) = O(log n) on balanced trees. Requirement: size must be maintained correctly on insertion, deletion and also during rebalancing rotations (affecting only a constant number of nodes).",
+    "key_points": [
+      "Each node stores its subtree size, updated on insert/delete/rotation",
+      "Find the k-th element and compute ranks by descending based on the left subtree size, O(log n)"
+    ],
+    "id": "Q_DSA_244"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "Deletion in Open Addressing and tombstones",
+    "difficulty": "Medium",
+    "question": "In a hash table using Open Addressing (linear probing), why can't an element be deleted by simply making its cell empty? What are the drawbacks of the 'tombstone' solution?",
+    "reference_answer": "A linear-probing search stops at an EMPTY cell, since an empty cell means the key was never placed further along. If element A is deleted by emptying its cell, a key B that collided and was placed after A can no longer be found — the probe chain is broken. Tombstone: mark the cell as 'deleted' — searches treat it as occupied and keep probing, while insertions can reuse it. Drawbacks: tombstones accumulate and lengthen probe chains, slowing searches (especially for absent keys) even when few real elements remain; periodic rehashing is needed to clean them, and the load factor must count tombstones. Alternative: backward-shift deletion (moving subsequent elements back to fill the gap) with linear probing.",
+    "key_points": [
+      "Emptying a cell breaks probe chains, making keys placed after it unfindable",
+      "Tombstones preserve chains but accumulate and slow lookups; rehash periodically or use backward-shift deletion"
+    ],
+    "id": "Q_DSA_245"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "Count-Min Sketch for approximate frequency counting",
+    "difficulty": "Medium",
+    "question": "How does a Count-Min Sketch estimate element frequencies in a very large data stream? What properties does its error have?",
+    "reference_answer": "A Count-Min Sketch is a d × w matrix of counters with d independent hash functions. When element x appears, for each row i increment the counter at column h_i(x). The frequency estimate for x is the MINIMUM of the counters h_i(x) over the d rows. Since other elements may collide into the same counters, each counter can only be greater than or equal to the true frequency, so the estimate never underestimates (only overestimates); taking the min over several rows reduces error. With w = ⌈e/ε⌉ and d = ⌈ln(1/δ)⌉, the error exceeds ε·N (N being the total number of elements) with probability at most δ. Memory depends only on ε and δ, not on the number of distinct elements — suited for counting URL hits and detecting heavy hitters in networks.",
+    "key_points": [
+      "A d × w counter matrix with d hash functions; increment one cell per row, estimate by the min",
+      "Only overestimates, error ≤ εN with probability 1 - δ; memory independent of distinct count"
+    ],
+    "id": "Q_DSA_246"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Array",
+    "concept": "Reservoir sampling",
+    "difficulty": "Medium",
+    "question": "How do you choose k elements uniformly at random from a data stream of unknown length, with a single pass and O(k) memory?",
+    "reference_answer": "Reservoir Sampling: put the first k elements into the 'reservoir'. For the i-th element (i > k, counting from 1), draw a uniform random j in [1, i]; if j ≤ k, replace the j-th element of the reservoir with the i-th element, otherwise skip it. Proof (induction): element i enters the reservoir with probability k/i; afterwards at each step m > i it is replaced with probability (k/m)·(1/k) = 1/m, i.e., survives with probability (m-1)/m; the product of survival probabilities up to n is i/n, multiplied by k/i gives k/n — every element has the same probability k/n. One pass, O(k) memory.",
+    "key_points": [
+      "Keep the first k; element i replaces a random slot with probability k/i",
+      "Every element is selected with probability k/n; one pass, O(k) memory"
+    ],
+    "id": "Q_DSA_247"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Array",
+    "concept": "The Fisher-Yates shuffle",
+    "difficulty": "Medium",
+    "question": "Describe the Fisher-Yates algorithm for uniformly shuffling an array, and why the approach 'for each i, swap a[i] with a[random(0, n-1)]' does not give a uniform distribution.",
+    "reference_answer": "Fisher-Yates: iterate i from n - 1 down to 1, pick j uniformly in [0, i] (including i), and swap a[i] and a[j]. Each step 'fixes' a random element from the remaining ones into position i; the number of possible outcomes is n·(n-1)·...·1 = n!, each permutation produced exactly one way — uniform, O(n). The wrong approach picks j from the whole [0, n-1] at every step, creating n^n equally likely choice sequences; since n^n is usually not divisible by n! (e.g., n = 3: 27 is not divisible by 6), some permutations appear more often than others — a biased distribution. This bug has occurred in practice (online card shuffling). A good random generator and avoiding biased modulo are also needed.",
+    "key_points": [
+      "Iterate i downward, swap a[i] with a[j], j uniform in [0, i]; n! equally likely outcomes",
+      "Choosing j from [0, n-1] creates n^n outcomes not divisible by n!, biasing the distribution"
+    ],
+    "id": "Q_DSA_248"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Las Vegas and Monte Carlo randomized algorithms",
+    "difficulty": "Medium",
+    "question": "Distinguish Las Vegas and Monte Carlo randomized algorithms, with examples of each.",
+    "reference_answer": "Las Vegas: always gives a CORRECT result, but the RUNNING TIME is random (analyzed in expectation). Example: Quick Sort with a random pivot — always sorts correctly, expected time O(n log n). Monte Carlo: the running time is deterministically bounded, but the RESULT may be wrong with a small, controllable probability. Examples: the Miller-Rabin primality test (may wrongly declare a composite prime with probability ≤ 4^(-k) after k rounds), Bloom filters (false positives). Repeating a Monte Carlo algorithm independently reduces the error probability exponentially.",
+    "key_points": [
+      "Las Vegas: always correct, random running time (e.g., randomized Quick Sort)",
+      "Monte Carlo: bounded time, may err with small probability (Miller-Rabin); repeat to reduce error"
+    ],
+    "id": "Q_DSA_249"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "The classes P, NP and NP-complete",
+    "difficulty": "Medium",
+    "question": "Distinguish the problem classes P, NP and NP-complete. What role do reductions play?",
+    "reference_answer": "P is the class of decision problems SOLVABLE in polynomial time. NP is the class of problems for which a proposed solution can be VERIFIED in polynomial time (e.g., checking a filled Sudoku is easy). P ⊆ NP; whether P = NP remains unresolved. NP-complete problems are those in NP that are the 'hardest' in NP: every NP problem reduces to them in polynomial time (SAT, 3-SAT, graph 3-coloring, Hamiltonian cycle, decision TSP). A reduction A ≤p B transforms every instance of A into an instance of B in polynomial time; if B can be solved quickly, so can A. To prove a new problem X is NP-hard, reduce a known NP-complete problem TO X (not the other way round).",
+    "key_points": [
+      "P: solvable in polynomial time; NP: verifiable in polynomial time; NP-complete: in NP and every NP problem reduces to it",
+      "Prove X NP-hard by reducing a known NP-complete problem to X"
+    ],
+    "id": "Q_DSA_250"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Searching",
+    "concept": "Overflow when computing the midpoint in binary search",
+    "difficulty": "Hard",
+    "question": "A binary search implementation with int mid = (lo + hi) / 2; existed for nearly 10 years in the Java standard library before the bug was discovered. Analyze the bug and the fixes.",
+    "reference_answer": "When the array is very large (over about 2^30 elements) and lo, hi are both large, lo + hi can exceed the int limit (2^31 - 1) and overflow to a negative number; a negative mid causes ArrayIndexOutOfBoundsException or wrong behavior. The bug does not appear with ordinary test data, so it survived a long time. Fixes: mid = lo + (hi - lo) / 2 (hi - lo cannot overflow since both are non-negative and hi ≥ lo), or mid = (lo + hi) >>> 1 (Java's unsigned right shift treats the overflowed sum as an unsigned 32-bit number, still correct). Lesson: intermediate arithmetic on indices/sizes must consider overflow, especially as data grows over time; the same applies to mergesort and averaging two numbers.",
+    "key_points": [
+      "lo + hi can overflow int for very large arrays, producing a negative mid",
+      "Use lo + (hi - lo) / 2 or an unsigned shift; always consider overflow in intermediate arithmetic"
+    ],
+    "id": "Q_DSA_251"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Sorting",
+    "concept": "Recursion depth of Quick Sort",
+    "difficulty": "Hard",
+    "question": "Even with a random pivot, recursive Quick Sort can still overflow the stack in the worst case. Analyze and present the technique that bounds stack depth to O(log n).",
+    "reference_answer": "With heavily unbalanced partitions (unlikely but possible, or guaranteed with a fixed pivot on sorted data/all-equal elements under two-way partitioning), each recursion only reduces the size by 1, making recursion depth O(n) — with n = 10 million the stack overflows. Technique: after partitioning, RECURSE into the SMALLER part and handle the larger part with a LOOP (tail-call elimination). Since the smaller part has size at most n/2, each recursion level at least halves the size, so stack depth is only O(log n) regardless of partition imbalance (worst-case time is still O(n²)). Combine with three-way partitioning for duplicates and Introsort (switching to Heap Sort when too deep) to also guarantee time.",
+    "key_points": [
+      "Unbalanced partitions make recursion depth O(n), possibly overflowing the stack",
+      "Recurse into the smaller part and loop on the larger to bound the stack at O(log n); combine with three-way partitioning/Introsort"
+    ],
+    "id": "Q_DSA_252"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "Floating-point keys in hash tables: -0.0 and NaN",
+    "difficulty": "Hard",
+    "question": "Analyze the problems of using floating-point numbers (double) as hash table keys, especially the values 0.0, -0.0 and NaN in Java.",
+    "reference_answer": "For primitives, 0.0 == -0.0 is true but NaN == NaN is false. Meanwhile Double.equals() and hashCode() are based on the bit representation: new Double(0.0).equals(-0.0) is false (different bits, different hash codes) while Double.NaN.equals(Double.NaN) is true. Consequences: map.put(0.0, x) then map.get(-0.0) returns null even though they are 'equal' mathematically; a set using == comparison (e.g., a custom hash table for primitive doubles) can insert infinitely many NaNs because NaN never equals itself, and none can ever be found again. Moreover, rounding errors give two 'equal' computed results different bits. Solutions: avoid floating-point keys; if unavoidable, normalize (convert -0.0 to 0.0, reject NaN), or quantize to integers (multiply by 10^k and round).",
+    "key_points": [
+      "== treats 0.0 equal to -0.0 and NaN unequal to NaN, while bit-based equals/hashCode does the opposite",
+      "Causes missing keys or infinite NaN insertions; avoid float keys or normalize/quantize them"
+    ],
+    "id": "Q_DSA_253"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Recursive DFS on large graphs and switching to an explicit stack",
+    "difficulty": "Hard",
+    "question": "Recursive DFS works on test data but crashes (RecursionError/StackOverflowError) on a path graph of 1 million vertices. Analyze, and state the points to watch when switching to DFS with an explicit stack.",
+    "reference_answer": "DFS recursion depth equals the length of the longest explored path, which can reach V (chain-like graphs), exceeding stack limits (Python's default 1000, a JVM a few tens of thousands of frames). An explicit stack on the heap avoids the limit, but watch out: (1) visiting order changes — neighbors pushed in forward order are popped in reverse, so push in reverse to match the recursive order; (2) marking time: if marking on push, the result is no longer a true DFS order (some algorithms like back-edge detection and Tarjan depend on it); (3) algorithms needing 'on exit' processing (post-order: topological sort, low-link computation) must store state in the frame, e.g., push (vertex, next neighbor index) pairs or push vertices twice with an 'entering/exiting' flag. Raising the recursion limit is only a stopgap and can actually crash the process.",
+    "key_points": [
+      "DFS recursion depth can equal V, exceeding stack limits",
+      "An explicit stack must preserve visit order, marking time and post-order state (vertex, neighbor index)"
+    ],
+    "id": "Q_DSA_254"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Dijkstra with a heap lacking decrease-key",
+    "difficulty": "Hard",
+    "question": "Most heap libraries (such as Python's heapq or Java's PriorityQueue) do not support decrease-key. Analyze the 'lazy deletion' Dijkstra implementation and the common bug of forgetting to check stale entries.",
+    "reference_answer": "Instead of decreasing keys, whenever dist[v] improves we push ANOTHER pair (new dist, v) into the heap; the old pair remains with a larger distance (a stale entry). When popping (d, u), we must check: if d > dist[u] (or u is already settled), skip it. The heap may hold up to O(E) entries, so the complexity is O(E log E) = O(E log V), memory O(E). If the check is forgotten, each stale entry causes u to be processed again and all its edges relaxed again — on dense graphs or with many improvements, the cost can explode (O(E·deg)), and in variants with negative weights (misuse) results can be wrong. This is a common bug making Dijkstra 'correct but slow', hard to detect with small tests.",
+    "key_points": [
+      "Push new entries instead of decrease-key; the heap holds up to O(E) entries, O(E log V)",
+      "Entries with d > dist[u] must be skipped; forgetting causes repeated processing and cost blow-ups"
+    ],
+    "id": "Q_DSA_255"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Adding a constant to negative weights does not preserve shortest paths",
+    "difficulty": "Hard",
+    "question": "To use Dijkstra on a graph with negative edges (no negative cycles), a student adds the constant C = |minimum weight| to EVERY edge to make them non-negative. Why is this wrong, and how does the correct technique (as in Johnson's algorithm) differ?",
+    "reference_answer": "Adding C to every edge increases the cost of a k-edge path by k·C, so paths with MORE edges are penalized more than paths with fewer edges — the order between paths changes. Example: a direct path A→B of weight 1 and a path A→C→B with weights 2 + (-2) = 0; adding C = 2 makes the direct path 3 and the two-edge path 4 + 0 = 4, so Dijkstra picks the direct path — wrong. The correct technique is 'reweighting with potentials': w'(u, v) = w(u, v) + h(u) - h(v), where h is the distance from a virtual vertex computed by Bellman-Ford. Then every path from s to t changes by the SAME amount h(s) - h(t) (intermediate terms cancel telescopically), so the order of paths is preserved, and the triangle inequality guarantees w' ≥ 0.",
+    "key_points": [
+      "Adding a constant penalizes paths with more edges, changing the shortest path",
+      "Reweighting w + h(u) - h(v) shifts every s→t path by the same amount, preserving order and making weights non-negative"
+    ],
+    "id": "Q_DSA_256"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Floating-point error in geometric algorithms",
+    "difficulty": "Hard",
+    "question": "A convex hull algorithm using orientation tests (cross products) with double coordinates sometimes gives wrong results or loops forever on nearly collinear points. Analyze the cause and remedies.",
+    "reference_answer": "The orientation test computes the sign of (b - a) × (c - a) to know whether c is left of, right of, or on line ab. When three points are nearly collinear, the true value is very close to 0 and rounding error can flip the sign; worse, different tests on the same points can give CONTRADICTORY conclusions (a-b-c turns left but b-c-a turns right), breaking invariants the algorithm relies on, leading to wrong hulls, wrongly discarded points or non-terminating loops. Remedies: (1) use integer coordinates and exact arithmetic (int64/BigInteger, integer cross products have no error) — the best option when possible; (2) compare with an epsilon threshold suited to the data magnitude (but epsilon comparisons are not transitive, reducing rather than eliminating contradictions); (3) use adaptive exact predicates (Shewchuk) computing quickly in floating point and switching to exact arithmetic only when the result is near 0.",
+    "key_points": [
+      "Near collinearity, rounding errors flip orientation signs and cause contradictory conclusions",
+      "Use integer coordinates/exact arithmetic, careful epsilons, or adaptive exact predicates"
+    ],
+    "id": "Q_DSA_257"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Shrinking dynamic arrays and thrashing",
+    "difficulty": "Hard",
+    "question": "A dynamic array doubles when full and halves when the number of elements drops to half its capacity. Show a sequence of operations making the amortized cost O(n) per operation, and the correct resizing strategy.",
+    "reference_answer": "Suppose the array has just filled with n elements (capacity n). Adding one element grows it to 2n (copying n); removing one leaves n elements, exactly half the capacity, so it shrinks back to n (copying n); adding again grows it again. An add-remove-add-remove sequence at this threshold makes EVERY operation cost O(n) — thrashing. Cause: the growth and shrink thresholds coincide, with no 'buffer zone'. Correct strategy: double when full, but only halve when the number of elements drops to 1/4 of the capacity. After each resize, the array is half full and needs at least Θ(n) more operations to reach the next threshold — analysis with the potential method shows O(1) amortized cost for both insertion and deletion.",
+    "key_points": [
+      "Coinciding growth (full) and shrink (half) thresholds make alternating add/remove cost O(n) each",
+      "Shrinking at 1/4 capacity creates a buffer zone; the potential method proves O(1) amortized"
+    ],
+    "id": "Q_DSA_258"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "Treeification of buckets in Java's HashMap",
+    "difficulty": "Hard",
+    "question": "Since Java 8, when a HashMap bucket has too many elements it is converted from a linked list into a red-black tree (treeification). Analyze the reason, the conditions and the limits of this mechanism.",
+    "reference_answer": "Reason: to prevent degradation when many keys collide into the same bucket (due to poor hashCode or hash-flooding attacks), turning lookups from O(1) into O(n). Conditions: a bucket has 8 or more elements AND the table capacity is at least 64 (for smaller tables, resizing is preferred); when the count drops to 6 it converts back to a list (hysteresis to avoid oscillation). Lookups within the bucket then cost O(log k). Limits: the tree is ordered by hashCode first; if keys have the SAME hashCode, the tree is only effective when keys implement Comparable (to compare them); otherwise it must tie-break (System.identityHashCode) and searches may have to explore both branches, nearly O(k). Tree nodes use about twice the memory of list nodes. So hashCode quality remains the key factor.",
+    "key_points": [
+      "Treeify prevents O(n) degradation under heavy collisions; threshold 8 elements and table ≥ 64, back to a list at ≤ 6",
+      "Effective for identical hashCodes only when keys are Comparable; more memory; good hashCodes still matter most"
+    ],
+    "id": "Q_DSA_259"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "State space explosion in memoization",
+    "difficulty": "Hard",
+    "question": "A memoized recursive solution uses (index i, list of chosen elements) as the memo key and runs out of memory even though n is only 40. Analyze the cause and the principle for designing DP states.",
+    "reference_answer": "Memoization is only effective when the number of DISTINCT STATES is small and states repeat often. Using the entire list of chosen elements as the key makes almost every call's key different: the number of states can be 2^40 — there is no overlap to exploit, the memo table balloons and is worse than plain recursion, not to mention the cost of hashing a long list at every call. Principle: the state should contain only the MINIMAL INFORMATION affecting future decisions. For Subset Sum, only (i, current sum) is needed, not which elements were chosen — reducing states to n·S. If the future truly depends on the chosen set (TSP), use a bitmask with small n. Also, memo keys must be immutable and hashable (tuples instead of lists).",
+    "key_points": [
+      "A memo key with too much information makes every state distinct, with no overlap and exploding memory",
+      "States should hold only the minimal information affecting the future (i, current sum); keys must be immutable"
+    ],
+    "id": "Q_DSA_260"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "The ascending-loop bug in 1D 0/1 Knapsack",
+    "difficulty": "Hard",
+    "question": "A developer optimizes 0/1 Knapsack memory to a 1D array: for each item (w_i, v_i): for c from w_i to W: dp[c] = max(dp[c], dp[c - w_i] + v_i). The result is larger than the correct answer. Explain.",
+    "reference_answer": "With a 1D array, when computing dp[c] we want dp[c - w_i] to be the value of the PREVIOUS ROW (without item i). Iterating c in INCREASING order means dp[c - w_i] has already been updated in the current loop — so it may already include item i — and dp[c] can use item i again: the algorithm accidentally solves the UNBOUNDED knapsack, giving a larger answer. Fix: iterate c DECREASING from W down to w_i, so dp[c - w_i] (a smaller index) has not been updated in the current pass and still holds the previous row's value. The bug is subtle because the code runs without exceptions and on many small tests the answers happen to match. Prevention: understand the dependencies between cells before compressing dimensions, and cross-check against the 2D version.",
+    "key_points": [
+      "Ascending iteration makes dp[c - w_i] already include item i, turning it into the unbounded problem",
+      "Iterate c descending to read the previous row's values; cross-check with the 2D version when compressing"
+    ],
+    "id": "Q_DSA_261"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Greedy Algorithms",
+    "concept": "Proving greedy correctness with an exchange argument",
+    "difficulty": "Hard",
+    "question": "How is an exchange argument used to prove a greedy algorithm optimal? Illustrate with the maximum number of non-overlapping activities problem (choosing the activity that finishes earliest).",
+    "reference_answer": "Exchange argument: take any optimal solution O; show that its choices can be gradually REPLACED by the greedy algorithm G's choices without making the solution worse, until O becomes G — hence G is also optimal. Illustration: let g be the activity finishing earliest (the greedy choice), and o the earliest-finishing activity in O. Since g finishes no later than o, replacing o with g in O still does not overlap with O's remaining activities (they all start after o finishes, hence after g finishes) and the count is unchanged. So there exists an optimal solution containing g; apply induction to the remaining subproblem (activities starting after g). In contrast, other intuitive criteria (shortest activity, earliest start) fail this argument and have counterexamples.",
+    "key_points": [
+      "Gradually transform an optimal solution into the greedy one without making it worse",
+      "The earliest-finishing activity can replace the first activity of an optimal solution; other criteria have counterexamples"
+    ],
+    "id": "Q_DSA_262"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Weighted Interval Scheduling",
+    "difficulty": "Hard",
+    "question": "When each activity also has a profit and the goal is to maximize total profit (non-overlapping), why does the 'earliest finish' strategy fail, and how does the O(n log n) DP solution work?",
+    "reference_answer": "Greedy by finish time maximizes the NUMBER of activities, ignoring profit: e.g., two short activities with profit 1 each overlapping one long activity with profit 100 — greedy picks the two short ones (total 2). No simple greedy criterion is correct. DP: sort by finish time; for activity j, let p(j) be the index of the last activity finishing no later than j's start (found by binary search). OPT(j) = max(OPT(j-1), profit_j + OPT(p(j))) — either skip j, or take j plus the best compatible solution. Total O(n log n). Trace back to find which activities were chosen.",
+    "key_points": [
+      "Greedy by earliest finish maximizes count, not profit, and has counterexamples",
+      "Sort by finish, OPT(j) = max(OPT(j-1), w_j + OPT(p(j))) with p(j) via binary search; O(n log n)"
+    ],
+    "id": "Q_DSA_263"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Stable matching (Gale-Shapley)",
+    "difficulty": "Hard",
+    "question": "Present the Gale-Shapley algorithm for the stable matching problem between n students and n schools, and analyze the 'proposers benefit' property.",
+    "reference_answer": "A matching is unstable if there exist a student s and a school t not matched together who both prefer each other over their current partners. Algorithm: while some student is free, that student proposes to the highest-ranked school on their list they have not yet proposed to; the school tentatively accepts if empty, or if holding another student keeps the one it prefers and frees the other. Each student proposes to each school at most once, so it ends after at most n² proposals, O(n²). The result is always stable (if s prefers t, s proposed to t earlier and was rejected in favor of someone t prefers). Property: the PROPOSING side gets the best possible partner among all stable matchings, while the RECEIVING side gets the worst possible — who proposes has policy implications (admission systems should let applicants propose). The proposing side also has no incentive to misreport preferences.",
+    "key_points": [
+      "Proposers propose in preference order, receivers keep the best so far; O(n²), always stable",
+      "Proposers get their best stable partner, receivers their worst; affects policy design"
+    ],
+    "id": "Q_DSA_264"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Edmonds-Karp and the role of BFS in maximum flow",
+    "difficulty": "Hard",
+    "question": "Ford-Fulkerson with arbitrary augmenting paths can run very slowly (or not terminate with irrational capacities). How does Edmonds-Karp fix this and what complexity does it achieve?",
+    "reference_answer": "Ford-Fulkerson with arbitrary augmenting paths (e.g., DFS) has an iteration count depending on the VALUE of the maximum flow: the classic example with capacities 10^9 and a capacity-1 edge in the middle can take 2·10^9 augmentations of 1 unit each; with irrational capacities it may not even terminate and can converge to a wrong value. Edmonds-Karp always chooses the SHORTEST augmenting path in number of edges via BFS on the residual graph. It can be proven that the distance (in edges) from the source to each vertex in the residual graph never decreases, and each edge becomes a 'bottleneck' at most O(V) times, so there are O(V·E) augmentations, O(V·E²) total — independent of the capacity values. Faster algorithms like Dinic (O(V²·E), very fast on unit graphs) use level graphs and blocking flows.",
+    "key_points": [
+      "Arbitrary augmenting paths make the iteration count depend on capacities, possibly non-terminating with irrationals",
+      "BFS picks shortest paths, distances never decrease, O(V·E) augmentations, O(V·E²) total; Dinic is faster"
+    ],
+    "id": "Q_DSA_265"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Uniqueness of topological order",
+    "difficulty": "Hard",
+    "question": "How do you check whether a DAG has a UNIQUE topological order, and what is the practical meaning of this question?",
+    "reference_answer": "The topological order is unique if and only if the DAG has a Hamiltonian path (through every vertex) — i.e., every pair of consecutive vertices in the topological order is directly connected by an edge. Check with Kahn's algorithm: if at any step the queue contains two or more in-degree-0 vertices, there are two valid choices and the order is not unique. Or compute a topological order and check that each consecutive pair (v_i, v_{i+1}) has an edge. Both are O(V + E). Meaning: in build/scheduling systems, multiple valid orders mean independent tasks can run in parallel; in order-inference problems (recovering an alien alphabet from a dictionary, ranking from comparison results), a non-unique order means the data is insufficient to conclude.",
+    "key_points": [
+      "Unique topological order ⇔ the DAG has a Hamiltonian path; Kahn's queue never holds ≥ 2 vertices",
+      "Multiple orders mean tasks can run in parallel or data is insufficient to determine the order"
+    ],
+    "id": "Q_DSA_266"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Pitfall when converting DFS to a stack: marking on push vs pop",
+    "difficulty": "Hard",
+    "question": "A DFS version using a stack marks vertices 'visited' as soon as they are PUSHED (like BFS). Analyze why the resulting order is no longer a true DFS order, and the consequences for cycle detection in directed graphs.",
+    "reference_answer": "Marking on push: when processing u, all unvisited neighbors of u are marked immediately. If later, while going deep along neighbor v, we reach neighbor w (of u) via another path, w is already marked and skipped — in a true DFS, w would have been visited via the path v → ... → w as a child in that branch. Result: a wrong DFS tree and wrong enter/exit (pre/post) orders. Consequences: three-color cycle detection (white/gray/black, an edge to a gray vertex is a back edge) and topological sorting by post-order both rely on a correct DFS tree, so they may report wrong cycles or wrong topological orders. Correct approach: mark when POPPING (accepting that a vertex may be pushed several times, skipping it if already visited), or simulate recursion exactly with (vertex, neighbor iterator) pairs.",
+    "key_points": [
+      "Marking on push lets neighbors be 'claimed' early, making the DFS tree and pre/post orders wrong",
+      "Three-color cycle detection and post-order topological sort become wrong; mark on pop or simulate recursion with (vertex, iterator)"
+    ],
+    "id": "Q_DSA_267"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "BFS marking on dequeue",
+    "difficulty": "Hard",
+    "question": "A BFS version marks vertices 'visited' only when DEQUEUING them (instead of when enqueuing). Distances are still correct but the program runs out of memory on a 2000 × 2000 grid. Analyze.",
+    "reference_answer": "If marking only on dequeue, a vertex not yet dequeued can be enqueued MANY times by different vertices (each processed neighbor enqueues it once). On a grid each cell has up to 4 neighbors, so the number of copies in the queue can be several times the number of cells; on dense graphs the queue can hold O(E) entries instead of O(V). Distances remain correct because each vertex's first dequeue still follows BFS order, but memory and time grow sharply, possibly exceeding limits. Correct for unweighted BFS: mark (and assign the distance) as soon as a vertex is ENQUEUED, ensuring each vertex enters the queue exactly once, O(V + E). Note this differs from Dijkstra, where a vertex is only 'settled' when popped because its distance may still improve.",
+    "key_points": [
+      "Marking on dequeue lets a vertex be enqueued many times, growing the queue to O(E)",
+      "Unweighted BFS should mark on enqueue; unlike Dijkstra, which settles on pop"
+    ],
+    "id": "Q_DSA_268"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Lowest common ancestor via binary lifting",
+    "difficulty": "Hard",
+    "question": "For a tree with n nodes and q LCA (lowest common ancestor) queries on a general tree, describe the binary lifting technique and its complexity.",
+    "reference_answer": "Preprocessing: compute each node's depth via DFS/BFS and the table up[k][v] = the 2^k-th ancestor of v: up[0][v] = parent of v, up[k][v] = up[k-1][up[k-1][v]]. The table has size n × log n, computed in O(n log n). Query LCA(u, v): (1) lift the deeper node to the same depth as the other by jumping according to the bits of the depth difference; (2) if they coincide, that is the LCA; (3) otherwise, for k from large to small, if up[k][u] ≠ up[k][v], lift both; finally the LCA is the parent of u. Each query is O(log n). The distance between two nodes = depth(u) + depth(v) - 2·depth(LCA). The technique also answers 'k-th ancestor' and can aggregate values (max edge on the path). Alternative: Euler tour + sparse table for O(1) queries.",
+    "key_points": [
+      "Table up[k][v] = the 2^k-th ancestor, preprocessing O(n log n)",
+      "Equalize depths, then jump from large to small steps while ancestors differ; O(log n) per query"
+    ],
+    "id": "Q_DSA_269"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Segment tree with lazy propagation",
+    "difficulty": "Hard",
+    "question": "A basic segment tree supports point updates and range queries in O(log n). When you need 'add v to every element in [l, r]' interleaved with range-sum queries, how does lazy propagation work and what should you watch out for?",
+    "reference_answer": "Updating each element in the range costs O(n log n). Lazy propagation: when a node's segment lies ENTIRELY within [l, r], update the node's sum (sum += v × segment length) and record a 'deferred tag' lazy += v instead of descending to the children. Only when a later operation needs to go into that node's children is the tag pushed down: applied to both children and cleared at the parent. Each operation touches O(log n) nodes, so both range updates and queries are O(log n). Caveats: push down before descending in BOTH updates and queries; with multiple update types (assign and add), the order of application and the composition of tags must be defined carefully (assignment overrides earlier additions); the tree array should have size 4n; and the aggregate must be compatible with the update (for max, adding v to the whole segment means max += v).",
+    "key_points": [
+      "Nodes fully inside the update range are updated in place with a lazy tag, pushed down only when needed",
+      "Range update/query O(log n); push down in every operation, define tag composition carefully"
+    ],
+    "id": "Q_DSA_270"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Array",
+    "concept": "Sparse Table for O(1) range minimum queries",
+    "difficulty": "Hard",
+    "question": "How does a sparse table answer range minimum queries on a STATIC array in O(1)? Why does this technique not directly apply to range sum queries?",
+    "reference_answer": "Preprocess st[k][i] = minimum of the range starting at i of length 2^k, with st[k][i] = min(st[k-1][i], st[k-1][i + 2^(k-1)]); the table is O(n log n). Query [l, r]: let k = ⌊log₂(r - l + 1)⌋, answer = min(st[k][l], st[k][r - 2^k + 1]) — two ranges of length 2^k covering [l, r] that may OVERLAP. This works because min is idempotent: min(x, x) = x, so elements counted twice do not matter. For sums, the overlap would be added twice, so this O(1) trick does not work (one must split the range into non-overlapping 2^k blocks, O(log n), or use prefix sums, which are already O(1)). Limitation: static arrays only; updating one element requires a rebuild.",
+    "key_points": [
+      "st[k][i] is the min of a length-2^k range; queries use two overlapping ranges covering [l, r]",
+      "Correct because min is idempotent; sums are not, so it does not work for them; static arrays only"
+    ],
+    "id": "Q_DSA_271"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Array",
+    "concept": "Square root decomposition and Mo's algorithm",
+    "difficulty": "Hard",
+    "question": "How does Mo's algorithm answer q offline queries 'number of distinct elements in [l, r]' in O((n + q)√n)? What conditions must hold to apply it?",
+    "reference_answer": "Idea: maintain a window [L, R] with a counting structure (frequency array and distinct count); extending or shrinking the window by one position costs O(1). Sort queries to make the total movement of L and R small: divide indices into blocks of size √n, sort queries by the block of l, and within a block by r increasing (variant: alternate r direction on odd blocks). Then R moves O(n) per block, O(n√n) total; L moves O(√n) per query, O(q√n) total. Process sequentially and record answers by original index. Conditions: queries known in advance (offline), no updates (or a more complex Mo variant with updates), and adding/removing one element from the window must be cheap. Suited when no efficient online data structure exists for the query.",
+    "key_points": [
+      "Maintain a window moved step by step, sorting queries by √n block of l then by r",
+      "Total O((n + q)√n); needs offline queries, no updates, O(1) add/remove"
+    ],
+    "id": "Q_DSA_272"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Persistent data structures via path copying",
+    "difficulty": "Hard",
+    "question": "Persistent data structures allow access to every old version after each update. How does path copying work on a balanced tree and how much memory does it cost?",
+    "reference_answer": "Nodes are never modified in place; when updating a key, only the nodes on the path from the root to the changed node are COPIED (O(log n) nodes), with the new nodes pointing to the unchanged subtrees of the old version. The new root represents the new version while the old root stays intact representing the old version — versions SHARE most of their structure. Each update costs O(log n) time and O(log n) extra memory, instead of O(n) for copying everything. Applications: undo/version histories, queries across versions (persistent segment trees for the k-th smallest in a range), immutable data structures in functional programming (Clojure, Scala, Immutable.js), MVCC in databases, safe lock-free reads by multiple threads. Trade-offs: many small node allocations, GC dependence, larger time constants than mutable structures.",
+    "key_points": [
+      "Copy only the O(log n) nodes on the update path, sharing unchanged subtrees",
+      "O(log n) extra memory per version; used for version histories, immutable structures, MVCC; at the cost of constants and GC pressure"
+    ],
+    "id": "Q_DSA_273"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Linked List",
+    "concept": "Cache locality: arrays vs linked lists",
+    "difficulty": "Hard",
+    "question": "Summing 10 million numbers in an ArrayList<Integer>/int[] array and in a LinkedList are both O(n), yet in practice they can differ by tens of times. Analyze the hardware-level cause and the implications for choosing data structures.",
+    "reference_answer": "CPUs read memory in cache lines (usually 64 bytes) and have hardware prefetchers. An int[] stores values contiguously: each cache line holds 16 numbers, sequential access is efficiently prefetched and almost always hits the cache. A linked list stores each node at an arbitrary heap location; each step must read the next pointer before knowing the next address (pointer chasing), which cannot be prefetched, usually missing the cache and waiting on RAM (hundreds of cycles). Additionally, each node costs extra memory for pointers and object headers. Even ArrayList<Integer> is slower than int[] because it holds references to scattered Integer objects. Implications: Big-O ignores hardware-dependent constants; for most real workloads, dynamic arrays beat linked lists, even for middle insertions/deletions with moderate n; linked lists only win when you already hold a reference to the node to operate on (as in an LRU cache).",
+    "key_points": [
+      "Contiguous arrays exploit cache lines and prefetching; linked lists chase pointers and miss the cache",
+      "Same Big-O but constants differ by tens of times; prefer arrays unless node references are at hand"
+    ],
+    "id": "Q_DSA_274"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Strassen's algorithm and its practical limits",
+    "difficulty": "Hard",
+    "question": "Strassen's algorithm multiplies matrices in O(n^2.807) instead of O(n³). Why do practical numerical libraries (BLAS) almost never use Strassen by default?",
+    "reference_answer": "Strassen splits each matrix into 4 blocks and uses only 7 block multiplications (instead of 8) plus 18 block additions/subtractions, giving T(n) = 7T(n/2) + O(n²) = O(n^log₂7). However: (1) large constants from many additions and temporary matrices make it beneficial only for very large n (hundreds to thousands depending on hardware), so it is used only at the upper levels, switching to ordinary multiplication for small blocks; (2) poorer numerical stability — larger rounding errors with floating point than the standard algorithm, unacceptable in many scientific applications; (3) extra memory for intermediate matrices; (4) standard matrix multiplication is extremely well optimized for hardware (cache blocking, SIMD, multithreading, GPUs), reaching near-peak performance, while Strassen's access pattern is hard to optimize similarly; (5) it needs suitable sizes (padding when n is not a power of 2). Algorithms with even lower exponents (Coppersmith-Winograd and successors) are purely theoretical due to enormous constants.",
+    "key_points": [
+      "Strassen uses 7 instead of 8 block multiplications, O(n^2.807)",
+      "Large constants, poorer numerical stability, extra memory and hard hardware optimization keep libraries from using it by default"
+    ],
+    "id": "Q_DSA_275"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Sorting",
+    "concept": "Why Java uses different algorithms for primitive and object sorting",
+    "difficulty": "Hard",
+    "question": "Java's Arrays.sort() uses Dual-Pivot Quicksort for primitive arrays (int[]) but TimSort (a Merge Sort variant) for object arrays. Analyze the reasons for this design.",
+    "reference_answer": "For objects, STABILITY matters: sorting by one criterion must not disturb the relative order of 'equal' objects (e.g., sorted by name, now sorted by class, students in the same class keep name order) — Quick Sort is not stable, TimSort is. Also, comparing objects via compareTo/Comparator is expensive (virtual calls, pointer chasing), so an algorithm with few comparisons like TimSort (exploiting presorted runs, O(n) on nearly sorted data) pays off; its O(n) extra memory holds only references. For primitives, equal values are indistinguishable so stability is meaningless; comparisons are very cheap, and memory locality and in-place sorting (no O(n) extra memory) matter more — Dual-Pivot Quicksort is faster in practice. In exchange, Quicksort has a rare O(n²) worst case, mitigated by pivot selection strategies and switching to other algorithms.",
+    "key_points": [
+      "Objects need stable sorting and comparisons are expensive, so TimSort with few comparisons is used",
+      "Primitives need no stability, comparisons are cheap, in-place and cache locality matter, so Dual-Pivot Quicksort is used"
+    ],
+    "id": "Q_DSA_276"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "The birthday paradox and hash collision probability",
+    "difficulty": "Hard",
+    "question": "A system generates random 32-bit identifiers for each order, assuming 'a space of 4 billion values is large enough to rarely collide'. After about 100,000 orders, a duplicate appears. Explain using the birthday paradox and propose an appropriate size.",
+    "reference_answer": "Birthday paradox: with N possible values, the probability of at least one collision among k random samples is approximately 1 - e^(-k²/(2N)), reaching about 50% when k ≈ 1.18·√N. With N = 2^32 ≈ 4.3 billion, √N ≈ 65,536, so only about 77,000 IDs already give a 50% chance of collision — not billions as intuition suggests. The number of PAIRS grows as k², which is why collisions appear early. Recommendation: for a collision probability below p with k IDs, we need N ≫ k²/(2p); e.g., 1 billion IDs with p = 10^-9 requires about 2^90 or more, so use the 122 random bits of UUID v4 or 128 bits. Still keep a uniqueness constraint in the database and handle collisions (regenerate). The same principle explains why cryptographic hashes need ≥ 256-bit outputs to resist collision attacks.",
+    "key_points": [
+      "Collision probability ≈ 1 - e^(-k²/2N); with N = 2^32 only about 77,000 IDs give a 50% chance",
+      "Need N ≫ k²/(2p); use 122-128 random bits and keep a unique constraint + regeneration on collision"
+    ],
+    "id": "Q_DSA_277"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Negative numbers when taking modulo after subtraction",
+    "difficulty": "Hard",
+    "question": "A DP solution counting ways modulo M = 10^9 + 7 uses dp[i] = (dp[i-1] * 2 - dp[last[i]]) % M and gives negative or wrong answers on some tests. Analyze the bug.",
+    "reference_answer": "After taking the modulo, dp[i-1]·2 % M and dp[last[i]] both lie in [0, M), but the reduced minuend can be SMALLER than the subtrahend even though the true value is larger; the difference becomes negative. In C++/Java/C#, the % operator with a negative operand returns a negative result (e.g., -3 % 7 = -3), so dp holds negative numbers and later steps propagate the error (Python returns non-negative results so it does not hit this bug — a source of discrepancy when porting code between languages). Fix: ((a - b) % M + M) % M, or add M before taking the modulo: (a - b + M) % M when a, b are both in [0, M). Also, multiplying two numbers close to M needs 64-bit types to avoid overflow before the modulo, and modular division must use the modular inverse (M prime, Fermat) rather than ordinary division.",
+    "key_points": [
+      "The difference of two values reduced modulo M can be negative; % in C++/Java keeps the negative sign",
+      "Use ((a - b) % M + M) % M; multiplication needs 64 bits, division needs modular inverses"
+    ],
+    "id": "Q_DSA_278"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "CSR representation for very large graphs",
+    "difficulty": "Hard",
+    "question": "For a graph with 100 million vertices and 2 billion edges, an adjacency list as List<List<Integer>> consumes enormous memory. Describe the Compressed Sparse Row (CSR) representation and its trade-offs.",
+    "reference_answer": "List<List<Integer>> carries heavy overhead beyond the real data: each list is an object with a header and an over-allocated internal array, and each Integer is a separate object (16 bytes + an 8-byte reference instead of 4 bytes) — potentially 5-10 times the necessary size, and scattered memory slows traversal. CSR uses two primitive arrays: adj[] of length E holding the target vertex of every edge, sorted by source vertex; and start[] of length V + 1 such that u's neighbors are adj[start[u] .. start[u+1]). Memory is about 4E + 4V bytes (or 8 bytes for large indices), and neighbor traversal is a contiguous sequential scan — cache friendly, easy to memory-map (mmap) and parallelize. Trade-offs: static structure, adding/removing edges is very expensive (requires a rebuild), construction needs degree counting and sorting; suited for analytical graphs that rarely change.",
+    "key_points": [
+      "Nested lists carry headers, boxing and over-allocation, many times the real data",
+      "CSR uses two arrays (adj, start), compact and contiguous, cache friendly; the trade-off is hard updates"
+    ],
+    "id": "Q_DSA_279"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Implicit graphs and state space explosion",
+    "difficulty": "Hard",
+    "question": "Word Ladder: transform 'cat' into 'dog' by changing one letter per step, each intermediate word being in a 100,000-word dictionary. Analyze why explicitly building the whole graph (connecting every pair of words differing by one letter) is inefficient and how to do better.",
+    "reference_answer": "Explicit construction requires comparing every pair of words: O(N²·L), with N = 100,000 that is about 10^10 comparisons, and the graph may have very many edges. Instead treat the graph as IMPLICIT: generate neighbors only when BFS needs them. Approach 1: for the current word, try replacing each position with all 26 letters and look up a dictionary hash set — O(26·L) per word. Approach 2: preprocess 'wildcard patterns' like 'c*t', 'ca*' mapping to lists of matching words; neighbors are words sharing a pattern. Run BFS from the start word (or bidirectional BFS from both ends to reduce states from b^d to about 2·b^(d/2)), marking visited words. General lesson: for state problems (puzzles, games), the state space is usually too large to enumerate; generate neighbors on demand, prune invalid states and choose a suitable search strategy.",
+    "key_points": [
+      "Explicitly building the graph needs O(N²·L) comparisons",
+      "Generate neighbors on demand (letter substitution or wildcard patterns), BFS/bidirectional BFS on the implicit graph"
+    ],
+    "id": "Q_DSA_280"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Confusing minimum spanning trees with shortest path trees",
+    "difficulty": "Hard",
+    "question": "An engineer uses the minimum spanning tree (MST) of a cable network to route packets from a data center to every branch, expecting minimum latency. Analyze the mistake, and also state facts about MST uniqueness and negative weights.",
+    "reference_answer": "An MST minimizes the TOTAL weight of the chosen edges (total cable construction cost), while a shortest path tree (SPT, the result of Dijkstra from the center) minimizes the distance from the ROOT to each vertex. The path on the MST from the root to a branch can be much longer than the shortest path: e.g., a 4-vertex cycle with three edges of weight 1 and one of weight 2.5 — the MST drops the 2.5 edge, so the vertex at its other end must go around three edges (total 3) instead of 2.5. The two problems have different objectives. Also: the MST is unique if all edge weights are distinct (with ties there may be several MSTs with the same total); MST algorithms remain correct with negative weights (Kruskal/Prim depend only on the order of weight comparisons), unlike Dijkstra; and adding a constant to every edge does not change the MST (every spanning tree has exactly V - 1 edges) — the opposite of shortest paths.",
+    "key_points": [
+      "An MST minimizes total tree weight; an SPT minimizes distance from the root — different objectives",
+      "The MST is unique with distinct weights, works with negative weights, and is invariant to adding a constant to all edges"
+    ],
+    "id": "Q_DSA_281"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Borůvka's algorithm and parallel MST",
+    "difficulty": "Hard",
+    "question": "How does Borůvka's algorithm find a minimum spanning tree, and why is it better suited to parallel/distributed environments than Prim and Kruskal?",
+    "reference_answer": "Initially each vertex is a component. Each round: for EVERY component, find the minimum-weight edge leaving it; add all these edges to the MST (the lightest edge leaving a set always belongs to the MST by the cut property), then merge components. Each round at least halves the number of components, so there are O(log V) rounds, each O(E): O(E log V) total. To avoid creating cycles when weights tie, a consistent tie-breaking rule is needed (also comparing edge indices). Parallelism: finding the lightest edge of each component in a round is INDEPENDENT and can be split across processors/machines; Prim grows a single tree sequentially, and Kruskal processes edges in a global sorted order — inherently hard to parallelize. Borůvka underlies many parallel and distributed MST algorithms and expected linear-time MST algorithms.",
+    "key_points": [
+      "Each round every component picks its lightest outgoing edge and merges; O(log V) rounds, O(E log V)",
+      "Components are processed independently, easy to parallelize/distribute; consistent tie-breaking is needed"
+    ],
+    "id": "Q_DSA_282"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Detecting currency arbitrage via negative cycles",
+    "difficulty": "Hard",
+    "question": "Given exchange rates between n currencies, detect a sequence of exchanges starting and ending in the same currency that is profitable (product of rates > 1). How is the problem transformed into negative cycle detection, and how is the cycle itself recovered?",
+    "reference_answer": "Profit means r1·r2·...·rk > 1. Taking logarithms: Σ log r_i > 0, equivalently Σ (-log r_i) < 0. Set edge weights w(u, v) = -log(rate u → v), and the problem becomes finding a cycle with negative total weight. Run Bellman-Ford (from a virtual vertex connected to all vertices with weight 0 to cover every component) for V - 1 rounds; if in round V some edge can still be relaxed, a negative cycle exists. Recovering the cycle: take a vertex x relaxed in round V, walk back through prev[] exactly V steps to be sure to be INSIDE the cycle (x may only be on a path leading to it), then keep following prev[] until returning to that vertex. Practical notes: floating-point error in log can create spurious negative cycles, requiring an epsilon threshold; transaction fees and latency make real opportunities rare.",
+    "key_points": [
+      "Weights -log(rate) turn a product > 1 into a negative-sum cycle; Bellman-Ford's V-th round detects it",
+      "Walk back prev[] V steps to enter the cycle, then follow it; beware floating-point error"
+    ],
+    "id": "Q_DSA_283"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Compressed tries (radix trees) to reduce memory",
+    "difficulty": "Hard",
+    "question": "A basic trie with an array of 26 pointers per node consumes huge amounts of memory when storing 1 million long URLs. Analyze the cause and memory-reducing variants.",
+    "reference_answer": "Each node pre-allocates a pointer array for the whole alphabet (26 for lowercase letters, 256 for bytes, thousands for Unicode) although most slots are empty; and long strings have many 'single-child' stretches (each URL's unique suffix), creating tens of millions of single-child nodes. Memory can be tens of times the total string length. Variants: (1) store children in a hash table or sorted list instead of a fixed array — trading a little speed for memory; (2) radix tree/Patricia trie: merge chains of single-child nodes into one edge labeled with a whole substring, reducing nodes to at most about twice the number of keys; (3) ternary search tree: one character per node with three pointers (less, equal, greater); (4) static compressed structures (succinct tries, FSTs as in Lucene) for read-only data. Radix trees are used in IP routing tables, HTTP routers and Redis's internal indexes.",
+    "key_points": [
+      "Fixed child arrays waste empty slots; long strings create countless single-child nodes",
+      "Use hashed/list children, radix trees merging single-child nodes, ternary search trees, or static compressed tries"
+    ],
+    "id": "Q_DSA_284"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "String",
+    "concept": "Suffix arrays and LCP arrays",
+    "difficulty": "Hard",
+    "question": "Which string problems do a suffix array combined with an LCP array solve? State the construction complexity and one concrete application.",
+    "reference_answer": "A suffix array is the list of starting positions of all suffixes of a string, sorted lexicographically. The LCP array stores the length of the longest common prefix between adjacent suffixes in that order. Construction: prefix doubling in O(n log n) (or a simpler O(n log² n)), SA-IS/DC3 in O(n); LCP via Kasai's algorithm in O(n). Applications: searching for a pattern of length m by binary search on the suffix array in O(m log n); longest repeated substring = max LCP; number of distinct substrings = n(n+1)/2 - Σ LCP; longest common substring of two strings (concatenated with a separator). Used in full-text search, bioinformatics (DNA alignment), data compression (Burrows-Wheeler). Compared with suffix trees, suffix arrays use much less memory.",
+    "key_points": [
+      "Suffix array: sorted suffixes; LCP: common prefix of adjacent suffixes",
+      "Built in O(n log n) or O(n), LCP O(n); used for pattern search, longest repeat, counting distinct substrings"
+    ],
+    "id": "Q_DSA_285"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "String",
+    "concept": "Aho-Corasick for matching many patterns at once",
+    "difficulty": "Hard",
+    "question": "You need to find occurrences of 10,000 banned keywords in a large text stream. Why is running KMP separately for each keyword inefficient, and how does Aho-Corasick solve it?",
+    "reference_answer": "Running KMP for k patterns costs O(k·n + Σm) — with k = 10,000 the text is scanned 10,000 times. Aho-Corasick builds a trie of all patterns, then adds a 'failure link' to each node: pointing to the node representing the longest suffix of the current string that is also a prefix of some pattern (generalizing KMP's failure function), computed by BFS. While scanning the text ONCE, at each character follow a trie edge if it exists, otherwise follow failure links; at each node report the patterns ending there (including via 'output links' to patterns that are suffixes). Complexity O(n + Σm + z) with z the number of occurrences. Applications: keyword filtering, malware signature detection in IDS (Snort), multi-pattern grep. Note that when z is huge (nested patterns like 'a', 'aa', 'aaa') the output dominates the cost.",
+    "key_points": [
+      "KMP per pattern scans the text k times, O(k·n)",
+      "Trie + failure links scan the text once, O(n + Σm + z); used for keyword filtering and IDS"
+    ],
+    "id": "Q_DSA_286"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Hirschberg's algorithm: reconstructing solutions in linear memory",
+    "difficulty": "Hard",
+    "question": "Edit distance between two 100,000-character strings: computing the VALUE needs only O(n) memory with two DP rows, but RECONSTRUCTING the edit sequence with the full table needs 10^10 cells. How does Hirschberg's algorithm solve this?",
+    "reference_answer": "Hirschberg combines divide and conquer with two-row DP. Split string A at its midpoint mid. Compute the last DP row for A[0..mid) against all of B (forward) and for A[mid..n) reversed against B reversed (backward), each pass needing only O(|B|) memory. The optimal split point k of B is the position minimizing forward[k] + backward[k] — the optimal alignment path is guaranteed to pass through cell (mid, k). Then recurse independently on the two subproblems (A[0..mid), B[0..k)) and (A[mid..n), B[k..m)), concatenating the edit sequences. Time remains O(n·m) (only about double, since the subproblems at each level have half the total area), but memory is only O(n + m). The technique is used in biological sequence alignment and diff tools.",
+    "key_points": [
+      "Split A in the middle; forward and backward two-row DP finds the split point k of B on the optimal path",
+      "Recurse on both halves: time still O(n·m) (about 2×), memory O(n + m)"
+    ],
+    "id": "Q_DSA_287"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Longest increasing subsequence in O(n log n)",
+    "difficulty": "Hard",
+    "question": "Describe the algorithm for the length of the longest increasing subsequence (LIS) in O(n log n) and explain why the auxiliary array is not the LIS itself. How do you recover the sequence?",
+    "reference_answer": "Maintain an array tails, where tails[k] is the SMALLEST possible ending element of an increasing subsequence of length k + 1 seen so far. tails is always strictly increasing. For each x: binary search for the first position in tails with value ≥ x (lower bound, for strictly increasing sequences); if none, append x (extending the LIS), otherwise set tails[pos] = x (a same-length sequence with a smaller ending, with better potential to be extended). The answer is the length of tails. O(n log n). tails is NOT the actual LIS: its elements may come from different sequences and not follow the order of appearance (e.g., [3, 4, 1] gives tails = [1, 4]). Recovery: store for each element the index of its predecessor (the index at tails[pos-1] at insertion time) and the index at tails[k], then trace back from the last element. Use upper bound if non-decreasing sequences are allowed.",
+    "key_points": [
+      "tails[k] is the smallest ending element of an increasing sequence of length k + 1; updated by binary search, O(n log n)",
+      "tails is not the real LIS; recover it by storing predecessor indices and tracing back"
+    ],
+    "id": "Q_DSA_288"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "Digit DP",
+    "difficulty": "Hard",
+    "question": "Count the integers in [1, 10^18] whose digit sum is divisible by 7. Why is enumeration impossible, and how does Digit DP define its states?",
+    "reference_answer": "Enumerating 10^18 numbers is infeasible. Digit DP builds the number digit by digit from left to right, with state (position pos, current digit sum modulo 7, tight flag). The tight flag indicates whether the prefix built so far equals the prefix of the upper bound N: if tight, the next digit can only range from 0 to N's corresponding digit; otherwise 0-9 freely. Count f(N) = number in [0, N], answer f(R) - f(L - 1). There are only about 19 × 7 × 2 states, each trying 10 digits. Notes: memoize only non-tight states (tight states occur once per position); handle zero and leading zeros if the condition depends on them (e.g., counting numbers with distinct digits needs an extra 'started' flag).",
+    "key_points": [
+      "Build the number digit by digit with state (position, remembered information, tight flag)",
+      "Compute f(N) and take differences; few states; mind leading zeros and memoize only non-tight states"
+    ],
+    "id": "Q_DSA_289"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Dynamic Programming",
+    "concept": "The Sprague-Grundy theorem for combinatorial games",
+    "difficulty": "Hard",
+    "question": "Two players alternate on several independent piles of stones; each turn a player chooses a pile and removes 1, 3 or 4 stones; whoever cannot move loses. How can winning/losing positions be determined without exploring the full game tree of all piles together?",
+    "reference_answer": "For impartial games — both players have the same move set — each position has a Grundy value: g(x) = mex{ g(y) : y reachable from x }, where mex is the smallest natural number not in the set; terminal positions have g = 0. A position is losing (for the player to move) if and only if g = 0. Sprague-Grundy theorem: the sum of independent games has a Grundy value equal to the XOR of the component Grundy values. So we only need to compute g(n) for a single pile by DP (g(n) = mex{g(n-1), g(n-3), g(n-4)}), then XOR the g values of all piles; the first player wins if and only if the XOR is non-zero. For ordinary Nim (remove any number), g(n) = n. Grundy values are often periodic, allowing very large piles to be handled.",
+    "key_points": [
+      "Grundy value g(x) = mex of successors' g; g = 0 means a losing position",
+      "Independent game sums have g equal to the XOR of components; the first player wins iff the XOR ≠ 0"
+    ],
+    "id": "Q_DSA_290"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Recursion",
+    "concept": "Meet in the middle",
+    "difficulty": "Hard",
+    "question": "Given n = 40 integers, count the subsets whose sum is exactly T (values may be very large, so DP over sums is impossible). Why is 2^40 too large, and how much does meet in the middle reduce it?",
+    "reference_answer": "Brute-forcing 2^40 ≈ 1.1 trillion subsets is too slow; DP over sums is infeasible because values are large (up to 10^15). Meet in the middle: split the array into two halves of 20 elements; enumerate all subset sums of each half — 2^20 ≈ 1 million sums each. A subset of the whole array is the union of a left-half subset and a right-half subset, so we count pairs (a, b) with a + b = T. Sort the right-half list and, for each a in the left half, binary search (or use a frequency hash table) for the count of T - a. Complexity O(2^(n/2)·n) instead of O(2^n), memory O(2^(n/2)). The technique applies when a problem splits into two independent halves whose results are combined: 4-SUM, the 'double DES' attack, bidirectional search.",
+    "key_points": [
+      "Split into halves, enumerate 2^(n/2) sums each, combine via sorting + binary search or a hash table",
+      "Time O(2^(n/2)·n) instead of O(2^n), at the cost of O(2^(n/2)) memory"
+    ],
+    "id": "Q_DSA_291"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Branch and bound",
+    "difficulty": "Hard",
+    "question": "How does branch and bound differ from plain backtracking? Illustrate with 0/1 Knapsack when the capacity is too large for DP.",
+    "reference_answer": "Backtracking only prunes on constraint violations (exceeding capacity). Branch and bound also prunes using OPTIMALITY BOUNDS: for each node (partial choice), compute an optimistic upper bound on the best value achievable in its subtree; if that bound does not exceed the best solution found so far, discard the whole subtree. For Knapsack: sort items by value/weight ratio descending; a node's upper bound = current value + the value of the FRACTIONAL knapsack (solved greedily) over the remaining items with the remaining capacity — since it relaxes the constraint, it is always ≥ the true answer. Explore nodes with the highest bounds first (best-first) to find good solutions early, enabling more pruning. The worst case is still exponential, but in practice most of the tree is usually pruned. Bound quality (tighter is better) and exploration order determine efficiency; this is also the foundation of integer programming solvers.",
+    "key_points": [
+      "Besides constraint pruning, prune subtrees whose optimality bound cannot beat the best solution so far",
+      "Knapsack: bound with the fractional knapsack, explore best-first; still exponential in the worst case, efficiency depends on bound tightness"
+    ],
+    "id": "Q_DSA_292"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Algorithm complexity",
+    "concept": "Approximation algorithm for vertex cover",
+    "difficulty": "Hard",
+    "question": "Minimum vertex cover is NP-hard. Present the 2-approximation algorithm based on maximal matching and prove the approximation ratio. Why does the greedy strategy 'pick the highest-degree vertex' lack a similar guarantee?",
+    "reference_answer": "Algorithm: while some edge is uncovered, pick any edge (u, v), add BOTH u and v to the cover, and remove all edges incident to u or v. The chosen edges form a matching M (no two share a vertex). The resulting cover has size 2|M|. Every cover (including the optimum OPT) must contain at least one endpoint of each edge in M, and since the edges of M are disjoint, OPT ≥ |M|. Hence result ≤ 2|M| ≤ 2·OPT — running in O(V + E). Greedy by highest degree seems reasonable but can be worse than optimal by a factor of Θ(log n) on specially constructed graphs (layered bipartite graphs), so it has no constant guarantee. Lesson: approximation algorithms are valuable when the ratio is PROVEN; it has also been shown (under the Unique Games Conjecture) that approximating better than 2 - ε in polynomial time is impossible.",
+    "key_points": [
+      "Take both endpoints of edges in a maximal matching; OPT ≥ |M| so the result ≤ 2·OPT",
+      "Greedy by highest degree can be Θ(log n) worse; the value of an approximation lies in its proven ratio"
+    ],
+    "id": "Q_DSA_293"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Sorting",
+    "concept": "Randomized Quick Sort attacked through a predictable random source",
+    "difficulty": "Hard",
+    "question": "A web service sorts user-submitted data with Quick Sort using a random pivot from a generator seeded with a fixed constant. Analyze the denial-of-service (DoS) vulnerability.",
+    "reference_answer": "Randomized Quick Sort's expected O(n log n) guarantee relies on the attacker NOT knowing the pivot choices in advance. If the generator is seeded with a constant (or a guessable time), the pivot sequence is fully deterministic; an attacker can simulate the algorithm and craft input making every pivot the smallest/largest element (McIlroy's 'antiquicksort' technique even does this with custom comparisons), pushing time to O(n²) — a few hundred thousand elements are enough to hang the server. Hash flooding is similar. Measures: use an unpredictable random source per run; better, use algorithms with worst-case O(n log n) guarantees like Introsort (switching to Heap Sort when recursion depth exceeds a threshold), Merge Sort/TimSort; and limit user input sizes.",
+    "key_points": [
+      "The expected-time guarantee holds only if pivots are unpredictable; a fixed seed allows crafting worst-case input",
+      "Use unpredictable randomness, prefer worst-case-guaranteed algorithms (Introsort, TimSort), limit input size"
+    ],
+    "id": "Q_DSA_294"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Queue",
+    "concept": "Fibonacci heaps: theory vs practice",
+    "difficulty": "Hard",
+    "question": "A Fibonacci heap provides amortized O(1) decrease-key, helping Dijkstra achieve O(E + V log V) versus O(E log V) with a binary heap. Why are binary heaps (or pairing heaps) usually faster in practice?",
+    "reference_answer": "Fibonacci heaps are 'lazy': insert and decrease-key just cut trees and move them to the root list (amortized O(1)), deferring all restructuring to extract-min (amortized O(log n), possibly O(n) for a single call). Although asymptotically better: (1) large constants — each node has many pointers (parent, child, left/right siblings, degree, mark flag), and cutting/consolidation involve many steps; (2) nodes are scattered on the heap, with poor cache locality, while a binary heap sits compactly in a contiguous array; (3) the advantage only shows when E ≫ V log V with very many decrease-keys, rare for real sparse graphs; (4) amortized complexity can cause latency spikes. So libraries usually use binary heaps (or d-ary heaps with smaller height) with lazy deletion, or pairing heaps — simpler and fast in experiments. A classic example of the gap between asymptotic optimality and real performance.",
+    "key_points": [
+      "Fibonacci heaps are asymptotically better thanks to lazy operations, amortized O(1) decrease-key",
+      "Large constants, poor cache locality, advantage only on very dense graphs; practice uses binary/d-ary/pairing heaps"
+    ],
+    "id": "Q_DSA_295"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "The Misra-Gries algorithm for frequent elements in a stream",
+    "difficulty": "Hard",
+    "question": "Find all elements appearing more than n/k times in a very long data stream with O(k) memory. Present the Misra-Gries algorithm and its guarantee.",
+    "reference_answer": "Keep at most k - 1 (element, counter) pairs. For each element x in the stream: if x already has a counter, increment it; if not and there is room, add (x, 1); if there is no room, DECREMENT every counter by 1 and remove those reaching 0 (x and k - 1 other elements 'cancel' each other). Each decrement removes k occurrences (k - 1 counters plus x itself), so there are at most n/k decrements in total; hence each element's counter underestimates its true frequency by at most n/k. Consequence: every element with frequency > n/k is guaranteed to remain in the final list. The list may contain false positives, so if a second pass over the stream is allowed, count candidates exactly to filter them. With k = 2 this is Boyer-Moore majority voting. Applications: detecting IPs sending many requests, trending keywords.",
+    "key_points": [
+      "Keep k - 1 counters; when full decrement all, each decrement cancels k occurrences",
+      "Underestimates by at most n/k, so every element > n/k is kept; a second pass removes false positives"
+    ],
+    "id": "Q_DSA_296"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Graph",
+    "concept": "Loop order in Floyd-Warshall",
+    "difficulty": "Hard",
+    "question": "A developer writes Floyd-Warshall with loop order for i: for j: for k: dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]). The result is wrong for some graphs. Explain why the k loop must be outermost.",
+    "reference_answer": "Floyd-Warshall is dynamic programming over the set of intermediate vertices: after finishing k, dist[i][j] is the shortest path from i to j using only intermediate vertices in {0, ..., k}. To compute step k correctly, dist[i][k] and dist[k][j] must already be optimal with intermediate set {0, ..., k-1} for ALL pairs — true only when the whole table has completed step k - 1, i.e., k must be the outermost loop. With k innermost, each cell dist[i][j] is examined exactly once, and at that time the values dist[i][k], dist[k][j] of cells not yet processed are still just direct edge weights, not reflecting paths through other intermediate vertices; so dist[i][j] may miss paths needing several intermediate vertices. (Experiments show running the wrong version 3 times converges, but that is not the correct algorithm.) Also note: updating in place within step k is safe because dist[i][k] and dist[k][j] do not change during step k (absent negative cycles).",
+    "key_points": [
+      "Floyd-Warshall is DP over intermediate vertex sets {0..k}, needing the whole table to finish step k - 1",
+      "k must be the outermost loop; placing it inside uses non-optimal values and misses paths"
+    ],
+    "id": "Q_DSA_297"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Tree",
+    "concept": "Morris traversal with O(1) memory",
+    "difficulty": "Hard",
+    "question": "In-order traversal of a binary tree normally needs O(h) stack memory (O(n) for skewed trees). How does Morris traversal achieve O(1) extra memory, and what are its limitations?",
+    "reference_answer": "Morris uses the tree's null right pointers as temporary 'return paths' (threading). At node cur: if cur has no left child, visit cur and go right. If it has a left child, find the in-order predecessor pre (the rightmost node of the left subtree): if pre.right is null, set pre.right = cur (creating a temporary thread) and go left; if pre.right already points to cur (the left subtree is done), restore pre.right = null, visit cur and go right. Each edge is traversed at most a few times, so total time is O(n), extra memory O(1). Limitations: the algorithm TEMPORARILY MODIFIES the tree — unsafe when other threads read it concurrently, unusable on immutable/read-only trees, and stopping midway (break, exceptions) without restoration corrupts the tree; the time constant is larger than stack-based traversal.",
+    "key_points": [
+      "Uses the predecessor's null right pointer as a temporary return thread, removed on return",
+      "O(n) time, O(1) memory but temporarily modifies the tree: unsafe concurrently, not for read-only trees, stopping midway corrupts it"
+    ],
+    "id": "Q_DSA_298"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Hash Table",
+    "concept": "Non-deterministic iteration order of hash tables",
+    "difficulty": "Hard",
+    "question": "A program prints results by iterating a HashMap/a Python set (of strings) and a regression test compares the output with a reference file. The test passes sometimes and fails at other times without code changes. Analyze the cause and fixes.",
+    "reference_answer": "A hash table's iteration order depends on hash values and table capacity, not on insertion order or key order. Many environments also deliberately RANDOMIZE string hashing per process (Python's PYTHONHASHSEED, Go maps intentionally iterating randomly, Rust's SipHash with random keys) to resist hash-flooding attacks — so the order changes between runs. Library version changes, initial capacity, and insertion/deletion history also change the order. Consequences: flaky tests, non-reproducible output, differences between machines. Fixes: do not rely on hash table iteration order; sort keys before printing, or use structures with deterministic order (LinkedHashMap keeps insertion order, TreeMap orders by key; Python 3.7+ dicts keep insertion order but sets do not); compare results as sets in tests.",
+    "key_points": [
+      "Hash table iteration order depends on hash values/capacity and is often randomized against hash flooding",
+      "Do not rely on it: sort before output, use ordered structures, compare as sets"
+    ],
+    "id": "Q_DSA_299"
+  },
+  {
+    "language": "en",
+    "subject": "Data Structures and Algorithms",
+    "competency": "Data Structures and Algorithms",
+    "topic": "Queue",
+    "concept": "Timing wheels vs heaps",
+    "difficulty": "Hard",
+    "question": "A server manages 10 million connections, each with a timeout timer reset whenever data arrives (very frequently) and rarely actually expiring. Why is a min-heap of timers inefficient, and how does a timing wheel solve this?",
+    "reference_answer": "With a min-heap, each timer reset means deleting/updating an element in the middle of the heap (O(log n), requiring stored positions) or inserting a new entry for lazy deletion (the heap bloats with stale entries); with tens of millions of resets per second, the log n cost and poor cache locality become significant. A timing wheel is a circular array of N slots, each corresponding to a time interval (tick) and holding a doubly linked list of timers expiring in that tick. Add/remove/reset are O(1): compute slot = (now + timeout) mod N and move the node to the new list. Each tick processes only the current slot. For timeouts longer than one wheel rotation, use hierarchical wheels (like hour-minute-second hands) or store a round count. Trade-offs: precision is rounded to the tick, and scanning empty slots costs something. Used in the Linux kernel, Netty and Kafka.",
+    "key_points": [
+      "Heaps cost O(log n) per reset, bloat with lazy deletion, and have poor cache locality",
+      "Timing wheel: circular array of tick slots, O(1) operations; hierarchical wheels for long timeouts; precision limited to the tick"
+    ],
+    "id": "Q_DSA_300"
+  }
+]

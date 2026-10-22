@@ -1,0 +1,2252 @@
+[
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "Phương thức equals()",
+    "difficulty": "Easy",
+    "question": "Phương thức equals() trong Java dùng để làm gì, và nó khác toán tử == như thế nào khi so sánh hai đối tượng?",
+    "reference_answer": "Toán tử == khi áp dụng cho hai biến tham chiếu chỉ kiểm tra xem chúng có trỏ tới CÙNG một vùng nhớ (cùng một đối tượng) hay không. Phương thức equals() được thiết kế để so sánh sự bằng nhau về mặt LOGIC/nội dung (ví dụ hai đối tượng SinhVien có cùng mã số được coi là bằng nhau dù là hai đối tượng khác nhau trong bộ nhớ). Cài đặt mặc định của equals() trong lớp Object thực chất vẫn dùng ==, nên lớp nào cần so sánh theo nội dung phải tự override equals().",
+    "key_points": [
+      "== so sánh danh tính (cùng tham chiếu), equals() so sánh bằng nhau về logic/nội dung",
+      "equals() mặc định của Object hoạt động như ==, cần override nếu muốn so sánh theo nội dung"
+    ],
+    "id": "Q_OOP3_001"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "Phương thức hashCode()",
+    "difficulty": "Easy",
+    "question": "Phương thức hashCode() trả về giá trị gì và được các cấu trúc dữ liệu nào sử dụng chủ yếu?",
+    "reference_answer": "hashCode() trả về một số nguyên (int) đại diện cho đối tượng, dùng làm 'mã băm' để xác định vị trí (bucket) lưu đối tượng trong các cấu trúc dựa trên bảng băm như HashMap, HashSet, Hashtable. Nhờ hashCode, các cấu trúc này có thể thu hẹp nhanh phạm vi tìm kiếm trước khi gọi equals() để so sánh chính xác.",
+    "key_points": [
+      "hashCode() trả về số nguyên dùng làm mã băm của đối tượng",
+      "Được HashMap, HashSet dùng để xác định bucket trước khi so sánh bằng equals()"
+    ],
+    "id": "Q_OOP3_002"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "Phương thức toString()",
+    "difficulty": "Easy",
+    "question": "Vì sao nên override phương thức toString() cho các lớp tự định nghĩa?",
+    "reference_answer": "Mặc định toString() của Object trả về chuỗi dạng TenLop@maHex (ví dụ SinhVien@1b6d3586), gần như không mang thông tin hữu ích. Override toString() giúp biểu diễn trạng thái đối tượng dưới dạng chuỗi dễ đọc, rất có ích khi in log, debug, hiển thị trong IDE hoặc thông báo lỗi. Tuy nhiên không nên đưa dữ liệu nhạy cảm (mật khẩu, token) vào toString().",
+    "key_points": [
+      "toString() mặc định chỉ trả về tên lớp và mã băm dạng hex",
+      "Override toString() hỗ trợ log/debug, nhưng tránh lộ dữ liệu nhạy cảm"
+    ],
+    "id": "Q_OOP3_003"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "Lớp Object là gốc của mọi lớp",
+    "difficulty": "Easy",
+    "question": "Trong Java, lớp Object có vai trò gì đối với hệ thống phân cấp lớp?",
+    "reference_answer": "Object là lớp gốc (root) của toàn bộ cây kế thừa trong Java: mọi lớp nếu không khai báo extends tường minh đều ngầm kế thừa từ Object. Nhờ vậy mọi đối tượng đều có sẵn các phương thức chung như equals(), hashCode(), toString(), getClass(), và một biến kiểu Object có thể tham chiếu tới bất kỳ đối tượng nào.",
+    "key_points": [
+      "Mọi lớp Java đều ngầm kế thừa Object nếu không extends lớp khác",
+      "Object cung cấp các phương thức chung như equals, hashCode, toString, getClass"
+    ],
+    "id": "Q_OOP3_004"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "Interface Comparable",
+    "difficulty": "Easy",
+    "question": "Interface Comparable<T> trong Java dùng để làm gì? Phương thức nào cần cài đặt?",
+    "reference_answer": "Comparable<T> định nghĩa 'thứ tự tự nhiên' (natural ordering) cho các đối tượng của một lớp. Lớp cài đặt cần viết phương thức int compareTo(T other), trả về số âm nếu đối tượng hiện tại nhỏ hơn other, 0 nếu bằng, số dương nếu lớn hơn. Nhờ đó các đối tượng có thể được sắp xếp bằng Collections.sort() hoặc dùng trong TreeSet/TreeMap mà không cần truyền thêm bộ so sánh.",
+    "key_points": [
+      "Comparable định nghĩa thứ tự tự nhiên của đối tượng qua compareTo()",
+      "compareTo trả về âm/0/dương tương ứng nhỏ hơn/bằng/lớn hơn"
+    ],
+    "id": "Q_OOP3_005"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "Interface Comparator",
+    "difficulty": "Easy",
+    "question": "Comparator<T> khác Comparable<T> ở điểm nào?",
+    "reference_answer": "Comparable được cài đặt BÊN TRONG chính lớp cần so sánh và chỉ cho phép một thứ tự tự nhiên duy nhất. Comparator là một đối tượng so sánh TÁCH RỜI bên ngoài lớp (cài đặt int compare(T a, T b)), cho phép định nghĩa nhiều cách sắp xếp khác nhau (theo tên, theo điểm, theo ngày sinh...) mà không cần sửa mã nguồn của lớp, kể cả với lớp từ thư viện bên thứ ba.",
+    "key_points": [
+      "Comparable nằm trong lớp, chỉ một thứ tự tự nhiên",
+      "Comparator tách rời, cho phép nhiều tiêu chí sắp xếp mà không sửa lớp gốc"
+    ],
+    "id": "Q_OOP3_006"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Kiểu liệt kê (Enum)",
+    "difficulty": "Easy",
+    "question": "Enum trong Java là gì và vì sao nên dùng enum thay cho các hằng số int (ví dụ TRANG_THAI_MOI = 0, TRANG_THAI_HUY = 1)?",
+    "reference_answer": "Enum là một kiểu đặc biệt định nghĩa một tập hữu hạn các giá trị hằng có tên (ví dụ enum TrangThai { MOI, DANG_XU_LY, HUY }). So với hằng số int, enum an toàn kiểu (type-safe): trình biên dịch ngăn việc truyền một số nguyên bất kỳ không hợp lệ, code dễ đọc hơn, có thể dùng trong switch, và mỗi giá trị enum còn có thể mang thuộc tính và phương thức riêng.",
+    "key_points": [
+      "Enum là tập hữu hạn các hằng có tên, là một kiểu dữ liệu riêng",
+      "An toàn kiểu, dễ đọc, có thể có thuộc tính/phương thức, tốt hơn hằng số int"
+    ],
+    "id": "Q_OOP3_007"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Record (Java 16+)",
+    "difficulty": "Easy",
+    "question": "Record trong Java (từ phiên bản 16) là gì và phù hợp để biểu diễn loại dữ liệu nào?",
+    "reference_answer": "Record là một dạng khai báo lớp ngắn gọn cho các đối tượng chỉ mang dữ liệu bất biến (data carrier), ví dụ record Diem(int x, int y) {}. Trình biên dịch tự sinh constructor, các phương thức truy cập (x(), y()), equals(), hashCode() và toString(). Các trường của record là final, nên record rất phù hợp cho Value Object, DTO, kết quả trả về nhiều giá trị.",
+    "key_points": [
+      "Record là lớp dữ liệu bất biến được tự sinh constructor, accessor, equals, hashCode, toString",
+      "Phù hợp cho Value Object/DTO thuần dữ liệu"
+    ],
+    "id": "Q_OOP3_008"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp lồng nhau và biểu thức Lambda",
+    "concept": "Lớp bên trong (Inner class)",
+    "difficulty": "Easy",
+    "question": "Lớp bên trong không static (inner class) trong Java có đặc điểm gì đặc biệt so với lớp thông thường?",
+    "reference_answer": "Inner class (lớp lồng không static) được khai báo bên trong một lớp khác và mỗi đối tượng của nó luôn gắn với một đối tượng cụ thể của lớp bao ngoài (outer). Nhờ vậy nó truy cập trực tiếp được mọi thành viên, kể cả private, của đối tượng bao ngoài. Muốn tạo đối tượng inner class cần có sẵn một đối tượng outer (outer.new Inner()).",
+    "key_points": [
+      "Inner class gắn với một thể hiện cụ thể của lớp bao ngoài",
+      "Truy cập được cả thành viên private của lớp bao ngoài"
+    ],
+    "id": "Q_OOP3_009"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp lồng nhau và biểu thức Lambda",
+    "concept": "Lớp lồng static (Static nested class)",
+    "difficulty": "Easy",
+    "question": "Static nested class khác inner class (không static) ở điểm cốt lõi nào?",
+    "reference_answer": "Static nested class không giữ tham chiếu tới một đối tượng của lớp bao ngoài; nó giống một lớp độc lập nhưng được đặt trong không gian tên của lớp ngoài để nhóm logic. Vì vậy có thể tạo đối tượng của nó mà không cần đối tượng outer (new Outer.Nested()), và nó chỉ truy cập trực tiếp được các thành viên static của lớp ngoài.",
+    "key_points": [
+      "Static nested class không cần và không giữ tham chiếu tới đối tượng outer",
+      "Chỉ truy cập trực tiếp thành viên static của lớp ngoài; dùng để nhóm lớp liên quan"
+    ],
+    "id": "Q_OOP3_010"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp lồng nhau và biểu thức Lambda",
+    "concept": "Lớp vô danh (Anonymous class)",
+    "difficulty": "Easy",
+    "question": "Lớp vô danh (anonymous class) là gì và thường được dùng trong tình huống nào?",
+    "reference_answer": "Lớp vô danh là lớp không có tên, được khai báo và khởi tạo cùng lúc tại chỗ, thường để cài đặt nhanh một interface hoặc kế thừa một lớp cho mục đích dùng một lần, ví dụ new Comparator<SinhVien>() { public int compare(...) {...} }. Nó hay dùng cho callback, xử lý sự kiện giao diện, hoặc các cài đặt ngắn mà không đáng tạo lớp riêng.",
+    "key_points": [
+      "Anonymous class được khai báo và khởi tạo tại chỗ, không có tên",
+      "Dùng cho cài đặt dùng một lần như callback, listener"
+    ],
+    "id": "Q_OOP3_011"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp lồng nhau và biểu thức Lambda",
+    "concept": "Biểu thức Lambda",
+    "difficulty": "Easy",
+    "question": "Biểu thức lambda trong Java là gì và nó có thể thay thế cho cấu trúc nào?",
+    "reference_answer": "Lambda là cú pháp ngắn gọn để biểu diễn một hàm vô danh, có dạng (tham số) -> biểu thức hoặc khối lệnh, ví dụ (a, b) -> a.getDiem() - b.getDiem(). Lambda chỉ dùng được ở nơi mong đợi một functional interface (interface có đúng một phương thức trừu tượng), và thường thay thế cho lớp vô danh cài đặt interface đó, giúp code gọn và dễ đọc hơn.",
+    "key_points": [
+      "Lambda là hàm vô danh với cú pháp (tham số) -> thân",
+      "Dùng thay lớp vô danh khi kiểu đích là functional interface"
+    ],
+    "id": "Q_OOP3_012"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "Functional Interface",
+    "difficulty": "Easy",
+    "question": "Functional interface là gì? Chú thích @FunctionalInterface có tác dụng gì?",
+    "reference_answer": "Functional interface là interface có ĐÚNG MỘT phương thức trừu tượng (có thể có thêm default/static method), ví dụ Runnable, Comparator, Function<T,R>, Predicate<T>. Nó là kiểu đích cho lambda và method reference. Chú thích @FunctionalInterface yêu cầu trình biên dịch kiểm tra và báo lỗi nếu interface có nhiều hơn một phương thức trừu tượng, giúp bảo vệ ý định thiết kế.",
+    "key_points": [
+      "Functional interface có đúng một phương thức trừu tượng",
+      "@FunctionalInterface để trình biên dịch kiểm tra ràng buộc này"
+    ],
+    "id": "Q_OOP3_013"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Đóng gói",
+    "concept": "Package (gói)",
+    "difficulty": "Easy",
+    "question": "Package trong Java dùng để làm gì trong việc tổ chức mã nguồn hướng đối tượng?",
+    "reference_answer": "Package là cơ chế nhóm các lớp/interface liên quan vào cùng một không gian tên (ví dụ com.congty.banhang.donhang). Nó giúp tránh xung đột tên lớp giữa các thư viện, tổ chức mã nguồn theo chức năng/module, và kết hợp với access modifier mặc định (package-private) để giới hạn phạm vi truy cập trong cùng gói.",
+    "key_points": [
+      "Package nhóm các lớp liên quan vào một không gian tên",
+      "Tránh xung đột tên và hỗ trợ kiểm soát truy cập ở mức gói"
+    ],
+    "id": "Q_OOP3_014"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Từ khóa final với biến tham chiếu",
+    "difficulty": "Easy",
+    "question": "Khai báo final List<String> ds = new ArrayList<>(); có làm cho danh sách ds trở thành bất biến (không thể thêm/xóa phần tử) không? Giải thích.",
+    "reference_answer": "Không. final với biến tham chiếu chỉ ngăn việc GÁN LẠI biến đó trỏ tới một đối tượng khác (ds = new ArrayList<>() sẽ lỗi biên dịch). Bản thân đối tượng mà ds trỏ tới vẫn có thể thay đổi trạng thái bình thường, nên ds.add(...) và ds.remove(...) vẫn hợp lệ. Muốn danh sách bất biến phải dùng List.of(...) hoặc Collections.unmodifiableList(...).",
+    "key_points": [
+      "final với tham chiếu chỉ cấm gán lại biến, không cấm thay đổi đối tượng",
+      "Muốn bất biến thật cần dùng collection bất biến như List.of"
+    ],
+    "id": "Q_OOP3_015"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Nạp chồng phương thức",
+    "concept": "Tham số biến đổi (Varargs)",
+    "difficulty": "Easy",
+    "question": "Varargs (ví dụ int tong(int... so)) là gì và có ràng buộc nào khi khai báo?",
+    "reference_answer": "Varargs cho phép một phương thức nhận số lượng đối số tùy ý cùng kiểu; bên trong phương thức, tham số varargs được xử lý như một mảng. Ràng buộc: mỗi phương thức chỉ có tối đa một tham số varargs và nó phải đứng CUỐI danh sách tham số. Có thể gọi tong(), tong(1), tong(1, 2, 3) hoặc truyền thẳng một mảng.",
+    "key_points": [
+      "Varargs cho phép truyền số lượng đối số tùy ý, bên trong là một mảng",
+      "Chỉ một tham số varargs và phải đứng cuối danh sách"
+    ],
+    "id": "Q_OOP3_016"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Lớp bao (Wrapper class) và Autoboxing",
+    "difficulty": "Easy",
+    "question": "Lớp bao (wrapper class) như Integer, Double là gì? Autoboxing và unboxing là gì?",
+    "reference_answer": "Wrapper class là các lớp đối tượng bao quanh kiểu nguyên thủy (int → Integer, double → Double...), cần thiết vì collection và generics chỉ làm việc với đối tượng. Autoboxing là việc Java tự động chuyển kiểu nguyên thủy thành đối tượng wrapper (int → Integer) và unboxing là chiều ngược lại, giúp viết list.add(5) thay vì list.add(Integer.valueOf(5)).",
+    "key_points": [
+      "Wrapper class bọc kiểu nguyên thủy thành đối tượng để dùng với collection/generics",
+      "Autoboxing/unboxing là chuyển đổi tự động giữa nguyên thủy và wrapper"
+    ],
+    "id": "Q_OOP3_017"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Tính bất biến của String",
+    "difficulty": "Easy",
+    "question": "Vì sao nói đối tượng String trong Java là bất biến (immutable)? Lợi ích của điều này là gì?",
+    "reference_answer": "Sau khi tạo, nội dung của một đối tượng String không thể thay đổi; các phương thức như toUpperCase() hay concat() đều trả về một String MỚI. Tính bất biến giúp String an toàn khi chia sẻ giữa nhiều luồng, cho phép tái sử dụng qua String pool, an toàn khi dùng làm khóa trong HashMap (hashCode không đổi) và tránh bị sửa đổi ngoài ý muốn khi truyền làm tham số (ví dụ đường dẫn file, URL).",
+    "key_points": [
+      "Mọi thao tác 'sửa' String đều tạo ra String mới",
+      "Lợi ích: an toàn đa luồng, String pool, khóa HashMap ổn định, an toàn khi chia sẻ"
+    ],
+    "id": "Q_OOP3_018"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Vòng đời đối tượng",
+    "concept": "Sao chép nông và sao chép sâu",
+    "difficulty": "Easy",
+    "question": "Phân biệt sao chép nông (shallow copy) và sao chép sâu (deep copy) của một đối tượng.",
+    "reference_answer": "Sao chép nông tạo đối tượng mới nhưng chỉ sao chép giá trị các trường; với trường kiểu tham chiếu, bản sao và bản gốc cùng trỏ tới CHUNG đối tượng con, nên sửa đối tượng con ở một bên sẽ ảnh hưởng bên kia. Sao chép sâu sao chép đệ quy cả các đối tượng con, tạo ra cấu trúc hoàn toàn độc lập với bản gốc.",
+    "key_points": [
+      "Shallow copy: trường tham chiếu vẫn dùng chung đối tượng con",
+      "Deep copy: sao chép đệ quy, bản sao độc lập hoàn toàn"
+    ],
+    "id": "Q_OOP3_019"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Vòng đời đối tượng",
+    "concept": "Interface Cloneable và clone()",
+    "difficulty": "Easy",
+    "question": "Interface Cloneable trong Java có đặc điểm gì lạ so với các interface thông thường?",
+    "reference_answer": "Cloneable là một 'marker interface' — không khai báo phương thức nào. Nó chỉ đóng vai trò đánh dấu cho phương thức Object.clone() biết lớp này cho phép nhân bản; nếu gọi clone() trên đối tượng không implements Cloneable sẽ ném CloneNotSupportedException. Mặc định clone() thực hiện sao chép nông.",
+    "key_points": [
+      "Cloneable là marker interface, không có phương thức",
+      "Object.clone() kiểm tra Cloneable, mặc định sao chép nông"
+    ],
+    "id": "Q_OOP3_020"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "Interface Iterator",
+    "difficulty": "Easy",
+    "question": "Interface Iterator<T> cung cấp những phương thức chính nào và dùng để làm gì?",
+    "reference_answer": "Iterator cung cấp cách duyệt tuần tự các phần tử của một tập hợp mà không cần biết cấu trúc bên trong. Các phương thức chính: hasNext() kiểm tra còn phần tử hay không, next() trả về phần tử kế tiếp, và remove() (tùy chọn) xóa phần tử vừa được next() trả về một cách an toàn trong lúc duyệt.",
+    "key_points": [
+      "Iterator có hasNext(), next(), remove() (tùy chọn)",
+      "Cho phép duyệt tập hợp mà không lộ cấu trúc bên trong"
+    ],
+    "id": "Q_OOP3_021"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "Interface Iterable và vòng lặp for-each",
+    "difficulty": "Easy",
+    "question": "Một lớp tự định nghĩa cần làm gì để có thể dùng trong vòng lặp for-each (for (X x : doiTuong))?",
+    "reference_answer": "Lớp đó cần implements interface Iterable<X> và cài đặt phương thức iterator() trả về một Iterator<X>. Vòng lặp for-each thực chất được trình biên dịch chuyển thành việc gọi iterator() rồi lặp hasNext()/next(), nên bất kỳ lớp nào cài đặt Iterable đều dùng được cú pháp này.",
+    "key_points": [
+      "Cần implements Iterable<T> và cài đặt iterator()",
+      "for-each được biên dịch thành vòng lặp dùng Iterator"
+    ],
+    "id": "Q_OOP3_022"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Trừu tượng hóa",
+    "concept": "Lập trình hướng giao diện (Program to an interface)",
+    "difficulty": "Easy",
+    "question": "Vì sao nên khai báo List<String> ds = new ArrayList<>(); thay vì ArrayList<String> ds = new ArrayList<>();?",
+    "reference_answer": "Khai báo biến theo kiểu interface (List) thay vì lớp cài đặt cụ thể (ArrayList) giúp phần code còn lại chỉ phụ thuộc vào hợp đồng chung của List. Khi cần đổi sang LinkedList hay một cài đặt khác, chỉ phải sửa ở chỗ khởi tạo, không ảnh hưởng tới code sử dụng. Đây là nguyên tắc 'lập trình hướng giao diện, không hướng cài đặt'.",
+    "key_points": [
+      "Khai báo theo interface giúp code chỉ phụ thuộc vào hợp đồng chung",
+      "Dễ thay đổi lớp cài đặt mà không ảnh hưởng code sử dụng"
+    ],
+    "id": "Q_OOP3_023"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Abstract Factory Pattern - khái niệm",
+    "difficulty": "Easy",
+    "question": "Abstract Factory Pattern dùng để giải quyết vấn đề gì?",
+    "reference_answer": "Abstract Factory cung cấp một interface để tạo ra một HỌ các đối tượng liên quan hoặc phụ thuộc nhau mà không cần chỉ định lớp cụ thể. Ví dụ một GUIFactory có các phương thức taoNut(), taoHopThoai(); WindowsFactory và MacFactory cài đặt để tạo ra các thành phần cùng phong cách. Client chỉ làm việc với factory trừu tượng nên đảm bảo các sản phẩm được tạo ra luôn tương thích với nhau.",
+    "key_points": [
+      "Abstract Factory tạo ra một họ đối tượng liên quan qua một interface chung",
+      "Đảm bảo các sản phẩm cùng họ tương thích, client không phụ thuộc lớp cụ thể"
+    ],
+    "id": "Q_OOP3_024"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Prototype Pattern - khái niệm",
+    "difficulty": "Easy",
+    "question": "Prototype Pattern tạo đối tượng mới theo cách nào?",
+    "reference_answer": "Prototype tạo đối tượng mới bằng cách SAO CHÉP (clone) một đối tượng mẫu có sẵn thay vì gọi constructor và khởi tạo từ đầu. Nó hữu ích khi việc khởi tạo tốn kém (đọc cấu hình, truy vấn dữ liệu) hoặc khi cần tạo nhiều đối tượng gần giống nhau, và cho phép client tạo đối tượng mà không cần biết lớp cụ thể.",
+    "key_points": [
+      "Prototype tạo đối tượng bằng cách sao chép một đối tượng mẫu",
+      "Hữu ích khi khởi tạo tốn kém hoặc cần nhiều đối tượng tương tự"
+    ],
+    "id": "Q_OOP3_025"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Iterator Pattern - khái niệm",
+    "difficulty": "Easy",
+    "question": "Iterator Pattern tách biệt điều gì khỏi điều gì?",
+    "reference_answer": "Iterator Pattern tách biệt CÁCH DUYỆT các phần tử khỏi CẤU TRÚC LƯU TRỮ của tập hợp. Tập hợp chỉ cần cung cấp một đối tượng iterator; client duyệt qua iterator theo cùng một giao diện (hasNext/next) bất kể bên dưới là mảng, danh sách liên kết hay cây. Nhờ vậy có thể thay đổi cấu trúc lưu trữ hoặc có nhiều cách duyệt khác nhau mà không sửa code client.",
+    "key_points": [
+      "Tách cách duyệt khỏi cấu trúc lưu trữ nội bộ",
+      "Client duyệt qua giao diện thống nhất bất kể cấu trúc bên dưới"
+    ],
+    "id": "Q_OOP3_026"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Chain of Responsibility - khái niệm",
+    "difficulty": "Easy",
+    "question": "Chain of Responsibility Pattern hoạt động như thế nào?",
+    "reference_answer": "Chain of Responsibility xếp các đối tượng xử lý (handler) thành một chuỗi; một yêu cầu được chuyển dọc theo chuỗi, mỗi handler hoặc tự xử lý yêu cầu hoặc chuyển tiếp cho handler kế tiếp. Người gửi yêu cầu không cần biết handler nào sẽ xử lý. Ví dụ: hệ thống duyệt chi phí theo cấp Trưởng nhóm → Trưởng phòng → Giám đốc tùy số tiền.",
+    "key_points": [
+      "Các handler được nối thành chuỗi, yêu cầu được chuyển tiếp dọc chuỗi",
+      "Tách người gửi khỏi người xử lý cụ thể"
+    ],
+    "id": "Q_OOP3_027"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Mediator Pattern - khái niệm",
+    "difficulty": "Easy",
+    "question": "Mediator Pattern giúp giảm vấn đề gì giữa các đối tượng?",
+    "reference_answer": "Khi nhiều đối tượng giao tiếp trực tiếp với nhau, số liên kết tăng theo kiểu 'mạng nhện' (n đối tượng có thể tới n(n-1) liên kết). Mediator đưa vào một đối tượng trung gian điều phối: các đối tượng chỉ giao tiếp với mediator thay vì với nhau, nhờ đó giảm coupling giữa chúng. Ví dụ đài kiểm soát không lưu điều phối các máy bay thay vì máy bay tự liên lạc với nhau.",
+    "key_points": [
+      "Mediator làm trung gian điều phối giao tiếp giữa nhiều đối tượng",
+      "Giảm số liên kết trực tiếp và coupling giữa các đối tượng"
+    ],
+    "id": "Q_OOP3_028"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Memento Pattern - khái niệm",
+    "difficulty": "Easy",
+    "question": "Memento Pattern thường được dùng để cài đặt chức năng nào?",
+    "reference_answer": "Memento cho phép lưu lại (chụp) trạng thái bên trong của một đối tượng tại một thời điểm và khôi phục lại sau đó mà không vi phạm tính đóng gói. Nó thường dùng để cài đặt chức năng Undo/Redo, lưu điểm khôi phục (checkpoint) trong trò chơi hoặc trình soạn thảo. Ba vai trò: Originator (đối tượng gốc), Memento (bản chụp trạng thái), Caretaker (nơi giữ các memento).",
+    "key_points": [
+      "Memento lưu và khôi phục trạng thái đối tượng mà không phá đóng gói",
+      "Dùng cho Undo/Redo, checkpoint; gồm Originator, Memento, Caretaker"
+    ],
+    "id": "Q_OOP3_029"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Flyweight Pattern - khái niệm",
+    "difficulty": "Easy",
+    "question": "Flyweight Pattern giúp tiết kiệm tài nguyên gì và bằng cách nào?",
+    "reference_answer": "Flyweight giúp tiết kiệm BỘ NHỚ khi cần một số lượng rất lớn đối tượng tương tự nhau, bằng cách CHIA SẺ phần trạng thái chung giữa nhiều đối tượng thay vì mỗi đối tượng giữ một bản riêng. Ví dụ trình soạn thảo văn bản dùng chung đối tượng định dạng font cho hàng triệu ký tự giống nhau, chỉ lưu riêng vị trí của từng ký tự.",
+    "key_points": [
+      "Flyweight tiết kiệm bộ nhớ khi có rất nhiều đối tượng tương tự",
+      "Chia sẻ phần trạng thái chung thay vì nhân bản cho từng đối tượng"
+    ],
+    "id": "Q_OOP3_030"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Bridge Pattern - khái niệm",
+    "difficulty": "Easy",
+    "question": "Bridge Pattern tách biệt hai thành phần nào của một hệ thống?",
+    "reference_answer": "Bridge tách PHẦN TRỪU TƯỢNG (abstraction — cái mà client sử dụng) khỏi PHẦN CÀI ĐẶT (implementation — cách thực hiện cụ thể) để hai phần có thể phát triển độc lập. Ví dụ lớp HinhVe (Tron, Vuong) giữ tham chiếu tới một interface BoVe (VeOpenGL, VeSVG); thêm hình mới hoặc cách vẽ mới không cần tạo ra mọi tổ hợp lớp con.",
+    "key_points": [
+      "Bridge tách abstraction khỏi implementation bằng composition",
+      "Hai chiều có thể mở rộng độc lập, tránh bùng nổ số lớp con"
+    ],
+    "id": "Q_OOP3_031"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kiến trúc hướng đối tượng",
+    "concept": "Mô hình MVC",
+    "difficulty": "Easy",
+    "question": "Mô hình MVC (Model-View-Controller) gồm ba thành phần nào và vai trò của từng thành phần?",
+    "reference_answer": "Model chứa dữ liệu và logic nghiệp vụ; View chịu trách nhiệm hiển thị dữ liệu cho người dùng; Controller tiếp nhận thao tác của người dùng, gọi Model xử lý và chọn View phù hợp để hiển thị kết quả. Việc tách ba vai trò giúp thay đổi giao diện mà không ảnh hưởng logic nghiệp vụ và ngược lại.",
+    "key_points": [
+      "Model: dữ liệu + nghiệp vụ; View: hiển thị; Controller: xử lý đầu vào và điều phối",
+      "Tách biệt giúp thay đổi giao diện và nghiệp vụ độc lập"
+    ],
+    "id": "Q_OOP3_032"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Coupling & Cohesion",
+    "concept": "Luật Demeter (Law of Demeter)",
+    "difficulty": "Easy",
+    "question": "Luật Demeter (nguyên tắc 'chỉ nói chuyện với bạn thân') phát biểu điều gì?",
+    "reference_answer": "Luật Demeter khuyên một phương thức của đối tượng chỉ nên gọi phương thức của: chính nó, các tham số được truyền vào, các đối tượng nó tự tạo ra, và các thành phần trực tiếp của nó — không nên 'đi xuyên' qua đối tượng khác để gọi tiếp (ví dụ tránh donHang.getKhachHang().getDiaChi().getThanhPho()). Mục tiêu là giảm sự phụ thuộc vào cấu trúc bên trong của các đối tượng khác.",
+    "key_points": [
+      "Chỉ gọi phương thức của chính mình, tham số, đối tượng tự tạo, thành phần trực tiếp",
+      "Tránh chuỗi gọi xuyên nhiều đối tượng để giảm coupling"
+    ],
+    "id": "Q_OOP3_033"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Nguyên tắc GRASP",
+    "concept": "GRASP - Information Expert",
+    "difficulty": "Easy",
+    "question": "Nguyên tắc Information Expert trong GRASP gợi ý giao trách nhiệm cho lớp nào?",
+    "reference_answer": "Information Expert khuyên giao một trách nhiệm cho lớp NẮM GIỮ thông tin cần thiết để thực hiện trách nhiệm đó. Ví dụ việc tính tổng tiền đơn hàng nên đặt ở lớp DonHang (nơi chứa danh sách dòng hàng), còn việc tính thành tiền từng dòng đặt ở lớp DongHang (nơi có số lượng và đơn giá).",
+    "key_points": [
+      "Giao trách nhiệm cho lớp có đủ thông tin để thực hiện nó",
+      "Giúp tăng cohesion và giảm việc truyền dữ liệu qua lại"
+    ],
+    "id": "Q_OOP3_034"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Nguyên tắc GRASP",
+    "concept": "GRASP - Creator",
+    "difficulty": "Easy",
+    "question": "Theo nguyên tắc Creator của GRASP, lớp nào nên chịu trách nhiệm tạo ra đối tượng của lớp B?",
+    "reference_answer": "Lớp A nên tạo đối tượng B nếu A chứa hoặc gộp (aggregate) B, A ghi nhận B, A sử dụng B chặt chẽ, hoặc A có dữ liệu khởi tạo cho B. Ví dụ DonHang nên tạo các DongHang vì nó chứa chúng. Nguyên tắc này giúp giảm coupling vì A vốn đã liên kết với B.",
+    "key_points": [
+      "A nên tạo B nếu A chứa, ghi nhận, dùng chặt chẽ hoặc có dữ liệu khởi tạo cho B",
+      "Giữ coupling thấp vì quan hệ A-B đã tồn tại sẵn"
+    ],
+    "id": "Q_OOP3_035"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Nguyên tắc GRASP",
+    "concept": "GRASP - Controller",
+    "difficulty": "Easy",
+    "question": "Nguyên tắc Controller trong GRASP giải quyết câu hỏi thiết kế nào?",
+    "reference_answer": "Controller trả lời câu hỏi: đối tượng nào (ngoài tầng giao diện) nên tiếp nhận và điều phối một sự kiện hệ thống (ví dụ 'đặt hàng', 'thanh toán')? Câu trả lời là một đối tượng controller đại diện cho toàn hệ thống hoặc một kịch bản use case. Controller nhận yêu cầu từ UI rồi ủy thác cho các đối tượng nghiệp vụ, giúp UI không chứa logic nghiệp vụ.",
+    "key_points": [
+      "Controller là đối tượng đầu tiên ngoài UI nhận và điều phối sự kiện hệ thống",
+      "Ủy thác cho đối tượng nghiệp vụ, tách UI khỏi logic nghiệp vụ"
+    ],
+    "id": "Q_OOP3_036"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "UML",
+    "concept": "Thẻ CRC (Class-Responsibility-Collaborator)",
+    "difficulty": "Easy",
+    "question": "Thẻ CRC dùng trong giai đoạn thiết kế hướng đối tượng gồm những phần nào?",
+    "reference_answer": "Thẻ CRC là một tấm thẻ nhỏ mô tả một lớp gồm ba phần: Class (tên lớp), Responsibilities (các trách nhiệm — lớp biết gì và làm gì), Collaborators (các lớp khác mà nó cần cộng tác để hoàn thành trách nhiệm). CRC giúp nhóm động não, phân chia trách nhiệm nhanh chóng trước khi vẽ UML chi tiết.",
+    "key_points": [
+      "CRC gồm Class, Responsibilities, Collaborators",
+      "Công cụ nhẹ để phân chia trách nhiệm trong giai đoạn thiết kế sớm"
+    ],
+    "id": "Q_OOP3_037"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "UML",
+    "concept": "Biểu đồ tuần tự (Sequence Diagram)",
+    "difficulty": "Easy",
+    "question": "Biểu đồ tuần tự (Sequence Diagram) trong UML biểu diễn điều gì?",
+    "reference_answer": "Sequence Diagram biểu diễn sự tương tác giữa các đối tượng theo TRÌNH TỰ THỜI GIAN trong một kịch bản cụ thể: các đối tượng đặt theo chiều ngang với đường sống (lifeline) kéo dọc xuống, các thông điệp (lời gọi phương thức) là mũi tên ngang giữa các lifeline, thời gian tăng dần từ trên xuống dưới.",
+    "key_points": [
+      "Sequence Diagram mô tả tương tác giữa đối tượng theo trình tự thời gian",
+      "Gồm lifeline, thông điệp (mũi tên), thời gian đi từ trên xuống"
+    ],
+    "id": "Q_OOP3_038"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "UML",
+    "concept": "Biểu đồ Use Case",
+    "difficulty": "Easy",
+    "question": "Biểu đồ Use Case trong UML gồm những thành phần cơ bản nào?",
+    "reference_answer": "Biểu đồ Use Case gồm: Actor (tác nhân — người dùng hoặc hệ thống bên ngoài tương tác với hệ thống), Use Case (chức năng hệ thống cung cấp, vẽ bằng hình elip), ranh giới hệ thống (system boundary) và các quan hệ giữa chúng (association, include, extend, generalization). Nó mô tả hệ thống làm gì từ góc nhìn người dùng, không mô tả cách cài đặt.",
+    "key_points": [
+      "Thành phần: Actor, Use Case, ranh giới hệ thống, các quan hệ",
+      "Mô tả chức năng từ góc nhìn người dùng, không mô tả cài đặt"
+    ],
+    "id": "Q_OOP3_039"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "UML",
+    "concept": "Biểu đồ trạng thái (State Machine Diagram)",
+    "difficulty": "Easy",
+    "question": "Biểu đồ trạng thái (State Machine Diagram) trong UML phù hợp để mô tả loại đối tượng nào?",
+    "reference_answer": "State Machine Diagram mô tả các TRẠNG THÁI mà một đối tượng có thể trải qua trong vòng đời và các CHUYỂN TRẠNG THÁI được kích hoạt bởi sự kiện. Nó phù hợp cho đối tượng có hành vi phụ thuộc mạnh vào trạng thái, ví dụ DonHang (Mới → Đã thanh toán → Đang giao → Hoàn tất / Đã hủy) hay máy bán hàng tự động.",
+    "key_points": [
+      "Mô tả các trạng thái và chuyển trạng thái do sự kiện của một đối tượng",
+      "Phù hợp với đối tượng có hành vi phụ thuộc trạng thái như đơn hàng"
+    ],
+    "id": "Q_OOP3_040"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "UML",
+    "concept": "Ký hiệu phạm vi truy cập trong UML",
+    "difficulty": "Easy",
+    "question": "Trong biểu đồ lớp UML, các ký hiệu +, -, #, ~ đứng trước thuộc tính/phương thức có ý nghĩa gì?",
+    "reference_answer": "Các ký hiệu biểu thị phạm vi truy cập: + là public, - là private, # là protected, ~ là package (mặc định trong Java). Ngoài ra thành viên static thường được gạch chân và thành viên abstract được in nghiêng.",
+    "key_points": [
+      "+ public, - private, # protected, ~ package",
+      "Static gạch chân, abstract in nghiêng"
+    ],
+    "id": "Q_OOP3_041"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "UML",
+    "concept": "Bội số (Multiplicity) trong UML",
+    "difficulty": "Easy",
+    "question": "Bội số (multiplicity) như 1, 0..1, 1..*, * trên đường liên kết giữa hai lớp UML có ý nghĩa gì?",
+    "reference_answer": "Multiplicity cho biết một đối tượng ở đầu này có thể liên kết với bao nhiêu đối tượng ở đầu kia: 1 là đúng một, 0..1 là không hoặc một (tùy chọn), 1..* là ít nhất một, * (hoặc 0..*) là không hoặc nhiều. Ví dụ KhachHang 1 —— * DonHang nghĩa là một khách hàng có nhiều đơn hàng, mỗi đơn hàng thuộc đúng một khách hàng.",
+    "key_points": [
+      "Multiplicity chỉ số lượng đối tượng có thể liên kết ở mỗi đầu quan hệ",
+      "1, 0..1, 1..*, * lần lượt là đúng một, tùy chọn, ít nhất một, nhiều"
+    ],
+    "id": "Q_OOP3_042"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Refactoring và Code Smell",
+    "concept": "Code Smell - khái niệm",
+    "difficulty": "Easy",
+    "question": "'Code smell' (mùi code) là gì? Nó có phải là lỗi (bug) không?",
+    "reference_answer": "Code smell là dấu hiệu bề mặt trong mã nguồn gợi ý có vấn đề sâu hơn về thiết kế, ví dụ phương thức quá dài, lớp quá lớn, code trùng lặp, danh sách tham số dài. Code smell KHÔNG phải là bug — chương trình vẫn chạy đúng — nhưng nó làm code khó hiểu, khó bảo trì và dễ phát sinh lỗi trong tương lai, là tín hiệu để cân nhắc refactor.",
+    "key_points": [
+      "Code smell là dấu hiệu gợi ý vấn đề thiết kế",
+      "Không phải bug nhưng làm code khó bảo trì, là tín hiệu để refactor"
+    ],
+    "id": "Q_OOP3_043"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Refactoring và Code Smell",
+    "concept": "Refactoring - khái niệm",
+    "difficulty": "Easy",
+    "question": "Refactoring là gì và điều kiện quan trọng nhất khi thực hiện refactoring là gì?",
+    "reference_answer": "Refactoring là quá trình thay đổi cấu trúc bên trong của mã nguồn để dễ hiểu, dễ bảo trì hơn mà KHÔNG thay đổi hành vi bên ngoài của chương trình. Điều kiện quan trọng là phải có bộ kiểm thử tự động đáng tin cậy để xác nhận hành vi không đổi sau mỗi bước nhỏ, và nên refactor theo từng bước nhỏ, an toàn.",
+    "key_points": [
+      "Refactoring cải thiện cấu trúc mà không đổi hành vi bên ngoài",
+      "Cần có kiểm thử tự động và thực hiện theo bước nhỏ"
+    ],
+    "id": "Q_OOP3_044"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Refactoring và Code Smell",
+    "concept": "God Class (Lớp thượng đế)",
+    "difficulty": "Easy",
+    "question": "'God Class' là gì và vì sao nó được coi là anti-pattern?",
+    "reference_answer": "God Class là một lớp ôm đồm quá nhiều trách nhiệm, biết quá nhiều và điều khiển quá nhiều phần của hệ thống (thường có hàng nghìn dòng, hàng trăm phương thức). Nó vi phạm SRP, có cohesion thấp, mọi thay đổi đều chạm vào nó nên dễ gây xung đột và lỗi dây chuyền, khó kiểm thử và khó hiểu.",
+    "key_points": [
+      "God Class ôm quá nhiều trách nhiệm và kiến thức",
+      "Vi phạm SRP, cohesion thấp, khó kiểm thử và bảo trì"
+    ],
+    "id": "Q_OOP3_045"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Xử lý ngoại lệ trong OOP",
+    "concept": "try-with-resources",
+    "difficulty": "Easy",
+    "question": "Cú pháp try-with-resources trong Java giải quyết vấn đề gì? Đối tượng cần thỏa mãn điều kiện gì để dùng được?",
+    "reference_answer": "try-with-resources tự động đóng tài nguyên (file, kết nối CSDL, socket) khi khối try kết thúc, dù kết thúc bình thường hay do ngoại lệ, giúp tránh rò rỉ tài nguyên và code finally rườm rà. Đối tượng khai báo trong ngoặc của try phải cài đặt interface AutoCloseable (hoặc Closeable) để có phương thức close().",
+    "key_points": [
+      "Tự động gọi close() khi kết thúc khối try, kể cả khi có ngoại lệ",
+      "Tài nguyên phải cài đặt AutoCloseable"
+    ],
+    "id": "Q_OOP3_046"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kế thừa",
+    "concept": "Lớp niêm phong (Sealed class)",
+    "difficulty": "Easy",
+    "question": "Sealed class (Java 17) cho phép kiểm soát điều gì trong kế thừa?",
+    "reference_answer": "Sealed class cho phép lớp/interface chỉ định CHÍNH XÁC những lớp nào được phép kế thừa nó thông qua mệnh đề permits, ví dụ sealed interface HinhHoc permits Tron, Vuong, TamGiac. Các lớp con phải khai báo final, sealed hoặc non-sealed. Nhờ vậy hệ phân cấp là đóng và đã biết trước, giúp trình biên dịch kiểm tra tính đầy đủ khi dùng switch theo kiểu.",
+    "key_points": [
+      "Sealed class giới hạn tập lớp con được phép qua permits",
+      "Lớp con phải là final/sealed/non-sealed; hỗ trợ kiểm tra đầy đủ khi switch"
+    ],
+    "id": "Q_OOP3_047"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Phương thức getClass() và thông tin kiểu lúc chạy",
+    "difficulty": "Easy",
+    "question": "Phương thức getClass() trả về thông tin gì, và khác gì với toán tử instanceof?",
+    "reference_answer": "getClass() trả về đối tượng Class biểu diễn kiểu THỰC TẾ (chính xác) của đối tượng lúc chạy. instanceof kiểm tra đối tượng có phải là thể hiện của một kiểu HOẶC bất kỳ lớp con nào của kiểu đó hay không. Vì vậy với lớp con SinhVienCaoHoc extends SinhVien, sv instanceof SinhVien là true nhưng sv.getClass() == SinhVien.class là false.",
+    "key_points": [
+      "getClass() trả về kiểu thực tế chính xác lúc chạy",
+      "instanceof chấp nhận cả lớp con, getClass() so sánh kiểu chính xác"
+    ],
+    "id": "Q_OOP3_048"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Lớp Optional - khái niệm",
+    "difficulty": "Easy",
+    "question": "Lớp Optional<T> (Java 8+) được thiết kế để giải quyết vấn đề gì?",
+    "reference_answer": "Optional<T> là một đối tượng bao có thể chứa một giá trị hoặc rỗng, dùng chủ yếu làm KIỂU TRẢ VỀ của phương thức để thể hiện tường minh rằng kết quả có thể không tồn tại (ví dụ timSinhVienTheoMa() có thể không tìm thấy). Nó buộc người gọi phải xử lý trường hợp rỗng (orElse, orElseThrow, ifPresent, map) thay vì nhận null và dễ gặp NullPointerException.",
+    "key_points": [
+      "Optional biểu diễn tường minh giá trị có thể vắng mặt",
+      "Chủ yếu dùng làm kiểu trả về để buộc người gọi xử lý trường hợp rỗng, giảm NullPointerException"
+    ],
+    "id": "Q_OOP3_049"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Đa hình",
+    "concept": "Pattern matching cho instanceof (Java 16+)",
+    "difficulty": "Easy",
+    "question": "Cú pháp if (obj instanceof SinhVien sv) { ... } (pattern matching cho instanceof) cải tiến gì so với cách viết truyền thống?",
+    "reference_answer": "Cách truyền thống phải kiểm tra rồi ép kiểu thủ công: if (obj instanceof SinhVien) { SinhVien sv = (SinhVien) obj; ... }. Pattern matching gộp kiểm tra kiểu và khai báo biến đã ép kiểu trong một bước: nếu điều kiện đúng, biến sv tự động có kiểu SinhVien trong phạm vi khối. Code ngắn gọn hơn và tránh lỗi ép nhầm kiểu do lặp lại tên kiểu.",
+    "key_points": [
+      "Gộp kiểm tra kiểu và ép kiểu vào một bước",
+      "Giảm code lặp và tránh lỗi ép kiểu thủ công"
+    ],
+    "id": "Q_OOP3_050"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "Hợp đồng equals()/hashCode()",
+    "difficulty": "Medium",
+    "question": "Vì sao khi override equals() thì BẮT BUỘC phải override cả hashCode()? Điều gì xảy ra nếu quên?",
+    "reference_answer": "Hợp đồng của Java yêu cầu: nếu a.equals(b) là true thì a.hashCode() phải bằng b.hashCode(). HashMap/HashSet dùng hashCode để chọn bucket trước, rồi mới dùng equals để so sánh trong bucket. Nếu chỉ override equals mà giữ hashCode mặc định (dựa trên địa chỉ), hai đối tượng 'bằng nhau' về logic sẽ có hashCode khác nhau, rơi vào bucket khác nhau: set.add(a); set.contains(b) trả về false dù a.equals(b), và HashSet có thể chứa các phần tử 'trùng' về logic.",
+    "key_points": [
+      "Hợp đồng: equals bằng nhau thì hashCode phải bằng nhau",
+      "Quên override hashCode khiến HashMap/HashSet không tìm thấy phần tử và chứa phần tử trùng logic"
+    ],
+    "id": "Q_OOP3_051"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "Các tính chất bắt buộc của equals()",
+    "difficulty": "Medium",
+    "question": "Một cài đặt equals() đúng đắn phải thỏa mãn những tính chất nào theo đặc tả của Java?",
+    "reference_answer": "equals() phải thỏa mãn: (1) Phản xạ: x.equals(x) là true; (2) Đối xứng: x.equals(y) khi và chỉ khi y.equals(x); (3) Bắc cầu: x.equals(y) và y.equals(z) thì x.equals(z); (4) Nhất quán: gọi nhiều lần cho cùng kết quả nếu đối tượng không đổi; (5) x.equals(null) luôn là false. Cài đặt điển hình: kiểm tra this == o, kiểm tra null và kiểu, ép kiểu rồi so sánh các trường quan trọng (dùng Objects.equals cho trường có thể null).",
+    "key_points": [
+      "Năm tính chất: phản xạ, đối xứng, bắc cầu, nhất quán, so với null là false",
+      "Quy trình chuẩn: kiểm tra tham chiếu, null, kiểu, rồi so sánh các trường quan trọng"
+    ],
+    "id": "Q_OOP3_052"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "Chọn giữa Comparable và Comparator",
+    "difficulty": "Medium",
+    "question": "Lớp SanPham cần được sắp xếp theo mã trong hầu hết các trường hợp, nhưng màn hình báo cáo lại cần sắp xếp theo giá giảm dần, rồi theo tên. Thiết kế thế nào cho hợp lý?",
+    "reference_answer": "Cho SanPham implements Comparable<SanPham> với compareTo theo mã sản phẩm — đây là thứ tự tự nhiên dùng mặc định (TreeSet, Collections.sort). Với báo cáo, tạo Comparator riêng mà không sửa lớp: Comparator.comparing(SanPham::getGia).reversed().thenComparing(SanPham::getTen). Cách này giữ lớp SanPham gọn, mỗi nhu cầu sắp xếp đặc thù được đóng gói trong một Comparator riêng và có thể tái sử dụng.",
+    "key_points": [
+      "Thứ tự phổ biến nhất đặt vào Comparable (thứ tự tự nhiên)",
+      "Các tiêu chí đặc thù dùng Comparator tổ hợp (comparing, reversed, thenComparing) mà không sửa lớp"
+    ],
+    "id": "Q_OOP3_053"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Enum có thuộc tính và hành vi",
+    "difficulty": "Medium",
+    "question": "Thay vì viết switch theo enum PhuongThucVanChuyen ở nhiều nơi để tính phí, làm thế nào tận dụng enum để loại bỏ các switch đó?",
+    "reference_answer": "Enum trong Java là lớp đầy đủ nên có thể có trường, constructor và phương thức, thậm chí mỗi hằng có thể override một phương thức trừu tượng. Ví dụ enum PhuongThucVanChuyen { NHANH { double tinhPhi(double kg) { return 30000 + kg*5000; } }, TIET_KIEM { ... }; abstract double tinhPhi(double kg); }. Logic tính phí gắn trực tiếp với từng hằng, nên thêm phương thức mới chỉ cần thêm một hằng; trình biên dịch buộc cài đặt tinhPhi, không sợ quên một nhánh switch ở đâu đó.",
+    "key_points": [
+      "Enum có thể chứa trường, constructor, phương thức, và phương thức riêng cho từng hằng",
+      "Gắn hành vi vào hằng enum thay thế các switch rải rác, trình biên dịch đảm bảo đầy đủ"
+    ],
+    "id": "Q_OOP3_054"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Singleton bằng Enum",
+    "difficulty": "Medium",
+    "question": "Vì sao Joshua Bloch (Effective Java) khuyên cài đặt Singleton bằng enum với một hằng duy nhất (enum CauHinh { INSTANCE; ... })?",
+    "reference_answer": "Enum singleton được JVM đảm bảo chỉ khởi tạo đúng một lần và an toàn đa luồng mà không cần đồng bộ thủ công. Nó cũng tự động chống được hai cách phá Singleton phổ biến: tuần tự hóa/giải tuần tự hóa (Java đảm bảo enum không tạo bản mới khi deserialize) và dùng reflection gọi constructor private (JVM cấm tạo thể hiện enum bằng reflection). Nhược điểm: không thể kế thừa lớp khác và khởi tạo không lười theo nhu cầu tinh tế.",
+    "key_points": [
+      "JVM đảm bảo khởi tạo một lần, an toàn đa luồng",
+      "Tự chống phá Singleton qua serialization và reflection; hạn chế là không kế thừa được lớp khác"
+    ],
+    "id": "Q_OOP3_055"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Record và Value Object",
+    "difficulty": "Medium",
+    "question": "Khi nào nên dùng record thay cho một lớp thông thường, và khi nào record KHÔNG phù hợp?",
+    "reference_answer": "Record phù hợp cho các đối tượng thuần dữ liệu, bất biến, được so sánh bằng giá trị: DTO, kết quả truy vấn, tọa độ, khoảng tiền tệ, khóa tổng hợp của Map. Record không phù hợp khi đối tượng cần trạng thái thay đổi được (entity có vòng đời, ví dụ TaiKhoan có số dư thay đổi), cần kế thừa từ lớp khác (record ngầm extends java.lang.Record và là final), cần ẩn bớt trường (mọi thành phần đều có accessor public), hoặc khi danh tính quan trọng hơn giá trị.",
+    "key_points": [
+      "Record hợp với dữ liệu bất biến so sánh theo giá trị (DTO, value object)",
+      "Không hợp với entity khả biến, cần kế thừa, cần ẩn trường hoặc dựa trên danh tính"
+    ],
+    "id": "Q_OOP3_056"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp lồng nhau và biểu thức Lambda",
+    "concept": "Chọn inner class hay static nested class",
+    "difficulty": "Medium",
+    "question": "Khi thiết kế lớp Node bên trong lớp DanhSachLienKet, nên khai báo Node là static nested class hay inner class? Vì sao?",
+    "reference_answer": "Nên là static nested class. Node chỉ cần lưu dữ liệu và tham chiếu tới node kế tiếp, không cần truy cập trạng thái của một đối tượng DanhSachLienKet cụ thể. Nếu khai báo là inner class, MỖI Node sẽ ngầm giữ thêm một tham chiếu tới đối tượng danh sách bao ngoài, tốn bộ nhớ (thêm một con trỏ cho mỗi node) và có thể giữ đối tượng ngoài sống lâu hơn cần thiết. Quy tắc chung: mặc định chọn static nested, chỉ dùng inner class khi thật sự cần truy cập thể hiện bao ngoài.",
+    "key_points": [
+      "Node không cần trạng thái của đối tượng danh sách nên dùng static nested",
+      "Inner class ngầm giữ tham chiếu outer, tốn bộ nhớ và có thể kéo dài vòng đời outer"
+    ],
+    "id": "Q_OOP3_057"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp lồng nhau và biểu thức Lambda",
+    "concept": "Khác biệt giữa Lambda và lớp vô danh",
+    "difficulty": "Medium",
+    "question": "Ngoài cú pháp ngắn gọn, lambda khác lớp vô danh ở những điểm ngữ nghĩa nào?",
+    "reference_answer": "(1) Từ khóa this: trong lớp vô danh, this trỏ tới chính đối tượng lớp vô danh; trong lambda, this trỏ tới đối tượng của lớp bao ngoài. (2) Lambda không tạo phạm vi tên mới nên không được khai báo biến trùng tên biến cục bộ bên ngoài, còn lớp vô danh thì có thể che (shadow). (3) Lambda chỉ cài đặt được functional interface, lớp vô danh có thể kế thừa lớp trừu tượng hoặc cài interface nhiều phương thức, có thể có trạng thái riêng. (4) Lambda thường được JVM hiện thực bằng invokedynamic, không sinh file .class riêng cho mỗi lambda.",
+    "key_points": [
+      "this trong lambda là đối tượng bao ngoài, trong lớp vô danh là chính nó",
+      "Lambda chỉ cho functional interface, không tạo phạm vi tên mới; lớp vô danh linh hoạt hơn và có thể có trạng thái"
+    ],
+    "id": "Q_OOP3_058"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp lồng nhau và biểu thức Lambda",
+    "concept": "Biến effectively final khi capture",
+    "difficulty": "Medium",
+    "question": "Vì sao lambda và lớp vô danh chỉ được dùng các biến cục bộ 'effectively final' (không bị gán lại sau khi khởi tạo) của phương thức bao ngoài?",
+    "reference_answer": "Biến cục bộ nằm trên stack của phương thức và sẽ biến mất khi phương thức kết thúc, trong khi lambda có thể được thực thi sau đó (ví dụ trong luồng khác). Vì vậy Java SAO CHÉP giá trị biến vào lambda tại thời điểm tạo. Nếu cho phép gán lại biến, giá trị trong lambda và bên ngoài sẽ lệch nhau gây khó hiểu và lỗi đồng thời. Ràng buộc effectively final đảm bảo bản sao luôn đúng. Muốn thay đổi trạng thái chung phải dùng trường của đối tượng hoặc một đối tượng bao như AtomicInteger.",
+    "key_points": [
+      "Lambda giữ bản sao giá trị biến cục bộ vì biến stack có thể đã mất khi lambda chạy",
+      "Effectively final đảm bảo bản sao không lệch; cần trạng thái thay đổi thì dùng trường hoặc đối tượng bao như AtomicInteger"
+    ],
+    "id": "Q_OOP3_059"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp lồng nhau và biểu thức Lambda",
+    "concept": "Method Reference",
+    "difficulty": "Medium",
+    "question": "Có bốn dạng method reference trong Java. Kể tên và cho ví dụ mỗi dạng.",
+    "reference_answer": "(1) Tham chiếu phương thức static: Integer::parseInt tương đương s -> Integer.parseInt(s). (2) Tham chiếu phương thức của một đối tượng cụ thể: System.out::println tương đương x -> System.out.println(x). (3) Tham chiếu phương thức thể hiện của một đối tượng bất kỳ thuộc kiểu: String::toUpperCase tương đương s -> s.toUpperCase() (đối số đầu trở thành đối tượng nhận lời gọi). (4) Tham chiếu constructor: ArrayList::new tương đương () -> new ArrayList<>().",
+    "key_points": [
+      "Bốn dạng: static, phương thức của đối tượng cụ thể, phương thức thể hiện của kiểu bất kỳ, constructor",
+      "Method reference là cách viết gọn của lambda chỉ gọi một phương thức có sẵn"
+    ],
+    "id": "Q_OOP3_060"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "So sánh Abstract Factory và Factory Method",
+    "difficulty": "Medium",
+    "question": "So sánh Abstract Factory với Factory Method về cơ chế và phạm vi áp dụng.",
+    "reference_answer": "Factory Method dựa trên KẾ THỪA: lớp cha định nghĩa một phương thức tạo đối tượng, lớp con override để quyết định tạo MỘT loại sản phẩm cụ thể. Abstract Factory dựa trên COMPOSITION: client nhận một đối tượng factory có NHIỀU phương thức tạo ra một HỌ sản phẩm liên quan (nút, hộp thoại, thanh cuộn cùng phong cách). Factory Method phù hợp khi chỉ cần trì hoãn việc chọn một lớp sản phẩm; Abstract Factory phù hợp khi cần đảm bảo nhiều sản phẩm được tạo ra luôn tương thích với nhau. Thực tế mỗi phương thức trong Abstract Factory thường chính là một factory method.",
+    "key_points": [
+      "Factory Method: kế thừa, tạo một loại sản phẩm; Abstract Factory: composition, tạo cả họ sản phẩm",
+      "Abstract Factory đảm bảo tính tương thích giữa các sản phẩm cùng họ"
+    ],
+    "id": "Q_OOP3_061"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Prototype và sao chép nông/sâu",
+    "difficulty": "Medium",
+    "question": "Khi cài đặt Prototype cho lớp TaiLieu chứa danh sách List<TrangGiay>, cần lưu ý gì để bản sao không làm hỏng bản gốc?",
+    "reference_answer": "Nếu chỉ dùng super.clone() (sao chép nông), bản sao và bản gốc dùng CHUNG một đối tượng List<TrangGiay>: thêm/xóa trang trên bản sao sẽ thay đổi cả bản gốc. Cần sao chép sâu ở mức phù hợp: tạo List mới và sao chép từng TrangGiay (nếu TrangGiay khả biến). Thường nên dùng copy constructor hoặc phương thức copy() tự viết thay vì Cloneable để kiểm soát rõ ràng phần nào được chia sẻ, phần nào được nhân bản.",
+    "key_points": [
+      "clone() nông khiến bản sao và bản gốc chia sẻ collection khả biến",
+      "Cần sao chép sâu các thành phần khả biến, ưu tiên copy constructor/phương thức copy tự viết"
+    ],
+    "id": "Q_OOP3_062"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Iterator fail-fast và ConcurrentModificationException",
+    "difficulty": "Medium",
+    "question": "Vì sao đoạn code for (SinhVien sv : ds) { if (sv.diem < 5) ds.remove(sv); } thường ném ConcurrentModificationException? Cách sửa đúng là gì?",
+    "reference_answer": "Các iterator của ArrayList/HashMap là 'fail-fast': chúng lưu số lần sửa đổi cấu trúc (modCount) lúc bắt đầu và kiểm tra lại ở mỗi lần next(). Gọi ds.remove() trực tiếp làm thay đổi modCount ngoài sự kiểm soát của iterator, nên lần next() kế tiếp phát hiện bất thường và ném ngoại lệ. Cách sửa: dùng iterator tường minh và gọi it.remove(), hoặc dùng ds.removeIf(sv -> sv.diem < 5), hoặc gom phần tử cần xóa vào danh sách riêng rồi xóa sau.",
+    "key_points": [
+      "Iterator fail-fast so sánh modCount, sửa cấu trúc trực tiếp khi đang duyệt sẽ bị phát hiện",
+      "Sửa bằng Iterator.remove(), removeIf() hoặc xóa sau khi duyệt"
+    ],
+    "id": "Q_OOP3_063"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Ứng dụng Chain of Responsibility cho bộ lọc yêu cầu",
+    "difficulty": "Medium",
+    "question": "Một web server cần kiểm tra lần lượt: xác thực, phân quyền, giới hạn tần suất, ghi log trước khi xử lý request. Phân tích việc áp dụng Chain of Responsibility thay vì viết một phương thức dài với nhiều if.",
+    "reference_answer": "Mỗi bước kiểm tra được đóng gói thành một handler riêng có cùng interface (xuLy(request, tiepTheo)), mỗi handler hoặc dừng chuỗi (trả lỗi 401, 429...) hoặc chuyển tiếp. Lợi ích: mỗi handler có một trách nhiệm (SRP), dễ kiểm thử độc lập, thêm/bớt/đổi thứ tự bước chỉ cần cấu hình lại chuỗi (OCP), có thể tái sử dụng cho nhiều route. Đây chính là mô hình middleware/filter trong Express, Servlet Filter, Spring Security. Cần lưu ý thứ tự trong chuỗi có ý nghĩa (ví dụ xác thực phải trước phân quyền).",
+    "key_points": [
+      "Mỗi bước kiểm tra là một handler độc lập, có thể dừng hoặc chuyển tiếp",
+      "Dễ thêm/bớt/sắp xếp lại bước, kiểm thử riêng; đây là mô hình middleware/filter thực tế"
+    ],
+    "id": "Q_OOP3_064"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "So sánh Mediator và Observer",
+    "difficulty": "Medium",
+    "question": "Mediator và Observer đều giúp giảm coupling giữa các đối tượng. Chúng khác nhau như thế nào?",
+    "reference_answer": "Observer thiết lập quan hệ một-nhiều: subject phát thông báo, các observer tự đăng ký lắng nghe; subject không biết và không điều khiển việc observer làm gì — luồng thông tin phân tán. Mediator tập trung logic tương tác vào một đối tượng điều phối biết rõ các thành phần và quyết định ai làm gì khi có sự kiện — luồng điều khiển tập trung. Observer phù hợp cho thông báo thay đổi; Mediator phù hợp khi các đối tượng có tương tác qua lại phức tạp (ví dụ các ô nhập trong một form phụ thuộc lẫn nhau). Hai pattern thường kết hợp: mediator có thể dùng cơ chế observer để nhận sự kiện.",
+    "key_points": [
+      "Observer: phát thông báo một-nhiều, luồng phân tán, subject không điều khiển observer",
+      "Mediator: tập trung logic phối hợp vào một đối tượng biết tất cả thành phần"
+    ],
+    "id": "Q_OOP3_065"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Memento và việc giữ tính đóng gói",
+    "difficulty": "Medium",
+    "question": "Khi cài đặt Undo cho lớp TrinhSoanThao, vì sao Memento được thiết kế sao cho chỉ Originator đọc được nội dung của nó, còn Caretaker thì không?",
+    "reference_answer": "Memento chứa trạng thái nội bộ (nội dung, vị trí con trỏ, vùng chọn...) mà lẽ ra chỉ TrinhSoanThao được biết. Nếu Caretaker (lớp quản lý lịch sử Undo) đọc/sửa được nội dung memento, nó sẽ phụ thuộc vào cấu trúc nội bộ của Originator và có thể tạo ra trạng thái không hợp lệ, phá vỡ đóng gói. Trong Java thường cài đặt Memento là static nested class với constructor/getter private, hoặc interface rỗng hướng ra ngoài (narrow interface) và cài đặt đầy đủ chỉ Originator thấy (wide interface). Caretaker chỉ lưu và trả lại memento như một 'hộp kín'.",
+    "key_points": [
+      "Memento chứa trạng thái nội bộ, chỉ Originator nên đọc/ghi",
+      "Caretaker chỉ giữ memento như hộp kín (narrow interface) để không phá đóng gói"
+    ],
+    "id": "Q_OOP3_066"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Flyweight - trạng thái nội tại và ngoại tại",
+    "difficulty": "Medium",
+    "question": "Trong Flyweight Pattern, phân biệt trạng thái nội tại (intrinsic) và ngoại tại (extrinsic) qua ví dụ game vẽ một khu rừng 1 triệu cây.",
+    "reference_answer": "Trạng thái nội tại là phần CHIA SẺ được, không phụ thuộc ngữ cảnh: loại cây, mô hình 3D, texture, màu lá — lưu trong đối tượng flyweight LoaiCay, chỉ có vài chục đối tượng. Trạng thái ngoại tại phụ thuộc từng thể hiện: tọa độ x, y, kích thước, độ nghiêng — lưu riêng (ví dụ trong mảng nhẹ hoặc đối tượng Cay chỉ gồm tọa độ và tham chiếu tới LoaiCay) và được truyền vào khi vẽ. Nhờ vậy dữ liệu nặng (texture, mesh) không bị nhân bản 1 triệu lần. Flyweight bắt buộc phải bất biến vì được chia sẻ, và thường được lấy qua một factory có cache.",
+    "key_points": [
+      "Intrinsic: phần dùng chung, độc lập ngữ cảnh, lưu trong flyweight",
+      "Extrinsic: phần riêng từng thể hiện, truyền vào khi dùng; flyweight phải bất biến và lấy qua factory có cache"
+    ],
+    "id": "Q_OOP3_067"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Phân biệt Bridge và Adapter",
+    "difficulty": "Medium",
+    "question": "Bridge và Adapter đều dùng composition để kết nối hai phần, vậy khác nhau ở điểm nào?",
+    "reference_answer": "Khác nhau chủ yếu ở Ý ĐỒ và THỜI ĐIỂM: Adapter là giải pháp 'sau khi sự đã rồi' — làm cho một lớp có sẵn với interface không tương thích làm việc được với code hiện có (ví dụ bọc thư viện thanh toán bên thứ ba). Bridge là quyết định thiết kế 'từ đầu' — chủ động tách abstraction và implementation để hai chiều mở rộng độc lập (ví dụ ThongBao × KenhGui: Email, SMS, Push). Adapter thường bọc một đối tượng để đổi giao diện; Bridge thiết kế hai hệ phân cấp song song nối nhau bằng tham chiếu.",
+    "key_points": [
+      "Adapter: hòa hợp interface không tương thích của thứ có sẵn (giải pháp hậu kỳ)",
+      "Bridge: thiết kế chủ động tách hai chiều biến đổi để mở rộng độc lập"
+    ],
+    "id": "Q_OOP3_068"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kiến trúc hướng đối tượng",
+    "concept": "So sánh MVC, MVP và MVVM",
+    "difficulty": "Medium",
+    "question": "So sánh ngắn gọn MVC, MVP và MVVM về cách View liên hệ với logic trình bày.",
+    "reference_answer": "MVC: Controller nhận input, cập nhật Model; View đọc/quan sát Model để hiển thị, View và Model có thể biết nhau. MVP: Presenter đứng giữa hoàn toàn, View thụ động chỉ hiển thị và chuyển sự kiện cho Presenter qua interface; Presenter cập nhật View tường minh — dễ kiểm thử vì View có thể giả lập. MVVM: ViewModel phơi bày trạng thái và lệnh, View liên kết với ViewModel qua data binding hai chiều nên gần như không có code cập nhật giao diện thủ công; ViewModel không biết View. Xu hướng chung: càng về sau càng tách View khỏi logic để dễ kiểm thử.",
+    "key_points": [
+      "MVC: View quan sát Model; MVP: Presenter điều khiển View thụ động qua interface",
+      "MVVM: View binding với ViewModel, ViewModel không biết View; mục tiêu tách logic khỏi giao diện để kiểm thử"
+    ],
+    "id": "Q_OOP3_069"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Coupling & Cohesion",
+    "concept": "Sửa vi phạm Luật Demeter (Train Wreck)",
+    "difficulty": "Medium",
+    "question": "Đoạn code if (donHang.getKhachHang().getViTien().getSoDu() >= tongTien) donHang.getKhachHang().getViTien().tru(tongTien); vi phạm điều gì và nên sửa thế nào?",
+    "reference_answer": "Đây là 'train wreck' vi phạm Luật Demeter: lớp gọi phải biết cấu trúc nội bộ của KhachHang (có ViTien) và của ViTien (có số dư), tạo coupling với cả chuỗi lớp; nếu đổi cách lưu ví (nhiều ví, điểm thưởng) thì mọi nơi gọi đều phải sửa. Đồng thời logic kiểm tra-rồi-trừ nằm sai chỗ. Nên chuyển hành vi về nơi có dữ liệu (Tell, Don't Ask): khachHang.thanhToan(tongTien) — bên trong KhachHang ủy quyền cho viTien.tru(soTien) và ViTien tự kiểm tra số dư, ném ngoại lệ nếu không đủ.",
+    "key_points": [
+      "Chuỗi getter xuyên đối tượng tạo coupling với cấu trúc nội bộ của nhiều lớp",
+      "Sửa bằng cách đưa hành vi về đối tượng sở hữu dữ liệu và ủy quyền từng tầng"
+    ],
+    "id": "Q_OOP3_070"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Nguyên tắc GRASP",
+    "concept": "GRASP - Pure Fabrication",
+    "difficulty": "Medium",
+    "question": "Nguyên tắc Pure Fabrication trong GRASP là gì? Cho ví dụ.",
+    "reference_answer": "Đôi khi giao trách nhiệm theo Information Expert lại làm giảm cohesion hoặc tăng coupling — ví dụ đặt việc lưu DonHang xuống CSDL vào chính lớp DonHang khiến lớp nghiệp vụ dính vào JDBC/SQL. Pure Fabrication khuyên tạo ra một lớp 'nhân tạo' không tương ứng khái niệm nào trong miền nghiệp vụ, chỉ để gánh trách nhiệm đó với cohesion cao, ví dụ DonHangRepository, GuiEmailService, BoChuyenDoiTienTe. Hầu hết service, repository, adapter trong thực tế là pure fabrication.",
+    "key_points": [
+      "Pure Fabrication: tạo lớp không có trong miền nghiệp vụ để gánh một trách nhiệm kỹ thuật",
+      "Giữ lớp nghiệp vụ có cohesion cao, coupling thấp; ví dụ Repository, Service"
+    ],
+    "id": "Q_OOP3_071"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Nguyên tắc GRASP",
+    "concept": "GRASP - Indirection và Protected Variations",
+    "difficulty": "Medium",
+    "question": "Giải thích mối quan hệ giữa hai nguyên tắc Indirection và Protected Variations trong GRASP.",
+    "reference_answer": "Protected Variations là MỤC TIÊU: xác định những điểm có khả năng thay đổi hoặc không ổn định (nhà cung cấp thanh toán, định dạng file, thuật toán thuế) và bảo vệ phần còn lại khỏi những thay đổi đó bằng một interface ổn định. Indirection là PHƯƠNG TIỆN: đặt một đối tượng trung gian giữa hai thành phần để chúng không phụ thuộc trực tiếp vào nhau (adapter, gateway, interface). Hầu hết design pattern (Adapter, Facade, Strategy, Observer) đều là cách hiện thực Indirection để đạt Protected Variations.",
+    "key_points": [
+      "Protected Variations: bảo vệ hệ thống khỏi các điểm biến đổi bằng interface ổn định",
+      "Indirection: dùng trung gian để tách phụ thuộc trực tiếp, là phương tiện để đạt mục tiêu trên"
+    ],
+    "id": "Q_OOP3_072"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Refactoring và Code Smell",
+    "concept": "Replace Conditional with Polymorphism",
+    "difficulty": "Medium",
+    "question": "Phương thức tinhLuong(NhanVien nv) có switch(nv.getLoai()) với các nhánh FULLTIME, PARTTIME, THUC_TAP và switch tương tự xuất hiện ở tinhThuong(), inPhieuLuong(). Đề xuất refactoring phù hợp.",
+    "reference_answer": "Áp dụng 'Replace Conditional with Polymorphism': tạo lớp cha/interface NhanVien với các phương thức trừu tượng tinhLuong(), tinhThuong(); mỗi loại là một lớp con (NhanVienFullTime, NhanVienPartTime, ThucTapSinh) tự cài đặt. Khi thêm loại nhân viên mới chỉ cần thêm lớp con, không phải tìm sửa mọi switch (đáp ứng OCP, loại bỏ code smell 'switch lặp lại'). Nếu loại nhân viên có thể thay đổi trong vòng đời đối tượng, nên dùng State/Strategy (composition) thay vì lớp con.",
+    "key_points": [
+      "Switch theo loại lặp lại ở nhiều nơi là code smell",
+      "Thay bằng đa hình: mỗi loại là lớp con tự cài đặt hành vi; nếu loại thay đổi lúc chạy dùng Strategy/State"
+    ],
+    "id": "Q_OOP3_073"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Refactoring và Code Smell",
+    "concept": "Data Clumps và Introduce Parameter Object",
+    "difficulty": "Medium",
+    "question": "Nhiều phương thức cùng nhận bộ tham số (ngayBatDau, ngayKetThuc) như timDonHang(ngayBatDau, ngayKetThuc), tinhDoanhThu(ngayBatDau, ngayKetThuc). Đây là code smell gì và nên refactor thế nào?",
+    "reference_answer": "Đây là 'Data Clumps' — một nhóm dữ liệu luôn đi cùng nhau nhưng không được gom thành một khái niệm. Refactor bằng 'Introduce Parameter Object': tạo lớp/record KhoangThoiGian(ngayBatDau, ngayKetThuc). Lợi ích: danh sách tham số ngắn hơn, ràng buộc (ngayBatDau <= ngayKetThuc) được kiểm tra một lần trong constructor, và có chỗ để đặt hành vi liên quan như chua(ngay), giaoNhau(khac), soNgay() thay vì lặp lại ở nhiều nơi.",
+    "key_points": [
+      "Data Clumps: nhóm tham số luôn đi cùng nhau mà chưa thành khái niệm",
+      "Introduce Parameter Object gom thành lớp riêng, kiểm tra bất biến tập trung và thu hút hành vi liên quan"
+    ],
+    "id": "Q_OOP3_074"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Refactoring và Code Smell",
+    "concept": "Primitive Obsession và Value Object",
+    "difficulty": "Medium",
+    "question": "Lớp KhachHang lưu email, soDienThoai, soTien đều bằng String/double và việc kiểm tra định dạng nằm rải rác khắp hệ thống. Phân tích code smell và cách khắc phục.",
+    "reference_answer": "Đây là 'Primitive Obsession' — dùng kiểu nguyên thủy để biểu diễn khái niệm miền có quy tắc riêng. Hệ quả: kiểm tra hợp lệ lặp lại hoặc bị quên, dễ truyền nhầm tham số (hai String đổi chỗ cho nhau vẫn biên dịch được), và double cho tiền gây sai số. Khắc phục bằng Value Object bất biến: Email, SoDienThoai, TienTe(soTien BigDecimal, donVi) — constructor kiểm tra hợp lệ nên mọi đối tượng tồn tại đều hợp lệ, có equals theo giá trị, và trình biên dịch phân biệt được kiểu.",
+    "key_points": [
+      "Primitive Obsession: dùng kiểu nguyên thủy cho khái niệm miền có quy tắc",
+      "Thay bằng Value Object bất biến tự kiểm tra hợp lệ, an toàn kiểu, chính xác (BigDecimal cho tiền)"
+    ],
+    "id": "Q_OOP3_075"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Refactoring và Code Smell",
+    "concept": "Shotgun Surgery và Divergent Change",
+    "difficulty": "Medium",
+    "question": "Phân biệt hai code smell 'Shotgun Surgery' và 'Divergent Change'.",
+    "reference_answer": "Divergent Change: MỘT lớp bị sửa vì NHIỀU lý do khác nhau (đổi CSDL phải sửa nó, đổi định dạng báo cáo cũng sửa nó) — dấu hiệu lớp ôm nhiều trách nhiệm, cần tách lớp (Extract Class). Shotgun Surgery thì ngược lại: MỘT thay đổi nhỏ buộc phải sửa ở NHIỀU lớp khác nhau (đổi cách tính thuế phải sửa 8 file) — dấu hiệu một trách nhiệm bị phân tán, cần gom lại (Move Method/Move Field). Cả hai đều liên quan đến việc phân bổ trách nhiệm chưa hợp lý.",
+    "key_points": [
+      "Divergent Change: một lớp thay đổi vì nhiều lý do, cần tách lớp",
+      "Shotgun Surgery: một thay đổi lan ra nhiều lớp, cần gom trách nhiệm về một chỗ"
+    ],
+    "id": "Q_OOP3_076"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Refactoring và Code Smell",
+    "concept": "Extract Class",
+    "difficulty": "Medium",
+    "question": "Lớp NhanVien có các trường ten, luong, soNha, duong, phuong, thanhPho, maBuuChinh và các phương thức định dạng địa chỉ. Phân tích và đề xuất refactoring.",
+    "reference_answer": "Nhóm trường địa chỉ cùng các phương thức định dạng địa chỉ tạo thành một trách nhiệm riêng có cohesion cao với nhau nhưng thấp với phần còn lại của NhanVien. Áp dụng Extract Class: tạo lớp DiaChi (lý tưởng là value object bất biến) chứa các trường và hành vi định dạng, NhanVien giữ một tham chiếu DiaChi. Kết quả: NhanVien gọn hơn, DiaChi tái sử dụng được cho KhachHang, NhaCungCap, và quy tắc địa chỉ thay đổi chỉ ảnh hưởng một lớp.",
+    "key_points": [
+      "Nhóm trường và hành vi liên quan chặt với nhau là ứng viên tách lớp",
+      "Extract Class tạo DiaChi tái sử dụng, giảm kích thước và tăng cohesion của NhanVien"
+    ],
+    "id": "Q_OOP3_077"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Refactoring và Code Smell",
+    "concept": "Middle Man và ủy quyền quá mức",
+    "difficulty": "Medium",
+    "question": "Code smell 'Middle Man' là gì? Nó có mâu thuẫn với lời khuyên dùng ủy quyền (delegation) để tuân thủ Luật Demeter không?",
+    "reference_answer": "Middle Man là lớp mà phần lớn phương thức chỉ đơn thuần chuyển tiếp lời gọi sang một đối tượng khác mà không thêm giá trị gì. Đây là mặt trái của việc áp dụng Luật Demeter quá đà: để tránh chuỗi getter, ta thêm quá nhiều phương thức ủy quyền 'xuyên qua'. Cần cân bằng: ủy quyền có ý nghĩa khi nó ẩn đi chi tiết và thể hiện một hành vi nghiệp vụ; nếu một lớp chỉ toàn ủy quyền, nên loại bỏ trung gian (Remove Middle Man) để client làm việc trực tiếp với đối tượng thật hoặc xem lại phân bổ trách nhiệm.",
+    "key_points": [
+      "Middle Man: lớp chủ yếu chuyển tiếp lời gọi mà không thêm giá trị",
+      "Là hệ quả của áp dụng Demeter quá mức; cần cân bằng giữa ẩn chi tiết và tránh trung gian rỗng"
+    ],
+    "id": "Q_OOP3_078"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Xử lý ngoại lệ trong OOP",
+    "concept": "Suppressed exception trong try-with-resources",
+    "difficulty": "Medium",
+    "question": "Trong try-with-resources, nếu khối try ném ngoại lệ A và sau đó close() của tài nguyên lại ném ngoại lệ B, ngoại lệ nào được truyền ra ngoài? Ngoại lệ còn lại đi đâu?",
+    "reference_answer": "Ngoại lệ A (từ khối try) là ngoại lệ chính được truyền ra ngoài, vì nó thường phản ánh nguyên nhân gốc. Ngoại lệ B từ close() không bị mất mà được gắn vào A dưới dạng 'suppressed exception', có thể lấy lại qua A.getSuppressed(). Đây là cải tiến lớn so với try-finally thủ công, nơi ngoại lệ trong finally sẽ ghi đè và làm mất ngoại lệ gốc.",
+    "key_points": [
+      "Ngoại lệ từ khối try được ưu tiên truyền ra",
+      "Ngoại lệ từ close() được lưu dưới dạng suppressed, lấy qua getSuppressed(), không bị mất như với finally thủ công"
+    ],
+    "id": "Q_OOP3_079"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Xử lý ngoại lệ trong OOP",
+    "concept": "Chuyển đổi ngoại lệ giữa các tầng (Exception Translation)",
+    "difficulty": "Medium",
+    "question": "Vì sao tầng dịch vụ (service) không nên để SQLException từ tầng truy cập dữ liệu lan thẳng lên tầng giao diện? Nên xử lý thế nào?",
+    "reference_answer": "SQLException là chi tiết cài đặt của tầng dữ liệu; để nó lan lên làm tầng trên phụ thuộc vào công nghệ lưu trữ (đổi sang NoSQL hay gọi API là phải sửa mọi nơi bắt SQLException) và phá vỡ trừu tượng hóa. Nên áp dụng 'exception translation': tầng dưới bắt ngoại lệ cấp thấp và ném ra ngoại lệ phù hợp mức trừu tượng của tầng mình (ví dụ KhongTimThayDonHangException, LoiLuuTruException), đồng thời giữ ngoại lệ gốc làm cause (exception chaining) để không mất thông tin debug.",
+    "key_points": [
+      "Ngoại lệ cấp thấp lan lên làm rò rỉ chi tiết cài đặt và tăng coupling giữa các tầng",
+      "Dịch sang ngoại lệ đúng mức trừu tượng của tầng, giữ ngoại lệ gốc làm cause"
+    ],
+    "id": "Q_OOP3_080"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Nguyên tắc SOLID",
+    "concept": "Các hình thức Dependency Injection",
+    "difficulty": "Medium",
+    "question": "So sánh ba cách tiêm phụ thuộc: qua constructor, qua setter và qua field (ví dụ @Autowired trên trường).",
+    "reference_answer": "Constructor injection: phụ thuộc được truyền khi tạo đối tượng, có thể khai báo final, đối tượng luôn ở trạng thái hợp lệ, phụ thuộc lộ rõ trong chữ ký, dễ kiểm thử bằng cách truyền mock — là cách được khuyến nghị cho phụ thuộc bắt buộc. Setter injection: phù hợp cho phụ thuộc tùy chọn hoặc cần thay đổi sau, nhưng đối tượng có thể tồn tại khi chưa đủ phụ thuộc. Field injection: ngắn gọn nhưng ẩn phụ thuộc, không thể final, khó kiểm thử ngoài container (phải dùng reflection) và che giấu việc lớp có quá nhiều phụ thuộc.",
+    "key_points": [
+      "Constructor injection: bắt buộc, bất biến, rõ ràng, dễ test — nên ưu tiên",
+      "Setter cho phụ thuộc tùy chọn; field injection gọn nhưng ẩn phụ thuộc và khó test"
+    ],
+    "id": "Q_OOP3_081"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Nguyên tắc SOLID",
+    "concept": "Service Locator so với Dependency Injection",
+    "difficulty": "Medium",
+    "question": "Service Locator (lớp tra cứu toàn cục: ServiceLocator.get(EmailService.class)) và Dependency Injection đều giúp tách phụ thuộc vào lớp cụ thể. Vì sao DI thường được ưu tiên?",
+    "reference_answer": "Với Service Locator, lớp tự đi 'kéo' phụ thuộc từ một registry toàn cục bên trong thân phương thức, nên các phụ thuộc bị ẩn — nhìn chữ ký constructor không biết lớp cần gì; khi kiểm thử phải cấu hình registry toàn cục, dễ gây ảnh hưởng chéo giữa các test; và lớp phụ thuộc vào chính ServiceLocator. Với DI, phụ thuộc được 'đẩy' vào từ bên ngoài, khai báo rõ trong constructor, dễ thay bằng mock. Service Locator vẫn có chỗ dùng ở biên hệ thống hoặc mã kế thừa khó sửa.",
+    "key_points": [
+      "Service Locator ẩn phụ thuộc và gắn lớp với registry toàn cục",
+      "DI khai báo phụ thuộc tường minh, dễ kiểm thử; được ưu tiên trong đa số trường hợp"
+    ],
+    "id": "Q_OOP3_082"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kiến trúc hướng đối tượng",
+    "concept": "Repository Pattern",
+    "difficulty": "Medium",
+    "question": "Repository Pattern đóng vai trò gì trong thiết kế hướng miền (domain-driven), và interface của nó nên được đặt ở tầng nào?",
+    "reference_answer": "Repository đóng vai trò như một 'tập hợp các đối tượng miền trong bộ nhớ' (themDonHang, timTheoMa, timDonHangChuaThanhToan), che giấu hoàn toàn chi tiết lưu trữ (SQL, ORM, API). Interface của repository nên đặt ở tầng miền (domain) và được diễn đạt bằng ngôn ngữ nghiệp vụ, còn lớp cài đặt (JpaDonHangRepository) đặt ở tầng hạ tầng — đây là áp dụng DIP: tầng nghiệp vụ không phụ thuộc vào tầng hạ tầng mà ngược lại.",
+    "key_points": [
+      "Repository che giấu lưu trữ, cung cấp giao diện như tập hợp đối tượng miền",
+      "Interface đặt ở tầng domain, cài đặt ở tầng hạ tầng (áp dụng DIP)"
+    ],
+    "id": "Q_OOP3_083"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "Static method và private method trong interface",
+    "difficulty": "Medium",
+    "question": "Từ Java 8/9, interface có thể có static method và private method. Mỗi loại dùng để làm gì?",
+    "reference_answer": "Static method trong interface dùng để cung cấp các phương thức tiện ích hoặc factory gắn liền với interface đó (ví dụ Comparator.comparing(), List.of()), thay vì phải tạo lớp tiện ích đi kèm như Collections; chúng không được kế thừa bởi lớp cài đặt và gọi qua tên interface. Private method (Java 9) dùng để chia sẻ code giữa các default method hoặc static method bên trong interface mà không phơi bày ra ngoài như một phần của API.",
+    "key_points": [
+      "Static method: tiện ích/factory gắn với interface, gọi qua tên interface",
+      "Private method: tái sử dụng code giữa các default/static method mà không lộ ra API"
+    ],
+    "id": "Q_OOP3_084"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "UML",
+    "concept": "Đọc Sequence Diagram: thông điệp đồng bộ và bất đồng bộ",
+    "difficulty": "Medium",
+    "question": "Trong Sequence Diagram, phân biệt thông điệp đồng bộ, bất đồng bộ và thông điệp trả về; thanh kích hoạt (activation bar) biểu thị điều gì?",
+    "reference_answer": "Thông điệp đồng bộ (mũi tên đầu đặc) nghĩa là bên gửi chờ bên nhận xử lý xong mới tiếp tục — tương ứng lời gọi phương thức thông thường. Thông điệp bất đồng bộ (mũi tên đầu mở) nghĩa là bên gửi tiếp tục ngay không chờ — như gửi sự kiện, đẩy vào hàng đợi. Thông điệp trả về là mũi tên nét đứt quay lại bên gọi. Thanh kích hoạt (hình chữ nhật hẹp trên lifeline) biểu thị khoảng thời gian đối tượng đang thực thi một thao tác, giúp thấy được lời gọi lồng nhau.",
+    "key_points": [
+      "Đồng bộ: mũi tên đầu đặc, chờ kết quả; bất đồng bộ: đầu mở, không chờ; trả về: nét đứt",
+      "Activation bar thể hiện khoảng thời gian đối tượng đang xử lý"
+    ],
+    "id": "Q_OOP3_085"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "UML",
+    "concept": "Quan hệ include và extend trong Use Case",
+    "difficulty": "Medium",
+    "question": "Phân biệt quan hệ <<include>> và <<extend>> giữa các use case, cho ví dụ.",
+    "reference_answer": "<<include>>: use case cơ sở LUÔN LUÔN bao gồm hành vi của use case được include, dùng để tách phần chung dùng lại — ví dụ 'Đặt hàng' và 'Hủy đơn' đều include 'Đăng nhập'. Mũi tên đi từ use case cơ sở tới use case được include. <<extend>>: use case mở rộng chỉ được thêm vào use case cơ sở trong một số điều kiện nhất định (tùy chọn) — ví dụ 'Áp mã giảm giá' extend 'Thanh toán'. Mũi tên đi từ use case mở rộng tới use case cơ sở.",
+    "key_points": [
+      "include: hành vi bắt buộc, luôn được thực hiện, tách phần dùng chung",
+      "extend: hành vi tùy chọn theo điều kiện, mũi tên từ use case mở rộng tới use case cơ sở"
+    ],
+    "id": "Q_OOP3_086"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Từ State Machine Diagram sang State Pattern",
+    "difficulty": "Medium",
+    "question": "Cho State Machine Diagram của DonHang với các trạng thái Mới, Đã thanh toán, Đang giao, Hoàn tất, Đã hủy. Mô tả cách chuyển biểu đồ này thành code theo State Pattern.",
+    "reference_answer": "Mỗi trạng thái trong biểu đồ trở thành một lớp cài đặt interface TrangThaiDonHang, các sự kiện trên mũi tên chuyển trạng thái trở thành phương thức của interface (thanhToan(), giaoHang(), xacNhanNhan(), huy()). Trong mỗi lớp trạng thái, phương thức tương ứng với một chuyển hợp lệ sẽ thực hiện hành động và đặt trạng thái mới cho DonHang (context); sự kiện không hợp lệ ở trạng thái đó ném ngoại lệ. DonHang giữ tham chiếu trạng thái hiện tại và ủy quyền mọi lời gọi cho nó. Như vậy code phản ánh trực tiếp biểu đồ và loại bỏ các if-else theo trạng thái.",
+    "key_points": [
+      "Trạng thái → lớp cài đặt interface; sự kiện chuyển trạng thái → phương thức",
+      "Context ủy quyền cho trạng thái hiện tại; chuyển không hợp lệ ném ngoại lệ, loại bỏ if-else"
+    ],
+    "id": "Q_OOP3_087"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Object Pool Pattern",
+    "difficulty": "Medium",
+    "question": "Object Pool Pattern là gì và vì sao connection pool trong ứng dụng CSDL là một ví dụ điển hình?",
+    "reference_answer": "Object Pool duy trì sẵn một tập đối tượng đã khởi tạo để tái sử dụng: client 'mượn' đối tượng từ pool, dùng xong 'trả lại' thay vì tạo mới và hủy. Nó có lợi khi việc tạo đối tượng tốn kém và số lượng đồng thời cần giới hạn. Kết nối CSDL là ví dụ điển hình vì mở kết nối tốn nhiều thời gian (bắt tay mạng, xác thực) và CSDL chỉ chịu được số kết nối hữu hạn. Cần chú ý: phải reset trạng thái đối tượng khi trả về pool và đảm bảo luôn trả lại (dùng try-with-resources) để tránh cạn pool.",
+    "key_points": [
+      "Object Pool tái sử dụng các đối tượng tốn kém thay vì tạo/hủy liên tục",
+      "Connection pool là ví dụ điển hình; cần reset trạng thái và luôn trả đối tượng về pool"
+    ],
+    "id": "Q_OOP3_088"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Đóng gói",
+    "concept": "Unmodifiable view và bản sao bất biến",
+    "difficulty": "Medium",
+    "question": "So sánh Collections.unmodifiableList(ds) và List.copyOf(ds) khi trả về danh sách nội bộ từ một getter.",
+    "reference_answer": "Collections.unmodifiableList(ds) trả về một 'view' chỉ đọc bọc quanh danh sách gốc: client không sửa được qua view, nhưng nếu đối tượng chủ sở hữu sửa ds thì client vẫn thấy thay đổi đó (view phản ánh dữ liệu sống), không tốn chi phí sao chép. List.copyOf(ds) tạo một bản sao bất biến độc lập tại thời điểm gọi: không bị ảnh hưởng bởi thay đổi sau đó, nhưng tốn O(n) để sao chép và không chấp nhận phần tử null. Chọn view khi muốn client thấy dữ liệu cập nhật và tiết kiệm; chọn copy khi cần ảnh chụp ổn định (ví dụ để duyệt trong luồng khác).",
+    "key_points": [
+      "unmodifiableList: view chỉ đọc, phản ánh thay đổi của danh sách gốc, không tốn sao chép",
+      "List.copyOf: bản sao bất biến độc lập, tốn O(n), không cho null"
+    ],
+    "id": "Q_OOP3_089"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Chi phí nối chuỗi và StringBuilder",
+    "difficulty": "Medium",
+    "question": "Vì sao nối chuỗi bằng toán tử += trong vòng lặp hàng chục nghìn lần có thể rất chậm? StringBuilder khắc phục bằng cách nào?",
+    "reference_answer": "Vì String bất biến, mỗi lần s += x tạo ra một đối tượng String MỚI và sao chép toàn bộ nội dung cũ cộng phần mới, nên n lần nối với độ dài tăng dần tốn tổng cộng O(n²) thao tác sao chép và tạo ra rất nhiều rác cho GC. StringBuilder là đối tượng khả biến với bộ đệm có thể mở rộng (tăng gấp đôi khi đầy), append chỉ ghi thêm vào cuối với chi phí phân bổ O(1), cuối cùng gọi toString() một lần — tổng chi phí O(n).",
+    "key_points": [
+      "String bất biến nên += trong vòng lặp tạo nhiều đối tượng mới, tổng chi phí O(n²)",
+      "StringBuilder khả biến với bộ đệm mở rộng, append phân bổ O(1), tổng O(n)"
+    ],
+    "id": "Q_OOP3_090"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "So sánh Integer bằng == và bộ đệm Integer",
+    "difficulty": "Medium",
+    "question": "Vì sao Integer a = 100, b = 100; a == b cho kết quả true, nhưng Integer c = 1000, d = 1000; c == d lại cho false?",
+    "reference_answer": "Autoboxing dùng Integer.valueOf(), phương thức này trả về đối tượng được CACHE sẵn cho các giá trị trong khoảng -128 đến 127. Vì vậy a và b cùng tham chiếu tới một đối tượng cache nên == (so sánh tham chiếu) trả về true. Với 1000 nằm ngoài khoảng cache, mỗi lần boxing tạo đối tượng mới nên c và d là hai đối tượng khác nhau, == trả về false. Bài học: luôn dùng equals() để so sánh giá trị của wrapper object.",
+    "key_points": [
+      "Integer.valueOf cache đối tượng cho giá trị -128..127",
+      "== so sánh tham chiếu nên kết quả phụ thuộc cache; luôn dùng equals cho wrapper"
+    ],
+    "id": "Q_OOP3_091"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Generics",
+    "concept": "Suy luận kiểu và toán tử diamond",
+    "difficulty": "Medium",
+    "question": "Toán tử diamond (Map<String, List<Integer>> m = new HashMap<>();) và suy luận kiểu (type inference) giúp ích gì? Có giới hạn nào?",
+    "reference_answer": "Diamond cho phép trình biên dịch tự suy ra tham số kiểu của constructor từ kiểu khai báo ở vế trái, tránh lặp lại kiểu dài dòng. Tương tự, với phương thức generic như Collections.emptyList(), kiểu T được suy ra từ ngữ cảnh. Giới hạn: suy luận dựa trên kiểu đích, nên trong một số biểu thức phức tạp (chuỗi lời gọi, truyền làm đối số cho phương thức overload) trình biên dịch có thể suy ra kiểu không mong muốn (ví dụ Object) và cần chỉ định tường minh như Collections.<String>emptyList(). Với 'var', cần cẩn thận vì var x = new ArrayList<>() suy ra ArrayList<Object>.",
+    "key_points": [
+      "Diamond và type inference giúp tránh lặp kiểu dài dòng",
+      "Suy luận dựa trên ngữ cảnh đích, có lúc cần chỉ định kiểu tường minh; var kết hợp diamond cho ra Object"
+    ],
+    "id": "Q_OOP3_092"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Generics",
+    "concept": "Nguy hiểm của raw type",
+    "difficulty": "Medium",
+    "question": "Raw type (dùng List thay vì List<String>) vẫn được Java chấp nhận. Vì sao không nên dùng?",
+    "reference_answer": "Raw type tồn tại chỉ để tương thích ngược với code trước Java 5. Khi dùng raw type, trình biên dịch tắt kiểm tra kiểu generic: có thể thêm Integer vào một List vốn chỉ nên chứa String mà không có lỗi biên dịch, và lỗi chỉ lộ ra ở runtime dưới dạng ClassCastException tại một nơi rất xa chỗ gây ra lỗi. Raw type cũng lan truyền: gán List<String> cho List raw rồi lại gán ngược gây cảnh báo unchecked. Nếu thật sự không biết kiểu phần tử, dùng wildcard List<?> để vẫn được kiểm tra an toàn.",
+    "key_points": [
+      "Raw type tắt kiểm tra kiểu generic, lỗi chỉ lộ ra ở runtime (ClassCastException)",
+      "Chỉ để tương thích ngược; khi không biết kiểu dùng List<?>"
+    ],
+    "id": "Q_OOP3_093"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Generics",
+    "concept": "Ràng buộc kiểu đệ quy <T extends Comparable<T>>",
+    "difficulty": "Medium",
+    "question": "Giải thích ý nghĩa của khai báo static <T extends Comparable<T>> T timMax(List<T> ds) và vì sao không viết đơn giản là <T extends Comparable>.",
+    "reference_answer": "Khai báo yêu cầu T phải so sánh được với CHÍNH kiểu T (ví dụ String implements Comparable<String>), nên bên trong có thể gọi a.compareTo(b) với a, b cùng kiểu T một cách an toàn kiểu. Nếu viết <T extends Comparable> (raw type), trình biên dịch mất thông tin kiểu được so sánh, sinh cảnh báo unchecked và cho phép so sánh các kiểu không tương thích, chỉ lỗi ở runtime. Phiên bản tổng quát hơn nữa là <T extends Comparable<? super T>> để chấp nhận cả lớp con kế thừa compareTo từ lớp cha.",
+    "key_points": [
+      "T extends Comparable<T> đảm bảo T so sánh được với chính nó, compareTo an toàn kiểu",
+      "Dùng raw Comparable mất kiểm tra kiểu; dạng tổng quát hơn là Comparable<? super T>"
+    ],
+    "id": "Q_OOP3_094"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kế thừa",
+    "concept": "Sealed class kết hợp switch pattern matching",
+    "difficulty": "Medium",
+    "question": "Với sealed interface HinhHoc permits Tron, ChuNhat và các record tương ứng, việc dùng switch pattern matching để tính diện tích có ưu điểm gì so với chuỗi if-instanceof?",
+    "reference_answer": "Vì tập lớp con là đóng và trình biên dịch biết đủ, biểu thức switch (case Tron t -> PI*t.r()*t.r(); case ChuNhat c -> c.d()*c.r();) được kiểm tra tính đầy đủ (exhaustive): không cần nhánh default, và khi thêm lớp con mới vào permits, mọi switch chưa xử lý sẽ báo LỖI BIÊN DỊCH thay vì âm thầm rơi vào nhánh mặc định. Chuỗi if-instanceof thì không có kiểm tra này, dễ quên trường hợp. Đây là cách tiếp cận 'dữ liệu đại số' thay thế cho Visitor khi tập kiểu ổn định.",
+    "key_points": [
+      "Sealed + switch pattern được trình biên dịch kiểm tra đầy đủ, không cần default",
+      "Thêm lớp con mới gây lỗi biên dịch ở switch chưa xử lý, an toàn hơn if-instanceof"
+    ],
+    "id": "Q_OOP3_095"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kiểm thử hướng đối tượng",
+    "concept": "Test double: Stub, Mock, Fake",
+    "difficulty": "Medium",
+    "question": "Phân biệt các loại test double: Stub, Mock và Fake khi kiểm thử một lớp DichVuDatHang phụ thuộc vào ThanhToanGateway.",
+    "reference_answer": "Stub: đối tượng thay thế trả về dữ liệu dựng sẵn (luôn trả 'thanh toán thành công') để đưa lớp cần test vào một tình huống, test kiểm tra TRẠNG THÁI/kết quả. Mock: đối tượng được lập trình kỳ vọng về TƯƠNG TÁC, test kiểm tra rằng phương thức nào đã được gọi, bao nhiêu lần, với đối số nào (ví dụ verify gateway.charge(500000) gọi đúng một lần). Fake: một cài đặt hoạt động thật nhưng đơn giản hóa, ví dụ repository lưu trong HashMap thay cho CSDL thật. Khả năng thay thế này có được nhờ DichVuDatHang phụ thuộc vào interface (DIP).",
+    "key_points": [
+      "Stub trả dữ liệu dựng sẵn, kiểm tra trạng thái; Mock kiểm tra tương tác (gọi gì, bao nhiêu lần)",
+      "Fake là cài đặt thật nhưng đơn giản (CSDL trong bộ nhớ); tất cả dựa vào phụ thuộc qua interface"
+    ],
+    "id": "Q_OOP3_096"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Trừu tượng hóa",
+    "concept": "Thiết kế theo hợp đồng (Design by Contract)",
+    "difficulty": "Medium",
+    "question": "Design by Contract gồm ba thành phần nào? Áp dụng cho phương thức rutTien(soTien) của lớp TaiKhoan.",
+    "reference_answer": "Ba thành phần: Tiền điều kiện (precondition) — điều người gọi phải đảm bảo trước khi gọi: soTien > 0 và soTien <= soDu. Hậu điều kiện (postcondition) — điều phương thức đảm bảo sau khi thực hiện: soDu mới = soDu cũ - soTien. Bất biến lớp (class invariant) — điều luôn đúng với mọi đối tượng ở trạng thái ổn định: soDu >= 0. Hợp đồng giúp phân định rõ trách nhiệm giữa người gọi và người được gọi, và liên hệ trực tiếp với LSP: lớp con không được làm mạnh tiền điều kiện hay làm yếu hậu điều kiện.",
+    "key_points": [
+      "Ba thành phần: tiền điều kiện, hậu điều kiện, bất biến lớp",
+      "Phân định trách nhiệm giữa người gọi và người được gọi; liên hệ với LSP"
+    ],
+    "id": "Q_OOP3_097"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Đóng gói",
+    "concept": "Kiểm tra fail-fast trong constructor",
+    "difficulty": "Medium",
+    "question": "Vì sao nên kiểm tra tham số ngay đầu constructor (ví dụ Objects.requireNonNull(email), kiểm tra tuoi >= 0) thay vì để lỗi xuất hiện sau này khi sử dụng đối tượng?",
+    "reference_answer": "Nguyên tắc fail-fast: phát hiện dữ liệu không hợp lệ càng sớm càng tốt, ngay tại điểm nó đi vào hệ thống. Nếu cho phép tạo đối tượng với email null, NullPointerException có thể chỉ xảy ra nhiều giờ sau ở một module khác (khi gửi mail), khiến việc truy vết nguồn gốc rất khó. Kiểm tra trong constructor đảm bảo mọi đối tượng tồn tại đều thỏa bất biến, thông báo lỗi rõ ràng chỉ đúng chỗ sai, và các phương thức khác không cần kiểm tra lại.",
+    "key_points": [
+      "Fail-fast phát hiện lỗi ngay tại điểm dữ liệu đi vào hệ thống",
+      "Đảm bảo mọi đối tượng hợp lệ, lỗi dễ truy vết, giảm kiểm tra lặp lại"
+    ],
+    "id": "Q_OOP3_098"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Listener/Callback và lập trình hướng sự kiện",
+    "difficulty": "Medium",
+    "question": "Trong lập trình giao diện, cơ chế listener (ví dụ button.addActionListener(...)) là áp dụng của pattern nào và giúp tách biệt điều gì?",
+    "reference_answer": "Listener là một dạng Observer Pattern kết hợp callback: nút bấm (subject) không biết sẽ làm gì khi được nhấn; mã nghiệp vụ đăng ký một đối tượng cài đặt interface listener và nút sẽ gọi lại (callback) phương thức của listener khi sự kiện xảy ra. Điều này tách biệt thành phần giao diện tái sử dụng (Button của thư viện) khỏi logic ứng dụng cụ thể, và cho phép nhiều listener cùng phản ứng với một sự kiện. Cơ chế này cũng là nền tảng của mô hình lập trình hướng sự kiện (event-driven).",
+    "key_points": [
+      "Listener là Observer kết hợp callback: thành phần gọi lại đối tượng đã đăng ký khi có sự kiện",
+      "Tách thành phần UI tái sử dụng khỏi logic ứng dụng, cho phép nhiều bên lắng nghe"
+    ],
+    "id": "Q_OOP3_099"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kiến trúc hướng đối tượng",
+    "concept": "Package by feature và Package by layer",
+    "difficulty": "Medium",
+    "question": "So sánh cách tổ chức package theo tầng (controller/, service/, repository/) với tổ chức theo tính năng (donhang/, khachhang/, thanhtoan/).",
+    "reference_answer": "Package by layer gom các lớp cùng vai trò kỹ thuật vào cùng gói; dễ hiểu với dự án nhỏ, nhưng một tính năng bị rải khắp các gói và hầu hết lớp phải là public để các tầng gọi nhau, làm mất khả năng đóng gói ở mức package. Package by feature gom mọi lớp của một tính năng vào một gói: thay đổi một tính năng chỉ chạm một chỗ, có thể dùng package-private để ẩn chi tiết bên trong tính năng và chỉ lộ ra một vài lớp public, cấu trúc phản ánh nghiệp vụ và dễ tách thành module/microservice sau này. Với hệ thống vừa và lớn, package by feature thường cho cohesion cao hơn.",
+    "key_points": [
+      "By layer: gom theo vai trò kỹ thuật, tính năng bị phân tán, phải public nhiều",
+      "By feature: gom theo nghiệp vụ, cohesion cao, tận dụng package-private để đóng gói, dễ tách module"
+    ],
+    "id": "Q_OOP3_100"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "Vi phạm tính đối xứng của equals() khi lớp con thêm trường",
+    "difficulty": "Hard",
+    "question": "Lớp Diem(x, y) có equals() dùng instanceof. Lớp con DiemMau(x, y, mau) override equals() để so sánh thêm màu, cũng dùng instanceof. Phân tích vì sao thiết kế này vi phạm hợp đồng equals() và các hướng giải quyết.",
+    "reference_answer": "Với p = Diem(1,2) và q = DiemMau(1,2,Do): p.equals(q) trả về true (q instanceof Diem, tọa độ bằng nhau) nhưng q.equals(p) trả về false (p không phải DiemMau) — vi phạm tính đối xứng. Nếu sửa DiemMau để bỏ qua màu khi so với Diem thường thì lại vi phạm tính bắc cầu (DiemMau Đỏ = Diem = DiemMau Xanh nhưng Đỏ ≠ Xanh). Thực tế không có cách mở rộng lớp khởi tạo được bằng cách thêm trường giá trị mà vẫn giữ hợp đồng equals với instanceof. Hướng giải quyết: (1) ưu tiên composition — DiemMau chứa một Diem và trả về view asDiem() thay vì kế thừa; (2) dùng getClass() != o.getClass() để chỉ coi bằng nhau khi cùng lớp chính xác (nhưng phá LSP vì lớp con không thay thế được lớp cha trong collection); (3) khai báo Diem là final/record.",
+    "key_points": [
+      "instanceof hai chiều với trường bổ sung ở lớp con phá tính đối xứng; vá lại thì phá tính bắc cầu",
+      "Giải pháp: composition thay kế thừa, getClass() (đánh đổi LSP), hoặc làm lớp final/record"
+    ],
+    "id": "Q_OOP3_101"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "Đối tượng khả biến làm khóa HashMap",
+    "difficulty": "Hard",
+    "question": "Một đối tượng SinhVien có hashCode() tính từ trường email được dùng làm khóa trong HashMap. Sau khi put, chương trình gọi sv.setEmail(emailMoi). Phân tích hậu quả và nguyên tắc thiết kế rút ra.",
+    "reference_answer": "Đối tượng được lưu vào bucket tương ứng với hashCode CŨ. Sau khi email thay đổi, hashCode mới khác đi, nên map.get(sv) hay map.containsKey(sv) tìm ở bucket mới và không thấy — entry trở thành 'mồ côi': không lấy ra được, không xóa được bằng remove(sv), vẫn chiếm bộ nhớ (một dạng rò rỉ bộ nhớ logic), và có thể put thêm một entry 'trùng' với cùng đối tượng. Nguyên tắc: các trường tham gia equals/hashCode của đối tượng dùng làm khóa (hoặc phần tử HashSet) phải bất biến; tốt nhất dùng khóa là value object bất biến (mã số, record) thay vì cả entity khả biến.",
+    "key_points": [
+      "Thay đổi trường tham gia hashCode sau khi put khiến entry nằm sai bucket, không tìm/xóa được",
+      "Khóa của HashMap/phần tử HashSet phải bất biến ở các trường dùng cho equals/hashCode"
+    ],
+    "id": "Q_OOP3_102"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "hashCode hợp lệ nhưng kém chất lượng",
+    "difficulty": "Hard",
+    "question": "Cài đặt public int hashCode() { return 42; } có vi phạm hợp đồng equals/hashCode không? Phân tích ảnh hưởng của nó.",
+    "reference_answer": "Không vi phạm hợp đồng: các đối tượng bằng nhau vẫn có hashCode bằng nhau (vì mọi đối tượng đều có hashCode 42). Tuy nhiên mọi phần tử rơi vào CÙNG một bucket, biến HashMap thành một danh sách liên kết (hoặc cây đỏ-đen từ Java 8 khi bucket lớn), khiến get/put từ O(1) trung bình suy biến thành O(n) (hoặc O(log n) nếu khóa Comparable). Với hàng trăm nghìn phần tử, hiệu năng sập nghiêm trọng mà không có lỗi nào được báo. Bài học: hợp đồng chỉ đảm bảo tính đúng, còn chất lượng phân bố của hashCode quyết định hiệu năng; nên dùng Objects.hash(...) hoặc kết hợp các trường quan trọng theo hệ số nguyên tố.",
+    "key_points": [
+      "Hằng số không vi phạm hợp đồng nhưng dồn mọi phần tử vào một bucket",
+      "HashMap suy biến từ O(1) thành O(n)/O(log n); hiệu năng phụ thuộc vào chất lượng phân bố hashCode"
+    ],
+    "id": "Q_OOP3_103"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "compareTo không nhất quán với equals",
+    "difficulty": "Hard",
+    "question": "new BigDecimal(\"1.0\").equals(new BigDecimal(\"1.00\")) là false nhưng compareTo trả về 0. Phân tích hệ quả khi thêm hai giá trị này vào HashSet và TreeSet.",
+    "reference_answer": "HashSet dùng equals/hashCode nên coi 1.0 và 1.00 là hai phần tử khác nhau: kích thước tập là 2. TreeSet dùng compareTo (hoặc Comparator) để xác định trùng lặp, nên coi chúng bằng nhau: kích thước tập là 1. Cùng một dữ liệu nhưng hai cấu trúc 'Set' cho kết quả khác nhau, vi phạm kỳ vọng của interface Set (vốn định nghĩa theo equals). Bài học: khi compareTo không nhất quán với equals phải ghi chú rõ, và khi tự viết Comparator cho TreeSet/TreeMap cần đảm bảo trả về 0 chỉ khi hai đối tượng thực sự được coi là trùng; nếu không, phần tử sẽ bị âm thầm loại bỏ (ví dụ Comparator chỉ so sánh theo điểm làm mất các sinh viên cùng điểm).",
+    "key_points": [
+      "HashSet dùng equals, TreeSet dùng compareTo, nên kết quả khác nhau khi hai phép so sánh không nhất quán",
+      "Comparator trả 0 cho đối tượng khác nhau khiến TreeSet/TreeMap âm thầm loại bỏ phần tử"
+    ],
+    "id": "Q_OOP3_104"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "Comparator dùng phép trừ gây tràn số",
+    "difficulty": "Hard",
+    "question": "Comparator viết (a, b) -> a.getId() - b.getId() với id kiểu int trông gọn gàng. Phân tích lỗi tiềm ẩn.",
+    "reference_answer": "Phép trừ hai số int có thể TRÀN SỐ khi hai giá trị có dấu khác nhau và độ lớn lớn: ví dụ a = Integer.MAX_VALUE, b = -1 thì a - b tràn thành số âm, Comparator kết luận a < b — sai. Kết quả là thứ tự sắp xếp không nhất quán, vi phạm hợp đồng Comparator (tính bắc cầu), có thể khiến TimSort ném 'Comparison method violates its general contract' hoặc TreeMap đặt sai vị trí, và lỗi chỉ xuất hiện với một số dữ liệu đặc biệt. Cách đúng: Integer.compare(a.getId(), b.getId()) hoặc Comparator.comparingInt(X::getId).",
+    "key_points": [
+      "a - b có thể tràn số int, đảo dấu kết quả so sánh",
+      "Gây vi phạm hợp đồng, sắp xếp sai hoặc ngoại lệ; dùng Integer.compare/Comparator.comparingInt"
+    ],
+    "id": "Q_OOP3_105"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp lồng nhau và biểu thức Lambda",
+    "concept": "Rò rỉ bộ nhớ qua inner class giữ tham chiếu ngầm",
+    "difficulty": "Hard",
+    "question": "Lớp ManHinhBaoCao (giữ nhiều MB dữ liệu) tạo một inner class (không static) TacVuNen implements Runnable và nộp vào một thread pool chạy lâu dài. Phân tích nguy cơ rò rỉ bộ nhớ.",
+    "reference_answer": "Mỗi đối tượng inner class ngầm giữ tham chiếu tới đối tượng bao ngoài (ManHinhBaoCao.this). Chừng nào TacVuNen còn nằm trong hàng đợi hoặc đang chạy trong thread pool (hoặc được lưu trong một danh sách tĩnh, một callback đăng ký lâu dài), đối tượng ManHinhBaoCao cùng toàn bộ dữ liệu nặng của nó không thể được GC thu hồi, dù màn hình đã đóng. Đây là nguyên nhân rò rỉ kinh điển (ví dụ Activity trong Android bị Handler/AsyncTask giữ). Khắc phục: dùng static nested class và chỉ truyền vào đúng dữ liệu cần thiết, hoặc giữ tham chiếu yếu (WeakReference) tới đối tượng ngoài, đồng thời hủy tác vụ khi đối tượng ngoài kết thúc vòng đời.",
+    "key_points": [
+      "Inner class/lambda dùng this ngầm giữ đối tượng bao ngoài, ngăn GC thu hồi",
+      "Dùng static nested class, chỉ truyền dữ liệu cần thiết, WeakReference và hủy tác vụ theo vòng đời"
+    ],
+    "id": "Q_OOP3_106"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp lồng nhau và biểu thức Lambda",
+    "concept": "Hủy đăng ký listener bằng lambda không hoạt động",
+    "difficulty": "Hard",
+    "question": "Code đăng ký nguonSuKien.addListener(e -> xuLy(e)); và sau đó hủy bằng nguonSuKien.removeListener(e -> xuLy(e));. Vì sao listener không bao giờ bị gỡ bỏ, và hậu quả là gì?",
+    "reference_answer": "Mỗi lần đánh giá biểu thức lambda (chứa capture như this) có thể tạo ra một đối tượng MỚI; hai lambda viết giống hệt nhau không bằng nhau theo equals (lambda không override equals, so sánh theo danh tính). removeListener tìm đối tượng bằng equals nên không tìm thấy lambda đã đăng ký, listener cũ vẫn nằm trong danh sách. Hậu quả: sự kiện tiếp tục được xử lý ngoài ý muốn (xử lý hai lần), và listener giữ tham chiếu tới this nên đối tượng không được GC — rò rỉ bộ nhớ. Cách đúng: lưu tham chiếu listener vào một trường khi đăng ký (Listener l = this::xuLy;) và dùng chính tham chiếu đó để hủy, hoặc để addListener trả về một handle/Subscription có phương thức huy().",
+    "key_points": [
+      "Hai lambda giống nhau về mã nhưng là hai đối tượng khác nhau, không bằng nhau theo equals",
+      "Phải giữ đúng tham chiếu đã đăng ký hoặc dùng handle hủy đăng ký; nếu không gây xử lý trùng và rò rỉ bộ nhớ"
+    ],
+    "id": "Q_OOP3_107"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Double-checked locking thiếu volatile",
+    "difficulty": "Hard",
+    "question": "Phân tích lỗi trong Singleton lười dùng double-checked locking sau: if (instance == null) { synchronized (X.class) { if (instance == null) instance = new X(); } } return instance; với instance không khai báo volatile.",
+    "reference_answer": "Lệnh instance = new X() không phải nguyên tử: gồm cấp phát bộ nhớ, chạy constructor và gán tham chiếu. Trình biên dịch/CPU được phép sắp xếp lại để gán tham chiếu TRƯỚC khi constructor chạy xong. Một luồng khác kiểm tra lần đầu instance == null ở ngoài khối synchronized (không có quan hệ happens-before) có thể thấy instance khác null và dùng một đối tượng mới khởi tạo một phần — trường còn giá trị mặc định, gây lỗi cực khó tái hiện. Khắc phục: khai báo private static volatile X instance (volatile cấm sắp xếp lại và tạo happens-before), hoặc dùng holder idiom (static nested class giữ instance, JVM đảm bảo khởi tạo lớp an toàn), hoặc enum singleton.",
+    "key_points": [
+      "Không có volatile, việc gán tham chiếu có thể bị sắp xếp trước khi constructor hoàn tất",
+      "Luồng khác có thể thấy đối tượng khởi tạo dở; sửa bằng volatile, holder idiom hoặc enum"
+    ],
+    "id": "Q_OOP3_108"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Phá vỡ Singleton qua serialization, reflection và clone",
+    "difficulty": "Hard",
+    "question": "Một Singleton cổ điển (constructor private, static getInstance()) implements Serializable. Phân tích ba cách có thể tạo ra thể hiện thứ hai và cách phòng chống.",
+    "reference_answer": "(1) Serialization: giải tuần tự hóa luôn tạo đối tượng mới không qua constructor; phòng bằng cách cài đặt readResolve() trả về instance duy nhất (và đánh dấu các trường transient). (2) Reflection: setAccessible(true) trên constructor private rồi gọi newInstance(); phòng bằng cách ném ngoại lệ trong constructor nếu instance đã tồn tại (vẫn có thể bị vượt qua nếu gọi reflection trước lần khởi tạo đầu tiên). (3) Clone: nếu lớp (hoặc lớp cha) hỗ trợ clone, có thể nhân bản; phòng bằng cách override clone() ném CloneNotSupportedException. Giải pháp triệt để là enum singleton, được JVM bảo vệ trước cả ba cách.",
+    "key_points": [
+      "Ba lỗ hổng: deserialization, reflection gọi constructor private, clone()",
+      "Phòng bằng readResolve, kiểm tra trong constructor, chặn clone; triệt để nhất là enum singleton"
+    ],
+    "id": "Q_OOP3_109"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Vòng đời đối tượng",
+    "concept": "Cạm bẫy của clone() và Cloneable",
+    "difficulty": "Hard",
+    "question": "Vì sao nhiều chuyên gia coi cơ chế Cloneable/clone() của Java là thiết kế lỗi và khuyên dùng copy constructor thay thế?",
+    "reference_answer": "(1) Cloneable không khai báo clone() nên không thể gọi clone() qua kiểu interface; clone() là protected trong Object. (2) Object.clone() tạo đối tượng mà KHÔNG gọi constructor, bỏ qua mọi kiểm tra bất biến trong constructor. (3) Mặc định sao chép nông, lớp phải tự sao chép sâu các trường khả biến, nhưng trường final không thể gán lại trong clone() nên xung đột với việc làm lớp bất biến. (4) Phải xử lý checked CloneNotSupportedException và ép kiểu kết quả. (5) Lớp con kế thừa nghĩa vụ clone đúng, dễ quên. Copy constructor (new TaiLieu(goc)) hoặc static factory copyOf() rõ ràng hơn, chạy qua constructor, tương thích với final và không cần ép kiểu.",
+    "key_points": [
+      "clone() bỏ qua constructor, sao chép nông, xung đột với trường final, API vụng về",
+      "Copy constructor/static factory rõ ràng, giữ bất biến và tương thích final"
+    ],
+    "id": "Q_OOP3_110"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Generics",
+    "concept": "Hiệp biến của mảng và ArrayStoreException",
+    "difficulty": "Hard",
+    "question": "Đoạn code Object[] ds = new String[3]; ds[0] = 10; biên dịch được nhưng lỗi khi chạy, còn List<Object> l = new ArrayList<String>(); lại lỗi biên dịch. Phân tích sự khác biệt thiết kế này.",
+    "reference_answer": "Mảng trong Java là hiệp biến (covariant): String[] là kiểu con của Object[], nên phép gán biên dịch được. Nhưng mảng lưu kiểu phần tử thật lúc chạy (reified), nên khi gán Integer vào mảng String, JVM kiểm tra và ném ArrayStoreException — lỗi chỉ được phát hiện lúc chạy. Generics thì bất biến (invariant): List<String> không phải kiểu con của List<Object>, nên trình biên dịch chặn ngay vì nếu cho phép, có thể thêm Integer vào danh sách String mà runtime không phát hiện được (do type erasure). Đây là lý do không tạo được mảng generic (new T[] hay new List<String>[]) và nên ưu tiên List thay cho mảng trong API generic.",
+    "key_points": [
+      "Mảng hiệp biến và reified: lỗi kiểu chỉ phát hiện lúc chạy qua ArrayStoreException",
+      "Generics bất biến và bị erasure nên trình biên dịch phải chặn sớm; không thể tạo mảng generic"
+    ],
+    "id": "Q_OOP3_111"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Generics",
+    "concept": "Heap pollution với varargs generic",
+    "difficulty": "Hard",
+    "question": "Phương thức static <T> T[] taoMang(T... phanTu) { return phanTu; } được gọi từ một phương thức generic khác. Phân tích nguy cơ 'heap pollution' và vai trò của @SafeVarargs.",
+    "reference_answer": "Varargs được cài đặt bằng mảng, mà mảng của kiểu generic T bị erasure thành mảng Object[] (hoặc kiểu cận trên). Nếu taoMang được gọi trong một ngữ cảnh generic khác, mảng thực tế tạo ra có kiểu Object[]; trả mảng đó ra ngoài và gán cho String[] sẽ ném ClassCastException ở một nơi trông hoàn toàn vô hại. Heap pollution là tình trạng một biến kiểu tham số hóa trỏ tới đối tượng không đúng kiểu đó. @SafeVarargs chỉ là lời cam kết của tác giả rằng phương thức không ghi vào mảng varargs và không để lộ tham chiếu mảng ra ngoài; nó tắt cảnh báo nhưng KHÔNG làm phương thức an toàn — taoMang ở trên chính là ví dụ không được gắn @SafeVarargs.",
+    "key_points": [
+      "Varargs generic tạo mảng bị erasure, để lộ mảng ra ngoài gây ClassCastException khó truy vết",
+      "@SafeVarargs chỉ là cam kết không ghi/không lộ mảng, không tự làm code an toàn"
+    ],
+    "id": "Q_OOP3_112"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "NullPointerException do auto-unboxing",
+    "difficulty": "Hard",
+    "question": "Map<String, Integer> tonKho; câu lệnh int sl = tonKho.get(maSP); và biểu thức Integer kq = dieuKien ? tonKho.get(maSP) : 0; đều có thể ném NullPointerException. Giải thích cơ chế.",
+    "reference_answer": "Trường hợp 1: get() trả về null khi không có khóa; gán null cho biến int buộc Java auto-unboxing gọi null.intValue() → NPE. Trường hợp 2 tinh vi hơn: toán tử ba ngôi có một nhánh kiểu Integer và một nhánh kiểu int, quy tắc kiểu của Java chọn kiểu kết quả là int, nên nhánh Integer bị unboxing TRƯỚC khi gán ngược lại vào Integer kq — nếu get() trả null thì NPE xảy ra dù biến đích là Integer. Phòng tránh: dùng getOrDefault(maSP, 0), kiểm tra null tường minh, hoặc làm hai nhánh cùng kiểu Integer (Integer.valueOf(0)).",
+    "key_points": [
+      "Gán null cho kiểu nguyên thủy gây unboxing null → NPE",
+      "Toán tử ba ngôi trộn Integer và int ép unboxing ngầm; dùng getOrDefault hoặc thống nhất kiểu"
+    ],
+    "id": "Q_OOP3_113"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Đóng gói",
+    "concept": "View chỉ đọc vẫn để lộ thay đổi và vòng đời",
+    "difficulty": "Hard",
+    "question": "Lớp LopHoc trả về Collections.unmodifiableList(dsSinhVien) cho client. Một luồng báo cáo duyệt danh sách này trong khi LopHoc thêm sinh viên mới. Phân tích các vấn đề tiềm ẩn.",
+    "reference_answer": "(1) View chỉ đọc vẫn phản ánh thay đổi của danh sách gốc; khi LopHoc sửa danh sách gốc trong lúc luồng khác đang duyệt view, iterator fail-fast có thể ném ConcurrentModificationException, hoặc tệ hơn đọc trạng thái không nhất quán vì ArrayList không an toàn đa luồng. (2) unmodifiable chỉ áp dụng cho chính danh sách: các đối tượng SinhVien bên trong vẫn khả biến nên client vẫn sửa được sv.setDiem(...) — đóng gói nông. (3) Client có thể giữ view lâu dài, vô tình giữ toàn bộ dữ liệu sống. Giải pháp tùy nhu cầu: trả bản sao List.copyOf cho ảnh chụp ổn định, dùng CopyOnWriteArrayList khi đọc nhiều ghi ít, và dùng đối tượng phần tử bất biến hoặc DTO.",
+    "key_points": [
+      "View chỉ đọc vẫn bị ảnh hưởng bởi thay đổi gốc, gây lỗi đồng thời",
+      "Chỉ bảo vệ danh sách, không bảo vệ phần tử khả biến bên trong; cân nhắc bản sao, CopyOnWrite, phần tử bất biến"
+    ],
+    "id": "Q_OOP3_114"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Vòng đời đối tượng",
+    "concept": "Rò rỉ 'this' trong lúc khởi tạo (this escape)",
+    "difficulty": "Hard",
+    "question": "Constructor của lớp CamBien gọi boPhatSuKien.dangKy(this) trước khi gán xong các trường. Phân tích rủi ro trong môi trường đa luồng.",
+    "reference_answer": "Khi this được công bố (publish) ra ngoài trước khi constructor hoàn tất, một luồng khác (ví dụ luồng phát sự kiện) có thể gọi phương thức của đối tượng khi các trường chưa được gán — thấy giá trị mặc định null/0 — gây NPE hoặc hành vi sai. Ngay cả trường final cũng KHÔNG được đảm bảo khả kiến đúng cho luồng khác nếu this thoát ra trong constructor (bảo đảm của final chỉ có hiệu lực khi constructor kết thúc mà không rò rỉ this). Nếu lớp có lớp con, trường của lớp con còn chưa được khởi tạo. Khắc phục: không đăng ký trong constructor; dùng static factory: tạo đối tượng hoàn chỉnh rồi mới đăng ký (CamBien cb = new CamBien(...); boPhat.dangKy(cb); return cb;).",
+    "key_points": [
+      "Công bố this trong constructor cho phép luồng khác thấy đối tượng khởi tạo dở",
+      "Mất cả bảo đảm khả kiến của trường final; dùng static factory đăng ký sau khi khởi tạo xong"
+    ],
+    "id": "Q_OOP3_115"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Đóng gói",
+    "concept": "Lớp bất biến không final bị lớp con phá vỡ",
+    "difficulty": "Hard",
+    "question": "Lớp TienTe có các trường private final, không có setter, nhưng không khai báo final. Phân tích cách lớp con có thể phá vỡ tính bất biến và hệ quả bảo mật.",
+    "reference_answer": "Lớp con có thể thêm trường khả biến và override các phương thức (getSoTien(), toString(), equals) để trả về giá trị thay đổi theo thời gian. Mã nhận tham số kiểu TienTe tin rằng đối tượng bất biến (ví dụ đã kiểm tra hạn mức rồi lưu lại, dùng làm khóa HashMap, chia sẻ giữa các luồng không đồng bộ) sẽ bị đánh lừa: đối tượng 'TienTe' độc hại trả về 100 lúc kiểm tra và 1 tỷ lúc thực hiện chuyển khoản (lỗi time-of-check/time-of-use). Vì vậy lớp bất biến cần khai báo final (hoặc constructor private + static factory), và khi nhận tham số từ nguồn không tin cậy nên sao chép phòng thủ sang lớp bất biến chuẩn.",
+    "key_points": [
+      "Lớp không final cho phép lớp con thêm trạng thái khả biến và override phương thức truy cập",
+      "Mã tin vào tính bất biến bị đánh lừa (TOCTOU); cần final hoặc constructor private, và sao chép phòng thủ"
+    ],
+    "id": "Q_OOP3_116"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Vòng đời đối tượng",
+    "concept": "finalize() và việc giải phóng tài nguyên",
+    "difficulty": "Hard",
+    "question": "Vì sao dựa vào finalize() để đóng file/kết nối là thiết kế sai, và vì sao nó đã bị đánh dấu deprecated?",
+    "reference_answer": "(1) Không có đảm bảo finalize() được gọi khi nào, thậm chí có được gọi hay không trước khi chương trình kết thúc — tài nguyên hệ điều hành (file handle, socket) có thể cạn trước khi GC chạy. (2) Đối tượng có finalize() làm chậm GC đáng kể (cần ít nhất hai chu kỳ để thu hồi). (3) finalize() có thể 'hồi sinh' đối tượng bằng cách gán this cho biến tĩnh, gây hành vi khó lường, và từng bị lợi dụng cho tấn công 'finalizer attack' để chiếm đối tượng khởi tạo dở. (4) Ngoại lệ trong finalize() bị nuốt im lặng. Cách đúng: cài đặt AutoCloseable và dùng try-with-resources để giải phóng tất định; Cleaner chỉ làm lưới an toàn cuối cùng.",
+    "key_points": [
+      "finalize() không đảm bảo thời điểm/được gọi, làm chậm GC, có thể hồi sinh đối tượng và nuốt ngoại lệ",
+      "Dùng AutoCloseable + try-with-resources; Cleaner chỉ là lưới an toàn"
+    ],
+    "id": "Q_OOP3_117"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Xử lý ngoại lệ trong OOP",
+    "concept": "Ngoại lệ trong finally làm mất ngoại lệ gốc",
+    "difficulty": "Hard",
+    "question": "Trong mã cũ dùng try { ghiDuLieu(); } finally { ketNoi.close(); }, nếu ghiDuLieu() ném IOException 'đĩa đầy' rồi close() lại ném ngoại lệ 'kết nối đã đóng', điều gì xảy ra với thông tin lỗi? Còn return trong finally thì sao?",
+    "reference_answer": "Ngoại lệ ném ra từ finally sẽ THAY THẾ hoàn toàn ngoại lệ đang lan truyền: người gọi chỉ thấy lỗi 'kết nối đã đóng' (hệ quả) mà mất hẳn lỗi 'đĩa đầy' (nguyên nhân gốc), khiến việc chẩn đoán sai hướng. Tệ hơn, nếu khối finally có lệnh return, mọi ngoại lệ từ try đều bị nuốt im lặng và phương thức trả về như thể thành công. Khắc phục: dùng try-with-resources (ngoại lệ close được gắn làm suppressed), hoặc bao close() trong try-catch riêng và addSuppressed thủ công; tuyệt đối không return/throw trong finally.",
+    "key_points": [
+      "Ngoại lệ trong finally ghi đè và làm mất ngoại lệ gốc",
+      "return trong finally nuốt mọi ngoại lệ; dùng try-with-resources hoặc addSuppressed, không return/throw trong finally"
+    ],
+    "id": "Q_OOP3_118"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Xử lý ngoại lệ trong OOP",
+    "concept": "Checked exception và lambda/stream",
+    "difficulty": "Hard",
+    "question": "Vì sao không thể gọi trực tiếp một phương thức ném IOException bên trong ds.stream().map(f -> docFile(f)), và các cách xử lý phổ biến có đánh đổi gì?",
+    "reference_answer": "Các functional interface chuẩn (Function, Consumer...) không khai báo throws checked exception, nên lambda không được phép ném IOException ra ngoài. Các cách xử lý: (1) bắt và bọc thành UncheckedIOException/RuntimeException — đơn giản nhưng mất tính 'checked', người gọi không bị nhắc xử lý; (2) tự định nghĩa functional interface có throws và hàm tiện ích chuyển đổi — linh hoạt nhưng thêm code; (3) trả về kiểu kết quả (Either/Result/Optional) cho từng phần tử để xử lý lỗi như dữ liệu — rõ ràng, không dừng cả luồng, nhưng phức tạp hơn; (4) dùng vòng lặp for thông thường khi xử lý lỗi quan trọng. Lựa chọn phụ thuộc lỗi có nên dừng toàn bộ hay chỉ bỏ qua từng phần tử.",
+    "key_points": [
+      "Functional interface chuẩn không cho phép ném checked exception",
+      "Bọc thành unchecked, interface tự định nghĩa, kiểu Result, hoặc vòng lặp thường — mỗi cách đánh đổi tính rõ ràng và độ phức tạp"
+    ],
+    "id": "Q_OOP3_119"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "Xung đột default method khi tiến hóa interface",
+    "difficulty": "Hard",
+    "question": "Thư viện thêm default method sapXep() vào interface DanhSach đã được hàng nghìn lớp cài đặt. Một lớp khách hàng vốn đã có phương thức public void sapXep() với ngữ nghĩa khác (sắp xếp giảm dần). Phân tích hệ quả.",
+    "reference_answer": "Theo quy tắc 'lớp thắng' (class wins), phương thức của lớp được ưu tiên hơn default method, nên lớp khách hàng vẫn biên dịch được — nhưng giờ phương thức cũ của họ vô tình trở thành phần cài đặt của sapXep() trong interface. Code thư viện gọi danhSach.sapXep() kỳ vọng sắp xếp tăng dần sẽ nhận kết quả giảm dần: lỗi ngữ nghĩa im lặng. Nếu chữ ký khác kiểu trả về (int sapXep()), lớp sẽ lỗi biên dịch khi nâng cấp. Ngoài ra default method cài chung có thể phá vỡ bất biến của các lớp cài đặt (ví dụ default removeIf trên một collection đồng bộ hóa không giữ khóa). Bài học: default method không phải 'miễn phí' — cần chọn tên ít đụng độ, tài liệu hóa rõ và coi việc thêm method vào interface công khai là thay đổi có rủi ro.",
+    "key_points": [
+      "Class wins: phương thức sẵn có của lớp vô tình trở thành cài đặt cho default method mới, sai ngữ nghĩa im lặng",
+      "Có thể gây lỗi biên dịch hoặc phá bất biến; thêm default method vào interface công khai vẫn là thay đổi rủi ro"
+    ],
+    "id": "Q_OOP3_120"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kế thừa",
+    "concept": "Static method bị che (hiding) chứ không bị override",
+    "difficulty": "Hard",
+    "question": "Lớp Cha có static void gioiThieu() in 'Cha', lớp Con khai báo static void gioiThieu() in 'Con'. Với Cha x = new Con(); x.gioiThieu(); kết quả là gì? Vì sao đây là cạm bẫy?",
+    "reference_answer": "Kết quả in 'Cha'. Phương thức static được liên kết lúc biên dịch theo KIỂU KHAI BÁO của biến chứ không theo kiểu thực tế của đối tượng; phương thức static cùng chữ ký ở lớp con chỉ CHE (hide) phương thức lớp cha, không phải override, nên không có đa hình. Cạm bẫy: cú pháp gọi qua biến đối tượng trông như lời gọi đa hình, lập trình viên kỳ vọng 'Con'. Thêm @Override vào phương thức static sẽ gây lỗi biên dịch, nên dùng @Override là cách phát hiện; và nên luôn gọi static method qua tên lớp.",
+    "key_points": [
+      "Static method liên kết theo kiểu khai báo lúc biên dịch, lớp con chỉ che chứ không override",
+      "Gọi static qua biến gây hiểu lầm đa hình; dùng @Override để phát hiện và gọi qua tên lớp"
+    ],
+    "id": "Q_OOP3_121"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "Nạp chồng equals thay vì ghi đè",
+    "difficulty": "Hard",
+    "question": "Lớp Diem khai báo public boolean equals(Diem khac) { ... } (tham số kiểu Diem thay vì Object). Vì sao ds.contains(new Diem(1,2)) trên ArrayList<Diem> vẫn trả về false dù danh sách có điểm (1,2)?",
+    "reference_answer": "Phương thức equals(Diem) là NẠP CHỒNG (overload), không phải ghi đè (override) equals(Object) của lớp Object, vì chữ ký khác nhau. Collection gọi o.equals(Object), nên phương thức được chọn là equals(Object) mặc định (so sánh tham chiếu), không bao giờ là bản tự viết. Overload được chọn lúc biên dịch theo kiểu tĩnh của đối số, còn override được chọn lúc chạy. Lỗi này im lặng vì code biên dịch bình thường, thậm chí sv1.equals(sv2) gọi trực tiếp lại cho kết quả đúng, gây nhầm lẫn. Phòng tránh: luôn khai báo equals(Object o) và gắn @Override để trình biên dịch phát hiện chữ ký sai.",
+    "key_points": [
+      "equals(Diem) là overload, không override equals(Object) nên collection không gọi tới",
+      "Overload chọn lúc biên dịch theo kiểu tĩnh; dùng @Override với equals(Object) để phát hiện"
+    ],
+    "id": "Q_OOP3_122"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kế thừa",
+    "concept": "Phương thức private không thể bị override",
+    "difficulty": "Hard",
+    "question": "Lớp Cha có private void kiemTra() và public void xuLy() gọi kiemTra(). Lớp Con định nghĩa public void kiemTra() với logic khác. Khi gọi new Con().xuLy(), phương thức kiemTra() nào chạy? Rút ra cạm bẫy gì?",
+    "reference_answer": "kiemTra() của Cha chạy. Phương thức private không được kế thừa nên không thể bị override; kiemTra() trong Con là một phương thức hoàn toàn mới, không liên quan. Lời gọi kiemTra() bên trong xuLy() của Cha được liên kết tĩnh tới phiên bản private của Cha. Cạm bẫy: lập trình viên lớp con tưởng đang tùy biến hành vi của lớp cha (giống Template Method) nhưng thực tế không có tác dụng, và không có lỗi nào báo. Nếu muốn cho phép tùy biến, lớp cha phải khai báo protected (hook có chủ đích); và luôn dùng @Override để trình biên dịch báo lỗi khi không thực sự override.",
+    "key_points": [
+      "Private method không được kế thừa, phương thức cùng tên ở lớp con là phương thức mới",
+      "Lời gọi trong lớp cha vẫn dùng bản private; muốn cho phép tùy biến phải dùng protected hook và @Override"
+    ],
+    "id": "Q_OOP3_123"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kiến trúc hướng đối tượng",
+    "concept": "Anemic Domain Model và Rich Domain Model",
+    "difficulty": "Hard",
+    "question": "Phân tích đánh đổi giữa Anemic Domain Model (đối tượng miền chỉ có getter/setter, logic nằm trong các lớp Service) và Rich Domain Model (đối tượng miền chứa cả dữ liệu và hành vi nghiệp vụ).",
+    "reference_answer": "Anemic Domain Model đơn giản, hợp với nghiệp vụ CRUD mỏng và dễ ánh xạ ORM/JSON, nhưng thực chất là lập trình thủ tục khoác áo đối tượng: bất biến nghiệp vụ không được đối tượng tự bảo vệ (ai cũng setTrangThai được), logic bị nhân bản ở nhiều service, dễ tạo trạng thái không hợp lệ. Rich Domain Model đặt hành vi cạnh dữ liệu (donHang.xacNhan(), donHang.themSanPham()), bảo vệ bất biến, code thể hiện ngôn ngữ nghiệp vụ, nhưng đòi hỏi thiết kế cẩn thận hơn, có thể xung đột với framework yêu cầu constructor rỗng/setter, và dễ bị nhồi quá nhiều trách nhiệm hoặc phụ thuộc hạ tầng vào entity. Lựa chọn nên dựa vào độ phức tạp nghiệp vụ.",
+    "key_points": [
+      "Anemic: đơn giản, hợp CRUD, nhưng mất bảo vệ bất biến và logic phân tán",
+      "Rich: bảo vệ bất biến, thể hiện nghiệp vụ, nhưng cần thiết kế kỹ và có thể xung đột với framework"
+    ],
+    "id": "Q_OOP3_124"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Coupling & Cohesion",
+    "concept": "Áp dụng Luật Demeter quá mức",
+    "difficulty": "Hard",
+    "question": "Một nhóm áp dụng Luật Demeter tuyệt đối, thêm vào lớp DonHang các phương thức getThanhPhoKhachHang(), getTenNganHangKhachHang(), getHanTheKhachHang()... Phân tích hệ quả và cách cân bằng.",
+    "reference_answer": "Áp dụng máy móc biến DonHang thành 'Middle Man' với giao diện phình to, mỗi thay đổi ở KhachHang lại kéo theo thêm phương thức chuyển tiếp ở DonHang — coupling không giảm mà chỉ bị che đi, đồng thời DonHang mất cohesion vì phải biết đủ thứ về khách hàng. Luật Demeter nhắm vào việc không phụ thuộc vào cấu trúc nội bộ của đối tượng có hành vi; nó ít ý nghĩa với cấu trúc dữ liệu thuần (DTO, value object) và các API fluent/stream. Cân bằng: hỏi 'ai nên chịu trách nhiệm cho hành vi này' và đưa hành vi về đúng chỗ (Tell, Don't Ask); nếu client thực sự cần dữ liệu khách hàng, có thể trả về một value object/DTO bất biến thay vì thêm hàng loạt phương thức ủy quyền.",
+    "key_points": [
+      "Demeter tuyệt đối tạo Middle Man, phình giao diện, coupling chỉ bị che chứ không giảm",
+      "Áp dụng cho đối tượng có hành vi, không cho DTO/fluent API; đưa hành vi về đúng chỗ hoặc trả value object"
+    ],
+    "id": "Q_OOP3_125"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Mediator trở thành God Object",
+    "difficulty": "Hard",
+    "question": "Hệ thống dùng Mediator để điều phối 30 thành phần của một màn hình đặt vé. Sau một năm, lớp mediator dài 4000 dòng. Phân tích nguyên nhân và hướng xử lý.",
+    "reference_answer": "Mediator chuyển độ phức tạp tương tác từ các thành phần vào một chỗ; nếu mọi quy tắc phối hợp đều dồn vào đó, nó trở thành God Object: cohesion thấp, mọi thay đổi đều chạm vào nó, khó kiểm thử, xung đột merge thường xuyên. Nguyên nhân: không phân tách theo nhóm tương tác, dùng mediator cho cả logic nghiệp vụ lẫn logic giao diện. Hướng xử lý: chia thành nhiều mediator nhỏ theo nhóm thành phần có tương tác chặt (chọn chuyến bay, chọn ghế, thanh toán), tách logic nghiệp vụ ra domain service, chuyển một phần tương tác đơn giản sang cơ chế sự kiện (observer) hoặc state machine tường minh, và kiểm soát bằng chỉ số độ dài/cohesion.",
+    "key_points": [
+      "Mediator gom toàn bộ logic phối hợp dễ thành God Object",
+      "Chia mediator theo nhóm tương tác, tách nghiệp vụ ra service, dùng sự kiện/state machine cho phần đơn giản"
+    ],
+    "id": "Q_OOP3_126"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Rủi ro của Chain of Responsibility",
+    "difficulty": "Hard",
+    "question": "Phân tích các rủi ro thường gặp khi dùng Chain of Responsibility trong hệ thống thực tế (ví dụ chuỗi xử lý duyệt khoản vay).",
+    "reference_answer": "(1) Yêu cầu có thể đi hết chuỗi mà không handler nào xử lý — nếu không có handler mặc định cuối chuỗi, yêu cầu bị 'nuốt' im lặng. (2) Thứ tự handler mang ý nghĩa nghiệp vụ ngầm: cấu hình sai thứ tự (kiểm tra hạn mức trước xác thực) gây lỗi logic hoặc lỗ hổng bảo mật. (3) Handler quên gọi tiếp handler kế tiếp làm đứt chuỗi. (4) Khó debug và truy vết vì luồng điều khiển phân tán. (5) Chuỗi dài làm tăng độ trễ và khó đảm bảo hiệu năng. Giảm thiểu: handler mặc định cuối chuỗi báo lỗi tường minh, khai báo thứ tự tập trung và có test, ghi log/tracing ở mỗi bước, và tách phần quyết định 'ai xử lý' khỏi phần 'chuyển tiếp'.",
+    "key_points": [
+      "Yêu cầu có thể không được xử lý, thứ tự handler mang nghĩa ngầm, dễ đứt chuỗi",
+      "Cần handler mặc định cuối chuỗi, cấu hình thứ tự tập trung có test, log/tracing từng bước"
+    ],
+    "id": "Q_OOP3_127"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Flyweight khả biến và an toàn đa luồng",
+    "difficulty": "Hard",
+    "question": "Một lập trình viên tối ưu bộ nhớ bằng cách chia sẻ các đối tượng KieuChu (font, cỡ chữ, màu) giữa hàng triệu ký tự, nhưng KieuChu có setter setMau(). Phân tích lỗi phát sinh.",
+    "reference_answer": "Flyweight được chia sẻ bởi rất nhiều 'chủ sở hữu' logic; khi một đoạn văn gọi kieuChu.setMau(DO) để tô đỏ một từ, MỌI ký tự khác đang dùng chung đối tượng đó cũng đổi màu — lỗi ngữ nghĩa lan rộng khó truy vết. Trong môi trường đa luồng, việc sửa đối tượng dùng chung còn gây race condition. Ngoài ra factory cache flyweight theo khóa (font, cỡ, màu): sửa đối tượng sau khi đã cache làm khóa và nội dung lệch nhau. Nguyên tắc: flyweight phải bất biến; 'thay đổi' được thực hiện bằng cách lấy flyweight khác từ factory (factory.lay(font, co, DO)), và factory phải an toàn đa luồng (ví dụ ConcurrentHashMap.computeIfAbsent).",
+    "key_points": [
+      "Sửa flyweight dùng chung làm thay đổi mọi nơi đang tham chiếu và gây race condition",
+      "Flyweight phải bất biến; thay đổi bằng cách lấy đối tượng khác từ factory an toàn đa luồng"
+    ],
+    "id": "Q_OOP3_128"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Chi phí bộ nhớ của Memento và lựa chọn thay thế",
+    "difficulty": "Hard",
+    "question": "Trình soạn thảo ảnh lưu một Memento chứa toàn bộ ảnh (50MB) sau mỗi thao tác để hỗ trợ Undo 100 bước. Phân tích vấn đề và các phương án thiết kế thay thế.",
+    "reference_answer": "Lưu toàn bộ trạng thái mỗi bước tốn tới 5GB bộ nhớ — không khả thi. Phương án: (1) Command Pattern với undo: mỗi thao tác lưu đủ thông tin để đảo ngược (lệnh tăng sáng lưu tham số để giảm lại), chi phí nhỏ, nhưng không phải thao tác nào cũng đảo ngược chính xác được (làm mờ, cắt mất dữ liệu). (2) Memento gia tăng: chỉ lưu vùng ảnh (tile) bị thay đổi — delta. (3) Kết hợp: lưu snapshot đầy đủ định kỳ cộng chuỗi lệnh/delta ở giữa, undo bằng cách khôi phục snapshot gần nhất rồi phát lại. (4) Chia sẻ cấu trúc bất biến (copy-on-write theo tile) để các memento dùng chung phần không đổi. Đồng thời giới hạn số bước hoặc đẩy lịch sử cũ xuống đĩa.",
+    "key_points": [
+      "Snapshot toàn bộ mỗi bước gây bùng nổ bộ nhớ",
+      "Thay thế: Command có undo, delta/tile, snapshot định kỳ + phát lại, chia sẻ cấu trúc copy-on-write"
+    ],
+    "id": "Q_OOP3_129"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Trục thay đổi của Abstract Factory",
+    "difficulty": "Hard",
+    "question": "Hệ thống dùng Abstract Factory với interface GiaoDienFactory có taoNut(), taoHopThoai() và 5 cài đặt (Windows, Mac, Linux, Web, Mobile). Nay cần thêm sản phẩm mới taoThanhTruot(). Phân tích tác động và bài học thiết kế.",
+    "reference_answer": "Abstract Factory dễ mở rộng theo trục 'thêm họ mới' (thêm một factory cài đặt đủ phương thức), nhưng rất khó mở rộng theo trục 'thêm loại sản phẩm mới': phải thêm phương thức vào interface và sửa CẢ 5 factory cùng mọi nơi cài đặt bên ngoài (nếu là API công khai thì phá vỡ tương thích). Đây là ví dụ của việc pattern chỉ đáp ứng OCP theo một chiều thay đổi. Bài học: trước khi chọn pattern cần xác định chiều nào thay đổi thường xuyên hơn; có thể giảm tác động bằng default method trả về cài đặt chung, hoặc dùng factory tham số hóa theo kiểu sản phẩm (tao(Class<T> loai)) đánh đổi an toàn kiểu, hoặc registry các creator.",
+    "key_points": [
+      "Abstract Factory dễ thêm họ sản phẩm nhưng khó thêm loại sản phẩm (phải sửa mọi factory)",
+      "Chọn pattern theo trục thay đổi chính; giảm thiểu bằng default method, factory tham số hóa hoặc registry"
+    ],
+    "id": "Q_OOP3_130"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Refactoring và Code Smell",
+    "concept": "Speculative Generality và áp dụng pattern quá sớm",
+    "difficulty": "Hard",
+    "question": "Một nhóm xây dựng tính năng xuất báo cáo PDF đã dựng sẵn Bridge, Abstract Factory, Plugin loader để 'sau này hỗ trợ Excel, Word, HTML', nhưng 2 năm sau vẫn chỉ có PDF. Phân tích chi phí của quyết định này.",
+    "reference_answer": "Đây là code smell 'Speculative Generality' (trái với nguyên tắc YAGNI). Chi phí: (1) nhiều lớp và tầng gián tiếp làm code khó đọc, người mới khó lần theo luồng; (2) trừu tượng hóa dựa trên phỏng đoán thường SAI: khi yêu cầu Excel thật sự đến, nó có thể cần những khả năng mà interface không lường trước (bảng tính nhiều sheet, công thức), buộc phải sửa lại cả cấu trúc; (3) chi phí bảo trì và kiểm thử cho các nhánh không ai dùng. Cách tiếp cận tốt hơn: viết đơn giản cho nhu cầu hiện tại nhưng giữ code sạch, có kiểm thử; khi xuất hiện biến thể thứ hai hoặc thứ ba mới refactor để trích xuất trừu tượng dựa trên các trường hợp cụ thể ('rule of three').",
+    "key_points": [
+      "Trừu tượng hóa đón đầu tăng độ phức tạp và chi phí bảo trì mà không mang lại giá trị",
+      "Trừu tượng dựa trên phỏng đoán thường sai; nên refactor khi có biến thể thực tế (rule of three)"
+    ],
+    "id": "Q_OOP3_131"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Event bus toàn cục và coupling ẩn",
+    "difficulty": "Hard",
+    "question": "Một ứng dụng dùng EventBus toàn cục: mọi module publish/subscribe sự kiện qua chuỗi tên như 'donhang.capnhat'. Phân tích các vấn đề tiềm ẩn của kiến trúc này.",
+    "reference_answer": "(1) Coupling ẩn: các module vẫn phụ thuộc lẫn nhau qua tên sự kiện và cấu trúc payload, nhưng phụ thuộc này không hiện ra trong code (không có import/kiểu), đổi tên hoặc payload làm hỏng subscriber mà trình biên dịch không phát hiện. (2) Khó truy vết luồng điều khiển: không biết ai xử lý sự kiện, theo thứ tự nào. (3) Thứ tự và tái nhập: subscriber publish sự kiện mới trong lúc đang xử lý có thể gây vòng lặp vô hạn hoặc trạng thái trung gian không nhất quán. (4) Xử lý lỗi: ngoại lệ ở một subscriber có thể làm hỏng các subscriber khác hoặc bị nuốt. (5) Rò rỉ bộ nhớ khi quên hủy đăng ký. Giảm thiểu: dùng kiểu sự kiện có định kiểu (class) thay vì chuỗi, giới hạn phạm vi bus theo module, tài liệu hóa luồng sự kiện, và dùng lời gọi trực tiếp khi quan hệ là một-một rõ ràng.",
+    "key_points": [
+      "Event bus tạo coupling ẩn qua tên/payload, trình biên dịch không kiểm tra được",
+      "Khó truy vết, rủi ro thứ tự/tái nhập, lỗi lan truyền, rò rỉ; dùng sự kiện có kiểu và giới hạn phạm vi"
+    ],
+    "id": "Q_OOP3_132"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Nguyên tắc SOLID",
+    "concept": "Phụ thuộc vòng trong DI container",
+    "difficulty": "Hard",
+    "question": "Trong ứng dụng Spring, DichVuDonHang cần DichVuKhoHang qua constructor, và DichVuKhoHang lại cần DichVuDonHang. Phân tích lỗi xảy ra và vì sao 'sửa' bằng field injection hoặc @Lazy chỉ che giấu vấn đề.",
+    "reference_answer": "Với constructor injection, container không thể tạo đối tượng nào trước vì mỗi bên cần bên kia đã tồn tại — lỗi khi khởi động (BeanCurrentlyInCreationException). Chuyển sang field/setter injection hoặc @Lazy giúp container tạo được đối tượng (gán phụ thuộc sau hoặc qua proxy), nhưng vòng phụ thuộc vẫn còn: hai lớp coupling chặt hai chiều, đối tượng có thể được dùng khi chưa đủ phụ thuộc, khó kiểm thử độc lập, và thường là dấu hiệu phân chia trách nhiệm sai. Cách sửa gốc: tách phần logic dùng chung ra một lớp thứ ba mà cả hai cùng phụ thuộc, đảo chiều một phụ thuộc bằng interface/sự kiện (DonHang phát sự kiện, KhoHang lắng nghe), hoặc gộp nếu hai lớp thực chất là một trách nhiệm.",
+    "key_points": [
+      "Constructor injection với phụ thuộc vòng làm container không khởi tạo được",
+      "Field injection/@Lazy chỉ che giấu; sửa gốc bằng tách lớp chung, đảo phụ thuộc qua interface/sự kiện, hoặc gộp"
+    ],
+    "id": "Q_OOP3_133"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kiểm thử hướng đối tượng",
+    "concept": "Lạm dụng mock khiến test gắn chặt vào cài đặt",
+    "difficulty": "Hard",
+    "question": "Bộ test của lớp DichVuThanhToan dùng mock cho mọi phụ thuộc và verify chính xác từng lời gọi nội bộ (thứ tự, số lần, đối số). Sau một lần refactor không đổi hành vi, 40 test bị fail. Phân tích nguyên nhân và cách viết test bền vững hơn.",
+    "reference_answer": "Test đã kiểm tra CÁCH lớp làm việc (chi tiết tương tác nội bộ) thay vì KẾT QUẢ quan sát được — gọi là over-specification. Bất kỳ thay đổi cài đặt nào (gộp hai lời gọi, đổi thứ tự, cache) đều phá test dù hành vi đúng, khiến test trở thành rào cản refactor và mất niềm tin ('test đỏ là chuyện thường'). Cách khắc phục: chỉ mock ở ranh giới hệ thống có tác dụng phụ thật (cổng thanh toán, gửi email, thời gian) và chỉ verify những tương tác là một phần của hợp đồng nghiệp vụ; với đối tượng nội bộ hoặc value object, dùng đối tượng thật hoặc fake; ưu tiên kiểm tra trạng thái/đầu ra; tránh mock những kiểu mình không sở hữu mà bọc chúng sau adapter.",
+    "key_points": [
+      "Verify chi tiết tương tác nội bộ khiến test gắn với cài đặt, vỡ khi refactor",
+      "Chỉ mock ở ranh giới có tác dụng phụ, ưu tiên kiểm tra kết quả, dùng fake/đối tượng thật cho phần nội bộ"
+    ],
+    "id": "Q_OOP3_134"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Value Object chứa số thực và so sánh bằng",
+    "difficulty": "Hard",
+    "question": "Record ToaDo(double lat, double lon) được dùng làm khóa HashMap để gom các điểm GPS trùng nhau. Phân tích các vấn đề về equals/hashCode với kiểu double.",
+    "reference_answer": "(1) Sai số dấu phẩy động: hai tọa độ về logic là một điểm nhưng tính qua các phép biến đổi khác nhau (0.1 + 0.2 so với 0.3) cho bit khác nhau nên không bằng nhau, khóa bị tách đôi. (2) Record so sánh double bằng Double.compare, nên 0.0 và -0.0 được coi là KHÁC nhau, còn NaN lại bằng NaN — khác với toán tử ==, gây bất ngờ. (3) Nếu muốn coi các điểm 'gần nhau' là bằng nhau bằng epsilon thì phá tính bắc cầu của equals và không thể viết hashCode nhất quán. Hướng xử lý: chuẩn hóa về biểu diễn rời rạc trước khi làm khóa (làm tròn tới số chữ số cố định, đổi sang số nguyên micro-độ, hoặc mã geohash), và dùng cấu trúc không gian (lưới, KD-tree) cho truy vấn 'gần nhau'.",
+    "key_points": [
+      "Sai số dấu phẩy động khiến giá trị bằng nhau về logic có biểu diễn khác nhau",
+      "Equals theo epsilon phá tính bắc cầu; chuẩn hóa về biểu diễn rời rạc trước khi làm khóa"
+    ],
+    "id": "Q_OOP3_135"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Lưu enum bằng ordinal()",
+    "difficulty": "Hard",
+    "question": "Một hệ thống lưu trạng thái đơn hàng vào CSDL bằng TrangThai.ordinal() (0, 1, 2...). Phân tích rủi ro khi phát triển tiếp.",
+    "reference_answer": "ordinal() là vị trí khai báo của hằng trong enum, phụ thuộc vào thứ tự viết code. Chỉ cần chèn thêm một trạng thái mới vào giữa (ví dụ DANG_DONG_GOI giữa DA_THANH_TOAN và DANG_GIAO) hoặc sắp xếp lại, mọi bản ghi cũ trong CSDL bị hiểu sai nghĩa — dữ liệu hỏng âm thầm mà không có lỗi nào, rất khó phát hiện và khôi phục. Tương tự nếu dùng ordinal trong file serialize, API hoặc cache. Cách đúng: lưu tên hằng (name()) hoặc một mã ổn định gắn tường minh trong enum (TrangThai(int ma) với trường ma không đổi), kèm ánh xạ ngược; với JPA dùng EnumType.STRING hoặc AttributeConverter.",
+    "key_points": [
+      "ordinal phụ thuộc thứ tự khai báo, chèn/sắp xếp lại làm dữ liệu cũ bị hiểu sai im lặng",
+      "Lưu name() hoặc mã ổn định tường minh trong enum kèm ánh xạ ngược"
+    ],
+    "id": "Q_OOP3_136"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Record bất biến nông và compact constructor",
+    "difficulty": "Hard",
+    "question": "record LopHoc(String ma, List<SinhVien> ds) {} được quảng bá là bất biến. Phân tích vì sao điều này chưa đúng và cách dùng compact constructor để khắc phục.",
+    "reference_answer": "Record chỉ bất biến NÔNG: trường ds là final nên không gán lại được, nhưng đối tượng List bên trong vẫn khả biến. Người gọi giữ tham chiếu danh sách gốc truyền vào constructor có thể sửa nó sau đó, và bất kỳ ai gọi lopHoc.ds().add(...) cũng sửa được trạng thái record — làm hỏng equals/hashCode nếu record đang là khóa HashMap. Khắc phục bằng compact constructor: record LopHoc(String ma, List<SinhVien> ds) { LopHoc { Objects.requireNonNull(ma); ds = List.copyOf(ds); } } — vừa kiểm tra hợp lệ vừa sao chép phòng thủ thành danh sách bất biến. Nếu phần tử SinhVien cũng khả biến thì record vẫn chưa bất biến sâu.",
+    "key_points": [
+      "Record chỉ bất biến nông, thành phần khả biến vẫn bị sửa được",
+      "Compact constructor dùng để kiểm tra hợp lệ và sao chép phòng thủ (List.copyOf); phần tử khả biến vẫn là rủi ro"
+    ],
+    "id": "Q_OOP3_137"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Đa hình",
+    "concept": "Bài toán biểu thức (Expression Problem)",
+    "difficulty": "Hard",
+    "question": "Hệ thống biểu diễn cây biểu thức (So, Cong, Nhan) cần thêm cả LOẠI NÚT mới lẫn THAO TÁC mới (tính giá trị, in, rút gọn, đạo hàm). So sánh cách tiếp cận đa hình hướng đối tượng, Visitor, và sealed + pattern matching dưới góc độ 'Expression Problem'.",
+    "reference_answer": "Expression Problem chỉ ra rằng khó mở rộng đồng thời theo cả hai chiều mà không sửa code cũ và vẫn an toàn kiểu. Đa hình OOP (mỗi nút có phương thức tinh(), in()): thêm loại nút dễ (thêm lớp), nhưng thêm thao tác phải sửa mọi lớp. Visitor và sealed + switch pattern matching: thêm thao tác dễ (thêm visitor/hàm mới), nhưng thêm loại nút phải sửa mọi visitor/switch — với sealed, trình biên dịch chỉ ra tất cả chỗ cần sửa, an toàn hơn Visitor và ít boilerplate hơn. Lựa chọn dựa vào chiều thay đổi thường xuyên: tập kiểu ổn định, thao tác hay thêm → sealed/Visitor; tập thao tác ổn định, kiểu hay thêm → đa hình OOP. Các kỹ thuật nâng cao (object algebras, type classes) giải được cả hai chiều với chi phí phức tạp.",
+    "key_points": [
+      "Expression Problem: khó mở rộng đồng thời loại dữ liệu và thao tác",
+      "OOP dễ thêm kiểu khó thêm thao tác; Visitor/sealed ngược lại; chọn theo chiều thay đổi chính"
+    ],
+    "id": "Q_OOP3_138"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Vòng đời đối tượng",
+    "concept": "Serialization phá vỡ đóng gói và bất biến",
+    "difficulty": "Hard",
+    "question": "Phân tích các rủi ro thiết kế và bảo mật khi một lớp nghiệp vụ implements Serializable của Java một cách 'cho tiện'.",
+    "reference_answer": "(1) Dạng tuần tự hóa trở thành một API công khai ẩn: mọi trường private đều bị đưa vào luồng byte, đổi cấu trúc nội bộ sẽ phá tương thích dữ liệu đã lưu (cần quản lý serialVersionUID và các phiên bản). (2) Deserialization tạo đối tượng KHÔNG gọi constructor, nên mọi kiểm tra bất biến trong constructor bị bỏ qua; kẻ tấn công có thể tạo luồng byte giả mạo cho ra đối tượng ở trạng thái không hợp lệ (soDu âm) hoặc chia sẻ tham chiếu tới thành phần khả biến nội bộ. (3) Lỗ hổng 'deserialization gadget chain' cho phép thực thi mã từ xa khi giải tuần tự dữ liệu không tin cậy. Biện pháp: tránh Java serialization cho dữ liệu ngoài, dùng định dạng tường minh (JSON với DTO), nếu bắt buộc thì dùng serialization proxy pattern, readObject kiểm tra bất biến và sao chép phòng thủ, và bộ lọc deserialization.",
+    "key_points": [
+      "Serializable biến cấu trúc private thành API ẩn và khó tiến hóa",
+      "Deserialization bỏ qua constructor, phá bất biến và có thể bị khai thác thực thi mã; dùng DTO/JSON hoặc serialization proxy"
+    ],
+    "id": "Q_OOP3_139"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Thành viên static",
+    "concept": "Rò rỉ bộ nhớ ThreadLocal trong thread pool",
+    "difficulty": "Hard",
+    "question": "Một lớp NguCanhNguoiDung dùng static ThreadLocal<NguoiDung> để lưu người dùng hiện tại của request trong ứng dụng web chạy trên thread pool. Phân tích hai rủi ro nghiêm trọng nếu không gọi remove() sau mỗi request.",
+    "reference_answer": "Trong thread pool, luồng được TÁI SỬ DỤNG cho nhiều request. (1) Rò rỉ dữ liệu giữa các request: nếu request sau không ghi đè giá trị (ví dụ là request ẩn danh), nó đọc được NguoiDung của request trước — lỗ hổng bảo mật (người dùng thấy dữ liệu của người khác). (2) Rò rỉ bộ nhớ: giá trị trong ThreadLocalMap được tham chiếu mạnh và sống theo luồng (gần như vĩnh viễn trong pool); nếu giá trị giữ đồ thị đối tượng lớn hoặc tham chiếu tới ClassLoader của ứng dụng, khi redeploy ứng dụng ClassLoader cũ không được thu hồi (PermGen/Metaspace leak). Biện pháp: luôn set/remove trong try-finally (hoặc filter/interceptor), tránh lưu đối tượng lớn, cân nhắc truyền ngữ cảnh tường minh hoặc ScopedValue.",
+    "key_points": [
+      "Luồng được tái sử dụng nên giá trị ThreadLocal cũ có thể lộ sang request khác",
+      "Giá trị sống theo luồng gây rò rỉ bộ nhớ/ClassLoader; luôn remove trong finally"
+    ],
+    "id": "Q_OOP3_140"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp Object và các phương thức nền tảng",
+    "concept": "equals/hashCode của entity ORM với id sinh tự động",
+    "difficulty": "Hard",
+    "question": "Entity DonHang (JPA) override equals/hashCode dựa trên trường id do CSDL sinh khi persist. Một đối tượng mới (id = null) được thêm vào HashSet rồi được lưu xuống CSDL. Phân tích lỗi.",
+    "reference_answer": "Trước khi persist, id = null nên hashCode tính theo null (hoặc mọi entity mới đều 'bằng nhau' nếu equals so sánh id null). Sau persist, id được gán giá trị nên hashCode thay đổi — entity giờ nằm sai bucket trong HashSet: contains() trả về false, remove() không xóa được, có thể thêm trùng. Ngoài ra nhiều entity mới cùng id null có thể bị coi là trùng và bị loại khỏi Set. Các giải pháp: dùng khóa nghiệp vụ tự nhiên bất biến (mã đơn hàng) cho equals/hashCode; hoặc sinh id phía ứng dụng (UUID) ngay khi tạo đối tượng; hoặc equals theo id nhưng hashCode trả hằng số theo lớp (chấp nhận hiệu năng kém hơn) và coi đối tượng id null chỉ bằng chính nó. Cũng cần dùng getClass/instanceof cẩn thận vì ORM tạo proxy lớp con.",
+    "key_points": [
+      "Id được gán khi persist làm hashCode thay đổi, entity mất trong HashSet; nhiều entity id null bị coi là trùng",
+      "Dùng khóa nghiệp vụ bất biến, id sinh sớm (UUID), hoặc hashCode hằng; lưu ý proxy của ORM"
+    ],
+    "id": "Q_OOP3_141"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Thành viên static",
+    "concept": "Khởi tạo lười không an toàn đa luồng",
+    "difficulty": "Hard",
+    "question": "Getter public CauHinh getCauHinh() { if (cauHinh == null) cauHinh = docTuFile(); return cauHinh; } được gọi đồng thời từ nhiều luồng. Phân tích các lỗi có thể xảy ra ngoài việc đọc file nhiều lần.",
+    "reference_answer": "(1) Race condition: nhiều luồng cùng thấy null và cùng gọi docTuFile(), tốn tài nguyên; nếu CauHinh có tác dụng phụ (mở kết nối, đăng ký) thì có nhiều thể hiện tồn tại song song, các luồng giữ các đối tượng khác nhau gây trạng thái không nhất quán. (2) Vấn đề khả kiến bộ nhớ: không có đồng bộ hóa nên một luồng có thể thấy tham chiếu cauHinh khác null nhưng các trường bên trong CauHinh chưa được ghi xong (đối tượng khởi tạo dở) do sắp xếp lại lệnh. (3) Một luồng có thể không bao giờ thấy giá trị đã gán. Giải pháp: khởi tạo sớm nếu chi phí chấp nhận được; holder idiom; synchronized/volatile + double-checked đúng cách; hoặc dùng AtomicReference/ConcurrentHashMap.computeIfAbsent; CauHinh nên bất biến với trường final.",
+    "key_points": [
+      "Race condition tạo nhiều thể hiện, mỗi luồng giữ đối tượng khác nhau",
+      "Không đồng bộ có thể đọc đối tượng khởi tạo dở; dùng holder idiom, volatile, computeIfAbsent, đối tượng bất biến"
+    ],
+    "id": "Q_OOP3_142"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Interface",
+    "concept": "Cài đặt Iterator tự định nghĩa sai hợp đồng",
+    "difficulty": "Hard",
+    "question": "Một lớp tự cài đặt Iterator cho dữ liệu đọc từ file, trong đó hasNext() đọc trước một dòng và tiến con trỏ file. Phân tích các lỗi tinh vi so với hợp đồng của Iterator.",
+    "reference_answer": "Hợp đồng ngầm: hasNext() phải idempotent và không có tác dụng phụ quan sát được — gọi nhiều lần liên tiếp không được làm thay đổi phần tử next() sẽ trả về. Nếu mỗi lần hasNext() lại đọc thêm một dòng, gọi hasNext() hai lần (thường gặp trong code debug hoặc thư viện) sẽ bỏ qua dữ liệu. Các lỗi khác: next() khi hết phần tử phải ném NoSuchElementException chứ không trả null; remove() không hỗ trợ phải ném UnsupportedOperationException; iterator giữ tài nguyên file mà không có cơ chế đóng nếu client dừng giữa chừng. Cách đúng: dùng một biến 'phần tử đã đọc trước' (lookahead) — hasNext() chỉ đọc khi bộ đệm trống, next() lấy từ bộ đệm rồi xóa — và cân nhắc kết hợp AutoCloseable hoặc Stream với onClose.",
+    "key_points": [
+      "hasNext() phải idempotent, không tiêu thụ dữ liệu; next() hết phần tử phải ném NoSuchElementException",
+      "Dùng bộ đệm lookahead, xử lý remove() và giải phóng tài nguyên đúng cách"
+    ],
+    "id": "Q_OOP3_143"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Lớp và đối tượng",
+    "concept": "Lạm dụng Optional",
+    "difficulty": "Hard",
+    "question": "Phân tích các cách dùng sai Optional phổ biến: làm kiểu trường của entity, làm tham số phương thức, gọi get() không kiểm tra, và Optional<List<T>>.",
+    "reference_answer": "(1) Optional làm trường: Optional không Serializable, tốn thêm một đối tượng cho mỗi trường, và không được thiết kế cho mục đích này — trường có thể vắng mặt nên để null nội bộ và getter trả Optional. (2) Optional làm tham số: buộc người gọi bọc giá trị, vẫn có thể truyền null cho chính Optional (giờ có ba trạng thái), nên dùng overload hoặc tham số nullable có tài liệu. (3) opt.get() không kiểm tra chỉ đổi NullPointerException thành NoSuchElementException, mất mục đích; dùng orElse/orElseThrow với thông điệp rõ, map/flatMap. (4) Optional<List<T>>: collection đã có trạng thái 'rỗng' tự nhiên, nên trả về danh sách rỗng thay vì Optional. Ngoài ra, orElse(tinhToanNang()) luôn đánh giá đối số; cần orElseGet(() -> ...) để đánh giá lười.",
+    "key_points": [
+      "Optional dành cho kiểu trả về; không nên làm trường, tham số hoặc bọc collection",
+      "get() không kiểm tra vô nghĩa; dùng orElseThrow/map, và orElseGet cho giá trị mặc định tốn kém"
+    ],
+    "id": "Q_OOP3_144"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Builder kết hợp kế thừa (generic self-type)",
+    "difficulty": "Hard",
+    "question": "Lớp ThongBao có Builder; lớp con ThongBaoEmail cần Builder kế thừa thêm phương thức tieuDe(). Vì sao new ThongBaoEmail.Builder().noiDung(\"x\").tieuDe(\"y\") có thể lỗi biên dịch, và kỹ thuật nào khắc phục? Đánh đổi là gì?",
+    "reference_answer": "Phương thức noiDung() khai báo ở Builder cha trả về kiểu Builder cha, nên sau khi gọi, kiểu tĩnh của biểu thức là Builder cha — không có tieuDe(), gây lỗi biên dịch dù đối tượng thực tế là Builder con. Khắc phục bằng 'generic self-type' (curiously recurring template): abstract static class Builder<T extends Builder<T>> { T noiDung(String s) { ...; return self(); } protected abstract T self(); }, Builder con khai báo extends ThongBao.Builder<Builder> và cài self() trả về this. Đánh đổi: chữ ký generic phức tạp, khó đọc với người mới, cần nhiều boilerplate, và vẫn không ngăn được việc lớp con khai báo sai tham số kiểu; với nhiều tầng kế thừa, độ phức tạp tăng nhanh — cân nhắc composition hoặc record + builder riêng.",
+    "key_points": [
+      "Phương thức builder cha trả kiểu cha làm mất các phương thức của builder con trong chuỗi gọi",
+      "Dùng generic self-type (T extends Builder<T>, self()); đánh đổi là độ phức tạp và boilerplate"
+    ],
+    "id": "Q_OOP3_145"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Vòng đời đối tượng",
+    "concept": "Interning/canonical cache và rò rỉ bộ nhớ",
+    "difficulty": "Hard",
+    "question": "Để tiết kiệm bộ nhớ, một hệ thống chuẩn hóa (intern) các đối tượng MaSanPham bằng static HashMap<String, MaSanPham> cache: mỗi mã chỉ có một đối tượng duy nhất. Sau vài tuần chạy, ứng dụng hết bộ nhớ. Phân tích và đề xuất giải pháp.",
+    "reference_answer": "Static HashMap giữ tham chiếu MẠNH tới mọi khóa và giá trị đã từng được chuẩn hóa, không bao giờ xóa — kể cả các mã sản phẩm chỉ xuất hiện một lần rồi không dùng nữa. Cache tăng vô hạn theo số mã duy nhất từng gặp, gây rò rỉ bộ nhớ dù mục đích ban đầu là tiết kiệm. Giải pháp: dùng tham chiếu yếu để đối tượng không còn ai dùng có thể bị GC thu hồi (WeakHashMap với giá trị bọc WeakReference, vì nếu giá trị tham chiếu mạnh tới khóa thì entry không bao giờ bị xóa), hoặc dùng cache có giới hạn kích thước/thời gian (LRU, Caffeine), hoặc chỉ intern các tập giá trị hữu hạn đã biết. Đồng thời cần đảm bảo an toàn đa luồng cho cache.",
+    "key_points": [
+      "Cache chuẩn hóa static giữ tham chiếu mạnh mãi mãi, tăng vô hạn gây rò rỉ",
+      "Dùng WeakHashMap + WeakReference cho giá trị, hoặc cache giới hạn kích thước/thời gian, an toàn đa luồng"
+    ],
+    "id": "Q_OOP3_146"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Đa hình",
+    "concept": "Chi phí của lời gọi đa hình trong mã hiệu năng cao",
+    "difficulty": "Hard",
+    "question": "Trong vòng lặp xử lý 100 triệu phần tử, lời gọi hinh.dienTich() qua interface với 8 lớp cài đặt khác nhau chạy chậm hơn đáng kể so với khi chỉ có 1 lớp cài đặt. Giải thích nguyên nhân ở mức JVM và các đánh đổi khi tối ưu.",
+    "reference_answer": "JIT của JVM tối ưu lời gọi ảo bằng cách theo dõi các kiểu thực tế tại mỗi điểm gọi (call site): nếu chỉ thấy 1 kiểu (monomorphic) hoặc 2 kiểu (bimorphic), nó có thể inline trực tiếp thân phương thức, mở đường cho các tối ưu khác (loại bỏ kiểm tra, vector hóa). Khi điểm gọi thấy nhiều kiểu (megamorphic), JIT phải dùng tra bảng phương thức ảo (vtable/itable), không inline được, nên chậm hơn nhiều trong vòng lặp chặt. Tối ưu có thể: nhóm dữ liệu theo kiểu rồi xử lý từng nhóm (mỗi vòng lặp monomorphic), dùng cấu trúc dữ liệu theo cột thay vì đối tượng đa hình, hoặc switch trên sealed type. Đánh đổi: hy sinh tính mở rộng và sự rõ ràng của thiết kế OOP; chỉ nên làm sau khi đo đạc chứng minh đây là điểm nóng thật sự.",
+    "key_points": [
+      "JIT inline được lời gọi monomorphic/bimorphic, còn megamorphic phải tra bảng ảo, không inline",
+      "Tối ưu bằng nhóm theo kiểu, dữ liệu dạng cột hoặc sealed switch; đánh đổi tính mở rộng, chỉ làm khi đo đạc chứng minh"
+    ],
+    "id": "Q_OOP3_147"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Kiến trúc hướng đối tượng",
+    "concept": "Coi lời gọi từ xa như lời gọi cục bộ",
+    "difficulty": "Hard",
+    "question": "Một hệ thống dùng Remote Proxy để client gọi khachHang.getTen(), khachHang.getEmail(), khachHang.getDiaChi()... như với đối tượng cục bộ, nhưng mỗi getter thực chất là một request mạng. Phân tích các vấn đề và nguyên tắc thiết kế giao diện cho đối tượng phân tán.",
+    "reference_answer": "Proxy làm lời gọi từ xa trông giống lời gọi cục bộ, che đi những khác biệt bản chất (các 'ngộ nhận về điện toán phân tán'): (1) độ trễ — giao diện 'chatty' với nhiều getter nhỏ biến một màn hình thành hàng chục round-trip, chậm hàng trăm lần; (2) lỗi một phần — mỗi getter có thể thất bại do mạng, timeout, nhưng chữ ký phương thức không thể hiện điều đó; (3) tính nhất quán — đọc từng trường ở các thời điểm khác nhau có thể cho dữ liệu lẫn lộn giữa hai phiên bản. Nguyên tắc: thiết kế giao diện từ xa theo kiểu 'coarse-grained' — một lời gọi trả về một DTO đầy đủ (Remote Facade + Data Transfer Object), làm lỗi mạng và timeout hiện rõ trong API, và thiết kế thao tác idempotent để có thể retry an toàn.",
+    "key_points": [
+      "Lời gọi từ xa khác bản chất lời gọi cục bộ: độ trễ, lỗi một phần, nhất quán",
+      "Thiết kế giao diện thô (Remote Facade + DTO), làm rõ lỗi mạng trong API, thao tác idempotent để retry"
+    ],
+    "id": "Q_OOP3_148"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Design Pattern",
+    "concept": "Gọi phương thức ngoại lai khi đang giữ khóa trong Observer",
+    "difficulty": "Hard",
+    "question": "Lớp KhoHang (subject) cài đặt capNhatTonKho() là synchronized và bên trong lặp qua danh sách observer để gọi observer.daThayDoi(this). Phân tích nguy cơ deadlock và các lỗi đồng thời khác.",
+    "reference_answer": "Gọi observer khi đang giữ khóa là gọi 'phương thức ngoại lai' (alien method): KhoHang không kiểm soát observer làm gì. Nếu một observer, trong daThayDoi, chờ một khóa khác mà luồng thứ hai đang giữ, trong khi luồng thứ hai lại cần gọi một phương thức synchronized của KhoHang → deadlock. Observer chạy chậm (gửi email, gọi mạng) giữ khóa lâu, chặn mọi luồng khác. Observer gọi lại KhoHang và hủy đăng ký chính nó trong lúc đang lặp gây ConcurrentModificationException (hoặc tái nhập khóa làm thay đổi trạng thái giữa chừng). Cách khắc phục: trong khối đồng bộ chỉ cập nhật trạng thái và chụp một bản sao danh sách observer (hoặc dùng CopyOnWriteArrayList), rồi THÔNG BÁO NGOÀI khối synchronized ('open call'); cân nhắc thông báo bất đồng bộ qua executor.",
+    "key_points": [
+      "Gọi callback của observer khi đang giữ khóa có thể gây deadlock, chặn luồng và lỗi tái nhập",
+      "Cập nhật trạng thái trong khóa, chụp danh sách observer, rồi thông báo bên ngoài khóa (open call) hoặc bất đồng bộ"
+    ],
+    "id": "Q_OOP3_149"
+  },
+  {
+    "language": "vi",
+    "subject": "Lập trình hướng đối tượng",
+    "competency": "3_Lập trình hướng đối tượng",
+    "topic": "Thành viên static",
+    "concept": "Đối tượng mặc định khả biến dùng chung",
+    "difficulty": "Hard",
+    "question": "Để tránh null, lớp GioHang dùng private static final List<SanPham> RONG = new ArrayList<>(); và constructor mặc định gán this.ds = RONG. Phân tích lỗi phát sinh khi hệ thống chạy thực tế.",
+    "reference_answer": "Mọi đối tượng GioHang tạo bằng constructor mặc định đều dùng CHUNG một đối tượng ArrayList RONG. Khi một giỏ hàng gọi ds.add(sp), sản phẩm được thêm vào danh sách dùng chung, nên mọi giỏ hàng 'rỗng' khác (của người dùng khác) cũng đột nhiên chứa sản phẩm đó — lỗi rò rỉ dữ liệu giữa các người dùng, và trong môi trường đa luồng còn gây hỏng cấu trúc ArrayList. 'final' chỉ ngăn gán lại biến RONG, không làm danh sách bất biến. Cách đúng: tạo danh sách mới cho mỗi đối tượng (this.ds = new ArrayList<>()), hoặc nếu muốn chia sẻ giá trị mặc định thì giá trị đó phải thực sự bất biến (List.of()) và code thêm phần tử phải thay thế bằng danh sách mới (copy-on-write). Đây cũng là cạm bẫy kinh điển 'tham số mặc định khả biến' trong Python.",
+    "key_points": [
+      "Đối tượng mặc định khả biến dùng chung khiến thay đổi ở một đối tượng lan sang mọi đối tượng khác",
+      "final không làm danh sách bất biến; tạo mới cho mỗi thể hiện hoặc chỉ chia sẻ giá trị bất biến thật sự"
+    ],
+    "id": "Q_OOP3_150"
+  }
+]
