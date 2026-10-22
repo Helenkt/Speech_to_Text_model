@@ -25,7 +25,7 @@ không dùng để tăng/hạ độ khó hoặc kết luận điểm mạnh/yế
 Giảng viên có thể tự chấm, dùng điểm AI hợp lệ và nghe voice nhiều lần. Không bắt buộc phát voice để được chấm.
 
 Danh sách chấm và báo cáo dùng chung `review_readiness`. Cache chấm lại là
-`teacher-review-v6-transcript-assurance`; cache cũ phải chạy lại trước khi chốt bằng thao tác dùng điểm AI.
+`teacher-review-v7-span-correction-evidence`; cache cũ phải chạy lại trước khi chốt bằng thao tác dùng điểm AI.
 
 ## STT và LLM
 
@@ -65,9 +65,11 @@ Chạy một tiến trình Uvicorn như launcher hiện tại. Không tăng số
 ## Chưa hoàn thành mục tiêu chất lượng
 
 Đây chưa phải STT streaming ngay trong lúc sinh viên nói: hiện vẫn upload sau khi dừng ghi.
-Chưa cho nhảy câu trước khi chấm vì bộ chọn câu hiện tại còn phụ thuộc kết quả/độ khó.
-Không thay chính sách thời hạn thi. Cần xác định chính sách đối với audio gửi sát giờ hết hạn trước khi thay luồng thi.
+Hạn chế chọn câu theo điểm của bản 1.13 đã được thay thế: phiên mới chuẩn bị đề
+ngay từ đầu, xác nhận transcript rồi chuyển câu, chỉ chấm khi kết thúc.
+Audio đã nhận hợp lệ trước hạn được tiếp tục xử lý sau hạn theo receipt của server;
+không nhận audio mới sau hạn. Xem FUNCTIONAL_FIXES.md về chính sách đóng mềm.
 
 Không fine-tune mới khi chưa có nhãn độc lập của giảng viên và tập kiểm tra tách biệt.
 Chưa chứng nhận WER 8%/15%, độ chính xác 99%, khả năng tách giọng nói chồng lấn hoặc hiệu năng mọi máy yếu.
-Kết quả đo và giới hạn được lưu tại `reports/recovery_20261018/`.
+Kết quả đo cũ lưu local tại `reports/recovery_20261018/`, không đi kèm bản tải Git.

@@ -7,8 +7,8 @@ hình Giáo viên.
 ## Cấu trúc
 
 - `rubric_labels/`: bộ đầy đủ cho AI101, DB101, DSA101 và OOP101. Mỗi môn có
-  một bản JSON và một bản JSONL chứa cùng các dòng dữ liệu.
-- `evaluation_samples/`: bộ mẫu nhỏ độc lập để kiểm tra pipeline. ID trong bộ
+  một bản JSON và một bản JSONL chứa cùng các dòng dữ liệu; chỉ nạp một định dạng, không cộng đôi.
+- `evaluation_samples/`: bộ mẫu nhỏ riêng để kiểm tra pipeline, không được coi là test độc lập về chủ đề. ID trong bộ
   mẫu có thể trùng với bộ đầy đủ nhưng nội dung khác, vì vậy không được gộp
   theo `question_id`.
 
@@ -28,3 +28,7 @@ câu hỏi, tiêu chí, mệnh đề tham chiếu, bằng chứng, nhãn quan h�
 
 Các file đã được kiểm tra trường bắt buộc, `label_id`, giới hạn điểm và số dòng
 giữa JSON/JSONL trước khi đưa vào repository.
+
+Đây là dữ liệu mẫu; tên trường điểm Giáo viên không tự chứng minh người thật đã duyệt.
+Cần kiểm định nguồn/nhãn và chia theo câu hỏi trước khi huấn luyện. Kiểm tra cấu trúc
+không chứng nhận chất lượng chấm bài sinh viên thật.

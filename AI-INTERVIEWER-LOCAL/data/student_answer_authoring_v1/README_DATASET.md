@@ -2,6 +2,11 @@
 
 Ngày: 22/10/2026. Đây là **bộ dữ liệu tổng hợp do AI soạn, nhãn dự thảo cần duyệt**, không phải câu trả lời đã thu từ 400 sinh viên.
 
+**Vị trí tệp:** README này là template trong `data/student_answer_authoring_v1` và
+được công cụ sao chép sang bundle đầu ra dưới tên `README.md`. Danh sách tệp bên
+dưới mô tả bundle `data/student_answer_dataset_v1`, không phải tất cả đều có trong
+thư mục authoring. Không nhập trực tiếp các tệp authoring vào ngân hàng câu hỏi.
+
 ## Quy mô và nguồn
 
 - Bốn môn AI101, DB101, DSA101 và OOP101.

@@ -87,8 +87,8 @@ lai bat ky bai nao van giu nguyen.
 5. Chay du doan khong dua nhan giang vien vao model, sau do do rieng.
 
 ```powershell
-.\.train-venv\Scripts\python.exe -X utf8 tools\evaluate_backend_quality.py predict --dataset corpus.json --output predictions.json
-.\.train-venv\Scripts\python.exe -X utf8 tools\evaluate_backend_quality.py grading --dataset corpus.json --predictions predictions.json --output grading-report.json
+.\.venv\Scripts\python.exe -X utf8 tools\evaluate_backend_quality.py predict --dataset corpus.json --output predictions.json
+.\.venv\Scripts\python.exe -X utf8 tools\evaluate_backend_quality.py grading --dataset corpus.json --predictions predictions.json --output grading-report.json
 ```
 
 Bao cao tinh MAE, ty le chuyen xac minh, so y cho diem oan/tru diem oan,
@@ -122,7 +122,7 @@ cum "A khong dung SQL", giup phat hien phu dinh bi chuyen sang chu the khac.
 Phai lay hypothesis tu STT that, khong tu viet cho khop reference.
 
 ```powershell
-.\.train-venv\Scripts\python.exe -X utf8 tools\evaluate_backend_quality.py stt --dataset stt-samples.json --output stt-report.json
+.\.venv\Scripts\python.exe -X utf8 tools\evaluate_backend_quality.py stt --dataset stt-samples.json --output stt-report.json
 ```
 
 Muc tieu WER: audio sach <= 8%, co nen <= 15%, khong sai cum quan trong.
@@ -136,12 +136,14 @@ truc tiep tu mic confidence khi khong co reference.
 ## 5. Audit nguon va gioi han con lai
 
 ```powershell
-.\.train-venv\Scripts\python.exe -X utf8 tools\audit_rubric_sources.py --output reports\rubric-audit-new.json
+.\.venv\Scripts\python.exe -X utf8 tools\audit_rubric_sources.py --output reports\rubric-audit-new.json
 ```
 
 Cong cu chi doc hai ngan hang duoc cung cap, tao ban nhap; khong sua DB,
 khong tu them synonyms tu dap an test va khong tu publish. File output cu
-khong bi ghi de. Report ngay 2026-10-17 nam trong `reports/backend_quality_20261017`.
+khong bi ghi de. Report ngay 2026-10-17 nam local trong `reports/backend_quality_20261017`,
+khong di kem ban tai Git. Cac lenh tren dung moi truong runtime `.venv` da cai theo
+REQUIREMENTS.md; dataset/du doan dau vao phai duoc tao rieng, khong co san chi tu lenh cai thu vien.
 
 Van can: corpus sinh vien that duoc phep su dung; rubric V3 duoc giang vien
 duyet; nhan doc lap va blind test; benchmark audio that VI/EN tren may CPU

@@ -55,12 +55,15 @@ Bản ghi legacy không có receipt vẫn được dùng khi kỳ thi còn mở.
 
 ## Kiểm Thử Và Khởi Động
 
-Kết quả xác minh được lưu ở `reports/fixes_20261018/REPORT.md`. Không thay trọng số Whisper, Qwen hoặc RubricGuard; không công bố cải thiện WER từ bản sửa chức năng này.
+Kết quả xác minh cũ lưu local ở `reports/fixes_20261018/REPORT.md`, không đi kèm Git. Không thay trọng số Whisper, Qwen hoặc RubricGuard; không công bố cải thiện WER từ bản sửa chức năng này.
 
-Sau khi dừng server cũ bằng Ctrl+C trong cửa sổ đang chạy, khởi động lại:
+Sau khi cài theo REQUIREMENTS.md, mở PowerShell trong thư mục AI-INTERVIEWER-LOCAL.
+Dừng server cũ bằng Ctrl+C trong cửa sổ đang chạy, rồi khởi động lại:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File "C:\Users\Admin\Downloads\AI-INTERVIEWER\AI-INTERVIEWER-LOCAL\start_local.ps1" -Port 8001
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8001
 ```
 
-Mở đúng địa chỉ script in ra. Nếu 8001 đang bận, script chọn cổng trống và không dừng ứng dụng khác.
+Mở http://127.0.0.1:8001. Nếu cổng bận, chọn cổng khác trong lệnh và URL; không dừng
+tiến trình không rõ nguồn gốc. Launcher portable start_local.ps1 có cơ chế chọn cổng
+trống riêng, nhưng không phải trình tự cài đặt cho máy mới.

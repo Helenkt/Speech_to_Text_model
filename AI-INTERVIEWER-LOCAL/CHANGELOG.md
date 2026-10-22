@@ -1,5 +1,11 @@
 # Changelog
 
+Đây là lịch sử theo phiên bản, không phải toàn bộ hành vi hiện tại. Chính sách nghe
+voice bắt buộc ở 1.8.2 đã được thay thế; quyền dùng điểm AI ở 1.11.0 được giới hạn
+lại bởi ngưỡng chấm mạnh ở 1.18.0. Luồng cuối phiên 1.16.x thay cách chọn câu theo
+điểm trước đó. Các phép đo STT cũ không kèm audio/báo cáo gốc trên Git, không phải
+chứng nhận WER/tốc độ của bản tải mới. Xem README và REQUIREMENTS để cài/chạy hiện tại.
+
 ## 1.18.0
 
 - Backend chỉ chuẩn bị STT/VAD sau API Bắt đầu hoặc khôi phục phiên đang làm, không nạp model khi mở web/đăng nhập.

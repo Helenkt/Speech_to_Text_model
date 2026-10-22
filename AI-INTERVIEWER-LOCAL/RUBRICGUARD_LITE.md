@@ -1,5 +1,9 @@
 # RubricGuard Lite
 
+Các số liệu fine-tune và chế độ chọn lọc bên dưới mô tả artifact trên máy phát triển
+ngày 16/10/2026, không tự có trong bản tải Git. Lệnh setup chỉ tải baseline; cần đủ
+artifact và metadata hợp lệ mới có chế độ chọn lọc tương ứng. Xem REQUIREMENTS.md.
+
 RubricGuard Lite là bộ chấm lai chạy local, được đặt sau bước Speech-to-Text và sửa
 bản chép lời. Bộ chấm không thay đổi nội dung giọng nói và không chạy trong lúc thu âm.
 

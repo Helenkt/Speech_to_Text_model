@@ -1,5 +1,10 @@
 # Báo cáo fine-tune RubricGuard Lite - 16/10/2026
 
+Đây là báo cáo lịch sử của máy phát triển tại ngày ghi trên tiêu đề. Các thư mục
+`models/` và báo cáo runtime được nhắc tới không đi kèm Git. Cài model gốc bằng
+setup không tái tạo bản fine-tune hoặc tự bật quality gate. Số test bên dưới là
+của thời điểm đó, không phải kết quả kiểm thử hiện tại trên máy mới.
+
 ## Kết quả
 
 Đã huấn luyện thật MiniLM, xuất bản nén trọng số INT8 và tích hợp vào backend.

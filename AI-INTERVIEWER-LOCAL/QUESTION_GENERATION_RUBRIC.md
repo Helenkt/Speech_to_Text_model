@@ -6,22 +6,31 @@ Rubric này kiểm soát câu hỏi do LLM sinh trước khi đưa vào phiên p
 
 - Chỉ sử dụng kiến thức từ `question_bank_vi.json` và `question_bank_en.json`.
 - Có độ khó xác định được bằng tiêu chí đo lường, không dựa vào cảm tính.
-- Đi theo lộ trình `Dễ -> Trung bình -> Khó`, mỗi lần chỉ thay đổi tối đa một cấp.
+- Có các mức `Dễ`, `Trung bình`, `Khó` theo cấu hình đề; lộ trình thích ứng cũ được mô tả riêng ở mục 6.
 - Có đáp án tham chiếu và các ý chấm điểm phù hợp với câu hỏi.
 - Phù hợp với phỏng vấn trực tiếp bằng giọng nói.
 
 File cấu hình máy đọc nằm tại `data/question_generation_rubric.json`.
 
+**Phạm vi hiện tại:** đây là tiêu chuẩn thiết kế, không phải chứng nhận mọi câu sinh
+ra đã đúng. Phiên mới mặc định lưu đề và độ khó từ đầu, chấm cuối phiên; không đổi
+độ khó theo điểm từng câu. Mục 6 chỉ mô tả cơ chế thích ứng cũ.
+
 ## 2. Quy trình sinh và kiểm định
 
-1. Hệ thống lấy câu nguồn trong đúng môn học, chủ đề và ngôn ngữ đã chọn.
+1. Hệ thống lấy nguồn nội bộ còn hoạt động trong ngân hàng `learning`, đúng môn/ngôn ngữ và chủ đề nếu có chọn. Chưa lọc bắt buộc trạng thái giảng viên đã duyệt của nguồn.
 2. LLM sinh một câu hỏi mới và trả về đầy đủ dữ liệu theo schema quy định.
 3. Backend kiểm tra điều kiện bắt buộc, cấp độ khó, độ trùng và cấu trúc dữ liệu.
-4. Một lượt đánh giá độc lập kiểm tra câu hỏi, đáp án và key points có thống nhất hay không.
-5. Câu luyện tập đạt từ 85/100 và không vi phạm điều kiện bắt buộc mới đủ điều kiện sử dụng.
-6. Câu dùng trong kiểm tra thật luôn ở trạng thái chờ giáo viên duyệt.
+4. Backend lưu kết quả quy tắc cùng `semantic_review_required=true`; chưa có một LLM độc lập tự kiểm chứng nội dung. Giảng viên cần kiểm tra câu hỏi, đáp án và key points.
+5. Từ 85/100 và không lỗi bắt buộc nhận nhãn rubric `practice_eligible`, không đồng nghĩa tự đưa vào ngân hàng.
+6. Luồng sinh hiện lưu bản nháp; giảng viên duyệt trước khi xuất bản vào ngân hàng, kể cả câu luyện tập đạt ngưỡng.
 
 LLM không được tự coi điểm do chính nó chấm là bằng chứng duy nhất. Kết quả phải qua kiểm tra quy tắc của backend; câu kiểm tra thật cần thêm quyết định của giáo viên.
+
+Các hàng G1/G3 và nhóm “Đáp án tham chiếu” là mục tiêu cần kiểm định nội dung.
+Mã hiện tại kiểm tra ID/trích dẫn khớp nguồn, trường bắt buộc, key points không rỗng/trùng
+và khai báo độ khó; điểm `reference_correctness` chủ yếu phản ánh có reference.
+Không suy ra tính đúng đắn ngữ nghĩa hoặc độ khó thực tế chỉ từ tổng điểm này.
 
 ## 3. Điều kiện bắt buộc
 
@@ -78,12 +87,16 @@ Câu hỏi yêu cầu tổng hợp nhiều khái niệm, đánh giá đánh đ�
 
 | Kết quả | Điều kiện | Xử lý |
 |---|---|---|
-| Đủ điều kiện luyện tập | Từ 85 điểm, không lỗi bắt buộc | Có thể đưa vào chế độ luyện tập. |
+| Đủ điều kiện luyện tập | Từ 85 điểm, không lỗi bắt buộc | Nhận nhãn rubric; vẫn cần duyệt bản nháp trước khi vào ngân hàng. |
 | Cần giáo viên duyệt | 75-84 điểm, không lỗi bắt buộc | Giáo viên sửa hoặc phê duyệt. |
 | Loại | Dưới 75 điểm hoặc có lỗi bắt buộc | Không đưa vào ngân hàng câu hỏi. |
 | Kiểm tra thật | Bất kỳ mức điểm nào | Luôn cần giáo viên duyệt trước khi mở đợt kiểm tra. |
 
-## 6. Quy tắc chuyển độ khó
+## 6. Quy tắc chuyển độ khó cũ
+
+Không áp dụng cho phiên mặc định `DEFER_GRADING_UNTIL_FINISH=true`. Phiên mới
+chuẩn bị toàn bộ câu hỏi/độ khó trước khi trả lời. Không phải mọi phiên đều bắt buộc
+đi từ Dễ đến Khó; cấu hình đề do người dùng/giảng viên chọn quyết định phạm vi.
 
 - Bắt đầu ở mức Dễ nếu giáo viên không chọn mức khác.
 - Điểm câu trước từ 80 trở lên và độ tin cậy đánh giá từ 0,65: tăng một cấp.

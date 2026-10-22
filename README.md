@@ -9,6 +9,7 @@ Toàn bộ mã nguồn, dữ liệu câu hỏi và hướng dẫn cài đặt n�
 - [AI-INTERVIEWER-LOCAL](./AI-INTERVIEWER-LOCAL)
 - [Hướng dẫn cài đặt và sử dụng](./AI-INTERVIEWER-LOCAL/README.md)
 - [Requirements và các bước chạy trên máy mới](./AI-INTERVIEWER-LOCAL/REQUIREMENTS.md)
+- [Rà soát tài liệu và giới hạn hiện tại](./AI-INTERVIEWER-LOCAL/docs/DOCUMENTATION_AUDIT_20261022.md)
 
 ## Thành phần AI
 

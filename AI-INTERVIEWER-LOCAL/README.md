@@ -71,7 +71,7 @@ Mật khẩu gốc chỉ nằm trong file do bạn quản lý. Sau khi import, S
 
 1. Đăng nhập bằng tài khoản Giáo viên.
 2. Import bộ câu hỏi JSON hoặc dùng sẵn hai bộ demo.
-3. Nhập tên đợt, chọn môn, số câu, thời gian, hình thức trả lời và mã đề.
+3. Nhập tên đợt, chọn môn, số câu, thời gian và mã đề. Giao diện ứng viên dùng ghi âm, không nhập câu trả lời bằng chữ.
 4. Bấm **Tạo và mở đợt Interview**.
 5. Gửi mã đề cho ứng viên.
 6. Mở trang **Kết quả** để xem báo cáo chi tiết.
@@ -98,16 +98,18 @@ Mật khẩu gốc chỉ nằm trong file do bạn quản lý. Sau khi import, S
 
 ## 5. Voice / STT và LLM local
 
-Tất cả thư viện Voice/STT đã có trong `requirements.txt`. Trong buổi luyện tập hoặc đợt Interview cho phép Voice, bấm **Ghi âm**, cấp quyền microphone cho Chrome/Edge rồi nói câu trả lời.
+Các thư viện runtime Voice/STT nằm trong `requirements.txt`; trọng số model, Ollama và thư viện GPU cần chuẩn bị riêng theo [REQUIREMENTS.md](REQUIREMENTS.md). Bấm **Ghi âm**, cấp quyền microphone cho Chrome/Edge rồi nói câu trả lời.
 
-Ở lần sử dụng đầu tiên, hệ thống tự chọn cấu hình Faster-Whisper theo máy và lưu model trong `models/whisper`: `medium/CUDA float16` cho máy có GPU, `medium/CPU INT8` cho CPU đủ mạnh, hoặc `small/CPU INT8` cho máy yếu. Cấu hình GPU medium được chọn từ kết quả đo thực tế vì ổn định hơn `large-v3` trên bộ âm thanh hiện có. Lần đầu cần Internet và có thể mất vài phút; các lần sau chạy offline. Nếu muốn tải model trước khi demo, có thể chạy:
+Hệ thống tự chọn cấu hình Faster-Whisper theo tài nguyên và lưu model trong `models/whisper`: `medium/CUDA float16` khi GPU tương thích và đủ tài nguyên, `medium/CPU INT8` cho CPU đủ mạnh, hoặc `small/CPU INT8` cho máy yếu. Đây là lựa chọn cân bằng tài nguyên, không chứng minh medium chính xác hơn large-v3. Lần tải đầu cần Internet; sau khi tải đủ model có thể chạy offline. Nếu muốn tải model trước khi demo, chạy:
 
 ```powershell
-python -m app.stt_setup
+.\.venv\Scripts\python.exe -m app.stt_setup
 ```
 
-Trước khi ghi, trình duyệt đo tiếng nền trong 1,5 giây và bật khử nhiễu, khử vọng
-cùng tự động cân bằng âm lượng. Ứng viên có thể chọn đúng microphone ngay trên màn
+Kiểm tra mic thành công được tái sử dụng trong cùng phiên; không đo lại trước mỗi câu.
+Bài kiểm tra có bước giữ im lặng 2 giây để đo nền và bước ghi thử giọng nói.
+Trình duyệt yêu cầu khử nhiễu, khử vọng và tự động cân bằng âm lượng; mức hỗ trợ tùy thiết bị.
+Ứng viên có thể chọn đúng microphone ngay trên màn
 phỏng vấn; lựa chọn được ghi nhớ trên máy. Hệ thống chỉ chặn trước khi ghi khi âm thanh
 quá lớn hoặc bị vỡ tiếng. Sau nhận dạng, hệ thống tính điểm chất lượng từ độ tin cậy
 của Whisper, tỷ lệ từ không chắc chắn, tỷ lệ im lặng và tiếng nền. Bản ghi có nội dung
@@ -121,7 +123,7 @@ Nếu trình duyệt chặn microphone, bấm biểu tượng ổ khóa cạnh �
 
 ### LLM sửa transcript
 
-Dự án dùng `Qwen2.5 3B Q4_K_M` qua Ollama portable để sửa lỗi ASR sau
+Dự án dùng `qwen2.5:3b` qua Ollama để sửa lỗi ASR sau
 Faster-Whisper. Model chỉ nhận câu hỏi hiện tại và danh sách thuật ngữ đã duyệt;
 không nhận đáp án tham chiếu. Server chỉ áp dụng từng cặp thay thế gần âm đã vượt qua
 bộ kiểm tra an toàn, đồng thời giữ cả transcript gốc, bản sửa và danh sách thay đổi.
@@ -157,9 +159,10 @@ Tải model Transformer cho máy mới:
 Model INT8 khoảng 102 MB và được nạp khi chấm lần đầu, không chạy trong lúc ghi âm
 hay chuyển giọng nói thành văn bản. Xem chi tiết tại [RUBRICGUARD_LITE.md](RUBRICGUARD_LITE.md).
 
-Bản local đã được fine-tune ngày 16/10/2026. Các ý tiếng Việt vượt ngưỡng đã kiểm định
-được chấm bằng Transformer, Qwen chỉ xử lý các ý chưa rõ. Lệnh setup ở trên tải model
-gốc, không tải checkpoint fine-tune. Xem kết quả thực nghiệm và cách tái lập tại
+Bản trên máy phát triển từng được fine-tune ngày 16/10/2026; trọng số đó không có trên Git.
+Chỉ runtime có đủ trọng số và metadata kiểm định hợp lệ mới bật chế độ chọn lọc tương ứng.
+Máy mới chạy lệnh setup ở trên nhận model gốc, không phải checkpoint fine-tune và không
+tự có cùng quality gate như máy phát triển. Xem kết quả thực nghiệm và cách tái lập tại
 [FINETUNE_REPORT_20261016.md](FINETUNE_REPORT_20261016.md).
 
 Lệnh pull chỉ cần chạy một lần khi máy đang có Internet. Sau khi tải xong, Ollama và
@@ -182,7 +185,7 @@ Kết thúc -> hàng đợi chấm -> giải phóng STT -> chấm đúng bản �
 
 Luồng mới mặc định bật qua `DEFER_GRADING_UNTIL_FINISH=true` và chỉ áp dụng khi
 tạo phiên mới. Phiên cũ giữ nguyên cách xử lý, không chấm lại lịch sử. STT xử lý
-từng bản ghi và giữ model qua các lượt, không ghép voice của nhiều câu thành một
+từng bản ghi và tái sử dụng worker khi ngân sách bộ nhớ cho phép, không ghép voice của nhiều câu thành một
 câu trả lời. Câu hỏi do LLM sinh vẫn qua luồng chuẩn bị/duyệt hiện có trước khi thi.
 Từ bản 1.16.1, sửa transcript diễn ra trước xác nhận; bước chấm cuối không sửa
 text thêm lần nữa. Bản tạm được giữ trên đĩa local, không giữ toàn bộ audio trong
@@ -220,30 +223,27 @@ ghi đè điểm qua API chấm lại. Điểm thiếu bằng chứng có `final
 Điểm 0 chỉ là kết quả chính thức khi AI đã đối chiếu được rubric, không phải do lỗi
 kỹ thuật/voice không rõ. Không chỉnh lại transcript đã xác nhận trong bước chấm.
 
-Khởi động cả Ollama portable và ứng dụng trên cổng 8001:
+Launcher tùy chọn khi đã có Ollama portable trong project và đã cài môi trường:
 
 ```powershell
 .\start_local.ps1
 ```
 
-Một bài kiểm thử cũ trên 7 file tiếng Việt, 299 từ tham chiếu, cho WER `6,02%`,
-không có mẫu nào bị Qwen sửa tệ hơn. Thời gian STT trung bình trên RTX 4060 là
-`2,41 giây/file`; Qwen sau khi được nạp mất khoảng `0,32 giây`. Báo cáo chi tiết
-nằm tại `test_audio/end_to_end_pipeline_evaluation.json`.
-Đây không phải WER đã xác nhận trên máy 4/8 GB hoặc giọng sinh viên thực tế;
-các bài audit khác có kết quả khác và không chứng minh mục tiêu WER đã đạt chung.
+Script chọn cổng trống; dùng đúng URL được in ra. Đây không phải bộ tự cài model.
+Với Ollama cài thông thường, ưu tiên lệnh uvicorn ở mục 1 để tránh đổi cache model.
 
-Bộ chấm mặc định thử Ollama `qwen2.5:3b`; nếu Ollama chưa chạy, hệ thống tự chuyển sang bộ chấm rubric local. Vì vậy Ollama không bắt buộc để demo.
+Bộ chấm kết hợp kiểm tra quy tắc, Transformer và Ollama `qwen2.5:3b` tùy bằng chứng.
+Có thể mở web khi Ollama chưa chạy, nhưng không có sửa transcript bằng Qwen và các ý
+không đủ bằng chứng có thể chưa chấm được; không coi đây là bản AI đầy đủ.
 
 Điểm không được lấy trực tiếp từ con số do LLM sinh. Qwen phân loại từng ý rubric
 thành `met`, `partial`, `missing` hoặc `contradicted`; server tính điểm theo trọng số
 cố định. Mỗi ý lưu cả lý do và trích dẫn bằng chứng; server loại bỏ trích dẫn không có
 trong câu trả lời và đánh dấu kết quả có độ tin cậy thấp để Giáo viên kiểm tra. Câu trả
 lời không biết, phủ định toàn bộ nội dung hoặc cố thao túng điểm được chặn trước khi gọi
-model. Khi câu trả lời dưới 80 điểm, câu tiếp theo ưu tiên cùng khái niệm để kiểm tra lại;
-khi đạt từ 80 điểm, hệ thống tăng độ khó và mở rộng sang nội dung khác. Bộ kiểm định gồm
-32 trường hợp đúng/sai/đối kháng trên 4 môn và 2 ngôn ngữ nằm tại
-`test_audio/grading_quality_evaluation.json`.
+model. Phiên mới mặc định chuẩn bị toàn bộ câu hỏi và độ khó trước khi bắt đầu,
+không dùng điểm câu trước để chọn câu sau. Luồng thích ứng cũ chỉ còn để tương thích
+khi không dùng chiến lược chấm cuối phiên; không phải hành vi mặc định.
 
 ## 6. Dữ liệu câu hỏi
 
@@ -259,9 +259,11 @@ Mỗi ngôn ngữ hiện có 900 câu, chia đều 300 câu cho từng mức Eas
 
 Quy tắc kiểm định câu hỏi do LLM sinh nằm trong
 `data/question_generation_rubric.json`; bản giải thích để đọc và trình bày nằm trong
-`QUESTION_GENERATION_RUBRIC.md`. Model chỉ được nhận các câu nguồn đã duyệt, không
-được bổ sung kiến thức Internet. Backend kiểm tra nguồn, cấu trúc, độ trùng và bằng
-chứng độ khó trước khi cho phép sử dụng câu hỏi.
+`QUESTION_GENERATION_RUBRIC.md`. Prompt giới hạn model vào nguồn nội bộ, không bổ sung
+kiến thức Internet. Backend kiểm tra ID nguồn, trích dẫn, cấu trúc, độ trùng và khai báo
+độ khó. Hiện bộ chọn nguồn lọc `active` và `bank_scope=learning`, chưa bắt buộc
+`verification_status` đã duyệt. Vì vậy không được mô tả tất cả nguồn là đã được giảng viên
+kiểm định. Trích dẫn khớp và điểm quy tắc cao không chứng minh đáp án đúng về ngữ nghĩa.
 
 Mỗi câu sinh mới còn được backend gắn `source_provenance` gồm UID/ID câu nguồn,
 tên file, SHA-256 file, trạng thái duyệt và trích đoạn tham chiếu. Model phải trả
@@ -271,8 +273,10 @@ có thể tái kiểm tra mà không phải công khai toàn bộ prompt.
 
 Độ khó không được xác định chỉ bằng độ dài câu. Rubric đo mức Bloom, số khái niệm,
 số bước suy luận, số ràng buộc, thời lượng trả lời và số key points. Câu luyện tập cần
-đạt tối thiểu 85/100 và không vi phạm điều kiện bắt buộc; câu dùng trong Interview
-thật luôn cần Giáo viên duyệt.
+đạt tối thiểu 85/100 và không vi phạm điều kiện bắt buộc để nhận nhãn `practice_eligible`.
+Đây không phải tự xuất bản: luồng sinh hiện lưu bản nháp, giảng viên duyệt trước khi
+đưa vào ngân hàng, kể cả câu đủ điều kiện luyện tập. Chưa có lượt LLM độc lập chứng
+nhận tính đúng đắn của câu hỏi.
 
 Luồng backend dành cho Giáo viên:
 
@@ -339,26 +343,26 @@ Chuẩn chấp nhận STT:
 - Không được làm mất hoặc thay đổi số liệu, phủ định và thuật ngữ được đánh dấu.
 
 Đây là tiêu chí benchmark, không phải con số ước lượng trên giao diện. Đặt các
-file voice có transcript chuẩn theo mẫu `test_audio/benchmark_manifest.example.json`,
-sau đó chạy:
+file voice có transcript chuẩn theo [mẫu manifest](data/stt_benchmark_manifest.example.json).
+Mẫu chỉ minh họa schema, không kèm audio và không phải kết quả đo. Thay đường dẫn,
+reference và thuật ngữ bằng dữ liệu đã được người nghe xác minh; cần cả clean/noisy
+cho từng ngôn ngữ được đánh giá. Sau đó chạy từ thư mục dự án:
 
 ```powershell
-python -m app.stt_benchmark test_audio/benchmark_manifest.json `
+.\.venv\Scripts\python.exe -m app.stt_benchmark data/stt_benchmark_manifest.example.json `
   --output data/stt_benchmark_report.json
 ```
 
-Lệnh trả exit code `0` chỉ khi cả hai nhóm clean/noisy đạt WER và tổng lỗi quan
-trọng bằng 0. Báo cáo lưu WER, CER và lỗi của từng mẫu.
+Lệnh trả exit code `0` khi clean/noisy tổng và theo từng ngôn ngữ có trong manifest
+đạt WER, tổng lỗi quan trọng bằng 0. CLI không bắt buộc có cả VI lẫn EN; muốn tuyên
+bố song ngữ phải cung cấp đủ cả hai. Báo cáo lưu WER, CER và lỗi từng mẫu. WER được
+tính theo token cách nhau bởi khoảng trắng sau chuẩn hóa, không phải phần trăm
+độ chính xác ngữ nghĩa hoặc độ chính xác cho từng bản ghi trực tiếp.
 
-Kết quả benchmark gần nhất với Faster-Whisper `medium`, CUDA/float16:
-
-| Điều kiện | Mẫu | Số từ | Lỗi từ | WER | Mục tiêu | Kết quả |
-|---|---:|---:|---:|---:|---:|---|
-| Audio sạch | 3 | 147 | 11 | 7,48% | <= 8% | Đạt |
-| Phòng có tiếng nền | 1 | 104 | 12 | 11,54% | <= 15% | Đạt |
-
-Số lỗi ở số liệu, phủ định và thuật ngữ quan trọng: `0`. Chi tiết từng mẫu nằm
-trong `data/stt_benchmark_report.json`.
+Repository không kèm audio hay báo cáo gốc của các phép đo STT cũ, nên không thể
+xác nhận lại các số WER/tốc độ đó chỉ từ bản tải Git. Các ngưỡng trên là mục tiêu,
+chưa phải chứng nhận đạt trên máy RAM 4/8 GB hoặc mọi giọng sinh viên. Benchmark
+này gọi STT, không đo toàn bộ luồng sửa bằng Qwen, xác nhận và chấm điểm.
 
 ### Tự nhận diện cấu hình máy
 
@@ -368,7 +372,7 @@ CUDA, số GPU và VRAM rồi tự chọn profile:
 | Profile | Model chính | Chính sách |
 |---|---|---|
 | Tiết kiệm | `small/cpu/int8` | Một model, ghi lại khi audio khó |
-| Cân bằng | `medium/cpu/int8` | Khử nhiễu theo nhu cầu nếu đã cài engine |
+| Cân bằng | `medium/cpu/int8` | VAD và giải mã theo tài nguyên; không cam kết có engine khử nhiễu ngoài |
 | Hiệu năng | `medium/cuda/float16` | Xử lý nặng theo nhu cầu, không giữ song song model |
 | Độ chính xác cao | `medium/cuda/float16` | Giải mã thích ứng: lượt nhanh trước, Beam 5 khi độ tin cậy thấp |
 
@@ -393,7 +397,9 @@ tiêu hỗ trợ chậm hơn, không phải bảo đảm mọi CPU/ổ đĩa đ�
 
 `GET /api/health` trả cả phần cứng, profile, tính năng thực sự có sẵn và chính sách
 bộ nhớ. DeepFilterNet hoặc pyannote chỉ được báo là có khi thư viện tương ứng đã
-cài; hệ thống không giả định chúng đang hoạt động. Có thể đặt `RUNTIME_PROFILE`
+cài; phát hiện thư viện không chứng minh đã gọi engine xử lý. Pipeline hiện không
+có lời gọi DeepFilterNet/pyannote để khử nhiễu hoặc tách người nói; không coi các
+trường policy/engine trong health là bằng chứng đã xử lý bằng chúng. Có thể đặt `RUNTIME_PROFILE`
 trong `.env`, nhưng profile cần GPU vẫn tự hạ xuống CPU nếu CUDA không tồn tại.
 
 ## 7. Cấu trúc chính
@@ -404,7 +410,7 @@ trong `.env`, nhưng profile cần GPU vẫn tự hạ xuống CPU nếu CUDA kh
 | `app/main.py` | API, đăng nhập và phân quyền. |
 | `app/services/account_importer.py` | Đọc tài khoản Excel/CSV/JSON. |
 | `app/services/exam_service.py` | Quản lý đợt Interview thật. |
-| `app/services/interview_engine.py` | Chọn câu hỏi thích ứng và tạo báo cáo. |
+| `app/services/interview_engine.py` | Chuẩn bị đề cố định cho phiên mới, giữ tương thích phiên cũ và tạo báo cáo. |
 | `app/services/evaluator.py` | Chấm bằng Ollama hoặc rubric local. |
 | `app/services/question_generation_rubric.py` | Tạo prompt và kiểm định câu hỏi do LLM sinh. |
 | `app/services/question_generator.py` | Sinh, lưu và duyệt câu hỏi từ model local. |
@@ -413,7 +419,7 @@ trong `.env`, nhưng profile cần GPU vẫn tự hạ xuống CPU nếu CUDA kh
 | `app/static/` | Giao diện web. |
 | `data/` | Dữ liệu mẫu và SQLite khi chạy. |
 
-API docs: <http://127.0.0.1:8000/docs>
+API docs theo lệnh mục 1: <http://127.0.0.1:8001/docs>. Nếu launcher chọn cổng khác, thay bằng đúng cổng đang chạy.
 
 ## 8. Kiểm thử
 

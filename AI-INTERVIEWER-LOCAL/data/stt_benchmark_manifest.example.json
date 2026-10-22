@@ -1,0 +1,41 @@
+{
+  "description": "Schema example only. Supply real audio and human-verified references before running. No measured results are included.",
+  "samples": [
+    {
+      "id": "vi-clean-example",
+      "audio": "benchmark_audio/vi-clean.wav",
+      "language": "vi",
+      "condition": "clean",
+      "reference": "Dung lượng là 2TB, không phải 2GB.",
+      "critical_terms": ["2TB", "2GB"],
+      "critical_spans": ["không phải 2GB"]
+    },
+    {
+      "id": "vi-noisy-example",
+      "audio": "benchmark_audio/vi-noisy.wav",
+      "language": "vi",
+      "condition": "noisy",
+      "reference": "Dung lượng là 2TB, không phải 2GB.",
+      "critical_terms": ["2TB", "2GB"],
+      "critical_spans": ["không phải 2GB"]
+    },
+    {
+      "id": "en-clean-example",
+      "audio": "benchmark_audio/en-clean.wav",
+      "language": "en",
+      "condition": "clean",
+      "reference": "The capacity is 2TB, not 2GB.",
+      "critical_terms": ["2TB", "2GB"],
+      "critical_spans": ["not 2GB"]
+    },
+    {
+      "id": "en-noisy-example",
+      "audio": "benchmark_audio/en-noisy.wav",
+      "language": "en",
+      "condition": "noisy",
+      "reference": "The capacity is 2TB, not 2GB.",
+      "critical_terms": ["2TB", "2GB"],
+      "critical_spans": ["not 2GB"]
+    }
+  ]
+}
