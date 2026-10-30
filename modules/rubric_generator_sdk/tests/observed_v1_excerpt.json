@@ -1,0 +1,21 @@
+{
+  "origin": "USER_PASTED_EXCERPT_2026_10_29",
+  "note": "Semantic regression excerpt, not the original generation_result.json bytes. Test input uses the plan quote to avoid inferring whether spaces lost in the pasted input were present in the file.",
+  "classification": {
+    "tasks": [{"quote": "Định nghĩa Stack và so sánh Stack với Queue về nguyên tắc lấy phần tử và vị trí thêm, lấy phần tử.", "labels": ["DEFINITION", "COMPARISON"], "weight": 10}],
+    "issues": []
+  },
+  "generated_criteria": {
+    "criteria": [
+      {"claim": "Stack là một cấu trúc dữ liệu tuyến tính.", "kind": "DEFINITION", "source_ids": ["R1"], "weight": 5},
+      {"claim": "Stack hoạt động theo nguyên tắc LIFO: phần tử được thêm sau sẽ được lấy ra trước.", "kind": "DEFINITION", "source_ids": ["R2"], "weight": 5},
+      {"claim": "Stack thêm và lấy phần tử tại đỉnh của cấu trúc.", "kind": "DEFINITION", "source_ids": ["R3"], "weight": 5},
+      {"claim": "Queue hoạt động theo nguyên tắc FIFO: phần tử được thêm trước sẽ được lấy ra trước.", "kind": "DEFINITION", "source_ids": ["R4"], "weight": 5},
+      {"claim": "Queue thêm phần tử tại cuối và lấy phần tử tại đầu.", "kind": "DEFINITION", "source_ids": ["R5"], "weight": 5},
+      {"claim": "Stack và Queue khác nhau về nguyên tắc lấy phần tử: Stack lấy phần tử từ đỉnh, Queue lấy từ đầu.", "kind": "DEFINITION", "source_ids": ["R3", "R5"], "weight": 5},
+      {"claim": "Stack và Queue khác nhau về vị trí thêm phần tử:Stack thêm tại đỉnh, Queue thêm tại cuối.", "kind": "DEFINITION", "source_ids": ["R3", "R5"], "weight": 5}
+    ],
+    "issues": []
+  },
+  "elapsed_seconds_reported": 80.985
+}
