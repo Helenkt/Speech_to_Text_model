@@ -1,0 +1,4 @@
+{
+  "question": "Định nghĩa Stack và so sánh Stack với Queue về nguyên tắc lấy phần tử và vị trí thêm, lấy phần tử.",
+  "reference_answer": "Stack là cấu trúc dữ liệu tuyến tính. Stack hoạt động theo LIFO: phần tử thêm sau được lấy ra trước. Stack thêm và lấy phần tử tại đỉnh. Queue hoạt động theo FIFO: phần tử thêm trước được lấy ra trước. Queue thêm phần tử tại cuối và lấy phần tử tại đầu."
+}
