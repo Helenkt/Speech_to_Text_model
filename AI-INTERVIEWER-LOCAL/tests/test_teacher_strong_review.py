@@ -103,6 +103,10 @@ def _seed_voice_answer(settings):
 
 
 def _save_result(settings, score):
+    statuses = {
+        0: ("missing", "missing"), 25: ("partial", "missing"),
+        50: ("met", "missing"), 75: ("met", "partial"), 100: ("met", "met"),
+    }.get(score, ("met", "met"))
     return save_review_reanalysis(
         settings,
         answer_id=1,
@@ -117,10 +121,10 @@ def _save_result(settings, score):
         evaluation={
             "score": score,
             "feedback": "Kết quả chấm lại từ transcript model mạnh.",
-            # Stub grades exercise the review workflow, not the grader's score arithmetic.
+            # Workflow fixtures must still agree with the saved rubric's arithmetic.
             "point_assessments": [
-                {"point": "giao thức", "status": "met"},
-                {"point": "truyền tải siêu văn bản", "status": "met"},
+                {"point": "giao thức", "status": statuses[0]},
+                {"point": "truyền tải siêu văn bản", "status": statuses[1]},
             ],
         },
     )
@@ -129,7 +133,7 @@ def _save_result(settings, score):
 def test_strong_review_below_threshold_requires_manual_teacher_decision(tmp_path):
     settings = _settings(tmp_path)
     _seed_voice_answer(settings)
-    result = _save_result(settings, 45)
+    result = _save_result(settings, 25)
 
     assert result["audio_required"] is False
     assert result["below_threshold"] is True
@@ -156,7 +160,7 @@ def test_strong_review_below_threshold_requires_manual_teacher_decision(tmp_path
     assert reviewed["final_score"] == 45
 
 
-@pytest.mark.parametrize("score", [50, 78])
+@pytest.mark.parametrize("score", [50, 75])
 def test_teacher_can_accept_strong_review_at_or_above_threshold(tmp_path, score):
     settings = _settings(tmp_path)
     _seed_voice_answer(settings)
@@ -188,7 +192,7 @@ def test_teacher_can_accept_strong_review_at_or_above_threshold(tmp_path, score)
 def test_teacher_can_grade_without_playing_audio(tmp_path):
     settings = _settings(tmp_path)
     _seed_voice_answer(settings)
-    _save_result(settings, 62)
+    _save_result(settings, 50)
 
     reviewed = review_answer(
         settings,
@@ -206,7 +210,7 @@ def test_teacher_can_grade_without_playing_audio(tmp_path):
 def test_provisional_ai_score_cannot_be_adopted_but_manual_review_is_allowed(tmp_path):
     settings = _settings(tmp_path)
     _seed_voice_answer(settings)
-    _save_result(settings, 70)
+    _save_result(settings, 75)
     with database(settings.database_path) as connection:
         connection.execute("UPDATE interview_answers SET review_ai_evaluation_json = ? WHERE answer_id = 1",
                            (json.dumps({"score": 70, "score_provisional": True}),))
@@ -222,7 +226,7 @@ def test_provisional_ai_score_cannot_be_adopted_but_manual_review_is_allowed(tmp
 def test_outdated_ai_reanalysis_cannot_be_adopted_by_calling_api_directly(tmp_path):
     settings = _settings(tmp_path)
     _seed_voice_answer(settings)
-    _save_result(settings, 70)
+    _save_result(settings, 75)
     settings.ollama_model = "different-model"
     with pytest.raises(TeacherReviewError, match="phiên bản cũ"):
         review_answer(settings, answer_id=1, teacher_id=1, action="accept_ai", score=None, feedback="")
@@ -231,7 +235,7 @@ def test_outdated_ai_reanalysis_cannot_be_adopted_by_calling_api_directly(tmp_pa
 def test_strong_review_cache_is_invalidated_when_model_changes(tmp_path):
     settings = _settings(tmp_path)
     _seed_voice_answer(settings)
-    _save_result(settings, 74)
+    _save_result(settings, 75)
     assert review_reanalysis_context(settings, answer_id=1)["cached"] is True
 
     settings.review_whisper_model = "large-v3-turbo"
@@ -259,7 +263,7 @@ def test_database_migration_keeps_real_voice_score_provisional(tmp_path):
 def test_cached_provisional_result_never_offers_adoption(tmp_path):
     settings = _settings(tmp_path)
     _seed_voice_answer(settings)
-    _save_result(settings, 70)
+    _save_result(settings, 75)
     with database(settings.database_path) as connection:
         evaluation = json.loads(connection.execute(
             "SELECT review_ai_evaluation_json FROM interview_answers WHERE answer_id = 1").fetchone()[0])
@@ -276,7 +280,7 @@ def test_cached_provisional_result_never_offers_adoption(tmp_path):
 def test_incomplete_stored_review_cannot_be_adopted(tmp_path, payload):
     settings = _settings(tmp_path)
     _seed_voice_answer(settings)
-    _save_result(settings, 70)
+    _save_result(settings, 75)
     with database(settings.database_path) as connection:
         connection.execute("UPDATE interview_answers SET review_ai_evaluation_json = ? WHERE answer_id = 1",
                            (json.dumps(payload),))
@@ -300,7 +304,7 @@ def test_invalid_reanalysis_score_is_rejected_before_any_write(tmp_path, score):
 def test_inconsistent_stored_review_cannot_be_adopted(tmp_path, mutation):
     settings = _settings(tmp_path)
     _seed_voice_answer(settings)
-    result = _save_result(settings, 70)
+    result = _save_result(settings, 75)
     evaluation = result["review_ai_evaluation"]
     if mutation == "score":
         evaluation["score"] = 99
@@ -359,7 +363,7 @@ def test_report_and_queue_agree_that_a_provisional_strong_score_is_not_final(tmp
 
     settings = _settings(tmp_path)
     _seed_voice_answer(settings)
-    result = _save_result(settings, 70)
+    result = _save_result(settings, 75)
     result["review_ai_evaluation"]["score_provisional"] = True
     with database(settings.database_path) as connection:
         connection.execute("UPDATE interview_answers SET final_score=NULL, review_ai_evaluation_json=?",

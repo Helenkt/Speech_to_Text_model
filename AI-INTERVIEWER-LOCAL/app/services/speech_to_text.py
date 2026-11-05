@@ -1010,8 +1010,12 @@ def offset_segment(segment: Any, offset: float) -> Any:
         compression_ratio=getattr(segment, "compression_ratio", 1))
 
 
-def _critical_decode_tokens(text: str) -> list[str]:
-    return re.findall(r"\b\d+(?:[.,]\d+)?[a-z]*\b|\b(?:không|chưa|chẳng|not|never|cannot|can't|no)\b", text.casefold())
+def _critical_decode_tokens(text: str, terms: list[str] | None = None) -> list[str]:
+    identifiers = {term.casefold() for term in terms or [] if re.fullmatch(r'[A-Z][A-Z0-9]{1,7}', term)}
+    identifiers.update({'bfs', 'dfs', 'fifo', 'lifo'})
+    pattern = r"\b\d+(?:[.,]\d+)?[a-z]*\b|\b(?:không|chưa|chẳng|not|never|cannot|can't|no)\b"
+    pattern += '|\\b(?:' + '|'.join(re.escape(term) for term in sorted(identifiers)) + ')\\b'
+    return re.findall(pattern, text.casefold())
 
 
 def _transcribe_bytes_locked(
@@ -1148,8 +1152,10 @@ def _transcribe_bytes_locked(
             if float(result["metrics"].get("quality_score") or 0) < float(initial["metrics"].get("quality_score") or 0):
                 result = initial
                 strategy += "_retained_initial"
-            if _critical_decode_tokens(initial["text"]) != _critical_decode_tokens(alternate["text"]):
-                result["quality_warnings"].append("Các lượt nhận dạng khác nhau ở số hoặc phủ định; cần đối chiếu voice.")
+            if initial['text'] != alternate['text']:
+                result['recognition_alternatives'] = [initial['text'], alternate['text']]
+            if _critical_decode_tokens(initial["text"], hotwords) != _critical_decode_tokens(alternate["text"], hotwords):
+                result["quality_warnings"].append("Các lượt nhận dạng khác nhau ở số, phủ định hoặc thuật ngữ quan trọng; cần đối chiếu voice.")
                 result["recognition_alternatives"] = [initial["text"], alternate["text"]]
             result["decode_passes"] = passes
             result["decode_strategy"] = strategy

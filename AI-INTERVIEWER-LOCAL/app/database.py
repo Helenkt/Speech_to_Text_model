@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator
 
-from app.services.grade_state import original_is_provisional
+from app.services.grade_state import original_is_provisional, practice_final_score
 
 
 SCHEMA = """
@@ -181,6 +181,7 @@ CREATE TABLE IF NOT EXISTS session_grading_jobs (
     worker_id TEXT,
     lease_until REAL,
     error TEXT,
+    retry_after REAL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -375,6 +376,7 @@ def connect(database_path: Path) -> sqlite3.Connection:
     connection = sqlite3.connect(database_path, timeout=30)
     connection.row_factory = sqlite3.Row
     connection.create_function("grade_is_provisional", 3, original_is_provisional, deterministic=True)
+    connection.create_function("practice_final_score", 9, practice_final_score, deterministic=True)
     connection.execute("PRAGMA foreign_keys = ON")
     connection.execute("PRAGMA journal_mode = WAL")
     return connection
@@ -394,6 +396,9 @@ def database(database_path: Path) -> Iterator[sqlite3.Connection]:
 
 
 def _migrate_existing_database(connection: sqlite3.Connection) -> None:
+    job_columns = {row["name"] for row in connection.execute("PRAGMA table_info(session_grading_jobs)")}
+    if "retry_after" not in job_columns:
+        connection.execute("ALTER TABLE session_grading_jobs ADD COLUMN retry_after REAL")
     question_columns = {row["name"] for row in connection.execute("PRAGMA table_info(questions)")}
     if "bank_scope" not in question_columns:
         connection.execute("ALTER TABLE questions ADD COLUMN bank_scope TEXT NOT NULL DEFAULT 'learning'")

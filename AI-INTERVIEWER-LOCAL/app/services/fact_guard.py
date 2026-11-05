@@ -187,8 +187,12 @@ def _relation_holds(relation: str, actual: str) -> bool:
 def check_rubric_point(question: dict[str, Any], answer: str, point: str) -> FactCheck:
     """Return only facts attributable to this point, never a whole-answer grade."""
     from app.services.course_verifier import check_course_point
+    from app.services.traversal_facts import check_traversal_point
+    traversal = check_traversal_point(question, answer, point)
+    if traversal.status != 'unknown':
+        return traversal
     course_check = check_course_point(answer, point, question=question)
-    if course_check.status != "unknown":
+    if course_check.status != "unknown" or course_check.verification_rule.endswith(":unparsed_scope"):
         return course_check
     evidence = _negated_rubric_point(point, answer)
     normalized_point = plain_text(point).strip(" .")
@@ -221,10 +225,8 @@ def check_rubric_point(question: dict[str, Any], answer: str, point: str) -> Fac
         relevant = [clause for clause in candidates if clause.startswith(subject + copula)]
         if not relevant:
             continue
-        exact_relation = re.compile(
-            rf"{re.escape(subject + copula + predicate)}(?:\s+(?:cua|of)\s+[a-z ]+)?"
-        )
-        if all(exact_relation.fullmatch(clause) for clause in relevant):
+        exact_relation = re.compile(re.escape(subject + copula + predicate))
+        if len(relevant) == len(candidates) and all(exact_relation.fullmatch(clause) for clause in relevant):
             return FactCheck("supported", 0.99,
                              "Phát biểu khẳng định đúng quan hệ chủ thể và thuộc tính trong tiêu chí.", relevant[0])
 
@@ -262,6 +264,9 @@ def check_rubric_point(question: dict[str, Any], answer: str, point: str) -> Fac
     if len(desired) != 1 or re.search(r"\b(va|and|dong thoi)\b", normalized_point):
         return FactCheck("unknown", 0.0)
     correct, quote = judgments[0]
+    if any(not any(plain_text(clause).strip() == claim[3].strip() for claim in claims)
+           for clause in split_clauses(asserted)):
+        return FactCheck("unknown", 0, "Cần kiểm tra phần giải thích ngoài quan hệ so sánh đã nhận dạng.")
     return FactCheck("supported" if correct else "contradicted", 0.995,
                      "Đối chiếu quan hệ với dữ kiện số trong đề.", quote, tuple(entities))
 

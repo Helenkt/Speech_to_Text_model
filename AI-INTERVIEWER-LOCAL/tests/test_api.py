@@ -209,7 +209,12 @@ def test_candidate_practice_history_is_saved_and_private(
     assert len(sessions) == 1
     assert sessions[0]["session_id"] == session_id
     assert sessions[0]["answered_count"] == 1
-    assert sessions[0]["average_score"] is not None
+    # This keyword-demo total does not match its criterion credits; save the attempt, not a final grade.
+    assert answered.json()["evaluation"]["score_provisional"] is True
+    assert sessions[0]["average_score"] is None
+    report = client.get(f"/api/interviews/{session_id}/report").json()
+    assert report["answers"][0]["evaluation"]["final_score"] is None
+    assert report["summary"]["scored_answer_count"] == 0
     assert sessions[0]["can_view_report"] is True
 
     client.post("/api/auth/logout")

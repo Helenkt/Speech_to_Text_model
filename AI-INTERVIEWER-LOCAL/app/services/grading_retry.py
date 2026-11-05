@@ -4,8 +4,9 @@ import time
 from datetime import datetime, timezone
 
 from app.database import database
-from app.services.assessment_feedback import assessment_feedback, voice_requires_review
+from app.services.assessment_feedback import assessment_feedback, voice_requires_review, has_technical_grading_failure
 from app.services.evaluator import evaluate_answer
+from app.services.practice_grading import validate_ai_grade, valid_score
 
 
 async def retry_practice_grade(settings, session_id, transcription_id, user_id, *, ensure_model=None, inference_runner=None):
@@ -23,8 +24,7 @@ async def retry_practice_grade(settings, session_id, transcription_id, user_id, 
         assessments = json.loads(row["assessment_json"])
         if not isinstance(assessments, list) or any(not isinstance(item, dict) for item in assessments):
             raise ValueError("Dữ liệu đối chiếu không hợp lệ; không tự chấm lại")
-        if not any(item.get("review_reason") in {"model_unavailable", "model_timeout", "model_output_invalid"}
-                   for item in assessments):
+        if not has_technical_grading_failure(assessments):
             raise ValueError("Câu trả lời không có lỗi kỹ thuật cần thử chấm lại")
         now = time.time()
         if row["grading_retry_count"] >= 2:
@@ -37,9 +37,12 @@ async def retry_practice_grade(settings, session_id, transcription_id, user_id, 
     evaluation = await evaluate_answer(settings, question, row["answer_text"],
         **({"ensure_model": ensure_model} if ensure_model else {}),
         **({"inference_runner": inference_runner} if inference_runner else {}))
+    if not valid_score(evaluation.get("score")):
+        raise ValueError("AI score must be a finite number from 0 to 100, not a boolean")
     voice = json.loads(row["metadata_json"] or "{}")
     if voice_requires_review(voice):
         evaluation.update(score_provisional=True, review_required=True)
+    validate_ai_grade(question, evaluation)
     evaluation.update(assessment_feedback(evaluation, voice, interview_mode="practice"))
     with database(settings.database_path) as connection:
         connection.execute("BEGIN IMMEDIATE")

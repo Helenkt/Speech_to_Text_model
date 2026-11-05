@@ -368,16 +368,37 @@ def list_exam_attempts(
                    s.requested_count, s.created_at, s.finished_at, u.username,
                    u.email, u.student_id, r.exam_code, r.title, r.subject,
                    ROUND(AVG(CASE WHEN a.reviewed_at IS NOT NULL THEN a.final_score END), 1) AS average_score,
+                   COUNT(a.answer_id) AS answer_count,
+                   SUM(CASE WHEN a.reviewed_at IS NOT NULL
+                            AND typeof(a.final_score) IN ('integer', 'real')
+                            AND a.final_score BETWEEN 0 AND 100 THEN 1 ELSE 0 END) AS scored_answer_count,
+                   SUM(CASE WHEN a.grading_pending = 1 THEN 1 ELSE 0 END) AS grading_pending_count,
+                   j.state AS grading_state,
                    SUM(CASE WHEN a.review_required = 1 AND a.reviewed_at IS NULL
                             THEN 1 ELSE 0 END) AS pending_review_count
             FROM interview_sessions AS s
             JOIN users AS u ON u.user_id = s.user_id
             JOIN exam_rounds AS r ON r.exam_round_id = s.exam_round_id
             LEFT JOIN interview_answers AS a ON a.session_id = s.session_id
+            LEFT JOIN session_grading_jobs AS j ON j.session_id = s.session_id
             WHERE {' AND '.join(clauses)}
             GROUP BY s.session_id
             ORDER BY s.created_at DESC
             """,
             parameters,
         ).fetchall()
-    return [dict(row) for row in rows]
+    results = []
+    for row in rows:
+        item = dict(row)
+        total, scored, pending = item['answer_count'], item['scored_answer_count'], item['grading_pending_count']
+        final = (item['status'] == 'completed' and total > 0
+                 and total == item['answered_count'] and scored == total and not pending)
+        item.update(final_score=item['average_score'] if final else None,
+                    score_status='final' if final else 'pending',
+                    scored_only_average=item['average_score'],
+                    unscored_answer_count=total - scored,
+                    grading_processed_count=total - pending)
+        if not item['grading_state']:
+            item['grading_state'] = 'collecting' if item['status'] == 'active' else 'queued' if pending else 'completed'
+        results.append(item)
+    return results

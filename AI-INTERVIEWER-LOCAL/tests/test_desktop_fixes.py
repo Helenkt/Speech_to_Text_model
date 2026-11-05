@@ -130,7 +130,7 @@ def test_wrong_llm_quote_is_recovered_from_the_actual_answer(test_settings, tmp_
     def infer(_path, _question, text):
         probs = {"entailment": .94, "neutral": .04, "contradiction": .02} if good in text else {
             "entailment": .07, "neutral": .36, "contradiction": .57}
-        return {"point_assessments": [{"probabilities": probs}]}
+        return {"acceptance_eligible": True, "point_assessments": [{"probabilities": probs, "truncated": False}]}
     monkeypatch.setattr(evaluator, "evaluate_with_transformer", infer)
     question = {"key_points": [point]}
     result = evaluator._coerce_llm_result({"point_assessments": [{"point": point, "status": "met", "evidence_quote": bad}]},
@@ -297,7 +297,8 @@ def test_pending_evidence_gets_one_llm_recheck_not_automatic_keyword_credit(tmp_
     point = "A base case returns directly and terminates recursion"
     answer = "A recursive function has two parts. The base case returns directly without further recursive calls."
     monkeypatch.setattr(evaluator, "evaluate_with_transformer", lambda *_args, **_kwargs: {
-        "point_assessments": [{"probabilities": {"entailment": .95, "neutral": .03, "contradiction": .02}}]})
+        "acceptance_eligible": True,
+        "point_assessments": [{"probabilities": {"entailment": .95, "neutral": .03, "contradiction": .02}, "truncated": False}]})
     calls = []
     def respond(request):
         payload = json.loads(request.content)

@@ -25,32 +25,32 @@ SEMANTIC_MARKERS = NEGATIONS | {
 }
 
 LETTER_SOUNDS = {
-    "A": {"a", "ay", "ey"},
-    "B": {"b", "be", "bi"},
-    "C": {"c", "xe", "si"},
-    "D": {"d", "de", "di"},
-    "E": {"e", "i"},
-    "F": {"f", "ep", "ef"},
-    "G": {"g", "go", "gi"},
-    "H": {"h", "hat", "et"},
+    "A": {"a", "ay", "ey", "ây"},
+    "B": {"b", "be", "bi", "bê"},
+    "C": {"c", "xe", "si", "xê"},
+    "D": {"d", "de", "di", "đê", "dê"},
+    "E": {"e", "i", "ê"},
+    "F": {"f", "ep", "ef", "ép"},
+    "G": {"g", "go", "gi", "gờ", "giê"},
+    "H": {"h", "hat", "et", "hát", "ét"},
     "I": {"i", "ai"},
-    "J": {"j", "giay", "jay"},
+    "J": {"j", "giay", "jay", "giây"},
     "K": {"k", "ca", "kay"},
     "L": {"l", "eo", "el"},
     "M": {"m", "em"},
     "N": {"n", "en"},
-    "O": {"o", "au"},
-    "P": {"p", "pe", "pi"},
+    "O": {"o", "au", "ô", "âu"},
+    "P": {"p", "pe", "pi", "pê"},
     "Q": {"q", "quy", "kiu"},
     "R": {"r", "a", "ar"},
-    "S": {"s", "et", "es"},
-    "T": {"t", "te", "ti"},
+    "S": {"s", "et", "es", "ét"},
+    "T": {"t", "te", "ti", "tê"},
     "U": {"u", "iu"},
-    "V": {"v", "ve", "vi"},
+    "V": {"v", "ve", "vi", "vê"},
     "W": {"w", "daboliu"},
-    "X": {"x", "ich", "ex"},
+    "X": {"x", "ich", "ex", "ích"},
     "Y": {"y", "wai"},
-    "Z": {"z", "det", "zi"},
+    "Z": {"z", "det", "zi", "dét"},
 }
 
 NUMBER_SOUNDS = {
@@ -83,10 +83,13 @@ def _plain_text(value: str) -> str:
 
 
 def _is_pronounced_acronym(source: str, target: str) -> bool:
+    if re.search(r"[^\w\s'-]|[\r\n]", source):
+        return False
     acronym = re.sub(r"[^A-Za-z]", "", target).upper()
     if not acronym or len(acronym) != len(target.strip()) or len(acronym) > 8:
         return False
-    sounds = [_plain_text(word) for word in _words(source)]
+    # Letter names are explicit spellings; stripping accents turns ordinary words into letters.
+    sounds = [unicodedata.normalize("NFC", word) for word in _words(source)]
     return len(sounds) == len(acronym) and all(
         sound in LETTER_SOUNDS.get(letter, set())
         for sound, letter in zip(sounds, acronym)
@@ -94,11 +97,14 @@ def _is_pronounced_acronym(source: str, target: str) -> bool:
 
 
 def _is_pronounced_technical_token(source: str, target: str) -> bool:
+    if re.search(r"[^\w\s'-]|[\r\n]", source):
+        return False
     match = re.fullmatch(r"(\d)([A-Za-z]{1,5})", target.strip())
     if not match:
         return False
     digit, acronym = match.groups()
-    sounds = [_plain_text(word) for word in _words(source)]
+    words = _words(source)
+    sounds = [_plain_text(words[0])] + [unicodedata.normalize("NFC", word) for word in words[1:]] if words else []
     return (
         len(sounds) == len(acronym) + 1
         and sounds[0] in NUMBER_SOUNDS[digit]
@@ -279,6 +285,34 @@ def _uncertain_language_corrections(
     return changes
 
 
+def _phonetic_baseline(raw_text: str, corrections: list[dict], approved_terms: list[str]) -> str:
+    """Project only exact approved letter-name spans before measuring other edits."""
+    approved = {term.strip() for term in approved_terms if isinstance(term, str)}
+    spans = []
+    for change in corrections:
+        if not isinstance(change, dict):
+            continue
+        source, target = change.get("source"), change.get("target")
+        start, end = change.get("start"), change.get("end")
+        if (not isinstance(source, str) or not isinstance(target, str)
+                or target.strip() not in approved or type(start) is not int or type(end) is not int
+                or not 0 <= start < end <= len(raw_text)):
+            continue
+        actual = raw_text[start:end]
+        if (actual.casefold() != source.strip().casefold()
+                or (start and re.match(r"\w", raw_text[start - 1]))
+                or (end < len(raw_text) and re.match(r"\w", raw_text[end]))
+                or not (_is_pronounced_acronym(actual, target.strip())
+                        or _is_pronounced_technical_token(actual, target.strip()))
+                or any(start < right and end > left for left, right, _ in spans)):
+            continue
+        spans.append((start, end, target.strip()))
+    baseline = raw_text
+    for start, end, target in sorted(spans, reverse=True):
+        baseline = baseline[:start] + target + baseline[end:]
+    return baseline
+
+
 def _apply_audited_corrections(
     raw_text: str,
     corrections: list[dict[str, str]],
@@ -288,7 +322,6 @@ def _apply_audited_corrections(
     patches: list[tuple[int, int, str]] = []
     applied: list[dict[str, str]] = []
     rejected: list[dict[str, str]] = []
-    number_normalized = False
     for change in corrections:
         source = change["source"].strip()
         target = change["target"].strip()
@@ -309,12 +342,6 @@ def _apply_audited_corrections(
             rejected.append(change)
             continue
 
-        current_normalizes_number = (
-            _plain_text(target) in {
-                _plain_text(term) for term in approved_terms if term.strip()
-            }
-            and _is_pronounced_technical_token(source, target)
-        )
         for start, end in matches:
             if any(start < used_end and end > used_start for used_start, used_end, _ in patches):
                 if (start, end, target) not in patches:
@@ -326,14 +353,14 @@ def _apply_audited_corrections(
             for left, right, replacement in sorted(proposed, reverse=True):
                 candidate = candidate[:left] + replacement + candidate[right:]
             accepted, _, _ = _validate_correction(raw_text, candidate,
-                allow_number_normalization=number_normalized or current_normalizes_number)
+                audited_corrections=applied + [{**change, "start": start, "end": end}],
+                approved_terms=approved_terms)
             if not accepted:
                 rejected.append(change)
                 continue
             patches = proposed
             corrected = candidate
             applied.append({**change, "start": start, "end": end})
-            number_normalized = number_normalized or current_normalizes_number
     return corrected, applied, rejected
 
 
@@ -350,6 +377,9 @@ def _validate_correction(
     corrected_text: str,
     *,
     allow_number_normalization: bool = False,
+    allow_phonetic_contraction: bool = False,
+    audited_corrections: list[dict] | None = None,
+    approved_terms: list[str] | None = None,
 ) -> tuple[bool, str, float]:
     raw_words = _words(raw_text)
     corrected_words = _words(corrected_text)
@@ -358,20 +388,25 @@ def _validate_correction(
 
     similarity = SequenceMatcher(None, raw_words, corrected_words).ratio()
     edit_ratio = round(1.0 - similarity, 3)
-    if len(corrected_words) > len(raw_words) * 1.35 + 2:
+    baseline = (_phonetic_baseline(raw_text, audited_corrections, approved_terms or [])
+                if audited_corrections is not None else raw_text)
+    baseline_words = _words(baseline)
+    remaining_edit_ratio = 1 - SequenceMatcher(None, baseline_words, corrected_words).ratio()
+    if len(corrected_words) > len(baseline_words) * 1.35 + 2:
         return False, "Bản sửa đã thêm quá nhiều nội dung.", edit_ratio
-    minimum_length_ratio = 0.45 if allow_number_normalization else 0.65
-    if len(corrected_words) < len(raw_words) * minimum_length_ratio:
+    contraction = audited_corrections is None and (allow_number_normalization or allow_phonetic_contraction)
+    minimum_length_ratio = 0.45 if contraction else 0.65
+    if len(corrected_words) < len(baseline_words) * minimum_length_ratio:
         return False, "Bản sửa đã loại bỏ quá nhiều nội dung.", edit_ratio
-    maximum_edit_ratio = 0.55 if allow_number_normalization else 0.30
-    if edit_ratio > maximum_edit_ratio:
+    maximum_edit_ratio = 0.55 if contraction else 0.30
+    if round(remaining_edit_ratio, 3) > maximum_edit_ratio:
         return False, "Mức thay đổi vượt giới hạn sửa lỗi nhận dạng.", edit_ratio
 
     raw_markers = Counter(word for word in raw_words if word in SEMANTIC_MARKERS)
     corrected_markers = Counter(word for word in corrected_words if word in SEMANTIC_MARKERS)
     if raw_markers != corrected_markers:
         return False, "Bản sửa làm thay đổi từ phủ định hoặc mức độ chắc chắn.", edit_ratio
-    if not allow_number_normalization and Counter(re.findall(r"\d+(?:[.,]\d+)?", raw_text)) != Counter(
+    if (audited_corrections is not None or not allow_number_normalization) and Counter(re.findall(r"\d+(?:[.,]\d+)?", baseline)) != Counter(
         re.findall(r"\d+(?:[.,]\d+)?", corrected_text)
     ):
         return False, "Bản sửa làm thay đổi số liệu.", edit_ratio
@@ -417,10 +452,8 @@ async def _correct_transcript_impl(
         _validate_correction(
             raw_text,
             deterministic_text,
-            allow_number_normalization=any(
-                _is_pronounced_technical_token(change["source"], change["target"])
-                for change in deterministic_applied
-            ),
+            audited_corrections=deterministic_applied,
+            approved_terms=approved_terms,
         )
     )
     unresolved_uncertain_spans = [
@@ -601,10 +634,8 @@ corrected when they are an obvious phonetic match. Never infer a better intervie
         accepted, reason, edit_ratio = _validate_correction(
             raw_text,
             corrected,
-            allow_number_normalization=any(
-                _is_pronounced_technical_token(change["source"], change["target"])
-                for change in applied_changes
-            ),
+            audited_corrections=applied_changes,
+            approved_terms=approved_terms,
         )
         if not accepted:
             return {

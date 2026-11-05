@@ -198,14 +198,51 @@ def _load(model_dir: Path) -> tuple[Any, Any, dict[str, str]]:
             _MODEL_PATH = None
             _MODEL_STAMP = None
             raise RuntimeError(f"Cannot load RubricGuard Transformer: {exc}") from exc
-    config = json.loads((model_dir / "config.json").read_text(encoding="utf-8"))
-    return _SESSION, _TOKENIZER, config.get("id2label", {})
+        # Capture one checkpoint's objects before another load or release can replace them.
+        return _SESSION, _TOKENIZER, config.get("id2label", {})
 
 
 def os_cpu_count() -> int | None:
     import os
 
     return os.cpu_count()
+
+
+def predict_nli_pairs(model_dir: Path, pairs: list[tuple[str, str]]) -> list[dict[str, Any]]:
+    """Raw, bounded-memory inference for offline graders; never grants grading approval."""
+    if not isinstance(pairs, list) or not 1 <= len(pairs) <= 30 or any(
+        not isinstance(pair, (list, tuple)) or len(pair) != 2 or any(
+            not isinstance(text, str) or not text.strip() for text in pair
+        ) for pair in pairs
+    ):
+        raise ValueError("Expected 1-30 non-empty premise/hypothesis pairs")
+    session, tokenizer, labels = _load(model_dir)
+    names = [str(labels.get(str(index), labels.get(index, ""))).lower() for index in range(3)]
+    if set(names) != {"entailment", "neutral", "contradiction"}:
+        raise ValueError("Expected a three-class NLI label mapping")
+    input_names = {item.name for item in session.get_inputs()}
+    if not {"input_ids", "attention_mask"} <= input_names or input_names - {
+        "input_ids", "attention_mask", "token_type_ids"
+    }:
+        raise ValueError("Unsupported NLI model inputs")
+    predictions = []
+    # Batch one criterion at a time; long answers cannot inflate a padded rubric batch.
+    for pair in pairs:
+        encoding = tokenizer.encode_batch([pair])[0]
+        fields = {"input_ids": encoding.ids, "attention_mask": encoding.attention_mask}
+        if "token_type_ids" in input_names:
+            fields["token_type_ids"] = encoding.type_ids
+        inputs = {key: np.asarray([value], dtype=np.int64) for key, value in fields.items()}
+        logits = np.asarray(session.run(None, inputs)[0])
+        if logits.shape != (1, 3) or not np.isfinite(logits).all():
+            raise ValueError("NLI returned invalid logits")
+        row = _softmax(logits)[0]
+        predictions.append({
+            "probabilities": dict(zip(names, map(float, row), strict=True)),
+            "truncated": bool(encoding.overflowing),
+            "token_count": len(encoding.ids),
+        })
+    return predictions
 
 
 def _verdict(score: float, language: str) -> str:
@@ -244,7 +281,10 @@ def evaluate_with_transformer(
         )
     temperature, calibrated_threshold = _calibration(model_dir)
     min_confidence = max(min_confidence, calibrated_threshold)
-    probabilities = _softmax(session.run(None, inputs)[0] / temperature)
+    logits = np.asarray(session.run(None, inputs)[0])
+    if logits.shape != (len(points), 3) or not np.isfinite(logits).all():
+        raise ValueError("NLI returned invalid logits")
+    probabilities = _softmax(logits / temperature)
     quality = _quality_metadata(model_dir)
     production_ready = quality["production_ready"]
     selective_ready = quality.get("selective_ready", False)
@@ -264,7 +304,7 @@ def evaluate_with_transformer(
         contradiction = distribution.get("contradiction", 0.0)
         confidence = max(entailment, neutral, contradiction)
         label = max(distribution, key=distribution.get)
-        status = {"entailment": "met", "contradiction": "contradicted", "neutral": "missing"}.get(label, "missing")
+        status = {"entailment": "met", "contradiction": "contradicted", "neutral": "unresolved"}.get(label, "unresolved")
         statuses.append(status)
         confidences.append(confidence)
         assessments.append(
@@ -277,7 +317,9 @@ def evaluate_with_transformer(
                 ),
                 "evidence_quote": "",
                 "confidence": round(confidence, 4),
-                "needs_review": (not can_accept or confidence < min_confidence or bool(encoding.overflowing)
+                "truncated": bool(encoding.overflowing),
+                "review_reason": "neutral_evidence" if status == "unresolved" else "",
+                "needs_review": (status == "unresolved" or not can_accept or confidence < min_confidence or bool(encoding.overflowing)
                                  or bool(re.search(r"\d|[<>]|\b(?:hơn|không|chưa|not|never|than)\b|[\"'\u201c\u2018]",
                                                    answer, re.IGNORECASE))),
                 "probabilities": {
@@ -311,13 +353,15 @@ def evaluate_with_transformer(
         "matched_points": [point for point, status in zip(points, statuses) if status == "met"],
         "partial_points": [point for point, status in zip(points, statuses) if status == "partial"],
         "contradicted_points": [point for point, status in zip(points, statuses) if status == "contradicted"],
-        "missing_points": [point for point, status in zip(points, statuses) if status != "met"],
+        "missing_points": [point for point, status in zip(points, statuses) if status in {"missing", "contradicted", "partial"}],
+        "unresolved_points": [point for point, status in zip(points, statuses) if status == "unresolved"],
         "point_assessments": assessments,
         "feedback": feedback,
         "confidence": round(confidence, 3),
         "acceptance_threshold": min_confidence,
-        "evaluator": "transformer:rubricguard-lite-v1",
+        "acceptance_eligible": can_accept,
+        "evaluator": "transformer:rubricguard-lite-v2-neutral-unresolved",
         "review_required": needs_review,
         "score_provisional": needs_review,
-        "rubric_version": "rubricguard-lite-v1",
+        "rubric_version": "rubricguard-lite-v2-neutral-unresolved",
     }

@@ -30,6 +30,7 @@ data/account_template.xlsx
 data/audio/
 data/backups/
 data/runtime_logs/
+data/specialist_runs/
 
 # Local runs, sensitive recordings and heavyweight experiment artifacts.
 .pytest*/

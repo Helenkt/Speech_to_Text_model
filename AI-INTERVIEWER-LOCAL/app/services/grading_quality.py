@@ -8,37 +8,11 @@ from pathlib import Path
 from typing import Any
 
 from app.database import database
-from app.services.rubric_contract import digest
+from app.services.rubric_contract import digest, rubric_hash
 from app.services.teacher_review import _evaluation_complete
 
 
 STATUSES = {"met": 1.0, "partial": 0.5, "missing": 0.0, "contradicted": 0.0}
-
-
-def rubric_hash(question: dict[str, Any]) -> str:
-    snapshot = question.get("rubric_snapshot")
-    if snapshot:
-        if not isinstance(snapshot, dict) or not isinstance(snapshot.get("contract"), dict):
-            raise ValueError("Malformed rubric snapshot")
-        contract = snapshot["contract"]
-        criteria = contract.get("criteria")
-        if (not isinstance(criteria, list) or not criteria
-                or any(not isinstance(item, dict) or not isinstance(item.get("claim"), str)
-                       or not item["claim"].strip() for item in criteria)):
-            raise ValueError("Malformed rubric snapshot criteria")
-        claims = [item["claim"] for item in criteria]
-        weights = {item["claim"]: item.get("weight") for item in criteria}
-        if (len(set(claims)) != len(claims) or claims != question["key_points"]
-                or weights != question.get("key_point_weights")
-                or any(isinstance(w, bool) or not isinstance(w, (int, float))
-                       or not math.isfinite(w) or w <= 0 for w in weights.values())
-                or digest(contract) != snapshot.get("sha256")):
-            raise ValueError("Rubric snapshot content does not match its integrity hash")
-        return snapshot["sha256"]
-    return digest({
-        "points": question["key_points"], "weights": question.get("key_point_weights", {}),
-        "reference": question.get("reference_answer", ""),
-    })
 
 
 def save_point_labels(database_path: Path, *, answer_id: int, teacher_id: int,
@@ -190,7 +164,7 @@ def review_triage(database_path: Path, limit: int = 1000, *,
             expected_review_cache_key and row["review_processed_at"] and row["review_ai_at"]
             and row["review_ai_score"] is not None
             and strong_metadata.get("review_cache_key") == expected_review_cache_key
-            and _evaluation_complete(strong, question.get("key_points", []), row["review_ai_score"])
+            and _evaluation_complete(strong, question, row["review_ai_score"])
         )
         if strong_current:
             assessments = strong["point_assessments"]
@@ -229,6 +203,13 @@ def _mean(values: list[float]) -> float | None:
     return round(sum(values) / len(values), 4) if values else None
 
 
+def validate_corpus_integrity(sample: dict[str, Any]) -> None:
+    if (not isinstance(sample.get("answer_hash"), str) or not isinstance(sample.get("rubric_sha256"), str)
+            or digest(sample["answer"]) != sample["answer_hash"]
+            or rubric_hash(sample["question"]) != sample["rubric_sha256"]):
+        raise ValueError(f"Corpus transcript/rubric content hash mismatch: {sample.get('sample_id', 'unknown')}")
+
+
 def evaluate_predictions(samples: list[dict[str, Any]], predictions: list[dict[str, Any]],
                          *, minimum_blind_samples: int = 100) -> dict[str, Any]:
     """Measure independent point labels. Never enable automatic grading from this report."""
@@ -244,6 +225,7 @@ def evaluate_predictions(samples: list[dict[str, Any]], predictions: list[dict[s
         issues.append("unknown_predictions")
     for sample in samples:
         sample_id = sample["sample_id"]
+        validate_corpus_integrity(sample)
         for field in ("question_id", "student_group", "answer_hash"):
             if not sample.get(field):
                 raise ValueError(f"Missing leakage group: {field}")
@@ -259,8 +241,6 @@ def evaluate_predictions(samples: list[dict[str, Any]], predictions: list[dict[s
         points = question["key_points"]
         if not points or len(points) != len(set(points)):
             raise ValueError("Benchmark rubric points must be non-empty and unique")
-        if digest(sample["answer"]) != sample["answer_hash"] or rubric_hash(question) != sample["rubric_sha256"]:
-            raise ValueError("Corpus transcript/rubric content hash mismatch")
         normalized = []
         for label in independent:
             labels = label["points"]

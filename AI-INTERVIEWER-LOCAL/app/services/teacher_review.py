@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import json
-import math
 from datetime import datetime, timezone
 from typing import Any
 
 from app.config import Settings
 from app.database import database
 from app.services.grade_state import decision_snapshot, json_object
+from app.services.practice_grading import question_breakdown, validate_ai_grade, valid_score as _valid_score
 from app.services.transcription_vocabulary import transcription_vocabulary
 
 
@@ -19,12 +19,7 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _valid_score(value: Any) -> bool:
-    return (isinstance(value, (int, float)) and not isinstance(value, bool)
-            and math.isfinite(value) and 0 <= value <= 100)
-
-
-def _evaluation_complete(evaluation: Any, points: list[str] | None = None,
+def _evaluation_complete(evaluation: Any, question: dict,
                          stored_score: float | None = None) -> bool:
     if not isinstance(evaluation, dict) or not _valid_score(evaluation.get("score")):
         return False
@@ -42,22 +37,24 @@ def _evaluation_complete(evaluation: Any, points: list[str] | None = None,
                     "met", "partial", "missing", "contradicted", "unresolved"}):
             return False
         found.append(item["point"])
-    return len(set(found)) == len(found) and (points is None or set(found) == set(points))
+    if len(set(found)) != len(found) or set(found) != set(question.get("key_points", [])):
+        return False
+    breakdown = question_breakdown(question, {**evaluation, "final_score": evaluation["score"],
+        "score_provisional": False}, completed=True)
+    return breakdown["status"] not in {"invalid_rubric", "score_mismatch"}
 
 
-def _score_is_provisional(evaluation: dict[str, Any], points: list[str] | None = None,
+def _score_is_provisional(evaluation: dict[str, Any], question: dict,
                            stored_score: float | None = None) -> bool:
-    return not _evaluation_complete(evaluation, points, stored_score) or bool(
-        evaluation.get("score_provisional") or any(
-            item.get("needs_review") or item["status"] == "unresolved"
-            for item in evaluation["point_assessments"]
-        ))
+    return (not _evaluation_complete(evaluation, question, stored_score)
+            or question_breakdown(question, {**evaluation, "final_score": evaluation.get("score")},
+                                  completed=True)["status"] != "final")
 
 
 def review_cache_key(settings: Settings) -> str:
     return "|".join(
         (
-            "teacher-review-v7-span-correction-evidence",
+            "teacher-review-v12-complete-clause-coverage",
             settings.review_whisper_model,
             settings.ollama_model,
             settings.transcript_correction_mode,
@@ -81,11 +78,10 @@ def review_readiness(settings: Settings, *, question: dict, score: Any, evaluati
         except (TypeError, ValueError):
             return {}
     evaluation, metadata = object_json(evaluation_json), object_json(metadata_json)
-    points = question.get("key_points", [])
     ready = bool(ai_at and processed_at and _valid_score(score)
         and metadata.get("review_cache_key") == review_cache_key(settings)
-        and _evaluation_complete(evaluation, points, score))
-    provisional = _score_is_provisional(evaluation, points, score)
+        and _evaluation_complete(evaluation, question, score))
+    provisional = _score_is_provisional(evaluation, question, score)
     below = bool(ready and score < settings.teacher_review_score_threshold)
     return {"strong_review_ready": ready, "can_accept_ai": ready and not provisional and not below,
             "review_ai_evaluation": evaluation,
@@ -199,7 +195,7 @@ def review_answer(
             if not row["review_ai_at"] or not row["review_processed_at"]:
                 raise TeacherReviewError("Kết quả AI chưa xử lý đầy đủ; cần chấm lại")
             question = json.loads(row["question_json"])
-            if _score_is_provisional(evaluation, question.get("key_points", []), row["review_ai_score"]):
+            if _score_is_provisional(evaluation, question, row["review_ai_score"]):
                 raise TeacherReviewError("Điểm AI còn ý chưa xác minh; cần xử lý lại hoặc giảng viên tự chấm")
             if row["review_ai_score"] < settings.teacher_review_score_threshold:
                 raise TeacherReviewError("Điểm AI chấm lại dưới trung bình; giảng viên cần tự chấm và ghi nhận xét")
@@ -237,11 +233,17 @@ def review_answer(
             """
             UPDATE interview_answers
             SET teacher_score = ?, final_score = ?, teacher_feedback = ?,
-                reviewed_by = ?, reviewed_at = ?, review_required = 0, final_decision_json = ?
+                reviewed_by = ?, reviewed_at = ?, review_required = 0, final_decision_json = ?, grading_pending = 0
             WHERE answer_id = ?
             """,
             (score, score, feedback, teacher_id, now, serialized_decision, answer_id),
         )
+        # A teacher can finish a failed batch without reviving AI or resetting attempt history.
+        connection.execute("""UPDATE session_grading_jobs SET state='completed',error=NULL,retry_after=NULL,
+            processed_count=(SELECT COUNT(*) FROM interview_answers WHERE session_id=? AND grading_pending=0),
+            updated_at=CURRENT_TIMESTAMP WHERE session_id=? AND state IN ('queued','failed')
+            AND NOT EXISTS (SELECT 1 FROM interview_answers WHERE session_id=? AND grading_pending=1)""",
+            (row["session_id"], row["session_id"], row["session_id"]))
     return {
         "answer_id": answer_id,
         "action": action,
@@ -263,6 +265,7 @@ def review_reanalysis_context(
                    a.review_ai_score, a.review_ai_feedback,
                    a.review_ai_evaluation_json, a.review_ai_at,
                    s.interview_mode, s.answer_mode, s.language, s.grading_strategy, s.status AS session_status,
+                   j.state AS grading_job_state,
                    t.transcription_id, t.corrected_text AS original_transcript,
                    t.audio_path, t.audio_mime_type, t.ambient_noise_dbfs,
                    t.review_transcript, t.review_model, t.review_runtime,
@@ -272,13 +275,15 @@ def review_reanalysis_context(
             JOIN interview_sessions AS s ON s.session_id = a.session_id
             LEFT JOIN speech_transcriptions AS t
                 ON t.transcription_id = a.transcription_id
+            LEFT JOIN session_grading_jobs AS j ON j.session_id = a.session_id
             WHERE a.answer_id = ?
             """,
             (answer_id,),
         ).fetchone()
     if not row:
         raise TeacherReviewError("Không tìm thấy câu trả lời")
-    if row["grading_strategy"] == "end_of_session" and (row["session_status"] == "active" or row["grading_pending"]):
+    if row["grading_strategy"] == "end_of_session" and (row["session_status"] == "active"
+            or (row["grading_pending"] and row["grading_job_state"] != "failed")):
         raise TeacherReviewError("Hãy chờ phiên kết thúc và chấm lần đầu hoàn tất trước khi chạy model chấm lại")
     if row["interview_mode"] != "real" or row["answer_mode"] != "voice":
         raise TeacherReviewError(
@@ -320,8 +325,7 @@ def review_reanalysis_context(
         if _valid_score(row["review_ai_score"])
         else None
     )
-    points = question.get("key_points", [])
-    cached = cached and strong_score is not None and _evaluation_complete(cached_evaluation, points, strong_score)
+    cached = cached and strong_score is not None and _evaluation_complete(cached_evaluation, question, strong_score)
     cached_result = (
         {
             "answer_id": answer_id,
@@ -380,9 +384,10 @@ def save_review_reanalysis(
         if not row or row["transcription_id"] != transcription_id:
             raise TeacherReviewError("Câu trả lời đã thay đổi trong lúc xử lý")
         question = json.loads(row["question_json"])
-        points = question.get("key_points", [])
-        if not _evaluation_complete(evaluation, points):
+        if not _evaluation_complete(evaluation, question):
             raise TeacherReviewError("Kết quả AI thiếu hoặc sai đối chiếu từng ý rubric; cần xử lý lại")
+        evaluation = dict(evaluation)
+        validate_ai_grade(question, evaluation)
         connection.execute(
             """
             UPDATE speech_transcriptions

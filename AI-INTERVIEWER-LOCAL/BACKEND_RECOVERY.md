@@ -25,7 +25,27 @@ không dùng để tăng/hạ độ khó hoặc kết luận điểm mạnh/yế
 Giảng viên có thể tự chấm, dùng điểm AI hợp lệ và nghe voice nhiều lần. Không bắt buộc phát voice để được chấm.
 
 Danh sách chấm và báo cáo dùng chung `review_readiness`. Cache chấm lại là
-`teacher-review-v7-span-correction-evidence`; cache cũ phải chạy lại trước khi chốt bằng thao tác dùng điểm AI.
+`teacher-review-v12-complete-clause-coverage`; cache cũ phải chạy lại trước khi chốt bằng thao tác dùng điểm AI.
+Điểm giảng viên đã xác nhận được giữ trong snapshot quyết định, không bị đổi khi cache hết hiệu lực.
+
+Điểm AI chấm lại phải khớp từng tiêu chí và trọng số rubric đã lưu. Không nhận nửa điểm cho
+tiêu chí atomic; ý chưa xác minh không có điểm cuối. Quyền giảng viên tự chấm tổng điểm vẫn giữ nguyên.
+Khi chấm đầu tiên đã dừng ở trạng thái `failed`, giảng viên có thể chạy STT mạnh và chấm lại;
+vẫn chặn khi phiên đang thu âm hoặc công việc đang `queued`/`processing`. Voice và transcript gốc không đổi.
+Dữ liệu assessment lồng nhau sai cấu trúc được coi là chưa xác minh khi đọc báo cáo, không đổi thành 0
+và không viết đè dữ liệu gốc. Mọi breakdown AI chưa final đều phải lưu điểm cuối NULL.
+
+Chế độ Transformer không tự hạ về chấm keyword khi model lỗi hoặc chưa cài: các ý chưa
+được xác minh giữ trạng thái unresolved và thử lại kỹ thuật có giới hạn. Những ý FactGuard
+đã xác minh vẫn được giữ. Bộ chấm rule chỉ chạy khi chủ động chọn chế độ demo rule.
+
+Nhận việc và chờ quyền suy luận không tiêu hao lượt chấm; attempts tăng khi worker đã lấy
+được quyền suy luận để bắt đầu chặng chấm. Hủy sau khi đã bắt đầu vẫn giữ lượt đã dùng.
+Trước khi đóng job, backend đọc lại các câu còn pending trong giao dịch có kiểm tra worker:
+nếu giảng viên đã xử lý hết thì hoàn tất báo cáo, không tiếp tục chờ/thử model vì lỗi cũ.
+Khởi động lại cũng khôi phục job queued/failed đã hết câu pending mà không đổi điểm hay
+lịch sử giảng viên. Không tự đặt lại attempts của các job cũ vì không đủ dữ liệu để phân
+biệt lượt chấm thật với lượt chờ trong những phiên bản trước.
 
 ## STT và LLM
 

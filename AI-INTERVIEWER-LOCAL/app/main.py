@@ -32,6 +32,7 @@ from app.schemas import (
     ExamStatusRequest,
     GeneratedQuestionDecisionRequest,
     LoginRequest,
+    PracticeAgainRequest,
     QuestionGenerateRequest,
     StartInterviewRequest,
     SubmitAnswerRequest,
@@ -75,6 +76,7 @@ from app.services.interview_engine import (
     question_summary,
     session_metadata,
     start_interview,
+    start_practice_again,
     submit_answer,
     resume_interview,
 )
@@ -475,6 +477,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 interview_mode="practice",
                 answer_mode="voice",
             )
+            readiness.start()
+            return {**session, "runtime_readiness": readiness.snapshot()}
+        except InterviewError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.post("/api/interviews/{session_id}/practice-again", status_code=201)
+    async def practice_again(
+        session_id: str, payload: PracticeAgainRequest,
+        user: dict[str, Any] = Depends(candidate_user),
+    ) -> dict[str, Any]:
+        try:
+            session = start_practice_again(app_settings, session_id, user_id=user["user_id"],
+                candidate_name=user["full_name"], answer_id=payload.answer_id)
             readiness.start()
             return {**session, "runtime_readiness": readiness.snapshot()}
         except InterviewError as exc:

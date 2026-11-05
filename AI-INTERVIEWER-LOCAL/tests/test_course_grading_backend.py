@@ -87,17 +87,19 @@ def test_complete_assertion_not_substring_or_keyword_overlap():
         assert check_rubric_point(question, answer, "Lớp là khuôn mẫu").status == "unknown"
 
 
-def test_however_prefix_keeps_a_correct_independent_assertion():
+def test_open_ownership_qualifier_requires_semantic_adjudication():
     point = "Đối tượng là thể hiện cụ thể"
     question = {"question": "Giải thích", "reference_answer": point, "key_points": [point]}
-    assert check_rubric_point(question, f"Em không nhớ phần khác. Tuy nhiên {point} của lớp.", point).status == "supported"
+    # Correct meaning may be verified by the semantic model; a partial copula match is not proof.
+    assert check_rubric_point(question, f"Em không nhớ phần khác. Tuy nhiên {point} của lớp.", point).status == "unknown"
 
 
 def test_disagreement_on_evidence_blocks_automatic_credit(test_settings, tmp_path, monkeypatch):
     test_settings.rubric_transformer_path = tmp_path
     (tmp_path / "tokenizer.json").write_text("{}", encoding="utf-8")
     monkeypatch.setattr(evaluator, "evaluate_with_transformer", lambda *_args, **_kwargs: {
-        "point_assessments": [{"probabilities": {"entailment": 0.05, "neutral": 0.04, "contradiction": 0.91}}]})
+        "acceptance_eligible": True,
+        "point_assessments": [{"probabilities": {"entailment": 0.05, "neutral": 0.04, "contradiction": 0.91}, "truncated": False}]})
     question = {"key_points": ["Lớp là khuôn mẫu"]}
     result = evaluator._coerce_llm_result({"confidence": 0.99, "point_assessments": [
         {"point": "Lớp là khuôn mẫu", "status": "met", "evidence_quote": "Đối tượng là khuôn mẫu"}]},

@@ -35,6 +35,7 @@ renderLucideIcons();
 
 const state = {
   user: null,
+  authGeneration: 0,
   health: null,
   summary: null,
   exams: [],
@@ -43,6 +44,12 @@ const state = {
   generatedQuestions: [],
   reviewQueue: [],
   practiceHistory: [],
+  practiceHistorySequence: 0,
+  sessionStartSequence: 0,
+  practiceStartSequence: 0,
+  realStartSequence: 0,
+  answerSubmissionSequence: 0,
+  sessionFinishSequence: 0,
   candidateExam: null,
   session: null,
   currentQuestion: null,
@@ -50,6 +57,8 @@ const state = {
   completed: false,
   reportOrigin: "practice",
   recorder: null,
+  recordingRequest: null,
+  recordingRestoreSequence: 0,
   audioChunks: [],
   savedRecording: null,
   speechBusy: false,
@@ -77,12 +86,14 @@ const state = {
   generationBusy: false,
   questionDeciding: new Set(),
   teacherReportSequence: 0,
+  historyReportSequence: 0,
   reviewOpenSequence: 0,
   generatedLoadSequence: 0,
   accountImporting: false,
   accountLoadSequence: 0,
   accountChanging: new Set(),
   teacherWorkspaceSequence: 0,
+  teacherWorkspaceRefreshTimer: null,
   teacherResultsLoaded: false,
   teacherReviewsLoaded: false,
   teacherResultsStale: false,
@@ -139,13 +150,27 @@ function toast(message, isError = false) {
   toast.timer = setTimeout(() => { el.toast.className = "toast"; }, 3600);
 }
 
+function authGuard() {
+  const owner = state.user;
+  const generation = state.authGeneration;
+  return () => state.authGeneration === generation && state.user === owner;
+}
+
+function voiceOwnerGuard() {
+  const authenticated = authGuard();
+  const session = state.session, question = state.currentQuestion;
+  return () => Boolean(session && question && authenticated() && state.user
+    && state.session === session && state.currentQuestion === question && !state.completed);
+}
+
 async function api(path, options = {}) {
+  const active = authGuard();
   const response = await fetch(path, { credentials: "same-origin", cache: "no-store", ...options });
   let payload = null;
   const contentType = response.headers.get("content-type") || "";
   if (contentType.includes("application/json")) payload = await response.json();
   if (!response.ok) {
-    if (response.status === 401 && !path.endsWith("/auth/login")) showLogin();
+    if (response.status === 401 && !path.endsWith("/auth/login") && active()) showLogin();
     const detail = payload?.detail;
     const error = new Error(Array.isArray(detail) ? detail.map((item) => item.msg).join("; ") : detail || `HTTP ${response.status}`);
     error.status = response.status;
@@ -163,17 +188,21 @@ function jsonOptions(method, body) {
 }
 
 function showLogin() {
+  stopTeacherWorkspaceRefresh();
+  state.authGeneration += 1;
+  state.practiceHistorySequence += 1;
+  state.sessionStartSequence += 1;
+  state.answerSubmissionSequence += 1;
+  state.answerSubmitting = false;
+  state.sessionFinishSequence += 1;
+  state.sessionFinishing = false;
   stopGradingWatch();
   state.speechRun += 1;
   state.speechBusy = false;
   state.savedRecording = null;
   dismissReportDialog();
-  state.micTestController?.abort();
-  if (state.recorder?.state === "recording") {
-    state.recorder.onstop = null;
-    state.recorder.stop();
-  }
-  state.mediaStream?.getTracks().forEach((track) => track.stop());
+  cancelMicrophoneCheck();
+  cancelAnswerCapture();
   state.teacherWorkspaceSequence += 1; state.generatedLoadSequence += 1; state.accountLoadSequence += 1;
   state.teacherReportSequence += 1; state.reviewEvidenceSequence += 1; state.reviewOpenSequence += 1;
   state.reviewDrafts = {}; state.reviewReportCache.clear(); state.reviewHistoryCache.clear(); state.currentTeacherReport = null;
@@ -187,13 +216,24 @@ function showLogin() {
   state.user = null;
   state.session = null;
   state.sessionMicCheck = null;
+  state.recordingRestoreSequence += 1;
+  state.draftLoading = false;
   state.ambientNoiseDbfs = null;
   state.practiceHistory = [];
+  el.practiceHistoryRows.innerHTML = "";
+  el.practiceHistoryCount.textContent = "0 buổi";
+  el.practiceHistoryRows.removeAttribute("aria-busy");
+  el.refreshPracticeHistoryButton.disabled = false;
+  el.refreshPracticeHistoryButton.textContent = "Làm mới";
+  el.startPracticeButton.disabled = false;
+  el.startRealButton.disabled = true;
   state.recorder = null;
   state.mediaStream = null;
   el.appShell.classList.add("hidden");
   el.loginView.classList.remove("hidden");
   el.loginPassword.value = "";
+  el.loginButton.disabled = false;
+  el.loginButton.textContent = "Đăng nhập";
   setPasswordVisibility(false);
   setTimeout(() => el.loginUsername.focus(), 0);
 }
@@ -211,10 +251,11 @@ function setNavigationLocked(locked) {
 function showView(viewId) {
   if (viewId === "teacherReviewsView") viewId = "teacherResultsView";
   state.activeViewId = viewId;
+  if (viewId !== "teacherResultsView") stopTeacherWorkspaceRefresh();
   state.teacherReportSequence += 1;
   if (viewId !== "teacherResultsView") { rememberReviewDraft(); el.reviewAudio.pause?.(); }
   dismissReportDialog();
-  if (viewId !== "interviewView") state.micTestController?.abort();
+  if (viewId !== "interviewView") cancelMicrophoneCheck();
   document.querySelectorAll(".app-view").forEach((view) => view.classList.toggle("active", view.id === viewId));
   el.roleNav.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === viewId));
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -222,6 +263,7 @@ function showView(viewId) {
 
 async function enterApp(user) {
   state.user = user;
+  const active = authGuard();
   el.loginView.classList.add("hidden");
   el.appShell.classList.remove("hidden");
   el.headerUserName.textContent = user.full_name;
@@ -233,6 +275,7 @@ async function enterApp(user) {
 
   try {
     const [health, summary] = await Promise.all([api("/api/health"), api("/api/questions/summary")]);
+    if (!active()) return;
     state.health = health;
     applySummary(summary);
     el.questionModelName.textContent = health.question_generation?.model || "Qwen3:8B";
@@ -242,21 +285,31 @@ async function enterApp(user) {
       await loadExams();
     } else {
       showView("practiceSetupView");
+      const recoverySequence = state.historyReportSequence;
+      const recovering = () => active() && recoverySequence === state.historyReportSequence
+        && state.activeViewId === "practiceSetupView" && !state.session;
       const key = `ai-interview-active:${user.user_id}`;
       let sessionId;
       try { sessionId = localStorage.getItem(key); } catch (_) { /* Storage is optional. */ }
       if (sessionId) {
-        try { beginSession(await api(`/api/interviews/${encodeURIComponent(sessionId)}/resume`)); }
+        try {
+          const resumed = await api(`/api/interviews/${encodeURIComponent(sessionId)}/resume`);
+          if (!recovering()) return;
+          beginSession(resumed);
+        }
         catch (error) {
+          if (!recovering()) return;
           if (error.status === 409) {
             try {
               const grading = await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/grading`);
+              if (!recovering()) return;
               if (grading.state !== "collecting") {
                 // A rejected candidate report identifies an official exam; never expose its score.
                 const report = await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/report`).catch(e => {
                   if (e.status === 403) return null;
                   throw e;
                 });
+                if (!recovering()) return;
                 if (report) {
                   state.session = { session_id: sessionId, interview_mode: "practice" };
                   state.completed = true;
@@ -270,6 +323,7 @@ async function enterApp(user) {
                 }
               }
             } catch (resumeError) {
+              if (!recovering()) return;
               if (resumeError.status === 404) forgetActiveSession(sessionId);
               else toast("Chưa khôi phục được trạng thái bài đã lưu. Hãy tải lại trang.", true);
             }
@@ -278,12 +332,14 @@ async function enterApp(user) {
       }
     }
   } catch (error) {
-    toast(`Không thể tải dữ liệu: ${error.message}`, true);
+    if (active()) toast(`Không thể tải dữ liệu: ${error.message}`, true);
   }
 }
 
 async function login(event) {
   event.preventDefault();
+  const generation = ++state.authGeneration;
+  const active = authGuard();
   el.loginError.textContent = "";
   el.loginButton.disabled = true;
   el.loginButton.textContent = "ĐANG ĐĂNG NHẬP...";
@@ -292,19 +348,26 @@ async function login(event) {
       username: el.loginUsername.value.trim(),
       password: el.loginPassword.value,
     }));
+    if (!active()) return;
     await enterApp(result.user);
   } catch (error) {
-    el.loginError.textContent = error.message;
+    if (generation === state.authGeneration) el.loginError.textContent = error.message;
   } finally {
-    el.loginButton.disabled = false;
-    el.loginButton.textContent = "Đăng nhập";
+    if (generation === state.authGeneration) {
+      el.loginButton.disabled = false;
+      el.loginButton.textContent = "Đăng nhập";
+    }
   }
 }
 
 async function logout() {
+  state.authGeneration += 1;
+  const active = authGuard();
+  dismissReportDialog();
   if (state.savedRecording) await recordingCache("delete", state.savedRecording).catch(() => {});
+  if (!active()) return;
   try { await api("/api/auth/logout", { method: "POST" }); } catch (_) { /* local logout still applies */ }
-  showLogin();
+  if (active()) showLogin();
 }
 
 function setPasswordVisibility(visible) {
@@ -931,8 +994,16 @@ function renderResults() {
   el.teacherResultCount.textContent = `${results.length} / ${state.results.length} bài làm`;
   el.teacherResultRows.innerHTML = results.length ? results.map((r) => {
     const id = escapeHtml(r.session_id), deleting = state.teacherDeleting.has(String(r.session_id));
-    const score = state.teacherResultsStale ? '<span title="Vừa chấm lại; cần làm mới điểm">Chờ cập nhật</span>' : r.average_score == null ? "—" : `<strong>${reportNumber(r.average_score)}/100</strong>`;
-    return `<tr><td><strong>${escapeHtml(r.exam_code)}</strong><small class="cell-subtext">${escapeHtml(r.subject)}</small></td><td><strong>${escapeHtml(r.candidate_name)}</strong><small class="cell-subtext">${escapeHtml(r.student_id || r.email || r.username || "")}</small></td><td>${escapeHtml(r.answered_count)}/${escapeHtml(r.requested_count)} câu<small class="cell-subtext">${r.status === "completed" ? "Hoàn tất" : "Đang làm"}</small></td><td>${score}${r.pending_review_count ? `<button type="button" class="pending-review-link" data-review-result-session="${id}" ${deleting ? "disabled" : ""}>Chấm lại ${escapeHtml(r.pending_review_count)} câu</button>` : ""}</td><td>${escapeHtml(formatDate(r.finished_at || r.created_at))}</td><td><div class="table-actions"><button type="button" class="button secondary compact" data-result-session="${id}" ${deleting ? "disabled" : ""}>Báo cáo</button><button type="button" class="teacher-delete-button" data-delete-result-session="${id}" aria-label="Xóa bài làm của ${escapeHtml(r.candidate_name)}" title="Xóa bài làm" ${deleting ? "disabled" : ""}>×</button></div></td></tr>`;
+    const final = r.score_status === "final" && r.final_score != null && Number.isFinite(Number(r.final_score));
+    const score = state.teacherResultsStale ? '<span title="Vừa chấm lại; cần làm mới điểm">Chờ cập nhật</span>'
+      : final ? `<strong>${reportNumber(r.final_score)}/100</strong>` : '<span>Chưa chốt</span>';
+    const coverage = !state.teacherResultsStale && !final && r.scored_answer_count > 0
+      ? `<small class="cell-subtext">Đã duyệt ${escapeHtml(r.scored_answer_count)}/${escapeHtml(r.answer_count)} câu · phần đã duyệt: ${reportNumber(r.scored_only_average)}/100</small>` : "";
+    const progress = r.status !== "completed" ? "Đang làm"
+      : r.grading_state === "failed" && r.grading_pending_count > 0 ? "Chấm AI bị gián đoạn"
+        : ["queued", "processing"].includes(r.grading_state) && r.grading_pending_count > 0
+          ? `Chấm AI ${r.grading_processed_count}/${r.answer_count} câu` : "Đã nộp bài";
+    return `<tr><td><strong>${escapeHtml(r.exam_code)}</strong><small class="cell-subtext">${escapeHtml(r.subject)}</small></td><td><strong>${escapeHtml(r.candidate_name)}</strong><small class="cell-subtext">${escapeHtml(r.student_id || r.email || r.username || "")}</small></td><td>${escapeHtml(r.answered_count)}/${escapeHtml(r.requested_count)} câu<small class="cell-subtext">${escapeHtml(progress)}</small></td><td>${score}${coverage}${r.pending_review_count ? `<button type="button" class="pending-review-link" data-review-result-session="${id}" ${deleting ? "disabled" : ""}>Chấm lại ${escapeHtml(r.pending_review_count)} câu</button>` : ""}</td><td>${escapeHtml(formatDate(r.finished_at || r.created_at))}</td><td><div class="table-actions"><button type="button" class="button secondary compact" data-result-session="${id}" ${deleting ? "disabled" : ""}>Báo cáo</button><button type="button" class="teacher-delete-button" data-delete-result-session="${id}" aria-label="Xóa bài làm của ${escapeHtml(r.candidate_name)}" title="Xóa bài làm" ${deleting ? "disabled" : ""}>×</button></div></td></tr>`;
   }).join("") : `<tr><td colspan="6" class="empty-state">${state.teacherResultsLoaded ? state.results.length ? "Không có kết quả phù hợp." : "Chưa có sinh viên làm bài." : "Chưa tải được kết quả. Nhấn Làm mới để thử lại."}</td></tr>`;
   renderTeacherSummary();
 }
@@ -948,7 +1019,27 @@ function setTeacherResultPane(pane) {
   if (!reviews) el.reviewAudio.pause?.();
 }
 
+function stopTeacherWorkspaceRefresh() {
+  clearTimeout(state.teacherWorkspaceRefreshTimer);
+  state.teacherWorkspaceRefreshTimer = null;
+}
+
+function scheduleTeacherWorkspaceRefresh() {
+  stopTeacherWorkspaceRefresh();
+  if (state.user?.role !== "teacher" || state.activeViewId !== "teacherResultsView"
+      || !state.results.some(item => item.status === "completed" && item.grading_pending_count > 0
+        && ["queued", "processing"].includes(item.grading_state))) return;
+  const active = authGuard();
+  state.teacherWorkspaceRefreshTimer = setTimeout(() => {
+    state.teacherWorkspaceRefreshTimer = null;
+    if (!active() || state.activeViewId !== "teacherResultsView") return;
+    if (document.hidden || state.reviewSaving) scheduleTeacherWorkspaceRefresh();
+    else void loadTeacherWorkspace();
+  }, 5000);
+}
+
 async function loadTeacherWorkspace() {
+  stopTeacherWorkspaceRefresh();
   const sequence = ++state.teacherWorkspaceSequence;
   rememberReviewDraft();
   el.teacherResultRows.setAttribute("aria-busy", "true"); el.teacherReviewRows.setAttribute("aria-busy", "true");
@@ -969,6 +1060,7 @@ async function loadTeacherWorkspace() {
   if (state.selectedReviewAnswerId && !reviewItem()) state.selectedReviewAnswerId = "";
   renderResults(); renderReviewQueue(); renderReviewDetail();
   el.teacherResultRows.removeAttribute("aria-busy"); el.teacherReviewRows.removeAttribute("aria-busy");
+  scheduleTeacherWorkspaceRefresh();
   return errors.length === 0;
 }
 
@@ -1107,7 +1199,8 @@ function renderReviewDetail() {
   el.reviewAiFeedback.textContent = item.review_ai_feedback || strongEvaluation.feedback || evaluation.review_ai_feedback || "Chưa có nhận xét từ lượt chấm lại";
   el.reviewReferenceAnswer.textContent = answer?.reference_answer || "Chưa tải được đáp án tham khảo";
   el.reviewRawTranscript.textContent = answer?.voice?.raw_transcript || "Chưa có bản STT gốc";
-  el.reviewRubric.innerHTML = pointAssessmentHtml(strongEvaluation.point_assessments || []);
+  el.reviewRubric.innerHTML = pointAssessmentHtml(strongEvaluation.point_assessments || [], null,
+    item.review_transcript || answer?.voice?.review_transcript || "");
   el.reviewEvidenceStatus.textContent = report ? "" : "Đang tải chi tiết…";
   el.reviewManualLabel.classList.toggle("hidden", !state.manualReviewItem || String(state.manualReviewItem.answer_id) !== String(item.answer_id));
   el.reviewScore.value = draft ? draft.score : finalScore != null ? String(finalScore)
@@ -1310,13 +1403,15 @@ function renderPracticeHistory() {
   el.practiceHistoryRows.innerHTML = state.practiceHistory.length
     ? state.practiceHistory.map((session) => {
       const completed = session.status === "completed";
-      const score = session.average_score == null ? "—" : `${Math.round(session.average_score)}/100`;
+      const final = completed && session.score_status === "final" && session.final_score != null;
+      const score = final ? `${reportNumber(session.final_score / 10)}/10` : "Chưa có điểm cuối";
+      const coverage = `Đã xác minh ${session.scored_answer_count ?? 0}/${session.stored_answer_count ?? session.answered_count} câu`;
       return `<tr>
         <td><strong>${formatDate(session.finished_at || session.created_at)}</strong></td>
         <td><span class="history-subject"><strong>${escapeHtml(session.subject || "Tất cả lĩnh vực")}</strong><small>${languageName(session.language)}</small></span></td>
         <td>${session.answered_count}/${session.requested_count} câu</td>
-        <td><strong>${score}</strong></td>
-        <td><span class="status-badge ${completed ? "" : "waiting"}">${completed ? "Hoàn tất" : "Chưa hoàn tất"}</span></td>
+        <td><span class="history-score"><strong>${score}</strong><small>${coverage}</small></span></td>
+        <td><span class="status-badge ${final ? "" : "waiting"}">${final ? "Đã chấm xong" : completed ? "Đã kết thúc · Chưa đủ điểm" : "Chưa kết thúc"}</span></td>
         <td><div class="table-actions"><button class="button secondary compact" data-practice-session="${escapeHtml(session.session_id)}" ${session.can_view_report ? "" : "disabled"}>${session.can_view_report ? "Xem báo cáo" : "Chưa có kết quả"}</button><button class="button secondary danger compact" data-delete-practice-session="${escapeHtml(session.session_id)}">Xóa</button></div></td>
       </tr>`;
     }).join("")
@@ -1324,28 +1419,41 @@ function renderPracticeHistory() {
 }
 
 async function loadPracticeHistory() {
+  const authenticated = authGuard();
+  const sequence = ++state.practiceHistorySequence;
+  const active = () => authenticated() && sequence === state.practiceHistorySequence;
   el.practiceHistoryRows.setAttribute("aria-busy", "true");
   try {
     const result = await api("/api/candidate/practice-history");
+    if (!active()) return false;
     state.practiceHistory = result.sessions;
     renderPracticeHistory();
+    return true;
   } finally {
-    el.practiceHistoryRows.removeAttribute("aria-busy");
+    if (active()) {
+      el.practiceHistoryRows.removeAttribute("aria-busy");
+      el.refreshPracticeHistoryButton.disabled = false;
+      el.refreshPracticeHistoryButton.textContent = "Làm mới";
+    }
   }
 }
 
 async function refreshPracticeHistory() {
-  const originalLabel = el.refreshPracticeHistoryButton.textContent;
+  const authenticated = authGuard();
+  const sequence = state.practiceHistorySequence + 1;
+  const active = () => authenticated() && sequence === state.practiceHistorySequence;
   el.refreshPracticeHistoryButton.disabled = true;
   el.refreshPracticeHistoryButton.textContent = "Đang tải...";
   try {
     await loadPracticeHistory();
-    toast("Đã làm mới lịch sử luyện tập.");
+    if (active()) toast("Đã làm mới lịch sử luyện tập.");
   } catch (error) {
-    toast(`Không thể làm mới: ${error.message}`, true);
+    if (active()) toast(`Không thể làm mới: ${error.message}`, true);
   } finally {
-    el.refreshPracticeHistoryButton.disabled = false;
-    el.refreshPracticeHistoryButton.textContent = originalLabel;
+    if (active()) {
+      el.refreshPracticeHistoryButton.disabled = false;
+      el.refreshPracticeHistoryButton.textContent = "Làm mới";
+    }
   }
 }
 
@@ -1361,14 +1469,21 @@ async function deleteCandidatePracticeHistory(sessionId) {
 }
 
 async function showPracticeHistoryReport(sessionId) {
+  if (!state.user || state.user.role !== "candidate" || state.activeViewId !== "practiceHistoryView") return;
+  dismissReportDialog();
+  const sequence = state.historyReportSequence;
+  const userId = state.user.user_id;
+  const active = () => sequence === state.historyReportSequence && state.user?.user_id === userId
+    && state.user?.role === "candidate" && state.activeViewId === "practiceHistoryView";
   try {
-    const report = await api(`/api/interviews/${sessionId}/report`);
+    const report = await api(`/api/interviews/${encodeURIComponent(sessionId)}/report`);
+    if (!active()) return;
     state.reportOrigin = "history";
     renderReport(report);
     openReportDialog();
     void watchSessionGrading(sessionId, "history");
   } catch (error) {
-    toast(error.message, true);
+    if (active()) toast(error.message, true);
   }
 }
 
@@ -1390,6 +1505,11 @@ async function showTeacherResult(sessionId) {
 
 async function startPractice(event) {
   event.preventDefault();
+  const authenticated = authGuard();
+  const sequence = ++state.sessionStartSequence;
+  state.practiceStartSequence = sequence;
+  const previousSession = state.session;
+  const owned = () => authenticated() && sequence === state.practiceStartSequence;
   el.startPracticeButton.disabled = true;
   try {
     const difficulty = document.querySelector('input[name="practiceDifficulty"]:checked').value;
@@ -1399,11 +1519,12 @@ async function startPractice(event) {
       question_count: Number(el.practiceQuestionCount.value),
       starting_difficulty: difficulty,
     }));
+    if (!owned() || sequence !== state.sessionStartSequence || state.session !== previousSession) return;
     beginSession(result);
   } catch (error) {
-    toast(error.message, true);
+    if (owned() && sequence === state.sessionStartSequence) toast(error.message, true);
   } finally {
-    el.startPracticeButton.disabled = false;
+    if (owned()) el.startPracticeButton.disabled = false;
   }
 }
 
@@ -1439,15 +1560,22 @@ async function checkExam(event) {
 
 async function startReal() {
   if (!state.candidateExam) return;
+  const authenticated = authGuard();
+  const sequence = ++state.sessionStartSequence;
+  state.realStartSequence = sequence;
+  const previousSession = state.session;
+  const exam = state.candidateExam;
+  const owned = () => authenticated() && sequence === state.realStartSequence;
   el.startRealButton.disabled = true;
   try {
-    const result = await api(`/api/candidate/exams/${encodeURIComponent(state.candidateExam.exam_code)}/start`, { method: "POST" });
+    const result = await api(`/api/candidate/exams/${encodeURIComponent(exam.exam_code)}/start`, { method: "POST" });
+    if (!owned() || sequence !== state.sessionStartSequence || state.session !== previousSession || state.candidateExam !== exam) return;
     beginSession(result);
     if (result.resumed) toast("Đã mở lại phiên Interview đang làm.");
   } catch (error) {
-    toast(error.message, true);
+    if (owned() && sequence === state.sessionStartSequence) toast(error.message, true);
   } finally {
-    el.startRealButton.disabled = false;
+    if (owned()) el.startRealButton.disabled = false;
   }
 }
 
@@ -1460,7 +1588,7 @@ function sttAvailable() {
 }
 
 function canRecordAnswer() {
-  return !state.completed && !state.draftLoading && !state.sessionFinishing && sttAvailable() && state.session?.recording_allowed !== false && Boolean(state.sessionMicCheck?.ready);
+  return !state.completed && !state.recordingRequest?.opening && !state.draftLoading && !state.sessionFinishing && sttAvailable() && state.session?.recording_allowed !== false && Boolean(state.sessionMicCheck?.ready);
 }
 
 function deferredSession() {
@@ -1581,6 +1709,15 @@ async function pinTestMicrophone(stream, signal) {
 }
 
 function beginSession(session) {
+  cancelMicrophoneCheck();
+  cancelAnswerCapture();
+  state.answerSubmissionSequence += 1;
+  state.answerSubmitting = false;
+  state.sessionFinishSequence += 1;
+  state.sessionFinishing = false;
+  el.finishPracticeButton.disabled = false;
+  el.microphoneSelect.disabled = false;
+  el.checkMicrophoneButton.disabled = false;
   stopGradingWatch();
   state.session = session;
   try { localStorage.setItem(`ai-interview-active:${state.user.user_id}`, session.session_id); } catch (_) { /* Storage is optional. */ }
@@ -1603,6 +1740,8 @@ function beginSession(session) {
 }
 
 function renderQuestion() {
+  cancelMicrophoneCheck();
+  cancelAnswerCapture();
   state.speechRun += 1;
   state.speechBusy = false;
   state.savedRecording = null;
@@ -1624,6 +1763,7 @@ function renderQuestion() {
   el.answerCard.classList.remove("hidden");
   el.evaluationCard.classList.add("hidden");
   el.answerText.value = "";
+  renderTranscriptWarnings(null);
   setVoiceStage("idle");
   state.currentTranscriptionId = null;
   state.currentPreviewSha256 = null;
@@ -1710,19 +1850,25 @@ function assessmentGroups(evaluation) {
   );
 }
 
-function pointAssessmentHtml(assessments) {
+function pointAssessmentHtml(assessments, breakdown = null, transcript = null) {
   if (!Array.isArray(assessments) || !assessments.length) return "";
+  const criteria = new Map((Array.isArray(breakdown?.criteria) ? breakdown.criteria : []).map(item => [item.point, item]));
   return assessments.map((item) => {
-    const status = item.needs_review ? ASSESSMENT_STATUS.unresolved : ASSESSMENT_STATUS[item.status] || ASSESSMENT_STATUS.unresolved;
-    const evidence = item.evidence_quote
+    const criterion = criteria.get(item.point);
+    const unresolved = item.needs_review || criterion?.needs_verification;
+    const status = unresolved ? ASSESSMENT_STATUS.unresolved : ASSESSMENT_STATUS[criterion?.status || item.status] || ASSESSMENT_STATUS.unresolved;
+    const points = criterion ? `<span class="criterion-score">${!unresolved && Number.isFinite(criterion.earned_points) ? reportNumber(criterion.earned_points) : "Chưa xác minh"} / ${reportNumber(criterion.max_points)} điểm</span>` : "";
+    const quoteIsLiteral = typeof transcript === "string" && typeof item.evidence_quote === "string"
+      && item.evidence_quote.trim() && transcript.includes(item.evidence_quote);
+    const evidence = quoteIsLiteral
       ? `<q>${escapeHtml(item.evidence_quote)}</q>`
       : "<span class=\"no-evidence\">Chưa có đoạn trích bằng chứng được xác minh cho tiêu chí này.</span>";
-    return `<div class="assessment-row"><span class="assessment-status ${status.className}">${status.label}</span><div><strong>${escapeHtml(item.point)}</strong><p>${escapeHtml(item.reason || "Chưa có giải thích.")}</p>${evidence}</div></div>`;
+    return `<div class="assessment-row"><span class="assessment-status ${status.className}">${status.label}</span><div><strong>${escapeHtml(item.point)}</strong>${points}<p>${escapeHtml(item.reason || "Chưa có giải thích.")}</p>${evidence}</div></div>`;
   }).join("");
 }
 
 function renderPointAssessments(assessments) {
-  el.pointAssessmentList.innerHTML = pointAssessmentHtml(assessments);
+  el.pointAssessmentList.innerHTML = pointAssessmentHtml(assessments, null, el.answerText.value);
   el.pointAssessmentList.classList.toggle("hidden", !assessments?.length);
 }
 
@@ -1753,7 +1899,7 @@ function renderEvaluation(evaluation, completed) {
 }
 
 async function submitCurrentAnswer() {
-  if (state.speechBusy || state.answerSubmitting || state.draftLoading || state.sessionFinishing || state.recorder) return;
+  if (state.recordingRequest?.opening || state.speechBusy || state.answerSubmitting || state.draftLoading || state.sessionFinishing || state.recorder) return;
   const answer = el.answerText.value.trim();
   if (!answer || !state.currentTranscriptionId) {
     toast("Vui lòng ghi âm câu trả lời trước khi gửi.", true);
@@ -1764,6 +1910,15 @@ async function submitCurrentAnswer() {
     toast("Chưa lấy được bản chuyển giọng nói hiện tại. Hãy tải lại bản ghi.", true);
     return;
   }
+  const authenticated = authGuard();
+  const sequence = ++state.answerSubmissionSequence;
+  const session = state.session;
+  const question = state.currentQuestion;
+  const transcriptionId = state.currentTranscriptionId;
+  const previewSha256 = state.currentPreviewSha256;
+  const savedRecording = state.savedRecording;
+  const owned = () => authenticated() && sequence === state.answerSubmissionSequence;
+  const active = () => owned() && state.session === session && state.currentQuestion === question && state.currentTranscriptionId === transcriptionId;
   el.submitAnswerButton.disabled = true;
   state.answerSubmitting = true;
   el.recordButton.disabled = true;
@@ -1772,12 +1927,12 @@ async function submitCurrentAnswer() {
   el.finishPracticeButton.disabled = true;
   el.microphoneSelect.disabled = true;
   el.checkMicrophoneButton.disabled = true;
-  const sessionId = state.session.session_id, transcriptionId = state.currentTranscriptionId;
+  const sessionId = session.session_id;
   const gradingStarted = performance.now();
   let gradingStage = "Đang đối chiếu câu trả lời theo rubric";
   let checkingRuntime = false;
   const gradingTimer = deferred ? null : setInterval(async () => {
-    if (!state.answerSubmitting || state.session?.session_id !== sessionId) return;
+    if (!active() || !state.answerSubmitting) return;
     el.recordingStatus.textContent = `${gradingStage} · ${Math.floor((performance.now() - gradingStarted) / 1000)} giây`;
     if (checkingRuntime) return;
     checkingRuntime = true;
@@ -1790,11 +1945,12 @@ async function submitCurrentAnswer() {
   try {
     const result = deferred
       ? await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/transcriptions/${encodeURIComponent(transcriptionId)}/confirm`,
-        jsonOptions("POST", { preview_sha256: state.currentPreviewSha256 }))
+        jsonOptions("POST", { preview_sha256: previewSha256 }))
       : await api(`/api/interviews/${encodeURIComponent(sessionId)}/answer`, jsonOptions("POST", { answer, transcription_id: transcriptionId }));
-    if (state.session?.session_id !== sessionId) return;
-    if (state.savedRecording) await recordingCache("delete", state.savedRecording).catch(() => {});
-    state.savedRecording = null;
+    if (!active()) return;
+    if (savedRecording) await recordingCache("delete", savedRecording).catch(() => {});
+    if (!active()) return;
+    if (state.savedRecording === savedRecording) state.savedRecording = null;
     state.session.answered_count = result.answered_count;
     state.pendingResult = result;
     el.progressBar.style.width = `${Math.round((result.answered_count / result.requested_count) * 100)}%`;
@@ -1821,6 +1977,7 @@ async function submitCurrentAnswer() {
       renderQuestion();
     }
   } catch (error) {
+    if (!active()) return;
     toast(error.name === "AbortError" || error instanceof TypeError
       ? "Kết nối bị gián đoạn. Bản ghi vẫn được giữ; bạn có thể xác nhận lại."
       : error.message, true);
@@ -1830,12 +1987,14 @@ async function submitCurrentAnswer() {
     }
   } finally {
     clearInterval(gradingTimer);
-    state.answerSubmitting = false;
-    el.recordButton.disabled = !canRecordAnswer();
-    el.finishPracticeButton.disabled = false;
-    el.microphoneSelect.disabled = false;
-    el.checkMicrophoneButton.disabled = false;
-    if (state.currentTranscriptionId === transcriptionId) el.submitAnswerButton.textContent = originalLabel;
+    if (owned()) {
+      state.answerSubmitting = false;
+      el.recordButton.disabled = !canRecordAnswer();
+      el.finishPracticeButton.disabled = false;
+      el.microphoneSelect.disabled = false;
+      el.checkMicrophoneButton.disabled = false;
+      if (state.currentTranscriptionId === transcriptionId) el.submitAnswerButton.textContent = originalLabel;
+    }
   }
 }
 
@@ -1873,8 +2032,13 @@ async function nextPracticeQuestion() {
 }
 
 async function finishPractice() {
-  if (!state.session || state.speechBusy || state.answerSubmitting || state.sessionFinishing || state.recorder) return;
+  if (!state.session || state.recordingRequest?.opening || state.speechBusy || state.answerSubmitting || state.sessionFinishing || state.recorder) return;
   if (!window.confirm("Kết thúc buổi luyện tập và chấm các câu đã xác nhận? Bản ghi chưa xác nhận của câu hiện tại sẽ không được chấm.")) return;
+  const authenticated = authGuard();
+  const sequence = ++state.sessionFinishSequence;
+  const session = state.session;
+  const owned = () => authenticated() && sequence === state.sessionFinishSequence;
+  const active = () => owned() && state.session === session;
   const sessionId = state.session.session_id;
   state.sessionFinishing = true;
   el.finishPracticeButton.disabled = true;
@@ -1882,18 +2046,23 @@ async function finishPractice() {
   el.submitAnswerButton.disabled = true;
   try {
     await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/finish`, { method: "POST" });
+    if (!active()) return;
     await loadPracticeReport();
   } catch (error) {
-    toast(error.message, true);
+    if (active()) toast(error.message, true);
   } finally {
-    state.sessionFinishing = false;
-    el.finishPracticeButton.disabled = false;
-    el.recordButton.disabled = !canRecordAnswer();
-    el.submitAnswerButton.disabled = state.completed || !state.currentTranscriptionId;
+    if (owned()) {
+      state.sessionFinishing = false;
+      el.finishPracticeButton.disabled = false;
+      el.recordButton.disabled = !canRecordAnswer();
+      el.submitAnswerButton.disabled = state.completed || !state.currentTranscriptionId;
+    }
   }
 }
 
 function completeRealInterview() {
+  cancelMicrophoneCheck();
+  cancelAnswerCapture();
   const sessionId = state.session?.session_id;
   state.completed = true;
   state.session = null;
@@ -1908,7 +2077,13 @@ function completeRealInterview() {
 
 async function loadPracticeReport() {
   const sessionId = state.session?.session_id;
-  if (!sessionId) return;
+  const owner = state.user;
+  if (!sessionId || owner?.role !== "candidate") return;
+  cancelMicrophoneCheck();
+  cancelAnswerCapture();
+  const sequence = ++state.historyReportSequence;
+  const active = () => sequence === state.historyReportSequence && state.user === owner
+    && state.session?.session_id === sessionId && el.reportDialog.open && state.reportOrigin === "practice";
   state.completed = true;
   state.currentQuestion = null;
   state.speechRun += 1;
@@ -1922,11 +2097,13 @@ async function loadPracticeReport() {
   openReportDialog();
   try {
     const report = await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/report`);
+    if (!active()) return;
     renderReport(report);
   } catch (error) {
+    if (!active()) return;
     toast(error.message, true);
   }
-  void watchSessionGrading(sessionId, "practice");
+  if (active()) void watchSessionGrading(sessionId, "practice");
 }
 
 function stopGradingWatch() {
@@ -1947,12 +2124,13 @@ function renderGradingStatus(grading, origin) {
     return;
   }
   el.reportGradingPanel.classList.toggle("hidden", ready);
-  el.reportContent.classList.toggle("hidden", !ready);
+  el.reportContent.classList.toggle("hidden", !ready && grading.report_available !== true);
   el.reportGradingTitle.textContent = failed ? "Chưa hoàn tất chấm bài" : "Đang tổng hợp kết quả";
   el.reportGradingStatus.textContent = message;
   el.reportGradingProgress.max = Math.max(1, count);
   el.reportGradingProgress.value = processed;
-  el.retrySessionGradingButton.classList.toggle("hidden", !failed || Number(grading.attempts) >= 3);
+  const canRetry = grading.can_retry ?? (failed && Number(grading.attempts) < 3);
+  el.retrySessionGradingButton.classList.toggle("hidden", !failed || !canRetry);
   el.refreshSessionGradingButton.classList.toggle("hidden", !failed);
 }
 
@@ -1962,23 +2140,26 @@ async function watchSessionGrading(sessionId, origin) {
   const active = () => sequence === state.gradingWatchSequence && state.user
     && (origin === "real" ? state.activeViewId === "realCompleteView" : el.reportDialog.open && state.reportOrigin === origin);
   let failures = 0;
+  let reportRevision = null;
   while (active()) {
     try {
       const grading = await speechApi(`/api/interviews/${encodeURIComponent(sessionId)}/grading`);
       if (!active()) return;
       if (!grading.report_ready || origin === "real") renderGradingStatus(grading, origin);
       failures = 0;
-      if (grading.report_ready) {
-        if (origin !== "real") {
-          const report = await speechApi(origin === "teacher"
-            ? `/api/teacher/results/${encodeURIComponent(sessionId)}` : `/api/interviews/${encodeURIComponent(sessionId)}/report`);
-          if (!active()) return;
-          renderReport(report);
-          if (origin === "teacher") {
-            state.currentTeacherReport = report;
-            state.reviewReportCache.set(sessionId, report);
-          }
+      const revision = JSON.stringify([grading.state, grading.processed_count, grading.pending_count, grading.attempts]);
+      if (origin !== "real" && (grading.report_ready || grading.report_available) && revision !== reportRevision) {
+        const report = await speechApi(origin === "teacher"
+          ? `/api/teacher/results/${encodeURIComponent(sessionId)}` : `/api/interviews/${encodeURIComponent(sessionId)}/report`);
+        if (!active()) return;
+        renderReport(report);
+        if (origin === "teacher") {
+          state.currentTeacherReport = report;
+          state.reviewReportCache.set(sessionId, report);
         }
+        reportRevision = revision;
+      }
+      if (grading.report_ready) {
         forgetActiveSession(sessionId);
         return;
       }
@@ -2019,7 +2200,45 @@ function reportNumber(value) {
   return Number.isFinite(number) ? number.toLocaleString("vi-VN", { maximumFractionDigits: 2 }) : "—";
 }
 
+function practiceScoreIsFinal(grade) {
+  return grade?.status === "final" && Number.isFinite(grade.score) && grade.score >= 0 && grade.score <= 10;
+}
+
+function practiceGradeStatus(grade) {
+  if (practiceScoreIsFinal(grade)) return "Đã chốt";
+  return { pending: "Đang chấm", insufficient_evidence: "Chưa đủ bằng chứng",
+    invalid_rubric: "Rubric cần kiểm tra", score_mismatch: "Điểm cần đối chiếu" }[grade?.status] || "Chưa chốt";
+}
+
+function renderPracticeGrading(grading) {
+  el.practiceGradingSection.classList.toggle("hidden", !grading);
+  el.reportLegacyCompetencies.classList.toggle("hidden", Boolean(grading));
+  el.practiceSessionGrade.textContent = grading
+    ? `Trạng thái toàn phiên: ${practiceGradeStatus(grading.session)}` : "";
+  const rows = (groups, competency) => (Array.isArray(groups) ? groups : []).map(group => {
+    const score = practiceScoreIsFinal(group) ? `${reportNumber(group.score)}/10` : "Chưa chốt";
+    const label = competency ? `${group.subject} · ${group.competency}` : group.subject;
+    return `<tr><th scope="row">${escapeHtml(label)}</th><td>${score}</td><td>${reportNumber(group.scored_question_count)}/${reportNumber(group.question_count)} câu</td><td>${practiceGradeStatus(group)}</td></tr>`;
+  }).join("") || '<tr><td colspan="4">Chưa có câu trả lời để tổng hợp.</td></tr>';
+  el.practiceSubjectRows.innerHTML = grading ? rows(grading.subjects, false) : "";
+  el.practiceCompetencyRows.innerHTML = grading ? rows(grading.competencies, true) : "";
+}
+
+function practiceQuestionGradeHtml(grade) {
+  if (!grade) return "";
+  const score = practiceScoreIsFinal(grade) ? `${reportNumber(grade.score)}/10` : "Chưa chốt";
+  const criteria = Array.isArray(grade.criteria) ? grade.criteria : [];
+  const coverage = criteria.length ? ` · ${reportNumber(grade.resolved_criterion_count)}/${criteria.length} tiêu chí đã xác minh` : "";
+  const interval = grade.possible_score_interval;
+  const bounds = !practiceScoreIsFinal(grade) && criteria.length && Array.isArray(interval)
+    && interval.length === 2 && interval.every(value => Number.isFinite(value) && value >= 0 && value <= 10)
+    && interval[0] <= interval[1]
+    ? `<p>Điểm đã xác minh: ${Number(grade.resolved_criterion_count) > 0 ? `${reportNumber(grade.confirmed_points)}/10` : "—"} · Khoảng điểm còn có thể đạt: ${reportNumber(interval[0])}–${reportNumber(interval[1])}/10</p>` : "";
+  return `<div class="practice-question-grade"><strong>Điểm câu: ${score}</strong><span>${practiceGradeStatus(grade)}${coverage}</span>${bounds}</div>`;
+}
+
 function dismissReportDialog() {
+  state.historyReportSequence += 1;
   stopGradingWatch();
   if (!el.reportDialog) return;
   if (el.reportDialog.open) el.reportDialog.close();
@@ -2028,7 +2247,7 @@ function dismissReportDialog() {
 }
 
 function openReportDialog() {
-  state.micTestController?.abort();
+  cancelMicrophoneCheck();
   el.reportDialogBody.scrollTop = 0;
   document.body.classList.add("report-modal-open");
   if (!el.reportDialog.open) el.reportDialog.showModal();
@@ -2039,29 +2258,62 @@ function renderReport(report) {
   const session = report.session || {};
   const summary = report.summary || {};
   const answers = Array.isArray(report.answers) ? report.answers : [];
+  const practice = session.interview_mode === "practice";
+  state.practiceReportSessionId = practice ? session.session_id : null;
   const average = Number(summary.average_score || 0);
-  const scoredAnswerCount = Number(summary.scored_answer_count ?? answers.length);
-  const total = answers.reduce((sum, item) => {
+  const finalScores = answers.flatMap((item) => {
     const evaluation = item.evaluation || {};
-    if (evaluation.score_provisional && evaluation.final_score == null) return sum;
-    const score = Number(session.interview_mode === "real" ? evaluation.final_score : evaluation.final_score ?? evaluation.score);
-    return sum + (Number.isFinite(score) ? score : 0);
-  }, 0);
+    if (evaluation.score_provisional && evaluation.final_score == null) return [];
+    const value = session.interview_mode === "real" ? evaluation.final_score : evaluation.final_score ?? evaluation.score;
+    const score = value == null ? NaN : Number(value);
+    return Number.isFinite(score) && score >= 0 && score <= 100 ? [score] : [];
+  });
+  const scoredAnswerCount = finalScores.length;
+  const total = finalScores.reduce((sum, score) => sum + score, 0);
+  const practiceGrade = summary.practice_grading?.session;
+  renderPracticeGrading(session.interview_mode === "practice" ? summary.practice_grading : null);
+  const allVerified = session.status === "completed" && answers.length > 0
+    && scoredAnswerCount === answers.length && answers.length === Number(session.answered_count ?? answers.length);
+  const wholeReady = allVerified && (!practiceGrade
+    || practiceGrade.status === "final" && practiceGrade.score != null && Number.isFinite(Number(practiceGrade.score)));
+  const wholeAverage = practiceGrade ? Number(practiceGrade.score) / Number(practiceGrade.scale || 10) * 100 : average;
+  el.reportStatGrid.classList.toggle("practice-report-stats", practice);
+  el.reportTotalCard.classList.toggle("hidden", practice);
+  el.reportPercentageCard.classList.toggle("hidden", practice);
+  el.reportScoreScale.textContent = practice ? "/10" : "/100";
+  el.reportScoreLabel.textContent = practice ? "Điểm phiên luyện tập" : "Trung bình toàn bài";
   const completed = session.answered_count ?? answers.length;
   const requested = session.requested_count ?? answers.length;
   el.reportTitle.textContent = session.subject || session.title || "Kết quả phỏng vấn kiến thức";
   el.reportCandidate.textContent = session.candidate_name || "Sinh viên";
   el.reportMeta.textContent = `${languageName(session.language || "vi")} · ${completed}/${requested} câu`;
   el.reportTotalScore.textContent = scoredAnswerCount ? `${reportNumber(total)}/${scoredAnswerCount * 100}` : "—";
-  el.reportPercentage.textContent = scoredAnswerCount ? `${reportNumber(average)}%` : "—";
-  el.reportScore.textContent = scoredAnswerCount ? reportNumber(average) : "—";
-  el.reportVerdict.textContent = scoredAnswerCount ? summary.overall_verdict || "Đã chấm"
-    : session.interview_mode === "practice" ? "Chưa có điểm đã xác minh" : "Chờ giảng viên xác nhận";
+  el.reportCoverage.textContent = `Đã xác minh ${scoredAnswerCount}/${answers.length} câu. ${wholeReady ? "Đã có điểm cuối cho toàn bài." : "Chưa có điểm cuối cho toàn bài."}`;
+  el.reportPercentage.textContent = wholeReady ? `${reportNumber(wholeAverage)}%` : "—";
+  el.reportScore.textContent = wholeReady ? reportNumber(practice ? wholeAverage / 10 : wholeAverage) : "—";
+  el.reportVerdict.textContent = wholeReady ? summary.overall_verdict || "Đã chấm"
+    : session.interview_mode === "practice" ? "Chưa đủ điểm toàn bài" : "Chờ giảng viên xác nhận";
   el.reportSummaryText.textContent = answers.length
-    ? `Báo cáo tổng hợp ${answers.length} câu đã trả lời. Xem các điểm mạnh, nội dung cần cải thiện và nhận xét từng câu bên dưới.`
+    ? wholeReady ? `Báo cáo tổng hợp ${answers.length} câu đã trả lời.`
+      : `${!practice && scoredAnswerCount ? `Điểm trên phần đã chấm: ${reportNumber(total)}/${scoredAnswerCount * 100}. ` : ""}Còn ${answers.length - scoredAnswerCount} câu chưa có điểm đã xác minh.`
     : "Phiên kết thúc trước khi có câu trả lời để chấm điểm.";
-  fillList(el.strengthList, summary.strengths, "Chưa đủ dữ liệu");
-  fillList(el.gapList, summary.gaps, "Chưa đủ dữ liệu");
+  const learning = practice ? summary.learning_feedback : null;
+  const learningLabels = items => items.map(item => `${item.message} (câu ${item.answers.map(ref => ref.sequence_number).join(", ")})`);
+  fillList(el.strengthList, learning ? learningLabels(learning.strengths) : summary.strengths, "Chưa đủ dữ liệu");
+  fillList(el.gapList, learning ? learningLabels(learning.priorities) : summary.gaps, "Chưa xác định được nội dung cần bổ sung");
+  el.practiceNextStepsSection.classList.toggle("hidden", !practice);
+  const steps = learning?.next_steps || [];
+  const stepHtml = step => `<div class="practice-next-step">
+    <p><strong>Câu ${escapeHtml(step.sequence_number)}:</strong> ${escapeHtml(step.message)}</p>
+    ${step.focus_points?.length ? `<ul>${step.focus_points.map(point => `<li>${escapeHtml(point)}</li>`).join("")}</ul>` : ""}
+    ${step.action === "practice_again" && session.status === "completed" && state.user?.role === "candidate" ? `<button type="button" class="button secondary compact" data-practice-again="${escapeHtml(step.answer_id)}">${step.category === "audio" ? "Ghi âm trong lượt mới" : "Luyện lại câu này"}</button>` : ""}
+    </div>`;
+  const gradingIncomplete = Number(report.grading?.pending_count) > 0
+    || answers.some(item => item.evaluation?.grading_pending === true);
+  el.practiceNextSteps.innerHTML = practice ? steps.slice(0, 5).map(stepHtml).join("")
+    + (steps.length > 5 ? `<details class="practice-next-more"><summary>${steps.length - 5} đề xuất khác</summary>${steps.slice(5).map(stepHtml).join("")}</details>` : "")
+    || (gradingIncomplete ? "<p>Bộ chấm chưa hoàn tất. Ghi âm và câu trả lời đã được lưu; chưa có đủ kết quả để đề xuất luyện lại.</p>"
+      : "<p>Chưa có đề xuất luyện lại cho phiên này.</p>") : "";
   const competencies = Array.isArray(summary.competencies) ? summary.competencies : [];
   el.competencyRows.innerHTML = competencies.length
     ? competencies.map((item) => `<div class="competency-row"><strong>${escapeHtml(item.name)}</strong><div class="competency-bar"><i style="width:${Math.max(0, Math.min(100, Number(item.average_score) || 0))}%"></i></div><span>${reportNumber(item.average_score)}/100 · ${escapeHtml(item.question_count)} câu</span></div>`).join("")
@@ -2072,32 +2324,69 @@ function renderReport(report) {
       const proposedScore = (evaluation.strong_review_ready ? evaluation.review_ai_score : null) ?? evaluation.ai_score ?? evaluation.score ?? 0;
       const hasFinalScore = evaluation.final_score != null;
       const score = hasFinalScore ? evaluation.final_score : proposedScore;
-      const review = evaluation.review_required
-        ? '<div class="review-notice">Cần giáo viên xem lại kết quả và bằng chứng của câu này.</div>' : "";
-      const assessments = pointAssessmentHtml(evaluation.point_assessments);
+      const needsReviewNotice = session.interview_mode === "practice"
+        ? evaluation.score_provisional && !hasFinalScore : evaluation.review_required;
+      const review = needsReviewNotice
+        ? `<div class="review-notice">${session.interview_mode === "practice" ? "AI chưa đủ bằng chứng để chốt điểm câu này." : "Cần giáo viên xem lại kết quả và bằng chứng của câu này."}</div>` : "";
+      const breakdown = session.interview_mode === "practice" ? evaluation.score_breakdown : null;
+      const gradedTranscript = typeof evaluation.graded_transcript === "string" ? evaluation.graded_transcript : item.answer || "";
+      const assessments = pointAssessmentHtml(evaluation.point_assessments, breakdown, gradedTranscript);
       const voice = state.reportOrigin === "teacher" && item.voice?.audio_available
         ? `<div class="report-voice"><h4>Voice gốc</h4><audio controls preload="none" src="/api/teacher/transcriptions/${encodeURIComponent(item.voice.transcription_id)}/audio">Trình duyệt không phát được voice.</audio><div class="transcript-compare"><div><span>STT gốc</span><p>${escapeHtml(item.voice.raw_transcript || "—")}</p></div><div><span>Bản xác minh</span><p>${escapeHtml(item.voice.verified_transcript || item.answer)}</p></div></div></div>` : "";
-      const scoreAudit = `<div class="score-audit"><div><span>Điểm AI đề xuất</span><strong>${evaluation.score_provisional ? "Chờ xác minh" : reportNumber(proposedScore)}</strong></div><div><span>Điểm cuối</span><strong>${hasFinalScore ? reportNumber(evaluation.final_score) : "Chờ duyệt"}</strong></div>${evaluation.teacher_score == null ? "" : `<div><span>Giảng viên</span><strong>${reportNumber(evaluation.teacher_score)}</strong></div>`}</div>`;
+      const scoreAudit = `<div class="score-audit"><div><span>Điểm AI đề xuất</span><strong>${evaluation.score_provisional ? "Chờ xác minh" : reportNumber(proposedScore)}</strong></div><div><span>Điểm cuối</span><strong>${hasFinalScore ? reportNumber(evaluation.final_score) : session.interview_mode === "practice" ? "Chưa chốt" : "Chờ duyệt"}</strong></div>${evaluation.teacher_score == null ? "" : `<div><span>Giảng viên</span><strong>${reportNumber(evaluation.teacher_score)}</strong></div>`}</div>`;
       const teacherFeedback = evaluation.teacher_feedback
         ? `<div class="teacher-feedback"><strong>Nhận xét của giảng viên</strong><p>${escapeHtml(evaluation.teacher_feedback)}</p></div>` : "";
+      const feedback = practice ? evaluation.learning_feedback : null;
+      const evidence = feedback ? [...new Set(feedback.items.flatMap(criterion => criterion.evidence_quotes || []))]
+        .filter(quote => typeof quote === "string" && quote.trim() && gradedTranscript.includes(quote)) : [];
+      const studentScore = breakdown ? practiceScoreIsFinal(breakdown) ? `Điểm câu: ${reportNumber(breakdown.score)}/10` : "Chờ xác minh, chưa có điểm cuối" : "Chưa có điểm câu";
       return `<article class="report-answer-card">
         <h3>Câu ${escapeHtml(item.sequence_number)}: ${escapeHtml(item.question?.question || "")}</h3>
-        <p class="report-answer-score">${evaluation.score_provisional && !hasFinalScore ? "Chờ xác minh, chưa có điểm cuối" : `${reportNumber(score)}/100 ${hasFinalScore ? "điểm" : "điểm AI đề xuất · Chờ giảng viên"}`}${evaluation.verdict && !evaluation.score_provisional ? ` · ${escapeHtml(evaluation.verdict)}` : ""}</p>
-        ${review}
+        <p class="report-answer-score">${practice ? studentScore : evaluation.score_provisional && !hasFinalScore ? "Chờ xác minh, chưa có điểm cuối" : `${reportNumber(score)}/100 ${hasFinalScore ? "điểm" : "điểm AI đề xuất · Chờ giảng viên"}`}${evaluation.verdict && !evaluation.score_provisional ? ` · ${escapeHtml(evaluation.verdict)}` : ""}</p>
+        ${feedback ? "" : review}
         ${state.reportOrigin === "teacher" && item.answer_id != null ? `<button type="button" class="button secondary compact report-review-button" data-report-review-session="${escapeHtml(state.currentTeacherReportSessionId)}" data-report-review-answer="${escapeHtml(item.answer_id)}">Chấm lại câu này</button>` : ""}
         <p class="report-answer-text"><strong>Trả lời:</strong> ${escapeHtml(item.answer || "Chưa có nội dung")}</p>
         ${evaluation.grading_source === "strong_ai" ? `<p class="report-answer-text"><strong>Transcript được dùng chấm:</strong> ${escapeHtml(evaluation.graded_transcript || "—")}</p>` : ""}
-        <p class="report-answer-feedback"><strong>Nhận xét:</strong> ${escapeHtml(evaluation.feedback || "Chưa có nhận xét")}</p>
+        <p class="report-answer-feedback"><strong>Nhận xét:</strong> ${escapeHtml(feedback?.summary || evaluation.feedback || "Chưa có nhận xét")}</p>
+        ${evidence.length ? `<div class="feedback-evidence"><strong>Bằng chứng trong bản trả lời</strong>${evidence.map(quote => `<blockquote>${escapeHtml(quote)}</blockquote>`).join("")}</div>` : ""}
         ${teacherFeedback}
         <p class="report-reference"><strong>Đáp án tham khảo:</strong> ${escapeHtml(item.reference_answer || "Chưa có đáp án tham khảo")}</p>
         <details class="report-answer-extra"><summary>Chi tiết chấm điểm${state.reportOrigin === "teacher" && item.voice?.audio_available ? " và ghi âm" : ""}</summary>
-          ${scoreAudit}${voice}
+          ${practice ? "" : scoreAudit}${voice}${practiceQuestionGradeHtml(breakdown)}
           ${assessments ? `<h4>Đối chiếu rubric</h4><div class="assessment-list">${assessments}</div>` : ""}
-          <p class="report-engine">Bộ chấm: ${escapeHtml(evaluation.evaluator || "—")}${evaluation.confidence == null ? "" : ` · mức tin cậy của bộ chấm ${reportNumber(Number(evaluation.confidence) * 100)}%`} · rubric ${escapeHtml(evaluation.rubric_version || "mặc định")}</p>
+          ${practice ? "" : `<p class="report-engine">Bộ chấm: ${escapeHtml(evaluation.evaluator || "—")} · rubric ${escapeHtml(evaluation.rubric_version || "mặc định")}</p>`}
         </details>
       </article>`;
     }).join("")
     : '<div class="empty-state">Chưa có câu trả lời.</div>';
+}
+
+async function practiceAgain(event) {
+  const button = event.target.closest("[data-practice-again]");
+  if (!button || state.practiceAgainBusy || state.user?.role !== "candidate" || !state.practiceReportSessionId) return;
+  const sessionId = state.practiceReportSessionId;
+  const userId = state.user.user_id;
+  const sequence = state.historyReportSequence;
+  state.practiceAgainBusy = true;
+  button.disabled = true;
+  try {
+    const result = await api(`/api/interviews/${encodeURIComponent(sessionId)}/practice-again`,
+      jsonOptions("POST", { answer_id: Number(button.dataset.practiceAgain) }));
+    const sameUser = state.user?.user_id === userId && state.user?.role === "candidate";
+    // A request may finish after the dialog closes; keep the new attempt resumable.
+    if (sameUser && (!state.session || state.completed || state.session.session_id === sessionId)) {
+      try { localStorage.setItem(`ai-interview-active:${userId}`, result.session_id); } catch (_) { /* Optional storage. */ }
+    }
+    if (!sameUser || sequence !== state.historyReportSequence || !el.reportDialog.open
+        || state.practiceReportSessionId !== sessionId) return;
+    dismissReportDialog();
+    beginSession(result);
+  } catch (error) {
+    if (state.user?.user_id === userId && sequence === state.historyReportSequence && el.reportDialog.open) toast(error.message, true);
+  } finally {
+    state.practiceAgainBusy = false;
+    button.disabled = false;
+  }
 }
 
 function reportBack() {
@@ -2223,8 +2512,20 @@ function renderMicrophoneResult(result, mode = "microphone") {
     <details class="mic-technical"><summary>Chi tiết âm thanh</summary><p>Tiếng nền: ${Number.isFinite(noiseDbfs) ? `${noiseDbfs.toFixed(1)} dBFS` : "Chưa đo"}. Điểm này phản ánh chất lượng âm thanh, không phải độ chính xác nhận dạng.</p></details>`;
 }
 
+function cancelMicrophoneCheck() {
+  const controller = state.micTestController;
+  state.micTestController = null;
+  if (controller) {
+    controller.abort();
+    el.finishMicTestButton.onclick = null;
+    el.finishMicTestButton.classList.add("hidden");
+    el.cancelMicTestButton.classList.add("hidden");
+  }
+}
+
 async function checkMicrophone() {
-  if (state.micTestController || state.recorder?.state === "recording") return;
+  if (!state.user || !state.session || state.completed) return;
+  if (state.recordingRequest?.opening || state.micTestController || state.recorder?.state === "recording") return;
   if (state.sessionMicCheck?.ready) {
     renderMicrophoneResult(state.sessionMicCheck.result || state.sessionMicCheck);
     return;
@@ -2236,8 +2537,11 @@ async function checkMicrophone() {
   }
   const previousCheck = state.sessionMicCheck;
   const checkedSession = state.session;
+  const authenticated = authGuard();
   const controller = new AbortController();
   state.micTestController = controller;
+  const owned = () => authenticated() && state.session === checkedSession
+    && state.micTestController === controller && !state.completed;
   const { signal } = controller;
   const controls = [el.checkMicrophoneButton, el.recordButton, el.microphoneSelect, el.submitAnswerButton, el.finishPracticeButton];
   const disabledStates = controls.map((control) => control.disabled);
@@ -2249,7 +2553,7 @@ async function checkMicrophone() {
   let recorder = null;
   let stopMeter = null;
   let countdownTimer = null;
-  const throwIfCancelled = () => { if (signal.aborted) throw new DOMException("Đã hủy kiểm tra", "AbortError"); };
+  const throwIfCancelled = () => { if (signal.aborted || !owned()) throw new DOMException("Đã hủy kiểm tra", "AbortError"); };
   const cancelCapture = () => {
     if (recorder?.state === "recording") recorder.stop();
     stream?.getTracks().forEach((track) => track.stop());
@@ -2325,7 +2629,7 @@ async function checkMicrophone() {
     const mimeType = recorder.mimeType || "audio/webm";
     const form = new FormData();
     form.append("file", new Blob(chunks, { type: mimeType }), `microphone-check.${mimeType.includes("mp4") ? "m4a" : "webm"}`);
-    form.append("session_id", state.session.session_id);
+    form.append("session_id", checkedSession.session_id);
     form.append("ambient_noise_dbfs", String(ambient.dbfs));
     const result = await api("/api/speech/microphone-check", { method: "POST", body: form, signal });
     throwIfCancelled();
@@ -2336,6 +2640,7 @@ async function checkMicrophone() {
     showMicTestStage(result.ready ? "done" : "error", "");
     toast(result.ready ? "Microphone sẵn sàng để ghi âm." : "Microphone cần điều chỉnh trước khi ghi.", !result.ready);
   } catch (error) {
+    if (!owned()) return;
     if (!signal.aborted) {
       const message = error.name === "NotAllowedError" ? "Chưa được cấp quyền microphone. Hãy cho phép microphone trên trình duyệt rồi thử lại."
         : error.name === "NotFoundError" ? "Không tìm thấy microphone. Hãy kiểm tra thiết bị đầu vào."
@@ -2359,30 +2664,49 @@ async function checkMicrophone() {
     clearInterval(countdownTimer);
     cancelCapture();
     signal.removeEventListener("abort", cancelCapture);
-    el.finishMicTestButton.onclick = null;
-    el.finishMicTestButton.classList.add("hidden");
-    el.cancelMicTestButton.classList.add("hidden");
-    if (el.micTestPanel.dataset.stage === "error") {
-      el.micLiveMeter.value = 0;
-      el.micLiveLabel.textContent = "Đã dừng";
-      delete el.micLiveMeter.dataset.level;
+    if (owned()) {
+      el.finishMicTestButton.onclick = null;
+      el.finishMicTestButton.classList.add("hidden");
+      el.cancelMicTestButton.classList.add("hidden");
+      if (el.micTestPanel.dataset.stage === "error") {
+        el.micLiveMeter.value = 0;
+        el.micLiveLabel.textContent = "Đã dừng";
+        delete el.micLiveMeter.dataset.level;
+      }
+      controls.forEach((control, index) => { control.disabled = disabledStates[index]; });
+      state.micTestController = null;
+      el.recordButton.disabled = !canRecordAnswer();
+    } else if (state.micTestController === controller) {
+      state.micTestController = null;
     }
-    controls.forEach((control, index) => { control.disabled = disabledStates[index]; });
-    if (state.micTestController === controller) state.micTestController = null;
-    el.recordButton.disabled = !canRecordAnswer();
   }
 }
 
+function cancelAnswerCapture() {
+  state.recordingRequest = null;
+  if (state.recorder) {
+    state.recorder.onstop = null;
+    state.recorder.ondataavailable = null;
+    if (state.recorder.state === "recording") state.recorder.stop();
+  }
+  state.mediaStream?.getTracks().forEach((track) => track.stop());
+  state.recorder = null;
+  state.mediaStream = null;
+  state.audioChunks = [];
+}
+
 async function toggleRecording() {
+  // Stopping must remain available after a deadline or a completed-session update.
+  if (state.recorder?.state === "recording") {
+    state.recorder.stop();
+    return;
+  }
+  if (state.recordingRequest || state.recorder || !state.user || !state.session || !state.currentQuestion) return;
   if (state.session?.recording_allowed === false) { toast("Đã hết thời gian ghi âm mới; chỉ xử lý bản ghi đã nhận trước hạn.", true); return; }
   if (state.speechBusy || state.answerSubmitting || state.draftLoading || state.sessionFinishing || state.completed) return;
   if (state.micTestController) return;
   if (!state.sessionMicCheck?.ready) {
     toast("Hãy kiểm tra microphone và môi trường ở cột bên trái trước khi trả lời.", true);
-    return;
-  }
-  if (state.recorder?.state === "recording") {
-    state.recorder.stop();
     return;
   }
   if (!sttAvailable()) {
@@ -2393,36 +2717,64 @@ async function toggleRecording() {
     toast("Trình duyệt chưa hỗ trợ ghi âm. Hãy dùng Chrome hoặc Edge.", true);
     return;
   }
-  el.checkMicrophoneButton.disabled = true;
+  const authenticated = authGuard();
+  const session = state.session, question = state.currentQuestion, micCheck = state.sessionMicCheck;
+  const deviceId = state.selectedMicrophoneId;
+  const request = { opening: true };
+  state.recordingRequest = request;
+  const owned = () => state.recordingRequest === request && authenticated()
+    && state.session === session && state.currentQuestion === question;
+  const active = () => owned() && !state.completed && !state.sessionFinishing
+    && session.recording_allowed !== false && state.sessionMicCheck === micCheck && state.selectedMicrophoneId === deviceId;
+  const controls = [el.recordButton, el.checkMicrophoneButton, el.microphoneSelect, el.submitAnswerButton, el.finishPracticeButton];
+  const disabledStates = controls.map(control => control.disabled);
+  const recordLabel = el.recordButton.textContent;
+  controls.forEach(control => { control.disabled = true; });
+  el.recordButton.textContent = "Đang mở mic...";
+  let stream = null;
+  let started = false;
   try {
-    el.submitAnswerButton.disabled = true;
     const audioConstraints = {
       channelCount: 1,
       echoCancellation: true,
       noiseSuppression: true,
       autoGainControl: true,
     };
-    if (state.selectedMicrophoneId) {
-      audioConstraints.deviceId = { exact: state.selectedMicrophoneId };
+    if (deviceId) {
+      audioConstraints.deviceId = { exact: deviceId };
     }
-    state.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
-    const activeDeviceId = state.mediaStream.getAudioTracks()[0]?.getSettings?.().deviceId || "";
-    if (activeDeviceId && !["default", "communications"].includes(activeDeviceId) && activeDeviceId !== state.sessionMicCheck.deviceId) {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+    if (!active()) return;
+    const activeDeviceId = stream.getAudioTracks()[0]?.getSettings?.().deviceId || "";
+    if (activeDeviceId && !["default", "communications"].includes(activeDeviceId) && activeDeviceId !== micCheck.deviceId) {
       resetMicTestPanel();
       throw new Error("Thiết bị ghi âm đã thay đổi. Hãy chọn microphone và kiểm tra lại.");
     }
     el.microphoneSelect.disabled = true;
     // Reuse the baseline measured once for this interview, without another silence test.
-    state.ambientNoiseDbfs = state.sessionMicCheck.baselineDbfs;
+    state.ambientNoiseDbfs = micCheck.baselineDbfs;
     const ambient = { dbfs: state.ambientNoiseDbfs };
     const preferred = typeof MediaRecorder.isTypeSupported === "function"
       ? ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find((type) => MediaRecorder.isTypeSupported(type))
       : null;
-    state.audioChunks = [];
-    state.recorder = preferred ? new MediaRecorder(state.mediaStream, { mimeType: preferred }) : new MediaRecorder(state.mediaStream);
-    state.recorder.ondataavailable = (event) => { if (event.data.size) state.audioChunks.push(event.data); };
-    state.recorder.onstop = transcribeRecording;
-    state.recorder.start(250);
+    const chunks = [];
+    const recorder = preferred ? new MediaRecorder(stream, { mimeType: preferred }) : new MediaRecorder(stream);
+    recorder.ondataavailable = (event) => { if (active() && event.data.size) chunks.push(event.data); };
+    recorder.onstop = () => {
+      if (!active()) {
+        if (state.recordingRequest === request) cancelAnswerCapture();
+        else stream.getTracks().forEach(track => track.stop());
+        return;
+      }
+      state.recordingRequest = null;
+      void transcribeRecording();
+    };
+    recorder.start(250);
+    state.mediaStream = stream;
+    state.recorder = recorder;
+    state.audioChunks = chunks;
+    request.opening = false;
+    started = true;
     // Keep the old preview intact if microphone permission or device opening fails.
     state.currentTranscriptionId = null;
     state.currentPreviewSha256 = null;
@@ -2435,12 +2787,14 @@ async function toggleRecording() {
     el.checkMicrophoneButton.disabled = true;
     el.recordButton.classList.add("recording");
     el.recordButton.textContent = "■ Dừng ghi";
+    el.recordButton.disabled = false;
     el.recordingStatus.textContent = ambient.dbfs > -28
       ? `Đang ghi · có tiếng nền, hệ thống sẽ lọc (${ambient.dbfs.toFixed(1)} dBFS)`
       : ambient.dbfs > -38
         ? `Đang ghi · tiếng nền trung bình (${ambient.dbfs.toFixed(1)} dBFS)`
       : "Đang ghi âm...";
   } catch (error) {
+    if (!owned()) return;
     const message = error?.name === "NotAllowedError"
       ? "Trình duyệt chưa được cấp quyền microphone. Hãy bấm biểu tượng ổ khóa cạnh địa chỉ và chọn Cho phép microphone."
       : error?.name === "NotFoundError"
@@ -2450,11 +2804,17 @@ async function toggleRecording() {
           : `Không mở được microphone: ${error.message}`;
     toast(message, true);
     setVoiceStage("error");
-    state.mediaStream?.getTracks().forEach((track) => track.stop());
-    state.mediaStream = null;
-    el.microphoneSelect.disabled = false;
-    el.checkMicrophoneButton.disabled = false;
-    el.submitAnswerButton.disabled = !state.currentTranscriptionId;
+  } finally {
+    if (!started) {
+      stream?.getTracks().forEach(track => track.stop());
+      const current = owned();
+      if (state.recordingRequest === request) state.recordingRequest = null;
+      if (current) {
+        controls.forEach((control, index) => { control.disabled = disabledStates[index]; });
+        el.recordButton.textContent = recordLabel;
+        el.recordButton.disabled = !canRecordAnswer();
+      }
+    }
   }
 }
 
@@ -2493,12 +2853,20 @@ async function measureAmbientNoise(stream, durationMs) {
 
 function recordingCache(action, recording = null) {
   const key = recording?.key || `${state.user?.user_id}:${state.session?.session_id}`;
+  const owner = voiceOwnerGuard();
+  const expectedKey = `${state.user?.user_id}:${state.session?.session_id}`;
+  const sessionId = state.session?.session_id;
+  const questionKey = `${state.currentQuestion?.language}:${state.currentQuestion?.id}`;
+  const canWrite = () => owner() && recording?.key === expectedKey
+    && recording.sessionId === sessionId && recording.questionKey === questionKey;
+  if (action === "put" && !canWrite()) return Promise.resolve(null);
   return new Promise((resolve, reject) => {
     const open = indexedDB.open("ai-interview-recordings", 1);
     open.onupgradeneeded = () => open.result.createObjectStore("recordings", { keyPath: "key" });
     open.onerror = () => reject(open.error);
     open.onsuccess = () => {
       const db = open.result;
+      if (action === "put" && !canWrite()) { db.close(); resolve(null); return; }
       const tx = db.transaction("recordings", action === "get" ? "readonly" : "readwrite");
       const store = tx.objectStore("recordings");
       const request = action === "put" ? store.put(recording) : action === "delete" ? store.delete(key) : store.get(key);
@@ -2516,10 +2884,15 @@ async function speechApi(path, options = {}) {
 }
 
 async function restoreRecording() {
+  if (state.recordingRequest || state.recorder || state.speechBusy) return;
+  const owner = voiceOwnerGuard();
+  if (!owner()) return;
+  const sequence = ++state.recordingRestoreSequence;
   const run = state.speechRun;
   const sessionId = state.session?.session_id;
   const questionKey = `${state.currentQuestion?.language}:${state.currentQuestion?.id}`;
-  const active = () => run === state.speechRun && state.session?.session_id === sessionId && !state.completed;
+  const owned = () => owner() && sequence === state.recordingRestoreSequence;
+  const active = () => owned() && run === state.speechRun;
   state.draftLoading = true;
   el.recordButton.disabled = true;
   el.submitAnswerButton.disabled = true;
@@ -2556,11 +2929,19 @@ async function restoreRecording() {
     toast(error.message, true);
   } finally {
     // processSavedRecording increments speechRun, but still belongs to this question.
-    if (state.session?.session_id === sessionId && `${state.currentQuestion?.language}:${state.currentQuestion?.id}` === questionKey) {
+    if (owned()) {
       state.draftLoading = false;
       el.recordButton.disabled = state.speechBusy || !canRecordAnswer();
     }
   }
+}
+
+function renderTranscriptWarnings(result) {
+  const spans = Array.isArray(result?.uncertain_spans) ? result.uncertain_spans.filter(value => typeof value === "string" && value.trim()) : [];
+  const uncertain = result?.transcript_status === "needs_review" || spans.length > 0;
+  el.transcriptUncertainty.textContent = uncertain
+    ? `Chưa chắc${spans.length ? ` các đoạn: ${spans.slice(0, 8).join(" · ")}` : " một số đoạn trong bản chép lời"}. Bạn có thể ghi âm lại nếu nội dung chưa đúng lời nói.` : "";
+  el.transcriptUncertainty.classList.toggle("hidden", !uncertain);
 }
 
 function applyTranscription(result) {
@@ -2568,6 +2949,7 @@ function applyTranscription(result) {
   state.currentTranscriptionId = result.transcription_id || null;
   state.currentPreviewSha256 = result.preview_sha256 || null;
   el.answerText.value = result.text;
+  renderTranscriptWarnings(result);
   el.answerText.dispatchEvent(new Event("input"));
   el.submitAnswerButton.disabled = !state.currentTranscriptionId || result.audio_saved === false
     || (deferredSession() && (!state.currentPreviewSha256 || (result.answer_stage || result.stage || "draft") !== "draft"));
@@ -2580,8 +2962,12 @@ function applyTranscription(result) {
 }
 
 async function processSavedRecording() {
-  if (state.speechBusy || state.answerSubmitting || state.sessionFinishing || !state.savedRecording) return;
+  if (state.recordingRequest || state.speechBusy || state.answerSubmitting || state.sessionFinishing || !state.savedRecording) return;
+  const owner = voiceOwnerGuard();
+  if (!owner()) return;
   const saved = state.savedRecording;
+  if (saved.sessionId !== state.session.session_id
+      || saved.questionKey !== `${state.currentQuestion.language}:${state.currentQuestion.id}`) return;
   const run = ++state.speechRun;
   state.speechBusy = true;
   el.recordButton.disabled = true;
@@ -2593,7 +2979,8 @@ async function processSavedRecording() {
   el.finishPracticeButton.disabled = true;
   el.retryRecordingButton.classList.add("hidden");
   const started = performance.now();
-  const active = () => run === state.speechRun && state.session?.session_id === saved.sessionId;
+  const owned = () => owner() && run === state.speechRun;
+  const active = () => owned() && state.savedRecording === saved;
   let waitingLabel = "Đang lưu bản ghi vào hệ thống";
   const updateWaiting = () => {
     if (active()) el.recordingStatus.textContent = `${waitingLabel} · ${Math.floor((performance.now() - started) / 1000)} giây`;
@@ -2609,10 +2996,13 @@ async function processSavedRecording() {
       form.append("session_id", saved.sessionId);
       if (Number.isFinite(saved.noise)) form.append("ambient_noise_dbfs", String(saved.noise));
       job = await speechApi("/api/speech/jobs", { method: "POST", body: form });
+      if (!active()) return;
       saved.jobId = job.job_id;
       await recordingCache("put", saved).catch(() => {});
+      if (!active()) return;
     } else {
       job = await speechApi(`/api/speech/jobs/${encodeURIComponent(saved.jobId)}`);
+      if (!active()) return;
       if (job.state === "failed" && job.retryable) job = await speechApi(`/api/speech/jobs/${encodeURIComponent(saved.jobId)}/retry`, { method: "POST" });
     }
     const labels = { queued: "Bản ghi đã lưu · đang chờ xử lý", transcribing: "Đang nhận dạng giọng nói",
@@ -2649,7 +3039,7 @@ async function processSavedRecording() {
     toast(error.name === "AbortError" ? "Kết nối quá hạn; bản ghi đã được giữ." : error.message, true);
   } finally {
     clearInterval(waitingTimer);
-    if (active()) {
+    if (owned()) {
       state.speechBusy = false;
       el.cancelRecordingJobButton.classList.add("hidden");
       el.recordButton.disabled = !canRecordAnswer();
@@ -2661,7 +3051,10 @@ async function processSavedRecording() {
 }
 
 async function transcribeRecording() {
+  const owner = voiceOwnerGuard();
   const capturedRecorder = state.recorder;
+  if (!owner() || !capturedRecorder) return;
+  const active = () => owner() && state.recorder === capturedRecorder;
   state.mediaStream?.getTracks().forEach((track) => track.stop());
   state.mediaStream = null;
   el.microphoneSelect.disabled = true;
@@ -2679,17 +3072,20 @@ async function transcribeRecording() {
     if (!recorder || !chunks.length) throw new Error("Không nhận được dữ liệu ghi âm. Hãy thử ghi lâu hơn.");
     const mimeType = recorder.mimeType || "audio/webm";
     const extension = mimeType.includes("mp4") ? "m4a" : "webm";
-    state.savedRecording = { key: `${state.user.user_id}:${state.session.session_id}`, sessionId: state.session.session_id,
+    const saved = { key: `${state.user.user_id}:${state.session.session_id}`, sessionId: state.session.session_id,
       questionKey: `${state.currentQuestion.language}:${state.currentQuestion.id}`, requestKey: crypto.randomUUID(),
       filename: `answer.${extension}`, blob: new Blob(chunks, { type: mimeType }), noise: state.ambientNoiseDbfs, jobId: null };
-    await recordingCache("put", state.savedRecording).catch(() => {});
+    state.savedRecording = saved;
+    await recordingCache("put", saved).catch(() => {});
+    if (!active() || state.savedRecording !== saved) return;
     await processSavedRecording();
   } catch (error) {
+    if (!active()) return;
     el.recordingStatus.textContent = "Nhận dạng chưa thành công";
     setVoiceStage("error");
     toast(error.message, true);
   } finally {
-    if (state.recorder === capturedRecorder) {
+    if (active()) {
       state.recorder = null;
       state.audioChunks = [];
       el.recordButton.disabled = state.speechBusy || !canRecordAnswer();
@@ -2820,6 +3216,7 @@ function bindEvents() {
   el.reviewReturnReportButton.addEventListener("click", () => { if (state.lastReviewedSessionId) showTeacherResult(state.lastReviewedSessionId); });
   el.reviewAudio.addEventListener("error", () => { el.reviewAudioStatus.textContent = "Không tải được ghi âm."; el.reviewAudioStatus.classList.remove("hidden"); });
   el.answerDetails.addEventListener("click", (event) => { const button = event.target.closest("[data-report-review-answer]"); if (button) openReviewSession(button.dataset.reportReviewSession, button.dataset.reportReviewAnswer); });
+  el.practiceNextSteps.addEventListener("click", practiceAgain);
 
   el.refreshPracticeHistoryButton.addEventListener("click", refreshPracticeHistory);
   el.practiceHistoryRows.addEventListener("click", (event) => {
@@ -2884,16 +3281,19 @@ function bindEvents() {
 
 async function initialize() {
   bindEvents();
+  const active = authGuard();
   try {
     const response = await fetch("/api/auth/me", { credentials: "same-origin" });
+    if (!active()) return;
     if (!response.ok) {
       showLogin();
       return;
     }
     const result = await response.json();
+    if (!active()) return;
     await enterApp(result.user);
   } catch (_) {
-    showLogin();
+    if (active()) showLogin();
   }
 }
 

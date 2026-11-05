@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from app.services.fact_guard import FactCheck, plain_text, split_clauses
 
 
-VERSION = "course-facts-v1"
+VERSION = "course-facts-v3"
 
 
 @dataclass(frozen=True)
@@ -90,6 +90,10 @@ def parse_course_fact(text: str, *, implicit_subject: str | None = None) -> Cour
     if extension:
         return CourseFact("extension_permission", "child_class", "allowed" if extension[1] else "forbidden")
 
+    addition = re.fullmatch(r"lop con\s+(co the|khong duoc)\s+them hanh vi rieng", value)
+    if addition:
+        return CourseFact("extension_addition", "child_class", "allowed" if addition[1] == "co the" else "forbidden")
+
     null_value = re.fullmatch(
         r"null\s+(?:theo em\s+)?(?:dai dien cho\s+(?:gia tri\s+)?|chinh la\s+|la\s+)"
         r"(khong xac dinh/chua co du lieu|chua co du lieu hoac chua xac dinh duoc gia tri|"
@@ -150,6 +154,8 @@ def check_course_point(answer: str, point: str, *, question: dict | None = None)
     ambiguous = False
     covered = True
     abstentions = []
+    previous_fact = None
+    unparsed_scope = False
     implicit_subject = None
     if question:
         context = plain_text(question.get("question", "") + " " + " ".join(question.get("key_points", [])) + " " + answer)
@@ -163,6 +169,22 @@ def check_course_point(answer: str, point: str, *, question: dict | None = None)
             ambiguous = True
             continue
         observed = parse_course_fact(original, implicit_subject=implicit_subject)
+        explanation = re.match(
+            r"^(?:nghia la|tuc la|y (?:em|toi) la|noi cach khac|that means|in other words|i mean)\b[,:]?\s*",
+            clause)
+        refers_back = explanation or re.match(
+            r"^(?:no|chung|nhung thu do|dieu (?:nay|do)|it|they|this|these|those)\b", clause)
+        if refers_back and previous_fact and (
+            previous_fact.kind, previous_fact.subject
+        ) == (expected.kind, expected.subject):
+            # Only resolve a continuation when both the relation and its subject remain explicit.
+            continuation = parse_course_fact(
+                clause[explanation.end():] if explanation else clause,
+                implicit_subject=implicit_subject)
+            if continuation and (continuation.kind, continuation.subject) == (expected.kind, expected.subject):
+                observed = continuation
+            else:
+                unparsed_scope = True
         abstention = re.fullmatch(
             r"(?:(?:phan (?:con lai|nay)|hai thao tac ten gi thi|con cach viet dieu kien sql thi)\s+)?"
             r"(?:em|toi)\s+(?:chua|khong)\s+(?:biet|nho|hieu)", clause)
@@ -170,6 +192,11 @@ def check_course_point(answer: str, point: str, *, question: dict | None = None)
             abstentions.append(original)
             continue
         covered &= observed is not None
+        if observed:
+            previous_fact = observed
+            if {observed.kind, expected.kind} == {"extension_permission", "extension_addition"}:
+                # Adding behavior alone does not establish permission to override it.
+                unparsed_scope = True
         if observed and (observed.kind, observed.subject) == (expected.kind, expected.subject):
             judgments.append((observed.value == expected.value, original))
         elif observed is None:
@@ -183,12 +210,16 @@ def check_course_point(answer: str, point: str, *, question: dict | None = None)
                 "update_direction": r"\b(tham so|trong so|parameters?|weights?)\b",
                 "stack_operations": r"\b(push|pop)\b",
                 "extension_permission": r"\b(bo sung|ghi de|them chuc nang)\b",
+                "extension_addition": r"\bthem hanh vi\b",
                 "null_meaning": r"\bnull\b.*\b(la|dai dien|nghia|meaning|represents?)\b",
                 "null_predicate": r"\b(is null|is not null|(?:=|bang) null)\b",
             }
             ambiguous |= bool(re.search(mentions[expected.kind], clause) or
                               re.search(r"\b(nhan dinh (?:nay|do)|phat bieu (?:nay|do)|that (?:claim|statement))\b.*"
                                         r"\b(sai|khong dung|wrong|false)\b", clause))
+    if unparsed_scope:
+        return FactCheck("unknown", 0, "Cần đối chiếu ngữ nghĩa của toàn bộ câu giải thích.",
+                         verification_rule=VERSION + ":unparsed_scope")
     if not judgments:
         if covered and abstentions and not ambiguous:
             return FactCheck("missing", .99, "Các mệnh đề đã được đối chiếu; ý này vắng và người trả lời nói chưa nhớ.",
@@ -197,6 +228,10 @@ def check_course_point(answer: str, point: str, *, question: dict | None = None)
     if ambiguous or len({correct for correct, _ in judgments}) > 1:
         return FactCheck("conflicted", 0, "Phát biểu cùng chủ thể còn mâu thuẫn hoặc chưa rõ phạm vi.",
                          judgments[0][1], verification_rule=VERSION + ":" + expected.kind)
+    if not covered:
+        # No list of discourse markers can prove that an unknown clause is irrelevant.
+        return FactCheck("unknown", 0, "Cần đối chiếu toàn bộ phần giải thích chưa được phân tích.",
+                         verification_rule=VERSION + ":unparsed_scope")
     correct, quote = judgments[0]
     return FactCheck("supported" if correct else "contradicted", .99,
                      "Đối chiếu chủ thể, quan hệ và giá trị với chính mệnh đề rubric.", quote,

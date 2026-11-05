@@ -90,7 +90,7 @@ def test_frontend_has_unique_ids_and_both_role_flows(project_root):
     assert 'action: "manual"' not in javascript
     assert '"accept_ai"' in javascript
     assert 'el.reviewAudio.addEventListener("ended"' not in javascript
-    assert 'form.append("session_id", state.session.session_id)' in javascript
+    assert 'form.append("session_id", checkedSession.session_id)' in javascript
     assert "Cần nghe hết voice" not in javascript
     assert "async function checkMicrophone()" in javascript
     assert 'api("/api/speech/microphone-check"' in javascript
@@ -116,13 +116,13 @@ def test_frontend_connects_preview_confirmation_and_final_grading(project_root):
     javascript = (project_root / "app/static/app.js").read_text(encoding="utf-8")
     html = (project_root / "app/static/index.html").read_text(encoding="utf-8")
     assert 'function deferredSession()' in javascript
-    assert 'jsonOptions("POST", { preview_sha256: state.currentPreviewSha256 })' in javascript
+    assert 'jsonOptions("POST", { preview_sha256: previewSha256 })' in javascript
     assert '/transcriptions/${encodeURIComponent(transcriptionId)}/confirm' in javascript
     assert '/interviews/${encodeURIComponent(sessionId)}/draft' in javascript
     assert 'async function watchSessionGrading(sessionId, origin)' in javascript
     assert '/interviews/${encodeURIComponent(sessionId)}/grading' in javascript
     assert '/interviews/${encodeURIComponent(target.sessionId)}/grading/retry' in javascript
-    assert 'el.reportContent.classList.toggle("hidden", !ready)' in javascript
+    assert 'el.reportContent.classList.toggle("hidden", !ready && grading.report_available !== true)' in javascript
     assert 'Xác nhận và tiếp tục' in html
     assert 'id="reportGradingProgress"' in html
     assert 'id="realGradingStatus"' in html

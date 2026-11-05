@@ -24,7 +24,9 @@ No score or accuracy estimate is requested; backend rubric weights determine cre
 
 def requires_semantic_audit(answer: str) -> bool:
     text = plain_text(answer)
-    correction = r"\b(sua lai|dinh chinh|xin sua|correction|i meant|let me correct|i correct myself)\b"
+    correction = (r"\b(sua lai|dinh chinh|xin sua|rut lai|thu hoi y|chot nguoc lai|khong giu y do nua|"
+                  r"correction|i meant|let me correct|i correct myself|i retract|"
+                  r"i withdraw|i take (?:it|that) back|scratch that)\b")
     # Separate sentences and coordinated clauses do not create nested scope.
     nested_negation = (r"\b(?:khong phai\s+(?:(?:la|rang)\s+)?(?:\w+\s+){0,5}(?<!so )(?:khong|chua)(?!\s+(?:hay|hoac|va)\b)|"
                        r"(?:not true|not the case|it is false)\s+(?:that\s+)?(?:\w+\s+){0,5}(?:not|never))\b")

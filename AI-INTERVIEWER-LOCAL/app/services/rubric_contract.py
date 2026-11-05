@@ -19,6 +19,56 @@ def digest(value: Any) -> str:
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
+def criterion_key(claim: str) -> str:
+    """Use the published rubric's duplicate policy without changing the stored claim."""
+    return " ".join(unicodedata.normalize("NFC", claim).casefold().split())
+
+
+def validate_rubric_points(points: Any, weights: Any = None) -> None:
+    """Share the grader's input contract with imports and question selection."""
+    if not isinstance(points, list) or not 1 <= len(points) <= 30:
+        raise ValueError("Rubric phải có từ 1 đến 30 tiêu chí")
+    seen = {}
+    for index, point in enumerate(points, 1):
+        if not isinstance(point, str) or not point.strip():
+            raise ValueError(f"Tiêu chí #{index} phải là văn bản không rỗng")
+        key = criterion_key(point)
+        if key in seen:
+            raise ValueError(f"Tiêu chí #{index} trùng tiêu chí #{seen[key]} sau khi chuẩn hóa")
+        seen[key] = index
+    if weights is None:
+        weights = {}
+    if not isinstance(weights, dict) or (weights and set(weights) != set(points)):
+        raise ValueError("Trọng số phải khớp đầy đủ với các tiêu chí")
+    if any(isinstance(w, bool) or not isinstance(w, (int, float)) or not math.isfinite(w)
+           or not 0 < w <= 100 for w in weights.values()):
+        raise ValueError("Trọng số phải là số hữu hạn lớn hơn 0 và không quá 100")
+
+
+def rubric_hash(question: dict[str, Any]) -> str:
+    snapshot = question.get("rubric_snapshot")
+    if snapshot:
+        if not isinstance(snapshot, dict) or not isinstance(snapshot.get("contract"), dict):
+            raise ValueError("Malformed rubric snapshot")
+        contract = snapshot["contract"]
+        criteria = contract.get("criteria")
+        if (not isinstance(criteria, list) or not criteria
+                or any(not isinstance(item, dict) or not isinstance(item.get("claim"), str)
+                       or not item["claim"].strip() for item in criteria)):
+            raise ValueError("Malformed rubric snapshot criteria")
+        claims = [item["claim"] for item in criteria]
+        weights = {item["claim"]: item.get("weight") for item in criteria}
+        if (len(set(claims)) != len(claims) or claims != question["key_points"]
+                or weights != question.get("key_point_weights")
+                or any(isinstance(w, bool) or not isinstance(w, (int, float))
+                       or not math.isfinite(w) or w <= 0 for w in weights.values())
+                or digest(contract) != snapshot.get("sha256")):
+            raise ValueError("Rubric snapshot content does not match its integrity hash")
+        return snapshot["sha256"]
+    return digest({"points": question["key_points"], "weights": question.get("key_point_weights", {}),
+                   "reference": question.get("reference_answer", "")})
+
+
 def question_fingerprint(question: dict[str, Any]) -> str:
     return digest({key: question.get(key) for key in (
         "uid", "language", "subject", "question", "reference_answer", "key_points", "source_name",
@@ -56,7 +106,7 @@ def validate_contract(question: dict[str, Any], contract: dict[str, Any]) -> tup
         if not isinstance(claim, str) or not 3 <= len(claim.strip()) <= 1000:
             raise ValueError("Criterion claim requires 3-1000 characters")
         claim = unicodedata.normalize("NFC", claim.strip())
-        claim_key = " ".join(claim.casefold().split())
+        claim_key = criterion_key(claim)
         if identifier in ids or claim_key in claims:
             raise ValueError("Duplicate criterion ID or claim")
         ids.add(identifier)

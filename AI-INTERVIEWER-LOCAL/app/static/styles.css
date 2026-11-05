@@ -667,6 +667,8 @@ fieldset {
   gap: 3px;
 }
 
+.history-score { display: grid; gap: 4px; }
+.history-score small { color: #64748b; font-size: 12px; }
 .history-subject small {
   color: var(--muted);
 }
@@ -2422,10 +2424,33 @@ body.report-modal-open { overflow: hidden; }
 .report-candidate { margin: 0; font-size: 18px; font-weight: 750; }
 .report-meta { margin: 5px 0 15px; color: #64748b; font-size: 12px; }
 .report-stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.report-stat-grid.practice-report-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .report-stat-grid > article { display: grid; align-content: start; gap: 5px; padding: 14px; border-radius: 10px; background: #f3f6fb; min-width: 0; }
 .report-stat-grid strong { font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
 .report-stat-grid article > span, .report-stat-grid strong > small { font-size: 12px; color: #64748b; font-weight: 400; }
 .report-summary-text { margin: 17px 0; color: #475569; font-size: 13px; line-height: 1.7; }
+.report-coverage { margin: 12px 0; color: #334155; font-size: 14px; line-height: 1.6; }
+.practice-grading-section { margin: 22px 0; min-width: 0; }
+.practice-grading-section h2 { margin: 0 0 14px; font-size: 15px; }
+.practice-grading-section h2 small { color: #64748b; font-size: 13px; font-weight: 400; }
+.practice-grading-section > summary { cursor: pointer; font-size: 14px; font-weight: 650; }
+.practice-next-step { padding: 12px 0; border-bottom: 1px solid #e2e8f0; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.practice-next-step p { margin: 0 0 8px; }
+.practice-next-more { margin: 12px 0; }
+.practice-next-more > summary { cursor: pointer; font-size: 13px; font-weight: 600; padding: 8px 0; }
+.practice-next-step ul { padding-left: 20px; margin: 8px 0; }
+.feedback-evidence { margin: 12px 0; font-size: 12px; color: #475569; }
+.feedback-evidence blockquote { margin: 8px 0; padding: 4px 12px; border-left: 3px solid #0f766e; white-space: pre-wrap; overflow-wrap: anywhere; }
+.practice-grading-section h3 { margin: 18px 0 8px; font-size: 13px; }
+.practice-grading-table { width: 100%; min-width: 0; table-layout: fixed; }
+.practice-grading-table th, .practice-grading-table td { padding: 10px; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.practice-grading-table th:first-child { width: 38%; text-align: left; }
+.practice-grading-table th { letter-spacing: 0; text-transform: none; }
+.practice-grading-table tbody th { background: transparent; color: #334155; font-weight: 600; }
+.practice-question-grade { display: grid; gap: 6px; margin: 14px 0; padding: 12px 0; border-block: 1px solid #e2e8f0; }
+.practice-question-grade > strong { color: #334155; font-size: 14px; }
+.practice-question-grade > span { color: #64748b; font-size: 12px; }
+.criterion-score { display: block; margin-top: 5px; color: #475569; font-size: 12px; font-variant-numeric: tabular-nums; }
 .report-feedback-section { margin: 20px 0; }
 .report-feedback-section h2, .report-question-section > h2 { margin: 0 0 10px; font-size: 15px; }
 .report-feedback-section ul { margin: 0; padding-left: 24px; color: #334155; font-size: 13px; line-height: 1.65; }

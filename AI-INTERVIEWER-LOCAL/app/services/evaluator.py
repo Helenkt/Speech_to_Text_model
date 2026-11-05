@@ -531,7 +531,15 @@ async def _verify_llm_evidence(settings: Settings, question: dict[str, Any],
         opposite = probabilities.get("contradiction" if item["status"] == "met" else "entailment", 0)
         threshold = max(.8, settings.rubric_transformer_min_confidence, check.get("acceptance_threshold", .8))
         item["evidence_verification"] = {"source": "rubricguard-lite", "probabilities": probabilities,
-                                         "acceptance_threshold": threshold}
+                                         "acceptance_threshold": threshold,
+                                         "acceptance_eligible": check.get("acceptance_eligible") is True}
+        if check.get("acceptance_eligible") is not True or assessment.get("truncated", True):
+            item.update(status="unresolved", needs_review=True,
+                        review_reason="evidence_input_truncated" if assessment.get("truncated", True)
+                                      and check.get("acceptance_eligible") is True else "evidence_verifier_unvalidated",
+                        reason="Checkpoint/ngôn ngữ hoặc bằng chứng bị cắt chưa đủ điều kiện xác minh; chưa chốt ý này.")
+            changed = True
+            continue
         # Neutral is uncertainty, not a refutation. It cannot independently certify
         # a positive/negative LLM judgment either. Never turn it into a final zero.
         expected = "entailment" if item["status"] == "met" else "contradiction"
@@ -555,7 +563,9 @@ async def _verify_llm_evidence(settings: Settings, question: dict[str, Any],
                     break
                 alternative = candidate["point_assessments"][0].get("probabilities", {})
                 # Retrieval only proposes spans; semantic agreement is still required.
-                if (_valid_evidence_probabilities(alternative)
+                if (candidate.get("acceptance_eligible") is True
+                        and candidate["point_assessments"][0].get("truncated", True) is False
+                        and _valid_evidence_probabilities(alternative)
                         and alternative.get("entailment", 0) >= max(threshold, candidate.get("acceptance_threshold", .8))
                         and alternative.get("contradiction", 0) < .1):
                     item.update(evidence_quote=parts[0], evidence_quotes=parts)
@@ -601,6 +611,15 @@ def _apply_facts(question: dict[str, Any], result: dict[str, Any],
         review_required=result.get("review_required", False))
 
 
+def _pending_model_result(question, reason, facts):
+    result = _compose_result(question, [
+        {"point": point, "status": "unresolved", "needs_review": True, "review_reason": reason,
+         "reason": "Bộ chấm chưa có kết quả hợp lệ; không dùng keyword để suy ra điểm.", "evidence_quote": ""}
+        for point in question["key_points"]],
+        evaluator="model-pending", confidence=0, review_required=True)
+    return _apply_facts(question, result, facts)
+
+
 async def _evaluate_answer_impl(
     settings: Settings, question: dict[str, Any], answer: str, *, ensure_model=None, inference_runner=None
 ) -> dict[str, Any]:
@@ -640,8 +659,11 @@ async def _evaluate_answer_impl(
                 "review_required"
             ]:
                 return transformer_result
-        except (ImportError, OSError, RuntimeError, TypeError, ValueError):
+        except (ImportError, OSError, RuntimeError, TypeError, ValueError, KeyError, MemoryError) as exc:
             transformer_result = None
+            if settings.evaluator_mode == "transformer":
+                reason = "model_output_invalid" if isinstance(exc, (TypeError, ValueError, KeyError)) else "model_unavailable"
+                return _pending_model_result(question, reason, facts)
     if settings.evaluator_mode in {"auto", "ollama"}:
         try:
             if transformer_result is not None:
@@ -677,12 +699,7 @@ async def _evaluate_answer_impl(
                     assessments.append(item)
                 return _compose_result(question, assessments, evaluator="model-pending",
                                        confidence=0, review_required=True)
-            fallback = _compose_result(question, [
-                {"point": point, "status": "unresolved", "needs_review": True, "review_reason": reason,
-                 "reason": "Bộ chấm chưa có kết quả hợp lệ; không dùng keyword để suy ra điểm.", "evidence_quote": ""}
-                for point in question["key_points"]],
-                evaluator="model-pending", confidence=0, review_required=True)
-            return _apply_facts(question, fallback, facts)
+            return _pending_model_result(question, reason, facts)
     if transformer_result is not None:
         return transformer_result
     if semantic_audit and settings.evaluator_mode != "rule":
@@ -690,7 +707,7 @@ async def _evaluate_answer_impl(
             {"point": point, "status": "unresolved", "needs_review": True,
              "reason": "Câu trả lời cần kiểm tra ngữ nghĩa trước khi chốt điểm.", "evidence_quote": ""}
             for point in question["key_points"]], evaluator="semantic-pending", confidence=0)
-    return evaluate_with_rules(question, answer)
+    return _pending_model_result(question, "model_unavailable", facts)
 
 
 async def evaluate_answer(settings: Settings, question: dict[str, Any], answer: str, *, ensure_model=None, inference_runner=None) -> dict[str, Any]:

@@ -245,6 +245,14 @@ model. Phiên mới mặc định chuẩn bị toàn bộ câu hỏi và độ k
 không dùng điểm câu trước để chọn câu sau. Luồng thích ứng cũ chỉ còn để tương thích
 khi không dùng chiến lược chấm cuối phiên; không phải hành vi mặc định.
 
+### Bộ chấm chuyên biệt đang thử nghiệm
+
+Có đường chạy backend độc lập gọi Transformer INT8 trực tiếp, không dùng Qwen
+và không huấn luyện khi chấm. Công cụ khóa checkpoint bằng manifest, chạy
+regression hoặc corpus giảng viên và lưu báo cáo shadow riêng. Chưa thay bộ chấm
+đang dùng, frontend hay điểm thật; chưa chứng nhận đủ chính xác để bỏ Qwen.
+Xem [SPECIALIST_GRADER.md](SPECIALIST_GRADER.md) để chạy thử và đọc giới hạn.
+
 ## 6. Dữ liệu câu hỏi
 
 Giáo viên có hai lựa chọn:
@@ -422,6 +430,11 @@ trong `.env`, nhưng profile cần GPU vẫn tự hạ xuống CPU nếu CUDA kh
 API docs theo lệnh mục 1: <http://127.0.0.1:8001/docs>. Nếu launcher chọn cổng khác, thay bằng đúng cổng đang chạy.
 
 ## 8. Kiểm thử
+
+Backend trả điểm luyện tập theo từng tiêu chí/câu/môn/phiên sau khi kết thúc.
+Xem [PRACTICE_GRADING.md](PRACTICE_GRADING.md) để biết trường API, thang điểm và
+cách giữ kết quả chưa xác minh. Giao diện đã nối báo cáo luyện tập, trạng thái
+chấm cuối phiên, phục hồi ghi âm và kết quả chấm lại của giảng viên.
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt

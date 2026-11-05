@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from app.database import active_question_count, database
+from app.services.rubric_contract import validate_rubric_points
 
 
 DIFFICULTY_ALIASES = {
@@ -61,10 +62,12 @@ def _key_points(raw: dict[str, Any]) -> list[str]:
         if isinstance(item, dict):
             item = _first(item, "text", "point", "description", "criterion")
         point = str(item or "").strip()
-        if point and point not in points:
+        if point:
             points.append(point)
-    if not points:
-        raise QuestionBankError("'key_points' phải có ít nhất một ý")
+    try:
+        validate_rubric_points(points)
+    except ValueError as exc:
+        raise QuestionBankError(str(exc)) from exc
     return points
 
 

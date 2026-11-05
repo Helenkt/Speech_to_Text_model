@@ -11,9 +11,14 @@ from typing import Any
 from app.config import Settings
 from app.database import database
 from app.services.evaluator import evaluate_answer
-from app.services.rubric_contract import attach_published_contract
+from app.services.rubric_contract import attach_published_contract, digest, question_fingerprint, validate_rubric_points
+from app.services.practice_rubric import prepare_practice_rubric
+from app.services.assessment_feedback import verified_assessment_evidence
 from app.services.teacher_review import review_readiness
 from app.services.grade_state import effective_grade
+from app.services.practice_grading import practice_summary, question_breakdown, validate_ai_grade, valid_score
+from app.services.learning_feedback import question_feedback, session_feedback
+from app.services.grading_queue import queue_session_grading
 from app.services.audio_lifecycle import audio_exists, deletion_result, schedule_session_audio
 from app.services.exam_policy import exam_is_open, submission_admission, received_admission
 from app.services.transcription_store import (
@@ -45,8 +50,44 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+PRACTICE_SOURCE_VERSION = "practice-source-v2"
+
+
+def _practice_source_content(question: dict[str, Any], *, legacy: bool = False) -> dict:
+    fields = ("uid", "language", "subject", "competency", "topic", "concept", "difficulty")
+    content = {field: " ".join(str(question.get(field) or "").split()) for field in fields}
+    def text(value: str) -> str:
+        return " ".join(value.split()) if legacy else value.replace("\r\n", "\n").replace("\r", "\n")
+    for field in ("question", "reference_answer"):
+        content[field] = text(str(question.get(field) or ""))
+    content["key_points"] = [text(point) for point in question.get("key_points", [])]
+    return content
+
+
+def _practice_source_hash(question: dict[str, Any]) -> str:
+    return digest(_practice_source_content(question))
+
+
+def _practice_source_matches(saved: dict[str, Any], current: dict[str, Any]) -> bool:
+    original, latest = _practice_source_content(saved), _practice_source_content(current)
+    if any(original[field] != latest[field] for field in original if field != "key_points"):
+        return False
+    captured = saved.get("learning_source_sha256")
+    version = saved.get("learning_source_version")
+    if captured:
+        if version == PRACTICE_SOURCE_VERSION:
+            return captured == _practice_source_hash(current)
+        if version is not None or captured != digest(_practice_source_content(current, legacy=True)):
+            return False
+    snapshot = saved.get("rubric_snapshot") or {}
+    if snapshot:
+        # Old source hashes lose layout; the contract still binds the original raw rubric text.
+        return (snapshot.get("contract") or {}).get("question_fingerprint") == question_fingerprint(current)
+    return original == latest
+
+
 def _row_to_question(row: sqlite3.Row) -> dict[str, Any]:
-    return {
+    question = {
         "uid": row["uid"],
         "id": row["question_id"],
         "language": row["language"],
@@ -62,12 +103,23 @@ def _row_to_question(row: sqlite3.Row) -> dict[str, Any]:
         "source_name": row["source_name"],
         "verification_status": row["verification_status"],
     }
+    question["learning_source_sha256"] = _practice_source_hash(question)
+    question["learning_source_version"] = PRACTICE_SOURCE_VERSION
+    return question
 
 
 def public_question(question: dict[str, Any] | None) -> dict[str, Any] | None:
     if question is None:
         return None
     return {key: question[key] for key in PUBLIC_QUESTION_FIELDS}
+
+
+def _gradable_question(question: dict[str, Any]) -> dict[str, Any]:
+    try:
+        validate_rubric_points(question.get("key_points"), question.get("key_point_weights"))
+    except ValueError as exc:
+        raise InterviewError(f"Rubric của câu {question.get('uid', question.get('id', '?'))} không hợp lệ: {exc}") from exc
+    return question
 
 
 def _select_question(
@@ -112,7 +164,7 @@ def _select_question(
             """,
             parameters,
         ).fetchone()
-        return json.loads(row["question_json"]) if row else None
+        return _gradable_question(json.loads(row["question_json"])) if row else None
 
     clauses = ["active = 1", "bank_scope = 'learning'", "language = ?"]
     parameters = [language]
@@ -140,7 +192,7 @@ def _select_question(
         f"SELECT * FROM questions WHERE {' AND '.join(clauses)} ORDER BY {order} LIMIT 1",
         parameters,
     ).fetchone()
-    return attach_published_contract(connection, _row_to_question(row)) if row else None
+    return _gradable_question(attach_published_contract(connection, _row_to_question(row))) if row else None
 
 
 def start_interview(
@@ -155,6 +207,8 @@ def start_interview(
     interview_mode: str = "practice",
     exam_round_id: str | None = None,
     answer_mode: str = "voice",
+    practice_question_uids: list[str] | None = None,
+    practice_source_questions: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     # The product is a live spoken interview; typed answers are never accepted.
     answer_mode = "voice"
@@ -162,9 +216,27 @@ def start_interview(
     subject = subject.strip() if subject else None
     target_rank = DIFFICULTY_RANK[starting_difficulty]
     session_id = str(uuid.uuid4())
+    deferred = settings.defer_grading_until_finish or practice_question_uids is not None
 
     with database(settings.database_path) as connection:
-        first_question = _select_question(
+        selected = []
+        if practice_question_uids is not None:
+            if (interview_mode != "practice" or not practice_question_uids
+                    or len(practice_question_uids) > 30 or len(set(practice_question_uids)) != len(practice_question_uids)):
+                raise InterviewError("Danh sách câu luyện lại không hợp lệ")
+            for uid in practice_question_uids:
+                row = connection.execute("SELECT * FROM questions WHERE uid=? AND active=1 AND bank_scope='learning' AND language=?",
+                                         (uid, language)).fetchone()
+                if not row:
+                    raise InterviewError("Câu hỏi không còn trong ngân hàng luyện tập đang dùng")
+                current = _row_to_question(row)
+                if practice_source_questions is not None:
+                    saved = practice_source_questions.get(uid)
+                    if saved is None or not _practice_source_matches(saved, current):
+                        raise InterviewError("Câu hỏi gốc đã được cập nhật; không thể tự luyện lại theo nội dung cũ. Hãy bắt đầu lượt luyện mới từ ngân hàng hiện tại.")
+                selected.append(_gradable_question(attach_published_contract(connection, current)))
+            question_count = len(selected)
+        first_question = selected[0] if selected else _select_question(
             connection,
             language=language,
             subject=subject,
@@ -173,17 +245,26 @@ def start_interview(
         )
         if not first_question:
             raise InterviewError("Không tìm thấy câu hỏi phù hợp với bộ lọc đã chọn")
+        if selected:
+            target_rank = first_question["difficulty_rank"]
 
         plan = None
-        if settings.defer_grading_until_finish:
+        if deferred:
             plan = [first_question]
             for index in range(1, question_count):
-                question = _select_question(connection, language=language, subject=subject,
+                question = selected[index] if selected else _select_question(connection, language=language, subject=subject,
                     target_rank=planned_difficulty(target_rank, index, question_count),
                     excluded_uids=[item["uid"] for item in plan], exam_round_id=exam_round_id)
                 if question is None:
                     raise InterviewError("Ngân hàng chưa đủ câu hỏi khác nhau để chuẩn bị toàn bộ đề")
                 plan.append(question)
+
+        if interview_mode == "practice":
+            if plan:
+                plan = [prepare_practice_rubric(question) for question in plan]
+                first_question = plan[0]
+            else:
+                first_question = prepare_practice_rubric(first_question)
 
         connection.execute(
             """
@@ -209,7 +290,7 @@ def start_interview(
                 target_rank,
                 settings.evaluator_mode,
                 _now(),
-                "end_of_session" if settings.defer_grading_until_finish else "per_answer",
+                "end_of_session" if deferred else "per_answer",
                 target_rank,
                 json.dumps(plan, ensure_ascii=False) if plan else None,
             ),
@@ -224,7 +305,7 @@ def start_interview(
         "answer_mode": answer_mode,
         "language": language,
         "resumed": False,
-        "grading_strategy": "end_of_session" if settings.defer_grading_until_finish else "per_answer",
+        "grading_strategy": "end_of_session" if deferred else "per_answer",
         "question_selection": "fixed" if plan else "adaptive",
         "difficulty_schedule": [item["difficulty"] for item in plan] if plan else None,
         "question": public_question(first_question),
@@ -279,10 +360,14 @@ def pending_session_evaluation() -> dict[str, Any]:
 
 def apply_voice_assurance(settings, evaluation, question, voice_quality, interview_mode):
     from app.services.assessment_feedback import assessment_feedback, voice_requires_review
-    if voice_requires_review(voice_quality):
+    from app.services.voice_evidence import project_voice_assessments
+    if not valid_score(evaluation.get("score")):
+        raise ValueError("AI score must be a finite number from 0 to 100, not a boolean")
+    evaluation['point_assessments'] = project_voice_assessments(voice_quality, evaluation.get('point_assessments') or [])
+    if voice_requires_review(voice_quality, evaluation['point_assessments']):
         evaluation["review_required"] = evaluation["score_provisional"] = True
         notice = (
-            ("Bản ghi giọng nói có cảnh báo chất lượng; chưa đủ cơ sở tính điểm luyện tập."
+            ("Bản ghi còn vùng cần xác minh; chỉ ghi nhận những tiêu chí có bằng chứng rõ."
              if interview_mode == "practice" else
              "Bản ghi giọng nói có cảnh báo chất lượng; giáo viên cần đối chiếu transcript trước khi dùng điểm.")
             if question.get("language") == "vi" else
@@ -291,16 +376,10 @@ def apply_voice_assurance(settings, evaluation, question, voice_quality, intervi
             evaluation["feedback"] = f'{evaluation["feedback"]} {notice}'.strip()
     if interview_mode == "real":
         evaluation["review_required"] = True
+    else:
+        validate_ai_grade(question, evaluation)
     evaluation.update(assessment_feedback(evaluation, voice_quality, interview_mode=interview_mode))
     return evaluation
-
-
-def queue_session_grading(connection, session_id):
-    connection.execute("""INSERT OR IGNORE INTO session_grading_jobs (session_id)
-        SELECT session_id FROM interview_sessions WHERE session_id=? AND status='completed'
-          AND grading_strategy='end_of_session'
-          AND EXISTS (SELECT 1 FROM interview_answers WHERE session_id=? AND grading_pending=1)""",
-        (session_id, session_id))
 
 
 async def submit_answer(
@@ -616,12 +695,13 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
 
     for row in answer_rows:
         question = json.loads(row["question_json"])
-        grade = effective_grade(row, interview_mode=session["interview_mode"])
+        grade = effective_grade(row, interview_mode=session["interview_mode"], completed=session["status"] == "completed")
         ai_score, final_score, score = grade["ai_score"], grade["final_score"], grade["score"]
         if session["interview_mode"] == "real" and row["reviewed_at"] is None:
             final_score = None
         provisional = grade["score_provisional"]
         matched, missing, assessments = grade["matched_points"], grade["missing_points"], grade["point_assessments"]
+        assessments = verified_assessment_evidence(assessments, grade["graded_transcript"])
         try:
             review_evaluation = json.loads(row["review_ai_evaluation_json"] or "{}")
         except (TypeError, json.JSONDecodeError):
@@ -634,7 +714,7 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
         provisional = provisional or (readiness["strong_review_ready"] and readiness["score_provisional"])
         if row["reviewed_at"] is not None:
             provisional = False
-        if (session["interview_mode"] == "practice" and not provisional) or final_score is not None:
+        if not row["grading_pending"] and ((session["interview_mode"] == "practice" and not provisional) or final_score is not None):
             scores.append(score)
             competency_scores[question["competency"]].append(score)
         if not provisional or row["reviewed_at"] is not None:
@@ -663,6 +743,7 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
                     "review_processed_at": row["review_processed_at"],
                 },
                 "evaluation": {
+                    **({"score_breakdown": grade["score_breakdown"]} if "score_breakdown" in grade else {}),
                     "grading_pending": bool(row["grading_pending"]),
                     "score": score,
                     "ai_score": ai_score,
@@ -700,6 +781,17 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
             }
         )
 
+    practice = None
+    if session["interview_mode"] == "practice":
+        completed = session["status"] == "completed"
+        for row, detail in zip(answer_rows, details, strict=True):
+            if "score_breakdown" not in detail["evaluation"]:
+                detail["evaluation"]["score_breakdown"] = question_breakdown(
+                    json.loads(row["question_json"]), detail["evaluation"], completed=completed)
+            detail["evaluation"]["learning_feedback"] = question_feedback(
+                json.loads(row["question_json"]), detail["evaluation"].get("graded_transcript") or detail["answer"],
+                detail["evaluation"])
+        practice = practice_summary(details, completed=completed)
     average_score = round(sum(scores) / len(scores), 1) if scores else None
     return {
         "session": {
@@ -721,6 +813,8 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
             "finished_at": session["finished_at"],
         },
         "summary": {
+            **({"practice_grading": practice} if practice is not None else {}),
+            **({"learning_feedback": session_feedback(details)} if practice is not None else {}),
             "average_score": average_score,
             "scored_answer_count": len(scores),
             "pending_answer_count": max(0, len(answer_rows) - len(scores)),
@@ -742,6 +836,29 @@ def interview_report(settings: Settings, session_id: str) -> dict[str, Any]:
         },
         "answers": details,
     }
+
+
+def start_practice_again(settings: Settings, session_id: str, *, user_id: int,
+                         candidate_name: str, answer_id: int | None = None) -> dict[str, Any]:
+    with database(settings.database_path) as connection:
+        session = connection.execute("SELECT * FROM interview_sessions WHERE session_id=? AND user_id=?",
+                                     (session_id, user_id)).fetchone()
+        if not session or session["interview_mode"] != "practice" or session["status"] != "completed":
+            raise InterviewError("Chỉ luyện lại được phiên luyện tập đã kết thúc của bạn")
+        rows = connection.execute("SELECT answer_id, question_uid, question_json FROM interview_answers WHERE session_id=? ORDER BY sequence_number",
+                                  (session_id,)).fetchall()
+    report = interview_report(settings, session_id)
+    actions = report["summary"]["learning_feedback"]["next_steps"]
+    eligible = {item["answer_id"] for item in actions if item["action"] == "practice_again"}
+    if answer_id is not None:
+        eligible &= {answer_id}
+    uids = list(dict.fromkeys(row["question_uid"] for row in rows if row["answer_id"] in eligible))
+    if not uids:
+        raise InterviewError("Chưa có câu phù hợp để luyện lại; lỗi bộ chấm cần được xử lý trên bài đã lưu")
+    originals = {row["question_uid"]: json.loads(row["question_json"]) for row in rows if row["answer_id"] in eligible}
+    return start_interview(settings, user_id=user_id, candidate_name=candidate_name,
+        language=session["language"], subject=session["subject"], question_count=len(uids),
+        starting_difficulty="Easy", practice_question_uids=uids, practice_source_questions=originals)
 
 
 def session_metadata(database_path: Path, session_id: str) -> dict[str, Any] | None:
@@ -775,8 +892,12 @@ def list_practice_history(
                 sessions.created_at,
                 sessions.finished_at,
                 COUNT(answers.answer_id) AS stored_answer_count,
-                AVG(CASE WHEN grade_is_provisional(answers.score_provisional,answers.assessment_json,voice.metadata_json)=0 OR answers.reviewed_at IS NOT NULL
-                    THEN COALESCE(answers.final_score, answers.score) END) AS average_score
+                COUNT(practice_final_score(answers.question_json,answers.assessment_json,answers.score,
+                    answers.final_score,answers.score_provisional,voice.metadata_json,answers.reviewed_at,
+                    answers.grading_pending,sessions.status)) AS scored_answer_count,
+                AVG(practice_final_score(answers.question_json,answers.assessment_json,answers.score,
+                    answers.final_score,answers.score_provisional,voice.metadata_json,answers.reviewed_at,
+                    answers.grading_pending,sessions.status)) AS average_score
             FROM interview_sessions AS sessions
             LEFT JOIN interview_answers AS answers
                 ON answers.session_id = sessions.session_id
@@ -798,6 +919,14 @@ def list_practice_history(
             if item["average_score"] is not None
             else None
         )
+        item["scored_answer_count"] = int(item["scored_answer_count"] or 0)
+        item["unscored_answer_count"] = item["stored_answer_count"] - item["scored_answer_count"]
+        item["scored_only_average"] = item["average_score"]
+        complete = (item["status"] == "completed" and item["stored_answer_count"] > 0
+                    and item["stored_answer_count"] == item["answered_count"]
+                    and item["unscored_answer_count"] == 0)
+        item["score_status"] = "final" if complete else "incomplete"
+        item["final_score"] = item["average_score"] if complete else None
         item["can_view_report"] = item["stored_answer_count"] > 0
         history.append(item)
     return history

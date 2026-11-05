@@ -7,7 +7,7 @@ import httpx
 import pytest
 
 from app.services import evaluator
-from app.services.course_verifier import check_course_point, parse_course_fact
+from app.services.course_verifier import VERSION, check_course_point, parse_course_fact
 from app.services.fact_guard import check_rubric_point
 from app.services.rubric_guidance import grading_guidance
 from tools.prepare_course_grading import check_rule_cases, contrastive_cases, prepare
@@ -32,7 +32,7 @@ def test_course_relations_accept_equivalents_and_reject_wrong_values(subject, po
     assert check_course_point(wrong, point).status == "contradicted"
     result = check_course_point(correct + " " + wrong, point)
     assert result.status == "conflicted"
-    assert result.verification_rule.startswith("course-facts-v1:")
+    assert result.verification_rule.startswith(VERSION + ":")
     assert result.evidence in correct + " " + wrong
 
 

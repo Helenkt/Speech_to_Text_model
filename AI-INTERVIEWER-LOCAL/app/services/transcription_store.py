@@ -12,6 +12,7 @@ from app.database import database
 from app.services.exam_policy import admit_recording, submission_admission, exam_is_open
 from app.services.transcription_vocabulary import transcription_vocabulary
 from app.services.audio_lifecycle import audio_exists
+from app.services.grading_queue import queue_session_grading
 
 
 class TranscriptionError(RuntimeError):
@@ -135,6 +136,8 @@ def expire_stale_sessions(database_path: Path, *, ttl_hours: int = 24) -> int:
               )
             """
         ).rowcount
+        if practice or real:
+            queue_session_grading(connection)
     return int(practice or 0) + int(real or 0)
 
 
@@ -422,6 +425,7 @@ def draft_transcription(database_path: Path, *, session_id: str, user_id: int,
                  "audio_saved": audio_saved,
                  "transcript_status": metadata.get("transcript_status"),
                  "quality_warnings": metadata.get("quality_warnings", []),
+                 "uncertain_spans": metadata.get("uncertain_spans", []),
                  "correction_applied": metadata.get("correction_applied", False),
                  "correction_rejected_reason": metadata.get("correction_rejected_reason")}
     return {"draft": draft, "can_confirm": can_confirm, "can_record": can_record,

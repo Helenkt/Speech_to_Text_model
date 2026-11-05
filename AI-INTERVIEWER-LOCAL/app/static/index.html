@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="AI Interview chạy local với hai vai trò Giáo viên và Ứng viên">
   <title>AI Interview</title>
-  <link rel="stylesheet" href="/static/styles.css?v=1.17.0">
+  <link rel="stylesheet" href="/static/styles.css?v=1.18.11">
 </head>
 
 <body>
@@ -344,6 +344,7 @@
             <label class="transcript-label" for="answerText">Bản chuyển giọng nói</label>
             <textarea id="answerText" maxlength="20000" readonly aria-label="Bản chuyển giọng nói"
               placeholder="Bản chuyển giọng nói sẽ xuất hiện tại đây..."></textarea>
+            <p id="transcriptUncertainty" class="inline-feedback hidden" role="status"></p>
             <div class="answer-footer">
               <span id="charCount" class="hidden">0 ký tự</span>
               <div class="voice-control">
@@ -426,16 +427,26 @@
           <button id="refreshSessionGradingButton" class="button secondary hidden" type="button" data-lucide="refresh-cw">Kiểm tra lại</button>
         </section>
         <div id="reportContent">
-        <div class="report-stat-grid">
-          <article><strong id="reportTotalScore">—</strong><span>Tổng điểm đã chấm</span></article>
-          <article><strong id="reportPercentage">—</strong><span>Tỷ lệ điểm</span></article>
-          <article><strong><span id="reportScore">—</span><small>/100</small></strong><span>Trung bình</span></article>
+        <p id="reportCoverage" class="report-coverage" role="status" aria-live="polite"></p>
+        <div id="reportStatGrid" class="report-stat-grid">
+          <article id="reportTotalCard"><strong id="reportTotalScore">—</strong><span>Tổng điểm đã chấm</span></article>
+          <article id="reportPercentageCard"><strong id="reportPercentage">—</strong><span>Tỷ lệ điểm toàn bài</span></article>
+          <article><strong><span id="reportScore">—</span><small id="reportScoreScale">/100</small></strong><span id="reportScoreLabel">Trung bình toàn bài</span></article>
           <article><strong id="reportVerdict">—</strong><span>Kết quả</span></article>
         </div>
         <p id="reportSummaryText" class="report-summary-text"></p>
+        <details id="practiceGradingSection" class="practice-grading-section hidden">
+          <summary>Điểm theo môn và năng lực <small>/10</small></summary>
+          <p id="practiceSessionGrade" class="report-coverage"></p>
+          <h3>Theo môn học</h3>
+          <div class="table-wrap"><table class="practice-grading-table"><thead><tr><th scope="col">Môn học</th><th scope="col">Điểm /10</th><th scope="col">Đã chấm</th><th scope="col">Trạng thái</th></tr></thead><tbody id="practiceSubjectRows"></tbody></table></div>
+          <h3>Theo năng lực</h3>
+          <div class="table-wrap"><table class="practice-grading-table"><thead><tr><th scope="col">Năng lực</th><th scope="col">Điểm /10</th><th scope="col">Đã chấm</th><th scope="col">Trạng thái</th></tr></thead><tbody id="practiceCompetencyRows"></tbody></table></div>
+        </details>
         <section class="report-feedback-section"><h2>Điểm mạnh</h2><ul id="strengthList"></ul></section>
         <section class="report-feedback-section"><h2>Cần cải thiện</h2><ul id="gapList"></ul></section>
-        <details class="report-competencies"><summary>Tổng hợp năng lực</summary><div id="competencyRows"></div></details>
+        <section id="practiceNextStepsSection" class="report-feedback-section hidden"><h2>Luyện tập tiếp theo</h2><p>Nhận xét dựa trên các câu trong phiên này.</p><div id="practiceNextSteps"></div></section>
+        <details id="reportLegacyCompetencies" class="report-competencies"><summary>Tổng hợp năng lực</summary><div id="competencyRows"></div></details>
         <section class="report-question-section"><h2>Chi tiết từng câu</h2><div id="answerDetails"></div></section>
         </div>
         <div class="report-dialog-footer"><button id="reportBackButton" class="button secondary" type="button">Đóng báo cáo</button></div>
@@ -444,7 +455,7 @@
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/static/app.js?v=1.17.0" defer></script>
+  <script src="/static/app.js?v=1.18.11" defer></script>
 </body>
 
 </html>

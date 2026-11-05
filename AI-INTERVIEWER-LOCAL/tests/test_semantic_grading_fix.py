@@ -35,7 +35,7 @@ def test_weak_evidence_is_not_a_final_wrong_answer_and_strong_support_can_finali
     test_settings.rubric_transformer_path = tmp_path
     (tmp_path / "tokenizer.json").write_text("{}", encoding="utf-8")
     monkeypatch.setattr(evaluator, "evaluate_with_transformer", lambda *_args, **_kwargs: {
-        "point_assessments": [{"probabilities": probabilities}]})
+        "acceptance_eligible": True, "point_assessments": [{"probabilities": probabilities, "truncated": False}]})
     question = {**QUESTION, "key_points": POINTS[:1]}
     result = evaluator._coerce_llm_result({"point_assessments": [
         {"point": POINTS[0], "status": "met", "evidence_quote": "A plain explanation"}]},
@@ -206,8 +206,8 @@ def test_saved_calibration_is_not_bypassed_for_llm_evidence(test_settings, tmp_p
     test_settings.rubric_transformer_path = tmp_path
     (tmp_path / "tokenizer.json").write_text("{}", encoding="utf-8")
     monkeypatch.setattr(evaluator, "evaluate_with_transformer", lambda *_args, **_kwargs: {
-        "acceptance_threshold": .95, "point_assessments": [
-            {"probabilities": {"entailment": .93, "neutral": .05, "contradiction": .02}}]})
+        "acceptance_eligible": True, "acceptance_threshold": .95, "point_assessments": [
+            {"probabilities": {"entailment": .93, "neutral": .05, "contradiction": .02}, "truncated": False}]})
     question = {**QUESTION, "key_points": POINTS[:1]}
     result = evaluator._coerce_llm_result({"point_assessments": [
         {"point": POINTS[0], "status": "met", "evidence_quote": "A plain explanation"}]},

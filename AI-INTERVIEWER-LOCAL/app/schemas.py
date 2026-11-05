@@ -23,6 +23,11 @@ class SubmitAnswerRequest(BaseModel):
     transcription_id: str | None = Field(default=None, max_length=64)
 
 
+class PracticeAgainRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    answer_id: int | None = Field(default=None, gt=0, strict=True)
+
+
 class ConfirmRecordingRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     preview_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
