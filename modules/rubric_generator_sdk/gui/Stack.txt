@@ -1,0 +1,2 @@
+câu hỏi: Định nghĩa Stack?
+câu trả lời: Stack là cấu trúc dữ liệu tuyến tính hoạt động theo nguyên tắc LIFO: phần tử thêm vào sau cùng được lấy ra trước tiên. Việc thêm và lấy phần tử đều thực hiện tại đỉnh Stack.
