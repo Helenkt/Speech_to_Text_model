@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rubric-generator-sdk"
+version = "1.0.0"
+description = "Local question and reference answer to rubric drafts, using the V15 engine"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2.10,<3"]
+
+[project.scripts]
+rubric-generator = "rubric_generator_sdk.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rubric_generator_sdk = ["*.json"]

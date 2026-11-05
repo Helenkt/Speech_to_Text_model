@@ -1,0 +1,60 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "question": {
+      "maxLength": 6000,
+      "minLength": 1,
+      "title": "Question",
+      "type": "string"
+    },
+    "reference_answer": {
+      "maxLength": 6000,
+      "minLength": 1,
+      "title": "Reference Answer",
+      "type": "string"
+    },
+    "question_id": {
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$",
+      "title": "Question Id",
+      "type": "string",
+      "description": "Optional; server should supply a unique question ID, otherwise SDK derives it from normalized input."
+    },
+    "total_units": {
+      "default": 1000,
+      "maximum": 100000,
+      "minimum": 100,
+      "title": "Total Units",
+      "type": "integer"
+    },
+    "units_per_point": {
+      "const": 100,
+      "default": 100,
+      "title": "Units Per Point",
+      "type": "integer"
+    },
+    "task_budgets_units": {
+      "anyOf": [
+        {
+          "patternProperties": {
+            "^[A-Za-z][A-Za-z0-9_]{0,63}$": {
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Budgets Units"
+    }
+  },
+  "required": [
+    "question",
+    "reference_answer"
+  ],
+  "title": "RubricGeneratorRequest",
+  "type": "object"
+}

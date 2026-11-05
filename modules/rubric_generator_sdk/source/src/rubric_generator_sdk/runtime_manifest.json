@@ -1,0 +1,21 @@
+{
+  "files": {
+    "__init__.py": "228bc71d26adcf5a354b60c1a97df78be16375025d1569b3bbf0355c5d970c7c",
+    "__main__.py": "79ee6f134c5c5193377cf9b189cbdcc3e2095e49ba9cec310114441c15a917c4",
+    "_core/__init__.py": "e41adf365b1e248371b687a0da1011cdc458fda517682c255a3456a9a344cc3f",
+    "_core/core.py": "12f6653e9eebc6f188667b1d3c02b3c58131ad4a478effb53d6eff43c073e388",
+    "_core/grounding.py": "a7503cca112c64e16b3d857965ad4c020d3f366a94656a7a4c875f06663e9d32",
+    "_engine/__init__.py": "e41adf365b1e248371b687a0da1011cdc458fda517682c255a3456a9a344cc3f",
+    "_engine/generator.py": "c68d8e028dafad40c7841df6eae963badae6a85c8dc5eb9e393d5361f2222804",
+    "_engine/grounded_contracts.py": "eb5e93acc9823c14eff0254ea494f0635b167d7fd392fa784b856396fc165199",
+    "_engine/quality.py": "0fc94659be7266c2432096f1a17fe4c6696d4f87ca6db65114dcd5366450af71",
+    "_engine/task_scope.py": "060957f50679120037e49e635666879a9bdc95e556dfe758b4b105332e0204bd",
+    "_provenance.json": "820ce955dc10f859a1789e295d07cc981f32ab99427c1cdbae5dddea26c25c67",
+    "_version.py": "f76b2603f3884f6d811e3861bcd24f8f35eb142228264f10bc61840ee90144d7",
+    "api.py": "5292a4d9b755ec50aefd4136260ec157223d2c6973ea95805ddb61ca45248db7",
+    "cli.py": "6f351b5bea371314801c4d7ce8a48f8e36eda9530ce6ef48a81df90817d28edf",
+    "contracts.py": "0e10c823494512d389be1afa6aae9db9ec126367be9bb9c7458b5a241735bdbb",
+    "integrity.py": "ce8e7cb954d6f6e4306b2de47ac938d4eccc951ed18b9f0349297a97e1591201",
+    "locking.py": "eec663f538e7a541c2591cc4814888066e99f4dfe986b678b4cc589958be8a7a"
+  }
+}
