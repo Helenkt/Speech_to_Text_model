@@ -1,6 +1,9 @@
 # Cài đặt và chạy trên máy khác
 
-Đây là hướng dẫn cài thủ công để thử bản mã nguồn từ GitHub. Bộ tự cài một lần bấm chưa được phát hành trong bản này. Chỉ tải ZIP rồi bấm `CHAY_WEB.bat` khi chưa cài thư viện/model thì chưa chạy đầy đủ AI được.
+Đây là hướng dẫn cài thủ công để thử bản mã nguồn từ GitHub. Đã có launcher
+**CAI_DAT_VA_CHAY.bat** tự chuẩn bị môi trường/model rồi mở web; xem
+[ONE_CLICK_SETUP.md](ONE_CLICK_SETUP.md) để biết điều kiện và giới hạn.
+`CHAY_WEB.bat` cũ vẫn chỉ chạy backend, không tự cài thư viện/model.
 
 ## 1. Những gì cần có
 
@@ -35,6 +38,23 @@ py -3.11 -m venv .venv
 ```
 
 Không cần chạy `Activate.ps1`, nên không cần đổi ExecutionPolicy toàn máy. Nếu lệnh `py` không tìm thấy Python, kiểm tra `python --version` và dùng `python -m venv .venv` với đúng phiên bản đã cài. Không tự dùng một Python mới hơn chưa kiểm thử rồi kết luận model bị lỗi.
+
+### Cấu hình riêng của máy
+
+Ứng dụng dùng mặc định nếu chưa có `.env`. Khi cần cấu hình rõ, tạo file từ mẫu
+mà không ghi đè cấu hình đang dùng:
+
+```powershell
+if (-not (Test-Path -LiteralPath .env)) {
+    Copy-Item -LiteralPath .env.example -Destination .env
+}
+```
+
+Mặc định `EVALUATOR_MODE=auto`, `DEFER_GRADING_UNTIL_FINISH=true`,
+`RUNTIME_WARMUP=true`, `INFERENCE_WORKER=true`. Model chỉ chuẩn bị sau khi bắt
+đầu/khôi phục phiên; chấm cuối phiên. Các biến môi trường đã đặt trong cửa sổ
+PowerShell được ưu tiên hơn `.env`. Sau khi sửa cấu hình, dừng rồi chạy lại backend.
+Không đưa `.env` của máy sử dụng thật lên Git.
 
 ## 3. Cài Ollama và tải LLM
 
@@ -137,7 +157,12 @@ $health.ollama
 $health.rubric_transformer
 ```
 
-Database mới có 1.800 câu hỏi và 3 tài khoản demo. Sau setup, Whisper cần `ready=true`; Ollama cần `running=true` và `model_available=true`. `rubric_transformer.installed=true` chỉ xác nhận có file, không chứng minh model đã đạt chất lượng tự chấm. Nếu dùng model gốc thì `production_ready=false` là đúng, không tự sửa thành true.
+Với dữ liệu đi kèm và `AUTO_SEED_DEMO=true`, database mới có 1.800 câu hỏi và 3 tài khoản demo. Database cũ/import riêng có thể khác. Sau setup, Whisper cần `ready=true`; Ollama cần `running=true` và `model_available=true`. `rubric_transformer.installed=true` chỉ xác nhận có file, không chứng minh model đã đạt chất lượng tự chấm. Nếu dùng model gốc thì `production_ready=false` là đúng, không tự sửa thành true.
+
+`speech_to_text.ready` dựa trên dấu kiểm tra setup của đúng cấu hình, không có
+nghĩa model đang thường trú trong RAM. Trạng thái chuẩn bị theo phiên nằm ở
+`runtime_readiness`. Health đọc trạng thái, không tự nạp tất cả model. Đổi profile
+có thể cần chạy lại `app.stt_setup` cho đúng model/device/compute type.
 
 Sau đó đăng nhập sinh viên, bắt đầu luyện tập, kiểm tra mic, ghi âm, xem transcript chỉ đọc, xác nhận từng câu và kết thúc để nhận báo cáo. Không cần Docker, Node.js, npm hoặc tải mô hình ngôn ngữ qua dịch vụ cloud để chạy bản này.
 
@@ -155,6 +180,11 @@ Chức năng giảng viên nhận dạng lại voice dùng `large-v3` và tải 
 
 Chỉ cần khi phát triển/kiểm tra phần mềm:
 
+Cài thêm Node.js và kiểm tra `node --version` nếu muốn chạy đủ các test frontend.
+Những test đó dùng DOM giả lập, không thay thế kiểm thử microphone hoặc giao diện
+trong trình duyệt thật. Không cần npm cho bộ test hiện tại. Nếu thiếu Node, một số
+test sẽ `skip`; không gọi đó là đã kiểm đủ frontend.
+
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
 .\.venv\Scripts\python.exe -m pytest -q
@@ -163,3 +193,30 @@ Chỉ cần khi phát triển/kiểm tra phần mềm:
 Huấn luyện là công việc riêng, cần môi trường `.train-venv` với Python 3.11 và `requirements-training.txt`. Không cài file training vào môi trường ứng dụng: tokenizer của bộ huấn luyện và runtime có ràng buộc khác nhau. Xem `RUBRICGUARD_LITE.md` trước khi fine-tune/xuất ONNX.
 
 Test phần mềm đạt không chứng minh STT hoặc chấm bài đạt một tỷ lệ chính xác cụ thể. Cần kiểm thử audio có transcript chuẩn và câu trả lời được giảng viên duyệt riêng trên máy đích.
+
+## 9. Lỗi thường gặp
+
+| Hiện tượng | Kiểm tra / xử lí |
+| --- | --- |
+| `ERR_CONNECTION_REFUSED` | Backend chưa chạy hoặc đã dừng. Đọc lỗi ở PowerShell, giữ cửa sổ mở và dùng đúng cổng đang chạy. |
+| `WinError 10048`, cổng 8001 đã dùng | Mở ứng dụng đã chạy hoặc đổi lệnh uvicorn sang `--port 8002`; không mở thêm hai backend vào cùng database để thử chữa lỗi cổng. |
+| Không gọi được Ollama / chưa có model | Kiểm tra `/api/tags`, `ollama list` và tải `qwen2.5:3b`; không chỉ cài requirements. |
+| Whisper chưa sẵn sàng, thiếu model/DLL | Chạy lại `app.stt_setup`, xem lỗi cụ thể; thử CPU INT8 theo mục 4 nếu thiếu DLL GPU. |
+| Báo cáo “chưa xác minh”, điểm chưa chốt | Kiểm tra transcript, trạng thái chấm và bằng chứng rubric. Đây không tự động có nghĩa trả lời sai hoặc đã đạt 0 điểm; xem PRACTICE_GRADING.md. |
+| Tải Git nhưng chấm khác máy phát triển | Setup tải Transformer baseline, không phải checkpoint fine-tune; xem mục 5. Cấu hình Whisper/Ollama và phần cứng cũng có thể khác. |
+
+## 10. Cập nhật và sao lưu
+
+Dừng backend trước khi sao lưu/đổi phiên bản. Giữ bản sao `data/ai_interviewer.db`
+và toàn bộ thư mục `data/audio` cùng nhau, cùng `.env` và các đường dẫn storage
+tùy chỉnh nếu có. Sao lưu chỉ database sẽ không giữ được voice cho bước nghe hoặc
+nhận dạng lại. Giữ model và metadata đã kiểm định nếu cần tái lập runtime fine-tune.
+
+Sau khi cập nhật mã, cài lại `requirements.txt` nếu danh sách thay đổi rồi chạy
+backend bằng database hiện có. Ứng dụng có migration schema tự động; không xóa
+database để nâng cấp. Sao lưu trước vì migration không phải công cụ khôi phục
+điểm/voice bị mất. Không commit backup, database hoặc voice cá nhân.
+
+Chức năng xóa trong ứng dụng có thể xóa cả bài làm và voice liên quan. Các file
+JSON nằm ngoài `AI-INTERVIEWER-LOCAL/data` không tự được nhập vào database; dùng
+trang nhập câu hỏi để kiểm tra và đưa thêm dữ liệu vào hệ thống.

@@ -32,14 +32,18 @@ def main() -> None:
             continue
         if not target.exists():
             print(f"Downloading {name}...", flush=True)
-            urllib.request.urlretrieve(f"{base}/{name}", target)
+            partial = target.with_name(target.name + '.download')
+            urllib.request.urlretrieve(f"{base}/{name}", partial)
+            partial.replace(target)
 
     from onnxruntime.quantization import QuantType, quantize_dynamic
 
     fp32 = args.output_dir / "model.onnx"
     if not int8.exists():
         print("Quantizing model to INT8...", flush=True)
-        quantize_dynamic(fp32, int8, weight_type=QuantType.QInt8)
+        partial = int8.with_name(int8.name + '.download')
+        quantize_dynamic(fp32, partial, weight_type=QuantType.QInt8)
+        partial.replace(int8)
     if not args.keep_fp32 and fp32.exists():
         fp32.unlink()
     summary = args.output_dir / "training_summary.json"

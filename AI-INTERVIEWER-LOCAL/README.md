@@ -15,7 +15,14 @@ Các hệ cơ sở dữ liệu, Cấu trúc dữ liệu và giải thuật, và 
 ## 1. Cài đặt và chạy
 
 Hướng dẫn đầy đủ cho máy mới, gồm Python, Ollama, Whisper, Transformer và tài khoản demo:
-**[REQUIREMENTS.md](REQUIREMENTS.md)**. Bản này vẫn cài thủ công, chưa có bộ tự cài một lần bấm.
+**[REQUIREMENTS.md](REQUIREMENTS.md)**. Để tự chuẩn bị môi trường/model và mở web,
+bấm **CAI_DAT_VA_CHAY.bat**; xem [hướng dẫn một lần bấm](ONE_CLICK_SETUP.md).
+Lần đầu cần Internet; Windows thiếu WinGet hoặc bị chặn cài phần mềm cần chuẩn
+bị Python/Ollama thủ công. Đây chưa phải bộ cài `.exe`/gói offline.
+
+Đây là project local cũ, có cả luyện tập và Interview thật. Không dùng Gemini,
+không phải project thi riêng AI-EXAM-HYBRID. Các thay đổi giao diện hiện tại dùng
+asset version `1.18.11`; xem [CHANGELOG.md](CHANGELOG.md).
 
 Yêu cầu đã kiểm thử: Windows 64-bit và Python 3.11. VS Code không bắt buộc.
 Mở PowerShell trong thư mục `AI-INTERVIEWER-LOCAL`, sau đó chạy:
@@ -263,6 +270,13 @@ Giáo viên có hai lựa chọn:
 Hệ thống kiểm tra toàn bộ file trước khi ghi. Nếu có một câu sai cấu trúc, toàn bộ lần import bị hủy.
 Mỗi ngôn ngữ hiện có 900 câu, chia đều 300 câu cho từng mức Easy, Medium và Hard.
 
+Số liệu trên chỉ đếm hai file `data/question_bank_vi.json` và
+`data/question_bank_en.json` đi kèm project. Database đã sử dụng có thể khác sau
+import hoặc duyệt câu mới; xem số thực tại trang quản lí hoặc `/api/health`.
+Các file JSON được tải lên thư mục gốc repository không tự được nhập vào ứng dụng.
+Muốn sử dụng, giảng viên cần nhập file qua trang quản lí câu hỏi; backend sẽ kiểm
+schema trước khi ghi. Không chép đè file khởi tạo rồi cho rằng database cũ đã cập nhật.
+
 ### Rubric sinh câu hỏi bằng LLM
 
 Quy tắc kiểm định câu hỏi do LLM sinh nằm trong
@@ -436,10 +450,17 @@ Xem [PRACTICE_GRADING.md](PRACTICE_GRADING.md) để biết trường API, thang
 cách giữ kết quả chưa xác minh. Giao diện đã nối báo cáo luyện tập, trạng thái
 chấm cuối phiên, phục hồi ghi âm và kết quả chấm lại của giảng viên.
 
+Node.js cần cho các test frontend chạy bằng Node (DOM giả lập và kiểm tra vòng
+đời request/ghi âm); không cần npm hay Node.js để dùng ứng dụng. Thiếu Node có
+thể khiến một số test bị bỏ qua, nên xem cả số `skipped` khi đánh giá kết quả.
+
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
 .\.venv\Scripts\python.exe -m pytest -q
 ```
+
+Hướng dẫn xử lí lỗi cài/chạy và sao lưu nằm cuối [REQUIREMENTS.md](REQUIREMENTS.md).
+Đợt rà soát tài liệu mới nhất: [05/11/2026](docs/DOCUMENTATION_AUDIT_20261105.md).
 
 Database local nằm tại `data/ai_interviewer.db`. Server chỉ lắng nghe `127.0.0.1`, nên mặc định chỉ laptop đang chạy ứng dụng truy cập được.
 

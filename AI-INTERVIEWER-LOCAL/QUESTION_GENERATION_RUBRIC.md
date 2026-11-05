@@ -4,7 +4,7 @@
 
 Rubric này kiểm soát câu hỏi do LLM sinh trước khi đưa vào phiên phỏng vấn. Câu hỏi phải:
 
-- Chỉ sử dụng kiến thức từ `question_bank_vi.json` và `question_bank_en.json`.
+- Chỉ sử dụng nguồn nội bộ trong ngân hàng `learning` được backend chọn. Hai file `data/question_bank_vi.json` và `data/question_bank_en.json` là dữ liệu khởi tạo; nguồn còn có thể đến từ JSON giảng viên nhập vào ngân hàng này.
 - Có độ khó xác định được bằng tiêu chí đo lường, không dựa vào cảm tính.
 - Có các mức `Dễ`, `Trung bình`, `Khó` theo cấu hình đề; lộ trình thích ứng cũ được mô tả riêng ở mục 6.
 - Có đáp án tham chiếu và các ý chấm điểm phù hợp với câu hỏi.

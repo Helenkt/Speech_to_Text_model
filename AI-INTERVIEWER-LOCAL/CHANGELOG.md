@@ -6,6 +6,17 @@ lại bởi ngưỡng chấm mạnh ở 1.18.0. Luồng cuối phiên 1.16.x tha
 điểm trước đó. Các phép đo STT cũ không kèm audio/báo cáo gốc trên Git, không phải
 chứng nhận WER/tốc độ của bản tải mới. Xem README và REQUIREMENTS để cài/chạy hiện tại.
 
+## 1.18.11 — thay đổi tích lũy sau 1.18.0
+
+- Thêm CAI_DAT_VA_CHAY.bat và launcher cài Python/Ollama/thư viện/model còn thiếu, kiểm tra rồi mở web; giữ cấu hình/dữ liệu/model cũ. Chưa kiểm chứng cài sạch trên máy Windows mới.
+- Nối báo cáo luyện tập theo tiêu chí/câu/môn/nhóm năng lực; giữ điểm chưa chốt khi thiếu bằng chứng, không coi trung bình phần đã chấm là điểm cả phiên.
+- Sửa vòng đời ghi âm, khôi phục bản ghi/request và giao diện khi đổi phiên/đăng xuất; tránh callback cũ cập nhật phiên mới.
+- Bổ sung xử lí hàng đợi chấm, thử lại kỹ thuật và khôi phục sau gián đoạn; không ghi đè quyết định giảng viên.
+- Tăng kiểm tra phạm vi bằng chứng, phủ định, quan hệ duyệt cây và thuật ngữ quan trọng giữa các lượt STT; không công bố đây là cải thiện WER đã được đo.
+- Giao diện kết quả đối chiếu điểm chính thức với điểm AI/đang chờ; giữ lịch sử chấm lại và ràng buộc dùng điểm AI.
+- Thêm đường chạy SpecialistGrader ở chế độ shadow, chưa thay bộ chấm chính hoặc ghi điểm thật.
+- Rà soát tài liệu ngày 05/11/2026; đây là tổng hợp thay đổi đã có, không phải một lượt huấn luyện mới. Xem `docs/DOCUMENTATION_AUDIT_20261105.md`.
+
 ## 1.18.0
 
 - Backend chỉ chuẩn bị STT/VAD sau API Bắt đầu hoặc khôi phục phiên đang làm, không nạp model khi mở web/đăng nhập.

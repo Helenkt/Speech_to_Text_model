@@ -13,7 +13,7 @@ bản chép lời. Bộ chấm không thay đổi nội dung giọng nói và kh
 2. MiniLM Transformer ONNX INT8 đối chiếu từng ý trong câu trả lời với từng tiêu chí rubric.
 3. Model trả ba xác suất: `entailment`, `neutral`, `contradiction`.
 4. Các ý vượt ngưỡng tin cậy đã kiểm định được chấm bằng Transformer; Qwen chỉ nhận các ý chưa rõ.
-5. Bài dưới ngưỡng điểm vẫn được đưa vào hàng chờ để giảng viên chấm lại.
+5. Chỉ Interview kiểm tra chính thức có luồng giảng viên chấm lại. Luyện tập do AI chấm; ý chưa đủ bằng chứng giữ trạng thái chưa xác minh, không chuyển giảng viên hoặc tự gán 0.
 
 ## Vì sao dùng kiến trúc này
 
@@ -25,7 +25,7 @@ bản chép lời. Bộ chấm không thay đổi nội dung giọng nói và kh
 ## Bản fine-tune hiện tại
 
 Đã fine-tune trên 364 mẫu tiếng Việt nội bộ, chia theo câu hỏi thành train/validation/test.
-Checkpoint được chọn ở vòng 6. Bản đang dùng nằm tại `models/rubricguard-lite`.
+Checkpoint được chọn ở vòng 6. Artifact của máy phát triển khi đo nằm tại `models/rubricguard-lite`; không suy ra model ở cùng đường dẫn trên máy tải Git là bản fine-tune đó.
 
 | Phép đo trên 72 mẫu test chưa học | Gốc FP32 | Fine-tune FP32 | Fine-tune INT8 weights |
 |---|---:|---:|---:|
